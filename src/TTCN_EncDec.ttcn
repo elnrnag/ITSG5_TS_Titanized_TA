@@ -5,6 +5,8 @@
 * which accompanies this distribution, and is available at
 * http://www.eclipse.org/legal/epl-v10.html
 *
+* This file is compatible with the Titan compiler R4C
+*
 ******************************************************************************/
 
 module TTCN_EncDec {
