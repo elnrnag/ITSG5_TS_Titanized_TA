@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_081b1d3f-e665-472a-abdb-5aad84bc9237\"><a name=\"081b1d3f-e665-472a-abdb-5aad84bc9237\" id=\"id_081b1d3f-e665-472a-abdb-5aad84bc9237\" class=\"requality_id\"><\/a>The field <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">digests&lt;var&gt;<font style=\"font-family: Times New Roman;\"> in the structure of <font style=\"font-family: Courier New;\">request_unrecognized_certificate<font style=\"font-family: Times New Roman;\"> shall be filled with a list of <a href=\"type\">\n<font style=\"font-family: Courier New;\">HashedId3<\/font>\n<\/a> elements of the missing ITS-S certificates. <\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "081b1d3f-e665-472a-abdb-5aad84bc9237"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_7a06b634-841c-48af-97b7-cd46d90ba02d\"><a name=\"7a06b634-841c-48af-97b7-cd46d90ba02d\" id=\"id_7a06b634-841c-48af-97b7-cd46d90ba02d\" class=\"requality_id\"><\/a><img width=\"18\" height=\"1\" border=\"0\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D\" class=\" requality_node id_7a06b634-841c-48af-97b7-cd46d90ba02d\" /><\/span><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_7a06b634-841c-48af-97b7-cd46d90ba02d\"><a name=\"7a06b634-841c-48af-97b7-cd46d90ba02d\" id=\"id_7a06b634-841c-48af-97b7-cd46d90ba02d\" class=\"requality_id\"><\/a>Authorization tickets (pseudonymous certificates)<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "7a06b634-841c-48af-97b7-cd46d90ba02d"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": ""
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "6e2b18ef-2431-48ae-9a10-cae099d89969"
+}

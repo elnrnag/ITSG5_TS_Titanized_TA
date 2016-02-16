@@ -1,0 +1,802 @@
+/**
+ *    @author   ETSI / STF405 / STF449
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CAM/LibItsCam_Templates.ttcn $
+ *              $Id: LibItsCam_Templates.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     Module containing base template definitions for CAM
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCam_Templates {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TypesAndValues all;
+    
+    // LibItsCam
+    import from LibItsCam_TestSystem all;
+    import from LibItsCam_TypesAndValues all;
+    
+    group camPrimitives {
+        
+        /**
+         * @desc    Receive template for CAM Message (CamPort Primitive)
+         * @param   p_camMsg    Expected CAM Message
+         */
+        template CamInd mw_camInd (
+            in template (present) CAM p_camMsg
+        ) := { 
+            msgIn := p_camMsg,
+            gnNextHeader := *,
+            gnHeaderType := *,
+            gnHeaderSubtype := *,
+            gnLifetime := *,
+            gnTrafficClass := *,
+            btpDestinationPort := *,
+            btpInfo := * 
+        };
+        
+        /**
+         * @desc    Receive template for CAM Message (CamPort Primitive)
+         * @param   p_camMsg            Expected CAM Message
+         * @param   p_gnNextHeader      GN next header value
+         * @param   p_gnHeaderType      GN header type value
+         * @param   p_gnHeaderSubtype   GN header subtype value
+         * @param   p_gnLifetime        GN packet lifetime value (ms)
+         * @param   p_gnTrafficClass    GN traffic class value
+         */
+        template CamInd mw_camIndWithGnParameters (
+            in template (present) CAM p_camMsg,
+            in template UInt8 p_gnNextHeader := *,
+            in template UInt8 p_gnHeaderType := *,
+            in template UInt8 p_gnHeaderSubtype := *,
+            in template UInt32 p_gnLifetime := *,
+            in template UInt8 p_gnTrafficClass := *
+        ) modifies mw_camInd := { 
+            gnNextHeader := p_gnNextHeader,
+            gnHeaderType := p_gnHeaderType,
+            gnHeaderSubtype := p_gnHeaderSubtype,
+            gnLifetime := p_gnLifetime,
+            gnTrafficClass := p_gnTrafficClass    
+        };
+        
+        /**
+         * @desc    Receive template for CAM Message (CamPort Primitive)
+         * @param   p_camMsg                Expected CAM Message
+         * @param   p_btpDestinationPort    BTP destination port value
+         * @param   p_btpInfo               BTP destination port info value (if BTP-B) or BTP source port value (if BTP-A)
+         */
+        template CamInd mw_camIndWithBtpParameters (
+            in template (present) CAM p_camMsg,
+            in template UInt16 p_btpDestinationPort := *,
+            in template UInt16 p_btpInfo := *
+        ) modifies mw_camInd := { 
+            btpDestinationPort := p_btpDestinationPort,
+            btpInfo := p_btpInfo     
+        };
+
+        /**
+         * @desc    Send template for CAM Message (CamPort Primitive)
+         * @param   p_camMsg CAM Message to be received
+         */    
+        template (value) CamReq m_camReq (
+            in template (value) CAM p_camMsg
+        ) := { 
+            msgOut := p_camMsg 
+        };
+        
+        group camUtPrimitives {
+            
+            /**
+             * @desc Initializes the CAM IUT. 
+             */
+            template (value) UtInitialize m_camInitialize := {
+                hashedId8 := '0000000000000000'O
+            }
+            
+            /**
+             * @desc Change the curvature
+             * @param p_offset The curvature value offset
+             */
+            template (value) UtCamTrigger m_changeCurvature(CurvatureValue p_changeCurvature) := {
+                changeCurvature := p_changeCurvature
+            }
+            
+            /**
+             * @desc Change the speed
+             * @param p_offset The speed value offset
+             */
+            template (value) UtCamTrigger m_changeSpeed(Int16 p_changeSpeed) := {
+                changeSpeed := p_changeSpeed
+            }
+            
+            /**
+             * @desc Set the acceleration control status
+             * @param p_status The status to set
+             */
+            template (value) UtCamTrigger m_setAccelerationControlStatus(AccelerationControl p_status) := {
+                setAccelerationControlStatus := p_status
+            }
+            
+            /**
+             * @desc Set the exterior lights status
+             * @param p_status The status to set
+             */
+            template (value) UtCamTrigger m_setExteriorLightsStatus(ExteriorLights p_status) := {
+                setExteriorLightsStatus := p_status
+            }
+            
+            /**
+             * @desc Change the heading
+             * @param p_offset The heading value offset
+             */
+            template (value) UtCamTrigger m_changeHeading(HeadingValue p_changeHeading) := {
+                changeHeading := p_changeHeading
+            }
+            
+            /**
+             * @desc Set the drive direction
+             * @param p_driveDirection The drive direction
+             */
+            template (value) UtCamTrigger m_setDriveDirection(DriveDirection p_driveDirection) := {
+                setDriveDirection := p_driveDirection
+            }
+            
+            /**
+             * @desc Change the yaw rate
+             * @param p_offset The yaw rate value offset
+             */
+            template (value) UtCamTrigger m_changeYawRate(YawRateValue p_changeYawRate) := {
+                changeYawRate := p_changeYawRate
+            }
+            
+            /**
+             * @desc Set the vehicle role
+             * @param p_vehicleRole The vehicle role
+             */
+            template (value) UtCamTrigger m_setVehicleRole(VehicleRole p_vehicleRole) := {
+                setVehicleRole := p_vehicleRole
+            }
+            
+            /**
+             * @desc Set the dangerous good description
+             * @param p_dangerousGoods The dangerous good description
+             */
+            template (value) UtCamTrigger m_setDangerousGoods(DangerousGoodsBasic p_dangerousGoods) := {
+                setDangerousGoods := p_dangerousGoods
+            }
+            
+        } // end utPrimitives
+        
+    } // end group Primitives
+
+    group positionTemplates {
+        
+        /**
+         * @desc The test system reference position.
+         */
+        template (value) ReferencePosition m_tsPosition := {
+            latitude := f_integer2Latitude(f_getTsLatitude()),
+            longitude := f_integer2Longitude(f_getTsLongitude()),
+            positionConfidenceEllipse := {
+                semiMajorConfidence   := c_semiAxisLengthOneCentimeter,
+                semiMinorConfidence   := c_semiAxisLengthOneCentimeter,
+                semiMajorOrientation  := c_headingValue_wgs84North
+            },
+            altitude := {
+                altitudeValue := c_altitudeValue_seaLevel,
+                altitudeConfidence := unavailable
+            }
+        }
+        
+    } // end positionTemplates
+    
+    /**
+     * @desc    Default Receive template for CAM PDU
+     */
+    template (present) CAM mw_camMsg_any := {
+        header := {
+            protocolVersion := c_protocolVersionCam, 
+            messageID := c_messageIdCam, 
+            stationID := ?
+        },
+        cam := {
+            generationDeltaTime := ?,
+            camParameters := ?
+        }
+    }
+    
+    group camBasicContainer {
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including basic container with 
+         *     given reference position
+         * @param p_referencePosition The reference position
+         */
+        template (present) CAM mw_camMsg_BC_refPos(
+            in template(present) ReferencePosition p_referencePosition
+        ) modifies mw_camMsg_any := {
+            cam := {
+                camParameters := {
+                    basicContainer := {
+                        stationType := ?,
+                        referencePosition := p_referencePosition
+                    },
+                    highFrequencyContainer := ?,
+                    lowFrequencyContainer := *,
+                    specialVehicleContainer := *
+                }
+            }
+        }
+        
+    } // end group camBasicContainer
+    
+    group camHighFrequencyContainer {
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_basicVehicleContainer The including basic vehicle container
+         */
+        template (present) CAM mw_camMsg_HF_BV(
+            in template(present) BasicVehicleContainerHighFrequency p_basicVehicleContainer
+        ) modifies mw_camMsg_any := {
+            cam := {
+                camParameters := {
+                    basicContainer := ?,
+                    highFrequencyContainer := {
+                        basicVehicleContainerHighFrequency := p_basicVehicleContainer
+                    },
+                    lowFrequencyContainer := *,
+                    specialVehicleContainer := *
+                }
+            }
+        }
+        
+        /**
+         * @desc    Default Receive template for basic vehicle container in 
+         *          the high frequency container
+         */
+        template (present) BasicVehicleContainerHighFrequency mw_HF_BV_any := {
+            heading := ?,
+            speed := ?,
+            driveDirection := ?,
+            vehicleLength := ?,
+            vehicleWidth := ?,
+            longitudinalAcceleration := ?,
+            curvature := ?,
+            curvatureCalculationMode := ?,
+            yawRate := ?,
+            accelerationControl := *,
+            lanePosition := *,
+            steeringWheelAngle := *,
+            lateralAcceleration := *,
+            verticalAcceleration := *,
+            performanceClass := *,
+            cenDsrcTollingZone := *
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_curvatureValue The curvature
+         */
+        template(present) BasicVehicleContainerHighFrequency mw_HF_BV_curvature(
+            in template(present) CurvatureValue p_curvatureValue
+        ) modifies mw_HF_BV_any := 
+        {
+            curvature := {
+                curvatureValue := p_curvatureValue,
+                curvatureConfidence := ?
+            }
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_accCtrl The acceleration control
+         */
+        template(present) BasicVehicleContainerHighFrequency mw_HF_BV_accCtrl(
+            in template AccelerationControl p_accCtrl
+        ) modifies mw_HF_BV_any := 
+        {
+            accelerationControl := p_accCtrl
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_headingValue The heading
+         */
+        template(present) BasicVehicleContainerHighFrequency mw_HF_BV_heading(
+            in template(present) HeadingValue p_headingValue
+        ) modifies mw_HF_BV_any := 
+        {
+            heading := {
+                headingValue := p_headingValue,
+                headingConfidence := ?
+            }
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_speedValue The speed
+         */
+        template(present) BasicVehicleContainerHighFrequency mw_HF_BV_speed(
+            in template(present) SpeedValue p_speedValue
+        ) modifies mw_HF_BV_any := 
+        {
+            speed := {
+                speedValue := p_speedValue,
+                speedConfidence := ?
+            }
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_driveDirection The drive direction
+         */
+        template(present) BasicVehicleContainerHighFrequency mw_HF_BV_driveDirection(
+            in template(present) DriveDirection p_driveDirection
+        ) modifies mw_HF_BV_any := 
+        {
+            driveDirection := p_driveDirection
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_yawRateValue The yaw rate
+         */
+        template(present) BasicVehicleContainerHighFrequency mw_HF_BV_yawRate(
+            in template(present) YawRateValue p_yawRateValue
+        ) modifies mw_HF_BV_any := 
+        {
+            yawRate := {
+                yawRateValue := p_yawRateValue,
+                yawRateConfidence := ?
+            }
+        }
+        
+    } // end group camHighFrequencyContainer
+    
+    group camLowFrequencyContainer {
+        
+        /**
+         * @desc Default Receive template for CAM PDU including 
+         *       optional lowFrequencyContainer
+         */
+        template (present) CAM mw_camMsg_LF_any modifies mw_camMsg_any := {
+            cam := {
+                camParameters := {
+                    basicContainer := ?,
+                    highFrequencyContainer := ?,
+                    lowFrequencyContainer := ?,
+                    specialVehicleContainer := *
+                }
+            }
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_basicVehicleContainer The including basic vehicle container
+         */
+        template (present) CAM mw_camMsg_LF_BV(
+            in template(present) BasicVehicleContainerLowFrequency p_basicVehicleContainer := ?
+        ) modifies mw_camMsg_any := {
+            cam := {
+                camParameters := {
+                    basicContainer := ?,
+                    highFrequencyContainer := ?,
+                    lowFrequencyContainer := {
+                        basicVehicleContainerLowFrequency := p_basicVehicleContainer
+                    },
+                    specialVehicleContainer := *
+                }
+            }
+        }
+        
+        /**
+         * @desc    Default Receive template for basic vehicle container in 
+         *          the low frequency container
+         */
+        template (present) BasicVehicleContainerLowFrequency mw_LF_BV_any := {
+            vehicleRole := ?,
+            exteriorLights := ?,
+            pathHistory := ?
+        }
+        
+        /**
+         * @desc
+         *     Receive template for CAM PDU including specific basic vehicle container
+         * @param p_extLights The exterior lights
+         */
+        template(present) BasicVehicleContainerLowFrequency mw_LF_BV_extLights(
+            in template ExteriorLights p_extLights
+        ) modifies mw_LF_BV_any := 
+        {
+            exteriorLights := p_extLights
+        }
+        
+    } // end group camLowFrequencyContainer
+    
+    group camSpecialVehicleContainer {
+        
+        /**
+         * @desc Default Receive template for CAM PDU including 
+         *       optional specialVehicleContainer
+         */
+        template (present) CAM mw_camMsg_SVC_any modifies mw_camMsg_any := {
+            cam := {
+                camParameters := {
+                    basicContainer := ?,
+                    highFrequencyContainer := ?,
+                    lowFrequencyContainer := *,
+                    specialVehicleContainer := ?
+                }
+            }
+        }
+        
+        /**
+         * @desc Receive template for CAM PDU including optional specialVehicleContainer
+         * @param p_specialVehicleContainer The expected specialVehicleContainer
+         */
+        template (present) CAM mw_camMsg_SVC(
+            in template (present) SpecialVehicleContainer p_specialVehicleContainer
+        ) modifies mw_camMsg_SVC_any := {
+            cam := {
+                camParameters := {
+                    specialVehicleContainer := p_specialVehicleContainer
+                }
+            }
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer public transport
+         */
+        template (present) SpecialVehicleContainer mw_publicTransport_any := {
+            publicTransportContainer := ?
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer special transport
+         */
+        template (present) SpecialVehicleContainer mw_specialTransport_any := {
+            specialTransportContainer := ?
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer dangerous goods
+         */
+        template (present) SpecialVehicleContainer mw_dangerousGoods_any := {
+            dangerousGoodsContainer := ?
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer road works
+         */
+        template (present) SpecialVehicleContainer mw_roadWorks_any := {
+            roadWorksContainerBasic := ?
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer rescue
+         */
+        template (present) SpecialVehicleContainer mw_rescue_any := {
+            rescueContainer := ?
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer emergency
+         */
+        template (present) SpecialVehicleContainer mw_emergency_any := {
+            emergencyContainer := ?
+        }
+        
+        /**
+         * @desc Receive template for specialVehicleContainer safety car
+         */
+        template (present) SpecialVehicleContainer mw_safetyCar_any := {
+            safetyCarContainer := ?
+        }
+        
+    } //end group camSpecialVehicleContainer
+    
+    group camAnyVehicle {
+        
+        /**
+         * @desc    Send template for Vehicle CAM PDU
+         * @param   p_stationId Station ID of the source
+         * @param   p_generationTime Timestamp of the generated message
+         * @param   p_referencePosition Position of the sending station
+         */
+        template (value) CAM m_camMsg_vehicle_HF_BV(
+            StationID p_stationId,
+            GenerationDeltaTime p_generationTime,
+            template (value) ReferencePosition p_referencePosition
+        ) := {
+            header := {
+                protocolVersion := c_protocolVersionCam,
+                messageID := c_messageIdCam,
+                stationID := p_stationId
+            },
+            cam := {
+                generationDeltaTime := p_generationTime,
+                camParameters := {
+                    basicContainer := {
+                        stationType := c_stationType_passengerCar,
+                        referencePosition := p_referencePosition
+                    },
+                    highFrequencyContainer := {
+                        basicVehicleContainerHighFrequency := {
+                            heading := {
+                                headingValue := c_headingValue_wgs84North, //0
+                                headingConfidence := 10
+                            },
+                            speed := {
+                                speedValue := 45,
+                                speedConfidence := 5
+                            },
+                            driveDirection := forward,
+                            vehicleLength := {
+                                vehicleLengthValue := 50,
+                                vehicleLengthConfidenceIndication := noTrailerPresent
+                            },
+                            vehicleWidth := 21,
+                            longitudinalAcceleration := {
+                                longitudinalAccelerationValue := c_longitudinalAccelerationValue_unavailable,
+                                longitudinalAccelerationConfidence := c_accelerationConfidence_unavailable
+                            },
+                            curvature := {
+                                curvatureValue := c_curvatureValue_straight,
+                                curvatureConfidence := unavailable
+                            },
+                            curvatureCalculationMode := yawRateUsed,
+                            yawRate := {
+                                yawRateValue := c_yawRateValue_straight,
+                                yawRateConfidence := unavailable
+                            },
+                            accelerationControl := omit,
+                            lanePosition := omit,
+                            steeringWheelAngle := omit,
+                            lateralAcceleration := omit,
+                            verticalAcceleration := omit, 
+                            performanceClass := omit,
+                            cenDsrcTollingZone := omit
+                        }
+                    },
+                    lowFrequencyContainer := omit,
+                    specialVehicleContainer := omit
+                }
+            }
+        }; // End of template m_camMsg_vehicle_HF_BV
+        
+        /**
+         * @desc    Send template for Vehicle CAM PDU
+         * @param   p_stationId Station ID of the source
+         * @param   p_generationTime Timestamp of the generated message
+         * @param   p_referencePosition Position of the sending station
+         */
+        template (value) CAM m_camMsg_vehicle(
+            StationID p_stationId,
+            GenerationDeltaTime p_generationTime,
+            template (value) ReferencePosition p_referencePosition
+        ) modifies m_camMsg_vehicle_HF_BV := {
+            cam := {
+                camParameters := {
+                    lowFrequencyContainer := {
+                        basicVehicleContainerLowFrequency := {
+                            vehicleRole := default_,
+                            exteriorLights := c_daytimeRunningLightsOn,
+                            pathHistory := {}
+                        }
+                    }
+                }
+            }
+        };
+        
+    } // end camAnyVehicle
+    
+    group camAccelerationControlTemplates {
+        
+        /**
+         * @desc  Receive template for acceleration control with brake padel active on
+         */
+        template AccelerationControl mw_brakePedalActive_On         := '1*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with brake padel active off
+         */
+        template AccelerationControl mw_brakePedalActive_Off        := '0*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with gas padel active on
+         */
+        template AccelerationControl mw_gasPedalActive_On           := '?1*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with gas padel active off
+         */
+        template AccelerationControl mw_gasPedalActive_Off          := '?0*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with emergency brake active on
+         */
+        template AccelerationControl mw_emergencyBrakeActive_On     := '??1*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with emergency brake active off
+         */
+        template AccelerationControl mw_emergencyBrakeActive_Off    := '??0*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with collision warning active on
+         */
+        template AccelerationControl mw_collisionWarningActive_On   := '???1*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with collision warning active off
+         */
+        template AccelerationControl mw_collisionWarningActive_Off  := '???0*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with adaptive cruise control active on
+         */
+        template AccelerationControl mw_accActive_On                := '????1*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with adaptive cruise control active off
+         */
+        template AccelerationControl mw_accActive_Off               := '????0*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with cruise control active on
+         */
+        template AccelerationControl mw_cruiseControl_On            := '?????1*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with cruise control active off
+         */
+        template AccelerationControl mw_cruiseControl_Off           := '?????0*'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with speed limiter active on
+         */
+        template AccelerationControl mw_speedLimiterActive_On       := '*1'B length(7);
+        
+        /**
+         * @desc  Receive template for acceleration control with speed limiter active off
+         */
+        template AccelerationControl mw_speedLimiterActive_Off      := '*0'B length(7);
+        
+    } // end group camAccelerationControlTemplates
+    
+    group camExteriorLightsTemplates {
+        
+        /**
+         * @desc  Receive template for exterior lights with low beam lights off  
+         */
+        template ExteriorLights mw_lowBeamLightsOff := '0*'B length (8);
+      
+        /**
+         * @desc  Receive template for exterior lights with low beam lights on 
+         */
+        template ExteriorLights mw_lowBeamLightsOn          := '1*'B length(8);
+      
+        /**
+         * @desc  Receive template for exterior lights with high beam lights off 
+         */
+        template ExteriorLights mw_highBeamLightsOff        := '?0*'B length(8);
+      
+        /**
+         * @desc  Receive template for exterior lights with high beam lights on 
+         */
+        template ExteriorLights mw_highBeamLightsOn         := '?1*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with left turn signal off 
+         */
+        template ExteriorLights mw_leftTurnSignalOff        := '??0*'B length(8);
+      
+        /**
+         * @desc  Receive template for exterior lights with left turn signal on 
+         */
+        template ExteriorLights mw_leftTurnSignalOn         := '??1*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with right turn signal off 
+         */
+        template ExteriorLights mw_rightTurnSignalOff       := '???0*'B length(8);
+        /**
+         * @desc  Receive template for exterior lights with right turn signal on 
+         */
+        template ExteriorLights mw_rightTurnSignalOn        := '???1*'B length(8); 
+        
+        /**
+         * @desc  Receive template for exterior lights with day time running lights off 
+         */
+        template ExteriorLights mw_daytimeRunningLightsOff  := '????0*'B length(8);
+        /**
+         * @desc  Receive template for exterior lights with day time running lights on 
+         */
+        template ExteriorLights mw_daytimeRunningLightsOn   := '????1*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with reverse light off 
+         */
+        template ExteriorLights mw_reverseLightOff          := '?????0*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with reverse light on 
+         */
+        template ExteriorLights mw_reverseLightOn           := '?????1*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with fog light off 
+         */
+        template ExteriorLights mw_fogLightOff              := '??????0*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with fog light on 
+         */
+        template ExteriorLights mw_fogLightOn               := '??????1*'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with parking lights off 
+         */
+        template ExteriorLights mw_parkingLightsOff         := '*0'B length(8);
+         
+        /**
+         * @desc  Receive template for exterior lights with parking lights on 
+         */
+        template ExteriorLights mw_parkingLightsOn          := '*1'B length(8);
+        
+        /**
+         * @desc  Receive template for exterior lights with hazard lights on 
+         */
+        template ExteriorLights mw_hazardConditionOn        := '??11*'B length(8);
+        
+    } // end group exteriorLights
+    
+    group camTemplateFunctions {
+        
+        /**
+         * @desc Converts an integer to Longitude
+         * @param p_longitude The integer value
+         * @return The longitude value
+         */
+        function f_integer2Longitude(in integer p_longitude) return Longitude {
+            
+            var Longitude v_longitude := f_abs(p_longitude);
+            
+            return v_longitude;
+        }
+        
+        /**
+         * @desc Converts an integer to Latitude
+         * @param p_latitude The integer value
+         * @return The latitude value
+         */
+        function f_integer2Latitude(in integer p_latitude) return Latitude {
+            
+            var Latitude v_latitude := f_abs(p_latitude);
+            
+            return v_latitude;
+        }
+        
+    } // end camTemplateFunctions
+
+} // end LibItsCam_Templates

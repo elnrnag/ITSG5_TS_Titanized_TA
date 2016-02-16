@@ -1,0 +1,185 @@
+-- ############################################################################
+-- Contains definitions from DSRC moved to a separate module to avoid circ. ref.
+-- 
+-- Begin module: DSRC2
+-- 
+-- ^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-
+-- ############################################################################
+
+DSRC2 DEFINITIONS AUTOMATIC TAGS::= BEGIN 
+
+
+
+IMPORTS
+
+	Latitude, Longitude
+    	FROM ITS-Container
+
+	Reg-NodeOffsetPoint
+
+	FROM REGION;
+
+-- =============================================================================
+-- DE_PrioritizationResponseStatus (Desc Name) Record 104
+PrioritizationResponseStatus ::= ENUMERATED {
+   unknown     (0),
+               -- unknown state
+   requested   (1),
+               -- this prioritization request was detected 
+               -- by the traffic controller.
+			   
+   processing  (2),
+               -- checking request 
+               -- (request is in queue, others requests are prior).
+			   
+   watchOtherTraffic (3),
+               -- can not give full permission, 
+               -- therefore watch for other traffic.
+			   
+   granted     (4),
+               -- intervention was successful 
+               -- and now prioritization is active.
+			   
+   rejected    (5),
+               -- the prioritization or preemption request was 
+               -- rejected by the traffic controller.
+			   
+   maxPresence (6)
+               -- request has exceeded maxPresence time
+   }
+
+
+
+-- =============================================================================
+-- DE_SignalGroupID (Desc Name) Record 121
+SignalGroupID ::= INTEGER (0..255) 
+    -- The value 0 shall be used when the ID is
+    -- not available or not known
+    -- the value 255 is reserved to indicate a 
+    -- permanent green movement state
+    -- therefore a simple 8 phase signal controller 
+    -- device might use 1..9 as its groupIDs
+
+
+-- =============================================================================
+-- DF_NodeOffsetPoint (Desc Name) Record 50
+NodeOffsetPoint ::=  CHOICE {
+   -- Nodes with X,Y content
+   node-XY1         Node-XY-20b,    -- node is within   5.11m of last node
+   node-XY2         Node-XY-22b,    -- node is within  10.23m of last node
+   node-XY3         Node-XY-24b,    -- node is within  20.47m of last node
+   node-XY4         Node-XY-26b,    -- node is within  40.96m of last node
+   node-XY5         Node-XY-28b,    -- node is within  81.91m of last node
+   node-XY6         Node-XY-32b,    -- node is within 327.67m of last node
+   node-LatLon      Node-LLmD-64b,  -- node is a full 32b Lat/Lon range
+   node-Regional    RegionalNodeOffsetPoint
+                                    -- node which follows is of a 
+                                    -- regional definition type 
+   }
+
+
+
+-- =============================================================================
+-- DF_Regional_NodeOffsetPoint (Desc Name) Record 90
+RegionalNodeOffsetPoint ::=  Reg-NodeOffsetPoint
+ 
+
+-- =============================================================================
+-- DF_Node_XY_20b (Desc Name) Record 52
+Node-XY-20b ::=  SEQUENCE {
+   x  Offset-B10,
+   y  Offset-B10
+   }
+
+   
+-- =============================================================================
+-- DF_Node_XY_22b (Desc Name) Record 53
+Node-XY-22b ::=  SEQUENCE {
+   x  Offset-B11,
+   y  Offset-B11
+   }
+
+   
+-- =============================================================================
+-- DF_Node_XY_24b (Desc Name) Record 54
+Node-XY-24b ::=  SEQUENCE {
+   x  Offset-B12,
+   y  Offset-B12
+   }
+
+   
+-- =============================================================================
+-- DF_Node_XY_26b (Desc Name) Record 55
+Node-XY-26b ::=  SEQUENCE {
+   x  Offset-B13,
+   y  Offset-B13
+   }
+
+   
+-- =============================================================================
+-- DF_Node_XY_28b (Desc Name) Record 56
+Node-XY-28b ::=  SEQUENCE {
+   x  Offset-B14,
+   y  Offset-B14
+   }
+
+   
+-- =============================================================================
+-- DF_Node_XY_32b (Desc Name) Record 57
+Node-XY-32b ::=  SEQUENCE {
+   x  Offset-B16,
+   y  Offset-B16
+   }
+
+
+-- =============================================================================
+-- DF_Node_LLmD_64b (Desc Name) Record 49
+Node-LLmD-64b ::=  SEQUENCE {
+   lon  Longitude,
+   lat  Latitude
+   }
+
+
+-- =============================================================================
+-- DE_Offset_B10 (Desc Name) Record 94
+Offset-B10 ::= INTEGER (-512..511)
+
+ 
+-- =============================================================================
+-- DE_Offset_B11 (Desc Name) Record 95
+Offset-B11 ::= INTEGER (-1024..1023)
+
+ 
+-- =============================================================================
+-- DE_Offset_B12 (Desc Name) Record 96
+Offset-B12 ::= INTEGER (-2048..2047)
+
+ 
+-- =============================================================================
+-- DE_Offset_B13 (Desc Name) Record 97
+Offset-B13 ::= INTEGER (-4096..4095)
+
+ 
+-- =============================================================================
+-- DE_Offset_B14 (Desc Name) Record 98
+Offset-B14 ::= INTEGER (-8192..8191)
+
+ 
+-- =============================================================================
+-- DE_Offset_B16 (Desc Name) Record 99
+Offset-B16 ::= INTEGER (-32768..32767)
+
+ -- =============================================================================
+-- DE_LaneId CHANGED (Desc Name) Record 67
+LaneID ::= INTEGER (0..255)
+   -- the value 0 shall be used when the lane ID is
+   -- not available or not known
+   -- the value 255 is reserved for future use
+
+
+
+
+END 
+-- end of the DSRC2 module.
+ 
+

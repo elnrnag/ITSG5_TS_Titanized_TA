@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_5\"><font style=\"font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\"><a name=\"a2e3634b-2d0b-4e80-8806-c75803dfa0ac\" id=\"id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\" class=\"requality_id\"><\/a>For the field <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">signer_info<\/span><\/font><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">, exactly one of the following types shall be included:<\/span><br /><\/font><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">\n<\/span><\/p><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">\n<\/span><ul xmlns=\"http://www.w3.org/1999/xhtml\" style=\"list-style-type: disc; margin: 0in 0in 0in 0.511806in; padding: 0pt; text-indent: -0.314583in; text-align: left;\"><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">\n<\/span><p class=\"class_35 b1+\"><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">\t<\/span><li class=\"class_36\"><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">\n<\/span><font style=\"font-family: Courier New; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_a2e3634b-2d0b-4e80-8806-c75803dfa0ac\">certificate_digest_with_sha256<\/span><\/font><\/li><\/p><\/ul>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "a2e3634b-2d0b-4e80-8806-c75803dfa0ac"
+}

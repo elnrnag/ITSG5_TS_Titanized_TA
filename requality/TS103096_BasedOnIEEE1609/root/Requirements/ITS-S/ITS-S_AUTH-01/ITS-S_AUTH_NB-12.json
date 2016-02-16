@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S accepts a valid authorization response having correct fields and values."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/4ac26752-656c-4a69-af0c-2c5aa9eb448a"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "268165b0-a411-4acc-8712-a81481a91c8f"
+}

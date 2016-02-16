@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S discards an authorization request error encapsulated into 1609Dot2Data with protocol_version not egal to 2."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/aa4ed425-8e3a-4571-b4ca-51841077309e"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "8cee1d55-3ab7-429f-98d2-24127785a363"
+}

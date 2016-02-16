@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\"><a name=\"e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\" id=\"id_e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\" class=\"requality_id\"><\/a>a timestamp of type <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\">Time64<\/span><\/font><span class=\"requality_text id_e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_e1c8b3e0-5da0-4e8d-8355-563039c7cdc7\">, which shall describe the point in time, when the contents of the security headers are fixed prior to the signing process<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "ba434be6-6d85-421b-9908-4bd047108381"
+}

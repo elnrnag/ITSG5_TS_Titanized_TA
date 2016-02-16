@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_last_generated": {
+            "isGenerated": false,
+            "key": "_last_generated",
+            "origin": "a17a750b-5fb2-40fa-a3df-b729a483b9fb",
+            "type": "STRING",
+            "value": "\\tps.html"
+        },
+        "_root_requiremnt_qid": {
+            "isGenerated": false,
+            "key": "_root_requiremnt_qid",
+            "origin": "a17a750b-5fb2-40fa-a3df-b729a483b9fb",
+            "type": "STRING",
+            "value": "/Requirements/SEC_ITSS"
+        },
+        "_template_id": {
+            "isGenerated": false,
+            "key": "_template_id",
+            "origin": "a17a750b-5fb2-40fa-a3df-b729a483b9fb",
+            "type": "STRING",
+            "value": "com.unitesk.requality.reports.tps"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a17a750b-5fb2-40fa-a3df-b729a483b9fb",
+            "type": "STRING",
+            "value": "ReportData"
+        },
+        "date": {
+            "isGenerated": false,
+            "key": "date",
+            "origin": "a17a750b-5fb2-40fa-a3df-b729a483b9fb",
+            "type": "STRING",
+            "value": "Mon Apr 27 18:11:44 CEST 2015"
+        }
+    },
+    "uuid": "a17a750b-5fb2-40fa-a3df-b729a483b9fb"
+}

@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S generates correctly a generic AuthorizationRequest message."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/ce56005f-4f7e-4a95-b7a8-75d5611fbc8f"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "b566a8cb-67db-4532-9c30-dab06364504d"
+}

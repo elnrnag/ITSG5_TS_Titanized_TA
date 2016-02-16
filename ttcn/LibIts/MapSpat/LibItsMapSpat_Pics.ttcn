@@ -1,0 +1,26 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/MapSpat/LibItsMapSpat_Pics.ttcn $
+ *              $Id: LibItsMapSpat_Pics.ttcn 1031 2014-11-10 13:18:13Z wattelet $
+ *    @desc     MAP SPAT PICS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsMapSpat_Pics {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+
+    group camMapSpatPics {
+
+        /**
+         * @desc Is IUT an RSU  
+         */
+        modulepar boolean PICS_RSU := true;
+    
+    } // end camMapSpatPics
+   
+      
+} // end LibItsMapSpat_Pics

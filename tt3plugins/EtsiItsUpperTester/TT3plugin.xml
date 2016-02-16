@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE plugin PUBLIC "-//TESTING TECH//DTD TT3plugin//2.0" "TT3plugin.dtd"> 
+<plugin id="org.etsi.its.uppertester" name="ETSI Its Upper Tester" provider-name="ETSI" version="1.0.0.0">
+  <runtime>
+    <library name="EtsiItsUpperTester.jar"/>
+    <library name="../../build"/>
+  </runtime>
+  <dependency>
+    <reference id="org.etsi.codec"/>
+  </dependency>
+</plugin>

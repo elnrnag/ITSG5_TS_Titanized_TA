@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "ef85edd1-77a7-46e1-9045-5392cd2abeb6",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "ef85edd1-77a7-46e1-9045-5392cd2abeb6",
+            "type": "STRING",
+            "value": "Check that the secured DENM contains exactly one element of these header fields: signer_info, generation_time, generation_location, message_type. \r\nCheck that the header fields are in the ascending order according to the numbering of the enumeration except of the signer_info, which is encoded first.\r\nCheck that generation_time_with_confidence (generation_time_standard_deviation) is not used"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "ef85edd1-77a7-46e1-9045-5392cd2abeb6",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send DENM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields[0]\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\tcontaining header_fields [n].type\r\n\t\t\t\tindicating value less then header_fields [n+1].type\r\n\t\t\tcontaining header_fields ['generation_time']\r\n\t\t\tcontaining header_fields ['generation_location']\r\n\t\t\tcontaining header_fields ['its_aid'] {\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t\tnot containing header_fields ['generation_time_with_confidence']\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "ef85edd1-77a7-46e1-9045-5392cd2abeb6",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "ef85edd1-77a7-46e1-9045-5392cd2abeb6",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "ef85edd1-77a7-46e1-9045-5392cd2abeb6"
+}

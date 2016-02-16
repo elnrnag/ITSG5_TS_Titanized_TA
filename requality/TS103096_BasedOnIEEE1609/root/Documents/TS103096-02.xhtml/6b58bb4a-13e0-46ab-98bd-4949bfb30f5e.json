@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Arial; font-size: 10pt;\">Enrolment Response acceptance<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "6b58bb4a-13e0-46ab-98bd-4949bfb30f5e"
+}

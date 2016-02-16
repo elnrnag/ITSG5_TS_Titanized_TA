@@ -1,0 +1,389 @@
+/**
+ *  @author   ETSI / STF405
+ *  @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsBTP/ItsBtp_TestCases.ttcn $
+ *            $Id: ItsBtp_TestCases.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *  @desc     Testcases for Basic Transport Protocol (TP version: 0.0.3)
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module ItsBtp_TestCases {
+    
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_Time all;
+    import from LibCommon_VerdictControl all;
+
+    // LibIts
+    import from LibItsBtp_TestSystem all;
+    import from LibItsBtp_Functions all;
+    import from LibItsBtp_Templates all;
+    import from LibItsBtp_Pixits all;
+    import from LibItsBtp_TypesAndValues all;
+    import from LibItsCommon_Functions all;
+    
+    group btpPacketGeneration {
+        
+        group btpBtpA {
+
+        /**
+         * @desc    Checks that BTP-A packets is well-formatted
+         * <pre>        
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when {
+         *          the IUT is requested to send a BTP packet via a BTP-data request
+         *              containing BTP Type
+         *                  indicationg value 'BTP-A'
+         *              containing Source PorT
+         *                  indicating value 'SOURCE_PORT'
+         *              containing Destination Port
+         *                  indicating value 'DESTINATION_PORT'
+         *      }
+         *      then {
+         *          the IUT sends a valid BTP-A packet
+         *              containing source port
+         *                  indicating 'SOURCE_PORT',
+         *              containing destination port
+         *                  indicating 'DESTINATION_PORT',
+         *              containing the Upper Layer payload
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @version 0.0.3
+         * @see     ETSI TS 102 870-2 v1.1.1 TP/BTP/PGA/BV/01
+         */
+        testcase TC_BTP_PGA_BV_01() runs on ItsBtp system ItsBtpSystem {
+
+            // Local variables
+                        
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                                
+            // Test Body
+            f_utTriggerEvent(m_generateBtpA(f_getBtpDstPort(), f_getBtpSrcPort()));
+            tc_ac.start;
+            alt {
+                [] btpPort.receive( mw_btpInd( mw_btpA (f_getBtpDstPort(), f_getBtpSrcPort(), *)))  {
+                    tc_ac.stop;
+                    log("*** TC_BTP_PGA_BV_01: PASS: BTP-A packet correclty received ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                }
+                    
+                [] tc_ac.timeout {
+                    log("*** TC_BTP_PGA_BV_01: INCONC: Expected BTP packet not received ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                }   
+             }
+
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                  
+        }// end TC_BTP_PGA_BV_0
+          
+        } // end btpBtpA
+        
+        group btpBtpB {
+          
+        /**
+         * @desc    Checks that BTP-B packets is well-formatted if Destination Port info is provided
+         * <pre>        
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when {
+         *          the IUT is requested to send a BTP packet via a BTP-data request
+         *              containing BTP Type
+         *                  indicationg value 'BTP-B'
+         *              containing Destination Port
+         *                  indicating value 'DESTINATION_PORT'
+         *              containing Destination Port Info
+         *                  indicating value 'DESTINATION_PORT_INFO'
+         *      }
+         *      then {
+         *          the IUT sends a valid BTP-B packet
+         *              containing Destination Port
+         *                  indicating value 'DESTINATION_PORT'
+         *              containing Destination Port Info
+         *                  indicating value 'DESTINATION_PORT_INFO'
+         *              containing the Upper Layer payload
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @version 0.0.3
+         * @see     ETSI TS 102 870-2 v1.1.1 TP/BTP/PGB/BV/01
+         */
+        testcase TC_BTP_PGB_BV_01() runs on ItsBtp system ItsBtpSystem {
+
+            // Local variables
+                        
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                                
+            // Test Body
+            f_utTriggerEvent(m_generateBtpB(f_getBtpDstPort(), f_getBtpDstPortInfo()));
+            tc_ac.start;
+            alt {
+                [] btpPort.receive( mw_btpInd( mw_btpB (f_getBtpDstPort(), f_getBtpDstPortInfo(), *))) {
+                    tc_ac.stop;
+                    log("*** TC_BTP_PGB_BV_01: PASS: BTP-B packet correclty received ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                }
+                    
+                [] tc_ac.timeout {
+                    log("*** TC_BTP_PGB_BV_01: INCONC: Expected BTP packet not received ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                }   
+             }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                  
+        }// end TC_BTP_PGB_BV_01
+
+        /**
+         * @desc    Checks that BTP-B packets are well-formatted if no Destination Port Info is provided
+         * <pre>        
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when {
+         *          the IUT is requested to send a BTP packet via a BTP-data request
+         *              containing BTP Type
+         *                  indicationg value 'BTP-B'
+         *              containing Destination Port
+         *                  indicating value 'DESTINATION_PORT'
+         *              not containing Destination Port Info parameter
+         *      }
+         *      then {
+         *          the IUT sends a valid BTP-B packet
+         *              containing Destination Port
+         *                  indicating value 'DESTINATION_PORT'
+         *              containing Destination Port Info
+         *                  indicating '0'
+         *              containing the Upper Layer payload
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @version 0.0.3
+         * @see     ETSI TS 102 870-2 v1.1.1 TP/BTP/PGB/BV/02
+         */
+        testcase TC_BTP_PGB_BV_02() runs on ItsBtp system ItsBtpSystem {
+
+            // Local variables
+                        
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                                
+            // Test Body
+            f_utTriggerEvent(m_generateBtpB(f_getBtpDstPort(), 0));
+            tc_ac.start;
+            alt {
+                [] btpPort.receive( mw_btpInd( mw_btpB (f_getBtpDstPort(), 0, *))) {
+                    tc_ac.stop;
+                    log("*** TC_BTP_PGB_BV_02: PASS: BTP-B packet correclty received ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                }
+                
+                [] tc_ac.timeout {
+                    log("*** TC_BTP_PGB_BV_02: INCONC: Expected BTP packet not received ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                }
+             }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                  
+        }// end TC_BTP_PGB_BV_02
+
+        } // end btpBtpB
+        
+    } // end btpPacketGeneration
+    
+    group btpPacketProcessing {
+    
+        group btpValid {
+          
+        /**
+         * @desc    Checks that BTP passes a valid BTP-A packets to the upper protocol entity
+         * <pre>        
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when {
+         *          the IUT receives a valid BTP-A packet
+         *              containing Source Port
+         *                  indicating 'SOURCE_PORT'
+         *              containing Destination Port
+         *                  indicating'DESTINATION_PORT'
+         *              containing the payload
+         *      }
+         *      then {
+         *          the IUT passes the payload to the upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @version 0.0.3
+         * @see     ETSI TS 102 870-2 v1.1.1 TP/BTP/PP/BV/01
+         */
+        testcase TC_BTP_PP_BV_01() runs on ItsBtp system ItsBtpSystem {
+
+            // Local variables
+            var BtpReq v_btpReq;
+            var integer i;
+            
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_btpReq := valueof(m_btpReq( m_btpAWithPorts (f_getBtpDstPort(), f_getBtpSrcPort(), f_getBtpPayload())));
+            btpPort.send(v_btpReq);
+
+            f_sleep(PX_TNOAC);
+            for(i:=0; i < lengthof(vc_utEvents) and not match(v_btpReq.msgOut.payload.rawPayload, vc_utEvents[i].rawPayload); i:=i+1) {
+                // empty on purpose 
+            }
+            if(i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": PASS: BTP was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: BTP was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error);
+            }
+
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                  
+        }// end TC_BTP_PP_BV_01
+          
+        /**
+         * @desc    Checks that BTP passes a valid BTP-B packets to the upper protocol entity
+         * <pre>        
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when {
+         *          the IUT receives a valid BTP-B packet
+         *              containing Destination Port
+         *                  indicating'DESTINATION_PORT'
+         *              containing Destination Port Info
+         *                  indicating'DESTINATION_PORT_INFO'
+         *              containing the payload
+         *      }
+         *      then {
+         *          the IUT passes the payload to the upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @version 0.0.3
+         * @see     ETSI TS 102 870-2 v1.1.1 TP/BTP/PP/BV/02
+         */
+        testcase TC_BTP_PP_BV_02() runs on ItsBtp system ItsBtpSystem {
+
+            // Local variables
+            var BtpReq v_btpReq;
+            var integer i;
+            
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                                
+            // Test Body
+            v_btpReq := valueof(m_btpReq( m_btpBWithPorts (f_getBtpDstPort(), f_getBtpDstPortInfo(), f_getBtpPayload())));
+            btpPort.send(v_btpReq);
+
+            f_sleep(PX_TNOAC);
+            for(i:=0; i < lengthof(vc_utEvents) and not match(v_btpReq.msgOut.payload.rawPayload, vc_utEvents[i].rawPayload); i:=i+1) {
+                // empty on purpose 
+            }
+            if(i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": PASS: BTP was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: BTP was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error);
+            }
+
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                  
+        }// end TC_BTP_PP_BV_02
+          
+        } // end btpValid
+        
+    } // end btpPacketProcessing
+    
+} // end ItsBtp_TestCases

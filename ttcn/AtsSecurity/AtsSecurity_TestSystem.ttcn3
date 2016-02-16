@@ -1,0 +1,37 @@
+/**
+ *  @author     ETSI / STF481
+ *  @version    $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsSecurity/AtsSecurity_TestSystem.ttcn3 $
+ *              $Id: AtsSecurity_TestSystem.ttcn3 1658 2014-10-02 06:12:52Z garciay $
+ *  @desc       Module containing t fest system description for the secured GN ATS
+ *
+ */
+module AtsSecurity_TestSystem { 
+    
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCam_TestSystem all;
+    import from LibItsDenm_TestSystem all;
+    import from LibItsGeoNetworking_TestSystem all;
+    
+    /**
+     * @desc Secured GN test system description
+     * @member acPort               Test Adapter control port
+     * @member geoNetworkingPort    GeoNetworking port
+     * @member utPort               GeoNetworking UT port
+     * @member denmUtPort           DENM UT port
+     * @member cammUtPort           CAM UT port
+     */
+    type component ItsSecSystem {
+        
+        port AdapterControlPort acPort;
+        
+        // NT2 ports
+        port LibItsGeoNetworking_TestSystem.UpperTesterPort utPort;
+        port GeoNetworkingPort geoNetworkingPort;
+        
+        // FA ports
+        port LibItsDenm_TestSystem.UpperTesterPort denmUtPort;
+        port LibItsCam_TestSystem.UpperTesterPort camUtPort;
+        
+    } // end ItsGeoNetworkingSystem
+    
+} // End of module AtsSecurity_TestSystem 

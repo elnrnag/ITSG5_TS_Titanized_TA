@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S generates valid signed data with a certificate containing start_validity field."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/3ab404a7-f606-430c-9408-430ba13e347a"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "c8ff2c90-1f72-46f1-8071-05e9d8873d33"
+}

@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/6b58bb4a-13e0-46ab-98bd-4949bfb30f5e"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "02. Enrolment Response acceptance"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "99f1e785-8df6-4680-b09c-6be793f528c0"
+}

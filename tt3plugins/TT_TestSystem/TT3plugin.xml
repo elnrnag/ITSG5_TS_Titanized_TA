@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE plugin PUBLIC "-//TESTING TECH//DTD TT3plugin//2.0" "TT3plugin.dtd"> 
+<plugin id="com.testingtech.ttworkbench" name="Testing Technologies TTworkbench Integration" provider-name="Testing Technologies IST GmbH" version="1.0.0.0">
+  <runtime>
+    <library name="TT_TestSystem.jar"/>
+    <library name="../../build"/>
+  </runtime>
+  <dependency>
+    <reference id="org.etsi.its.codec.tool.testingtech.LibItsCam_asn1"/>
+    <reference id="org.etsi.its.codec.tool.testingtech.LibItsDenm_asn1"/>
+    <reference id="org.etsi.its.codec.tool.testingtech.LibItsCdd_asn1"/>
+    <reference id="org.etsi.its.codec.tool.testingtech.LibItsMapSpat_asn1"/>
+    <reference id="org.etsi.its.tool.testingtech.Its_CodecProvider"/>
+    <reference id="org.etsi.its.tool.testingtech.LibItsV2G_TypesAndValuesCodec"/>
+    <reference id="org.etsi.its.ttcn.ItsExternalFunctionsProvider"/>
+    <reference id="org.etsi.its.adapter"/>
+    <reference id="org.etsi.ttcn.codec"/>
+  </dependency>
+  <extension point="com.testingtech.ttcn.extension.CodecProvider">
+    <parameter id="class" value="org.etsi.its.tool.testingtech.Its_CodecProvider"/>
+    <parameter id="name" value="Main ITS Codec"/>
+    <parameter id="description" value="Main ITS Codec"/>
+  </extension>
+  <extension point="com.testingtech.ttcn.extension.CodecProvider">
+    <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsDenm_asn1.LibItsDenm_asn1PERCanonicalUnalignedCodecProvider"/>
+    <parameter id="encoding" value="LibItsDenm_asn1"/>
+    <parameter id="name" value="DENM ASN.1 Codec"/>
+    <parameter id="description" value="ASN.1 External Codec (DENM)"/>
+  </extension>
+  <extension point="com.testingtech.ttcn.extension.CodecProvider">
+    <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsCam_asn1.LibItsCam_asn1PERCanonicalUnalignedCodecProvider"/>
+    <parameter id="encoding" value="LibItsCam_asn1"/>
+    <parameter id="name" value="CAM ASN.1Codec"/>
+    <parameter id="description" value="ASN.1 External Codec (CAM)"/>
+  </extension>
+  <extension point="com.testingtech.ttcn.extension.CodecProvider">
+    <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsCdd_asn1.LibItsCdd_asn1PERCanonicalUnalignedCodecProvider"/>
+    <parameter id="encoding" value="LibItsCdd_asn1"/>
+    <parameter id="name" value="CDD ASN.1 Codec"/>
+    <parameter id="description" value="ASN.1 External Codec (CDD)"/>
+  </extension>  
+  <extension point="com.testingtech.ttcn.extension.CodecProvider">
+    <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsMapSpat_asn1.LibItsMapSpat_asn1PERCanonicalUnalignedCodecProvider"/>
+    <parameter id="encoding" value="LibItsMapSpat_asn1"/>
+    <parameter id="name" value="MAP/SPaT ASN.1 Codec"/>
+    <parameter id="description" value="ASN.1 External Codec (MapSpat)"/>
+  </extension>  
+  <extension point="com.testingtech.ttcn.extension.ExternalFunctionsProvider">
+    <parameter id="class" value="org.etsi.its.tool.testingtech.ExternalFunctionsPluginProvider"/>
+    <parameter id="name" value="Its External Function"/>
+    <parameter id="description" value="The implementation of the external functions defined in the ITS project."/>
+  </extension>
+  <extension point="com.testingtech.ttcn.tri.extension.PortPluginProvider">
+    <parameter id="class" value="org.etsi.its.tool.testingtech.PluginAdapter"/>
+    <parameter id="taParams">
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="DEBUG_ENABLED"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="ALL"/>
+        <parameter id="description" value="Set to ALL/INFO/OFF to activate full/medium/no traces"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="camPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="CamSource"/>
+        <parameter id="description" value="Define the port/layer configuration for CAM"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="denmPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="DenmSource"/>
+        <parameter id="description" value="Define the port/layer configuration for DENM"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="mapSpatPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="MapSpatSource"/>
+        <parameter id="description" value="Define the port/layer configuration for MAP/SPaT"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="btpPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BtpSource"/>
+        <parameter id="description" value="Define the port/layer configuration for BTP"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="geoNetworkingPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="GnSource"/>
+        <parameter id="description" value="Define the port/layer configuration for GeoNetworking"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="ipv6OverGeoNetworkingPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="Gn6Source"/>
+        <parameter id="description" value="Define the port/layer configuration for GeoNetworking over IPv6"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="v2gPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="Debug"/>
+        <parameter id="description" value="Define the port/layer configuration for V2G"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="UpperTesterSettings"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="192.168.56.11:2222"/>
+        <parameter id="description" value="Define the Upper Tester settings for communication with Upper Tester"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LocalEthernetMAC"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="0025645B0CED"/>
+        <parameter id="description" value="Define the MAC address of the Ethernet interface connected to the IUT device"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="IutEthernetTypeValue"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="0x8947"/>
+        <parameter id="description" value="Define the Ethernet type value used by the IUT"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LinkLayer_NodeA"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BABEBABE0001"/>
+        <parameter id="description" value="Link-Layer address of component NodeA"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LinkLayer_NodeB"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BABEBABE0002"/>
+        <parameter id="description" value="Link-Layer address of component NodeB"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LinkLayer_NodeC"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BABEBABE0003"/>
+        <parameter id="description" value="Link-Layer address of component NodeC"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LinkLayer_NodeD"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BABEBABE0004"/>
+        <parameter id="description" value="Link-Layer address of component NodeD"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LinkLayer_NodeE"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BABEBABE0005"/>
+        <parameter id="description" value="Link-Layer address of component NodeE"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="LinkLayer_NodeF"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="BABEBABE0006"/>
+        <parameter id="description" value="Link-Layer address of component NodeF"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="Gn6RemoteAdapterIp"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="192.168.56.11"/>
+        <parameter id="description" value="IP address of GN6 remote Adapter"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="Gn6RemoteAdapterPort"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="42000"/>
+        <parameter id="description" value="UDP port of GN6 remote Adapter"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsBeaconInterval"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="1000"/>
+        <parameter id="description" value="Interval between each beacon sent by TS (ms)"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsLatitude"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="7000"/>
+        <parameter id="description" value="Latitude of Test System"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsLongitude"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="520000"/>
+        <parameter id="description" value="Longitude of Test System"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="V2gTsRole"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="SECC"/>
+        <parameter id="description" value="Is TS SECC or EVCC"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="V2gSeccAddress"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="FE80::1"/>
+        <parameter id="description" value="V2gSeccAddress"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="V2gSeccPort"/>
+        <parameter id="type" value="integer"/>
+        <parameter id="default" value="32000"/>
+        <parameter id="description" value="V2gSeccPort"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="UtSecuredMode"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="false"/>
+        <parameter id="description" value="UpperTester Secured mode status"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsSecuredMode"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="false"/>
+        <parameter id="description" value="Secured mode status"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsSecuredRootPath"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value=""/>
+        <parameter id="description" value="Secured root path to access certificates and private keys"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsSecuredConfiId"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value=""/>
+        <parameter id="description" value="Secured configuration identifier"/>
+      </parameter>
+      <parameter id="taParamDeclaration">
+        <parameter id="name" value="TsItsAidOther"/>
+        <parameter id="type" value="charstring"/>
+        <parameter id="default" value="38"/>
+        <parameter id="description" value="ITS-AID for other profile"/>
+      </parameter>
+    </parameter>
+    <parameter id="name" value="ITS System Adapter"/>
+    <parameter id="description" value="The ITS System Adapter providing the communication functionality to and from the SUT."/>
+  </extension>
+</plugin>

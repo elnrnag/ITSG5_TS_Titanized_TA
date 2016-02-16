@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S generates valid authorization request with a certificate containing 1 to 8 entries in the permissions_list field. "
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/5b73398e-da91-4cac-9375-9f2ae5af68c8"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "44143128-4ab8-4da1-8841-bc6fcd4f93bb"
+}

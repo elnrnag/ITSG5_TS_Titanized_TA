@@ -1,0 +1,27 @@
+/**
+ *	@author 	ETSI / STFS46
+ *  @version 	$URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/V2G/LibItsV2G_Pics.ttcn $
+ *				$Id: LibItsV2G_Pics.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *	@desc		V2G PICS
+ *
+ */
+module LibItsV2G_Pics {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    
+    group v2gPics {
+        
+        
+        // E X A M P L E
+        /**
+         * @desc EVCC sequence performance time 
+         * @see  PICS doc v1.1.1 A.2/1 
+         */
+		modulepar float PICS_EVCC_SEQUENCE_PERFORMANCE_TIME := 10.0;
+
+
+    	        
+    } // end v2gPics
+    
+} // end LibItsV2G_Pics

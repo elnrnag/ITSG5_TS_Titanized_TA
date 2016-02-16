@@ -1,0 +1,207 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/GeoNetworking/LibItsGeoNetworking_Pixits.ttcn $
+ *              $Id: LibItsGeoNetworking_Pixits.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       GeoNetworking PICS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsGeoNetworking_Pixits {
+    
+    // LibCommon
+    import from LibCommon_DataStrings all;
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from LibItsGeoNetworking_TypesAndValues all;
+    
+    group geoNetworkingPixits {
+        
+        group gnAddresses {
+            
+            /**
+             * @desc GeoNetworking address of the GeoAdhoc router node A
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar GN_Address PX_TS_NODE_A_LOCAL_GN_ADDR := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := int2oct(10,6)
+            };
+            
+            /**
+             * @desc GeoNetworking address of the GeoAdhoc router node B
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar GN_Address PX_TS_NODE_B_LOCAL_GN_ADDR := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := int2oct(11,6)
+            };
+            
+            /**
+             * @desc GeoNetworking address of the GeoAdhoc router node C
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar GN_Address PX_TS_NODE_C_LOCAL_GN_ADDR := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := int2oct(12,6)
+            };
+            
+            /**
+             * @desc GeoNetworking address of the GeoAdhoc router node D
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar GN_Address PX_TS_NODE_D_LOCAL_GN_ADDR := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := int2oct(13,6)
+            };
+            
+            /**
+             * @desc GeoNetworking address of the GeoAdhoc router node E
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar GN_Address PX_TS_NODE_E_LOCAL_GN_ADDR := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := int2oct(14,6)
+            };
+            
+            /**
+             * @desc GeoNetworking address of the GeoAdhoc router node F
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar GN_Address PX_TS_NODE_F_LOCAL_GN_ADDR := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := int2oct(15,6)
+            };
+
+        } // end gnAddresses
+        
+        group congestionControl {
+            
+            /**
+             * @desc    Nr of neighbour limit to enter the "medium" congestion status value
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_MIN_NR_NEIGHBOUR := 50;
+            
+            /**
+             * @desc    Nr of neighbour limit to enter the "maximum" congestion status value
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_MAX_NR_NEIGHBOUR := 50;
+            
+            /**
+             * @desc Maximum number of application retransmissions
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_APPLICATION_MAX_RETRANS := 10;
+            
+        } // end congestionControl
+        
+        group timers {
+            
+            /**
+             * @desc  Delta for timers to reflect processing time
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar float PX_T_DELTA := 0.1;
+            
+            /**
+             * @desc Duration of Beacon service retransmit timer [ms] for NetBeaconInterval = medium (cong. ctrl)
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_BEACON_SERVICE_TIMER_MEDIUM := 5000;
+            
+            /**
+             * @desc Duration of Beacon service retransmit timer [ms] for NetBeaconInterval = maximum (cong. ctrl)
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_BEACON_SERVICE_TIMER_MAXIMUM := 8000;
+            
+            /**
+             * @desc Duration of Location service retransmit timer [ms] for NetRepInterval = medium (cong. ctrl)
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_LOCATION_SERVICE_TIMER_MEDIUM := 2000;
+            
+            /**
+             * @desc Duration of Location service retransmit timer [ms] for NetRepInterval = maximum (cong. ctrl)
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_LOCATION_SERVICE_TIMER_MAXIMUM := 3000;
+            
+            /**
+             * @desc Duration of Application retransmit timer [ms]
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_APPLICATION_RETRANSMIT_TIMER := 1000;
+            
+            /**
+             * @desc Duration of Application retransmit timer [ms] - medium
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_APPLICATION_RETRANSMIT_TIMER_MEDIUM := 2000;
+            
+            /**
+             * @desc Duration of Application retransmit timer [ms] - maximum
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_GN_APPLICATION_RETRANSMIT_TIMER_MAXIMUM := 3000;
+            
+            /**
+             * @desc The allowed delta for position checking.
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_POS_DELTA := 1;
+        }
+        
+        group upperLayer {
+        
+            /**
+             * @desc The IUT's upper layer
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar NextHeader PX_GN_UPPER_LAYER := e_btpA;    
+
+            /**
+             * @desc   Is BTP header present in IUT's UT indication. Only applicable if PX_GN_UPPER_LAYER == e_btpA or e_btpB.
+             * @remark It may happen that IUT do not report BTP header in UT indications (dur to GN/BTP merge)
+             * @see    ETSI TS 102 871-3 Table B.7
+             */
+            modulepar boolean PX_BTP_IN_UT_IND := true;    
+
+        }
+        
+        group parametrisation {
+            
+            /**
+             * @desc Number of messages to be sent
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar integer PX_MESSAGE_COUNT := 5;
+            
+            /**
+             * @desc Time necessary for IUT to detect neighbours
+             * @see  ETSI TS 102 871-3 Table B.7
+             */
+            modulepar float PX_NEIGHBOUR_DISCOVERY_DELAY := 1.0
+            
+        }
+        
+    } // end geoNetworkingPixits
+    
+} // end LibItsGeoNetworking_Pixits
+

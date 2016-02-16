@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that if ITS-S generates correctly a ToBeSignedData containing the generation location."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/213d6da7-2190-446d-9a57-368489c9f50f"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "62d43b7b-16e0-4d3b-8885-aec07fa4648a"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "TP/SEC/ITS-S/R-DATA/EB-15-X"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "0956fd46-ddcc-494d-8df8-692e87efbbaa"
+}

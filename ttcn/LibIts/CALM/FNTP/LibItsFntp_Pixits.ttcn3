@@ -1,0 +1,361 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FNTP/LibItsFntp_Pixits.ttcn3 $
+ *              $Id: LibItsFntp_Pixits.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       FAST networking & transport layer protocol (ISO 29281-2) Pixits
+ *  @see        ETSI TS 102 985-3 v1.1.2
+ */
+module LibItsFntp_Pixits {
+    
+    // LibCommon
+    import from LibCommon_DataStrings {
+        type Bit6, Bit7
+    };
+    
+    // LibIts
+	
+    // LibItsCalm
+    import from CITSapplMgmtApplReg language "ASN.1:1997" {
+        type ITSaid
+    };
+    import from CALMmanagement language "ASN.1:1997" {
+        type 
+            ITS_scuId, StationID
+    };
+    import from CALMllsap language "ASN.1:1997" {
+        type
+            EUI64, 
+            UserPriority, Link_ID, 
+            AccessParameters, NullType 
+    };
+    import from CALMfntp language "ASN.1:1997" {
+        type
+            PortNumber, ITSfpdu, FNTPhopCount,
+            RXcip, TXcip
+    };
+    import from CALMlegacySupport language "ASN.1:1997" {
+        type FNTPlpp
+    };
+    import from CITSapplReq language "ASN.1:1997" { 
+        type ServiceRef 
+    };
+    
+    /**
+     * @desc Service reference value used bu NF-FNTP-PORT.request SAP primitive
+     */
+    group generalSettings { 
+        
+        /**
+         * @desc Defines a number uniquely identifying the endpoint at this host in an implementation specific way
+         * @see ISO 29281-2 - Clause 8.2.1 Link Identifier
+         */
+        modulepar ServiceRef PX_SERVICE_REF := {
+            itsaid:= { 
+                content := 8 
+            },
+			instance := 1,
+            flowNo := 0
+        };
+        
+        /**
+         * @desc ITS-SP payload
+         * For instance, a DENM messages associated to a Slow vehicle in ASN.1 PER encoding
+         */
+        modulepar ITSfpdu PX_ITS_FPDU := '0102000000021b3b4056b49d200d693a3ffffffffc21f861a83c87843f7ffff809f754399d4eba7fff84202800'O;
+         
+        /**
+         * @desc The user priority as specified in ISO 21218
+         */
+        modulepar UserPriority PX_USER_PRIORITY := 0;
+        
+        /**
+         * @desc The ITS-SCU-ID of the host ITS-SCU
+         */
+        modulepar ITS_scuId PX_HOST_SCU_ID := 8;
+        
+        /**
+         * @desc The ITS-SCU-ID of an unknown host ITS-SCU
+         */
+        modulepar ITS_scuId PX_UNKNOWN_HOST_SCU_ID := 65534;
+        
+    } // End of group generalSettings
+    
+    /**
+     * @desc 64 bits MAC addresses for local CIs/VCIs for ITS_S router (e.g.G5 CI/VCI)
+     */
+    group routerWlanVcisMac {
+        
+        /**
+         * @desc Identifies the VCI localCIID on ITS-S router (e.g. It coud be the G5 radio MAC address of the IUT)
+         * @see ISO 21218 - Clause 6.2 Link Identifier 
+		 * NOTE 0A0B0CFFFE0D0E0F is MAC address 0A:0B:0C:0D:0E:0F
+         */
+        modulepar EUI64 PX_WL_LOCAL_CIID :=     '0A0B0CFFFE0D0E0F'O; // Commsignia FNTP setting (laptop)
+//        modulepar EUI64 PX_WL_LOCAL_CIID :=     'FFFFFFFFFEFFFFFF'O ; // Commsignia FSAP setting
+//        modulepar EUI64 PX_WL_LOCAL_CIID :=     'D4CA6DFFFF55A72C'O ; // Commsignia FNTP setting (ITS-S box)
+//        modulepar EUI64 PX_WL_LOCAL_CIID :=     '000C42FFFF6A9E2C'O; // Peek setting (@home)
+//        modulepar EUI64 PX_WL_LOCAL_CIID :=     '000C42FFFF974497'O; // Peek setting (@office)
+        
+        /**
+         * @desc Identifies the VCI remoteCIID on ITS-S router (e.g. It coud be the G5 radio MAC address of the IUT)
+         * @see ISO 21218 - Clause 6.2 Link Identifier 
+         */
+        modulepar EUI64 PX_WL_REMOTE_CIID :=     '0A0B0CFFFE0D0E0F'O; // Commsignia setting
+//		modulepar EUI64 PX_WL_REMOTE_CIID :=    '000C42FFFF6A9E2C'O; // Peek setting (@home)
+//		modulepar EUI64 PX_WL_REMOTE_CIID :=    '000C42FFFF974497'O; // Peek setting (@office)
+		
+        /**
+         * @desc Identifies the VCI for broadcast on ITS-S router 
+		 * Note that U/L bit is set to 1 for broadcast 
+         */
+        modulepar EUI64 PX_WL_REMOTE_CIID_BC := 'FFFFFFFFFEFFFFFF'O; 
+        
+        /**
+         * @desc Identifies the VCI for multicast on ITS-S router 
+         */
+        modulepar EUI64 PX_WL_REMOTE_CIID_MC := 'EF0008FFFE011234'O;
+        
+        /**
+         * @desc Identifies the VCI for unicast on ITS-S router (peer station)
+         */
+        modulepar EUI64 PX_WL_REMOTE_CIID_UC := '030008FFFE010001'O; // Commsignia setting
+//        modulepar EUI64 PX_WL_REMOTE_CIID_UC := '030008FFFF010001'O; // Peek setting
+        
+        /**
+         * @desc Identifies an unknown CI on ITS-S router 
+         */
+        modulepar EUI64 PX_WL_LOCAL_CIID_UNKNOWN := '030008FFFE020001'O;
+        
+        /**
+         * @desc Identifies the VCI for multicast on ITS-S router
+         */
+        modulepar EUI64 PX_WL_REMOTE_CIID_UNKNOWN_UC := '030008FFFE020001'O; 
+        
+        /**
+         * @desc Identifies an unknown CI on ITS-S router
+         */
+        modulepar EUI64 PX_WL_REMOTE_CIID_UNKNOWN_BC := 'FF0008FFFF02FFFF'O; 
+        
+    } // End of group routerWlanVcisMac
+    
+    /**
+     * @desc 64 bits MAC addresses for lan CIs/VCIs to connect to the ITS station-internal network 
+     */
+    group routerLanVcisMac {
+        
+        /**
+         * @desc Identifies the CI on ITS-S host 
+         * @see ISO 21218 - Clause 6.2 Link Identifier 
+         */
+        modulepar EUI64 PX_LAN_LOCAL_CIID :=           '03000AFFFEFF0000'O; 
+        
+        /**
+         * @desc Identifies the VCI for broadcast on ITS-S host 
+         */
+        modulepar EUI64 PX_LAN_REMOTE_CIID_BC :=       'FF000AFFFEFFFFFF'O;
+        
+        /**
+         * @desc Identifies the VCI for unicast on ITS-S host 
+         */
+        modulepar EUI64 PX_LAN_REMOTE_CIID_UC :=       '03000AFFFEFF0001'O;
+        
+        /**
+         * @desc Identifies a different VCI on ITS-S host 
+         * @see ISO 21218 - Clause 6.2 Link Identifier 
+         */
+        modulepar EUI64 PX_LAN_DIFFERENT_LOCAL_CIID := '03000AFFFEFE0001'O; 
+        
+    } // End of routerLanVcisMac
+    
+    /**
+     * @desc 64 bits MAC addresses for the peer ITS-S station
+     */
+    group peerItsStationVcisMac {
+        
+        /**
+         * @desc Identifies uniquely a specific CI in a specific ITS-SCU
+         * @see ISO 21218 - Clause 6.2 Link Identifier
+         */
+        modulepar EUI64 PX_DEST_LOCAL_CIID :=          '030009FFFE010000'O;
+        
+        /**
+         * @desc Identifies uniquely a specific CI in a specific ITS-SCU for broadcast
+         */
+        modulepar EUI64 PX_DEST_REMOTE_CIID_BC :=      'FFFFFFFFFEFFFFFF'O; // Standard value
+//        modulepar EUI64 PX_DEST_REMOTE_CIID_BC :=      'FFFFFFFFFFFFFFFF'O; // For Peek
+        
+        /**
+         * @desc Identifies uniquely a specific CI in a specific ITS-SCU for multicast
+         */
+        modulepar EUI64 PX_DEST_REMOTE_CIID_MC :=      '030009FFFE010001'O;
+        
+        /**
+         * @desc Identifies uniquely a specific VCI in a specific ITS-SCU for unicast (peer to peer)
+         */
+        modulepar EUI64 PX_DEST_REMOTE_CIID_UC :=      '030009FFFE010001'O; // Commsignia
+//        modulepar EUI64 PX_DEST_REMOTE_CIID_UC :=      'D4CA6DFFFF55A72C'O; // Peek 
+        
+        /**
+         * @desc Identifies a second VCI for unicast (peer to peer) on ITS-SCU 
+         */
+        modulepar EUI64 PX_SECOND_REMOTE_CIID_BC :=    '040002FFFE010005'O;
+        
+    } // End of peerItsStationVcisMac
+    
+    /**
+     * @desc Contains the Link Identifier parameters for broadcast, Multicast and unicast modes
+     * @see ISO 21218 Clause 6.2
+     * Notes:
+     * <li>vciID Identifies the MAC address of the Communication Interface identified by the CIID</li>
+     * <li>CIID Identifies the Communication Interface of the ITS-SCU. 0 indicates unknown or not existent</li>
+     * <li>scuID Identifies the ITS-SCU in the ITS station</li>
+     */
+    group linkIds {
+        
+        group cf01 { 
+            
+            /**
+             * @desc Identify the VCI to be used to transmit the packet outside (e.g. G5), i.e. the IUT station, for Broadcast
+             */
+            modulepar Link_ID PX_WL_LINK_ID_BC := {
+                remoteCIID := PX_WL_REMOTE_CIID_BC,
+                localCIID := PX_WL_LOCAL_CIID
+            }
+            
+        } // End of group cf01
+        
+        group cf02 { 
+            
+            /**
+             * @desc Identify the VCI to be used to transmit the packet to the LAN, for Broadcast
+             */
+            modulepar Link_ID PX_LAN_LINK_ID_BC := {
+                remoteCIID := PX_LAN_REMOTE_CIID_BC,
+                localCIID := PX_LAN_LOCAL_CIID
+            }
+            
+        } // End of group cf02 
+        
+        /**
+         * @desc Identify an unknown VCI to be used to transmit the packet, i.e. the peer station, for Broadcast
+         */
+        modulepar Link_ID PX_WL_LINK_ID_UNKWNON_BC := {
+            remoteCIID := PX_WL_REMOTE_CIID_UNKNOWN_BC,
+            localCIID := PX_WL_LOCAL_CIID_UNKNOWN
+        }
+        
+        /**
+         * @desc Identify an unknown VCI to be used to transmit the packet, i.e. the peer station, for Unicast
+         */
+        modulepar Link_ID PX_WL_LINK_ID_UNKWNON_UC := {
+            remoteCIID := PX_WL_REMOTE_CIID_UNKNOWN_UC,
+            localCIID := PX_WL_LOCAL_CIID_UNKNOWN
+        }
+        
+        /**
+         * @desc Identify the VCI to be used to transmit the packet, i.e. the peer station, for Unicast
+         */
+        modulepar Link_ID PX_WL_LINK_ID_UC := {
+            remoteCIID := PX_WL_REMOTE_CIID_UC,
+            localCIID := PX_WL_LOCAL_CIID
+        }
+        
+    } // End of group linkIds
+    
+    /**
+     * @desc    Source and destination Ports
+     * @see     ISO/WD 29281-2 Clause 6.2.2.2
+     */
+    group portNumbers {
+        
+        /**
+         * @desc Indicate the application port number, used instead of c_portDyn
+         */
+        modulepar PortNumber PX_APP_PORT_NUMBER := { portLong := 12345 } ;
+        
+        /**
+         * @desc Indicate the source port number, i.e. the local endpoint
+         */
+        modulepar PortNumber PX_LOCAL_PORT_NUMBER := { portLong := 5555 } ;
+        
+        /**
+         * @desc Indicate the destination port number, i.e. the peer ITS-SP
+         */
+        modulepar PortNumber PX_REMOTE_PORT_NUMBER := { portLong := 5556 } ;
+        
+        /**
+         * @desc Indicate a second destination port number
+         */
+        modulepar PortNumber PX_SECOND_REMOTE_PORT_NUMBER := { portLong := 5557 } ;
+        
+        /**
+         * @desc Indicate an unknown destination port number
+         */
+        modulepar PortNumber PX_UNKNOWN_REMOTE_PORT_NUMBER := { portLong := 666 } ;
+        
+        /**
+         * @desc Indicate the forwarding source port number, i.e. the originator endpoint
+         * @see ISO/CD 29281-2 Clause 8.3.1
+         */
+        modulepar PortNumber PX_FORWARDING_SRC_PORT := { portLong := 5550 } ;
+        
+        /**
+         * @desc Indicate the forwarding destination port number, i.e. the destinator endpoint
+         * @see ISO/CD 29281-2 Clause 8.3.1
+         */
+        modulepar PortNumber PX_FORWARDING_DST_PORT := { portLong := 5551 } ;
+        
+        /**
+         * @desc Indicate the forwarding destination port number, i.e. the destinator endpoint
+         * @see ISO/CD 29281-2 Clause 8.3.1
+         */
+        modulepar PortNumber PX_SERVICE_PORT := { portLong := 32700 } ;
+        
+    } // End of group portNumbers
+    
+    group hopsConstants {
+        
+        /**
+         * Single hop value
+         * @see ISO/CD 29281-2 Clause 8.3.1 NF-FNTP-COMM.request
+         */
+        modulepar FNTPhopCount PX_SHOP := 0;
+        
+        /**
+         * N hops value
+         * @see ISO/CD 29281-2 Clause 8.3.1 NF-FNTP-COMM.request
+         */
+        modulepar FNTPhopCount PX_NHOPS := 5;
+        
+    } // End of group hopsConstants
+    
+    group cipConstants {
+        
+        /**
+         *  Access parameters settings for reception
+         * @see ISO/CD 29281-2 Clause 7.10.1 Purpose of CIPs
+         */
+        modulepar RXcip PX_CIP_RX_SETTINGS := 'CAFEDECA'O;
+        
+        /**
+         * Access parameters settings for transmission
+         * @see ISO/CD 29281-2 Clause 7.10.1 Purpose of CIPs
+         */
+        modulepar TXcip PX_CIP_TX_SETTINGS := 'C0CAC01A'O;
+        
+    } // End of group cipConstants
+    
+    group accessParams { 
+        
+        modulepar AccessParameters PX_ACCESS_PARAMETERS_SETTINGS := { 
+            apRef := 0,
+            aParameter := { NullType := NULL } 
+        }
+        
+    } // End of group accessParams 
+    
+    /**
+     * Wait until the IUT is in a stable situation (beaconing...)
+     */
+    modulepar float PX_WAIT_FOR_IUT_READY := 1.0;
+} // End of module LibItsFntp_Pixits

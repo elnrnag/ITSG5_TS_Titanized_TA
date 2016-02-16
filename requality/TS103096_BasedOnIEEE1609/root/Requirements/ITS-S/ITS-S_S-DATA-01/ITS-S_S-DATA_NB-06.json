@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that if ITS-S generates correctly a ToBeSignedData containing the expiry time."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/00970315-e4d0-445e-bdd7-3a6707f8e1b6"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "1eb771b1-650d-433d-bc8c-ea752a73bc38"
+}

@@ -1,0 +1,32 @@
+[DEFINE]
+
+DESTPORT := 4000
+SOURCEPORT := 5000
+
+[TESTPORT_PARAMETERS]
+*.*.TRI_mapper_address := "127.0.0.1"
+*.*.TRI_mapper_port := "2222"
+
+[MODULE_PARAMETERS]
+LibCommon_Time.PX_TWAIT := 1.0; //120.0
+LibCommon_Sync.PX_TSYNC_TIME_LIMIT := 10.0;//120.0;
+
+[LOGGING]
+ConsoleMask := ERROR | WARNING | VERDICTOP | TESTCASE | USER | DEBUG
+FileMask := LOG_ALL | MATCHING | DEBUG
+TimeStampFormat := DateTime
+LogEventTypes := Yes
+SourceInfoFormat := Stack
+LogSourceInfo := Yes
+
+[MAIN_CONTROLLER]
+TCPPort := 9999
+#NumHCs := 1
+KillTimer := 3
+
+[EXECUTE]
+//ItsCam_TestControl.control
+//ItsDenm_TestControl.control
+ItsBtp_TestControl.control
+//ItsGeoNetworking_TestControl.control
+//ItsIpv6OverGeoNetworking_TestControl.control

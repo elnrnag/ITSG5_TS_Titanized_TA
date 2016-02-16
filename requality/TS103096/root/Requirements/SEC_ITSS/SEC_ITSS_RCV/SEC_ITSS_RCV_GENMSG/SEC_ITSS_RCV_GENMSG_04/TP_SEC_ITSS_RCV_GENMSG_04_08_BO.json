@@ -1,0 +1,25 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT is able to receive a Secured GN Beacon if the header fields are not in the ascending order according to the numbering of the enumeration."
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "f99b1bbd-2b27-43df-9ec5-3a20ef38e64f"
+}

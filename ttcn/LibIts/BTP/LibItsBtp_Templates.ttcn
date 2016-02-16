@@ -1,0 +1,204 @@
+/**
+ *  @author   ETSI / STF405
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/BTP/LibItsBtp_Templates.ttcn $
+ *            $Id: LibItsBtp_Templates.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Basic Transport Protocol Templates
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsBtp_Templates {
+    
+    // LibIts
+    import from LibItsBtp_TestSystem all;
+    import from LibItsBtp_TypesAndValues all;
+    import from LibItsBtp_Pixits all;
+    import from LibItsCommon_TypesAndValues all;
+        
+    group btpPrimitivesTemplates {
+
+        /**
+         * @desc    Send template for BTP packet (BtpPort Primitive)
+         * @param   p_btpPkt BTP Packet to be sent
+         */
+        template (value) BtpReq m_btpReq(
+            template (value) BtpPacket p_btpPkt
+            ) := {
+            msgOut := p_btpPkt
+        }
+        
+        /**
+         * @desc    Receive template for BTP packet (BtpPort Primitive)
+         * @param   p_btpPkt BTP Packet to be received
+         */
+        template BtpInd mw_btpInd(
+            template (present) BtpPacket p_btpPkt
+            ) := {
+            msgIn := p_btpPkt
+        }
+    
+        group utPrimitives {
+            
+            /**
+             * @desc Initializes the BTP IUT. 
+             */
+            template (value) UtInitialize m_btpInitialize := {
+                hashedId8 := '0000000000000000'O
+            }
+            
+            /**
+             * @desc Generate a BTP A packet
+             * @param p_destPort  The destination port
+             * @param p_srcPort   The source port
+             */
+            template (value) UtBtpTrigger m_generateBtpA(in BtpPortId p_destPort, in BtpPortId p_srcPort) := {
+                btpA := {
+                    btpAHeader := {
+                        destinationPort := p_destPort,
+                        sourcePort := p_srcPort
+                    }
+                }
+            }
+            
+            /**
+             * @desc Generate a BTP B packet
+             * @param p_destPort      The destination port
+             * @param p_destPortInfo  The destination port information
+             */
+            template (value) UtBtpTrigger m_generateBtpB(in BtpPortId p_destPort, in BtpPortInfo p_destPortInfo) := {
+                btpB := {
+                    btpBHeader := {
+                        destinationPort := p_destPort,
+                        destinationPortInfo := p_destPortInfo
+                    }
+                }
+            }
+                        
+        } // end utPrimitives
+        
+    } // btpPrimitivesTemplates
+    
+    group btpPduTemplates {
+        
+        /**
+         * @desc    Send template for BTP-A packet
+         * @param   p_destPort  Destination port
+         * @param   p_srcPort   Source port
+         * @param   p_payload   Payload
+         */
+        template (value) BtpPacket m_btpA (
+            template (value) BtpPayload p_payload
+        ):= {
+            header := { 
+                btpAHeader := {
+                    destinationPort := PX_DESTINATION_PORT, 
+                    sourcePort := PX_SOURCE_PORT
+                }
+            }, 
+            payload := p_payload
+        }
+
+        /**
+         * @desc    Send template for BTP-B packet
+         * @param   p_destPort      Destination port
+         * @param   p_destPortInfo  Destination port information
+         * @param   p_payload       Payload
+         */
+        template( value) BtpPacket m_btpB (
+            template (value) BtpPayload     p_payload
+        ) := {
+            header := { 
+                btpBHeader := {
+                    destinationPort := PX_DESTINATION_PORT, 
+                    destinationPortInfo := 0
+                }
+            }, 
+            payload := p_payload
+        }
+        
+        /**
+         * @desc    Send template for BTP-A packet with port parameters
+         * @param   p_destPort  Destination port
+         * @param   p_srcPort   Source port
+         * @param   p_payload   Payload
+         */
+        template (value) BtpPacket m_btpAWithPorts (
+            template (value) BtpPortId  p_destPort,
+            template (value) BtpPortId  p_srcPort,
+            template (value) BtpPayload p_payload
+        ):= {
+            header := { 
+                btpAHeader := {
+                    destinationPort := p_destPort, 
+                    sourcePort := p_srcPort
+                }
+            }, 
+            payload := p_payload
+        }
+
+        /**
+         * @desc    Send template for BTP-B packet with port parameters
+         * @param   p_destPort      Destination port
+         * @param   p_destPortInfo  Destination port information
+         * @param   p_payload       Payload
+         */
+        template( value) BtpPacket m_btpBWithPorts (
+            template (value) BtpPortId      p_destPort,
+            template (value) BtpPortInfo    p_destPortInfo,
+            template (value) BtpPayload     p_payload
+        ) := {
+            header := { 
+                btpBHeader := {
+                    destinationPort := p_destPort, 
+                    destinationPortInfo := p_destPortInfo
+                }
+            }, 
+            payload := p_payload
+		}
+
+        /**
+         * @desc    Receive template for BTP-A packet
+         * @param   p_destPort  Destination port
+         * @param   p_srcPort   Source port
+         * @param   p_payload   Payload
+         */
+        template BtpPacket mw_btpA (
+            template (present) BtpPortId   p_destPort,
+            template (present) BtpPortId   p_srcPort,
+            template BtpPayload  p_payload
+        ) := {
+            header := { 
+                btpAHeader := {
+                    destinationPort := p_destPort, 
+                    sourcePort := p_srcPort
+                }
+            }, 
+            payload := p_payload
+        }
+
+        /**
+         * @desc    Receive template for BTP-B packet
+         * @param   p_destPort      Destination port 
+         * @param   p_destPortInfo  Destination port information
+         * @param   p_payload       Payload
+         */
+        template BtpPacket mw_btpB (	
+            template (present) BtpPortId   p_destPort,
+            template (present) BtpPortInfo p_destPortInfo,
+            template BtpPayload  p_payload
+        ) := {
+            header := { 
+                btpBHeader := {
+                    destinationPort := p_destPort, 
+                    destinationPortInfo := p_destPortInfo
+                }
+            }, 
+            payload := p_payload
+        }
+
+    } // end btpPduTemplates
+    
+    
+} // end LibItsBtp_Templates
+

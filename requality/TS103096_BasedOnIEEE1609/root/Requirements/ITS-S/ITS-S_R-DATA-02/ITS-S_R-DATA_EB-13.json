@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards received data signed with a revoked certificate."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/e1c4a29d-598e-4fac-99ba-bc7d858e649b"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "6f5ac2c1-e571-4b7b-b511-d5d3a2e3d7e0"
+}

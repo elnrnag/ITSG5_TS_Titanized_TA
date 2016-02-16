@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_da6b3098-07d5-49aa-876f-6ae437a945ef\"><a name=\"da6b3098-07d5-49aa-876f-6ae437a945ef\" id=\"id_da6b3098-07d5-49aa-876f-6ae437a945ef\" class=\"requality_id\"><\/a>For compliance with the present document, protocol version <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">2<font style=\"font-family: Times New Roman;\"> shall be used<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "da6b3098-07d5-49aa-876f-6ae437a945ef"
+}

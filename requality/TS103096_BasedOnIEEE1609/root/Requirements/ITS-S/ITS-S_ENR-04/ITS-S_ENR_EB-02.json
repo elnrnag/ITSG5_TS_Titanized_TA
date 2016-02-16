@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards enrolment response if the subordinate certificate's validity region is outside of the issuing certificate's validity region."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/4fb0585b-5077-45a4-871c-f42766805894"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "29196cd6-4277-4b15-9ec4-48c4d396ddd3"
+}

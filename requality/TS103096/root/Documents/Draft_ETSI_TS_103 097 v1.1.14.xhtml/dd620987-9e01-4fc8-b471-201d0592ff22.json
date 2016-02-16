@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_35 b1+\"><li class=\"class_36\"><font style=\"font-family: Courier New; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\"><a name=\"dd620987-9e01-4fc8-b471-201d0592ff22\" id=\"id_dd620987-9e01-4fc8-b471-201d0592ff22\" class=\"requality_id\"><\/a>signer_info<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">: this field shall contain an element of type <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">certificate<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">.<\/span><br /><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><\/font><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><\/font><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><\/font><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><\/font><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><\/li><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><\/p><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_35 b1+\"><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\t<\/span><li class=\"class_36\"><span class=\"requality_text id_dd620987-9e01-4fc8-b471-201d0592ff22\">\n<\/span><font style=\"font-family: Courier New; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><\/font><\/li><\/p>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "dd620987-9e01-4fc8-b471-201d0592ff22"
+}

@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT is able to receive a secured DENM if the signer_info header field is not encoded first.\r\n"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "TODO"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "55c51db3-b6dd-4880-a985-eda9446fd3f5"
+}

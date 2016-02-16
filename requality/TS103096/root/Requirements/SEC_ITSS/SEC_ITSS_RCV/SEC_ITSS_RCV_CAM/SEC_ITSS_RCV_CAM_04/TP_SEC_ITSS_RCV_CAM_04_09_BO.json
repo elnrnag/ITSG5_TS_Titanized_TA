@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT ignores the HeaderFields generation_time_standard_deviation of received Secured CAM"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (CAM)\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'signer_info'\r\n\t\t\tcontaining header_fields[1]{\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_time'\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating TIME_1 outside the validity period of the signer certificate\r\n\t\t\t}\r\n\t\t\tcontaining header_fields[2] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_time_with_standard_deviation'\r\n\t\t\t\tcontaining generation_time_with_standard_deviation\r\n\t\t\t\t\tindicating TIME_2 inside the validity period of the signer certificate\r\n\t\t\t}\r\n\t\t\tand containing header_fields[3] {\r\n\t\t\t\tcontainint type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontainint its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "3a088ef7-c52a-4347-83b9-442d927fceaa"
+}

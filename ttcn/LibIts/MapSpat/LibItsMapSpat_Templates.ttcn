@@ -1,0 +1,423 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/MapSpat/LibItsMapSpat_Templates.ttcn $
+ *              $Id: LibItsMapSpat_Templates.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     Module containing base template definitions for MAP SPAT
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsMapSpat_Templates {
+
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsMapSpat_TestSystem all;
+    import from LibItsMapSpat_TypesAndValues all;
+    import from LibItsMapSpat_Pixits all;
+    import from ITS_Container language "ASN.1:1997" all;
+
+    import from DSRC language "ASN.1:1997" all;
+    import from DSRC2 language "ASN.1:1997" all;  //FIXME!!!
+    import from REG_D language "ASN.1:1997" all;
+    import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+    
+    const integer ItsPduHeader_protocolVersion_currentVersion_ := 1;//FIXME!!!
+    const integer ItsPduHeader_messageID_spat_ := 4;//FIXME!!
+    const integer ItsPduHeader_messageID_map_  := 5;//FIXME!!
+
+    group primitivesTemplates {
+        
+        /**
+         * @desc    Send template for MAP Message (MapSpatPort Primitive)
+         * @param   p_mapMsg    The MAP Message to be sent
+         */
+        template (value) MapReq m_mapReq (
+            template (value) MAP_PDU p_mapMsg
+        ) := {
+            msgOut := p_mapMsg
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message (MapSpatPort Primitive)
+         * @param   p_mapMsg    The expected MAP Message
+         */
+        template (present) MapInd mw_mapInd (
+            template (present) MapMsg p_mapMsg
+        ) := {
+            msgIn := p_mapMsg,
+            gnNextHeader := *,
+            gnHeaderType := *,
+            gnHeaderSubtype := *,
+            gnLifetime := *,
+            gnTrafficClass := *,
+            btpDestinationPort := *,
+            btpInfo := * 
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message (MapSpatPort Primitive)
+         * @param   p_mapMsg            The expected MAP Message
+         * @param   p_gnNextHeader      GN next header value
+         * @param   p_gnHeaderType      GN header type value
+         * @param   p_gnHeaderSubtype   GN header subtype value
+         * @param   p_gnLifetime        GN packet lifetime value (ms)
+         * @param   p_gnTrafficClass    GN traffic class value
+         */
+        template (present) MapInd mw_mapIndWithGnParameters (
+            template (present) MapMsg p_mapMsg,
+            in template UInt8 p_gnNextHeader := *,
+            in template UInt8 p_gnHeaderType := *,
+            in template UInt8 p_gnHeaderSubtype := *,
+            in template UInt32 p_gnLifetime := *,
+            in template UInt8 p_gnTrafficClass := *
+        ) modifies mw_mapInd := { 
+            gnNextHeader := p_gnNextHeader,
+            gnHeaderType := p_gnHeaderType,
+            gnHeaderSubtype := p_gnHeaderSubtype,
+            gnLifetime := p_gnLifetime,
+            gnTrafficClass := p_gnTrafficClass
+        }
+        
+        /**
+         * @desc    Send template for SPAT Message (MapSpatPort Primitive)
+         * @param   p_mapMsg    The SPAT Message to be sent
+         */
+        template (value) SpatReq m_spatReq (
+            template (value) SPAT_PDU p_spatMsg
+        ) := {
+            msgOut := p_spatMsg
+        }
+        
+        /**
+         * @desc    Receive template for SPAT Message (MapSpatPort Primitive)
+         * @param   p_mapMsg    The expected SPAT Message
+         */
+        template (present) SpatInd mw_spatInd (
+            template (present) SpatMsg p_spatMsg
+        ) := {
+            msgIn := p_spatMsg,
+            gnNextHeader := *,
+            gnHeaderType := *,
+            gnHeaderSubtype := *,
+            gnLifetime := *,
+            gnTrafficClass := *,
+            btpDestinationPort := *,
+            btpInfo := * 
+        };
+
+        /**
+         * @desc    Receive template for SPAT Message (MapSpatPort Primitive)
+         * @param   p_spatMsg            The expected SPAT Message
+         * @param   p_gnNextHeader      GN next header value
+         * @param   p_gnHeaderType      GN header type value
+         * @param   p_gnHeaderSubtype   GN header subtype value
+         * @param   p_gnLifetime        GN packet lifetime value (ms)
+         * @param   p_gnTrafficClass    GN traffic class value
+         */
+        template (present) SpatInd mw_spatIndWithGnParameters (
+            template (present) SpatMsg p_spatMsg,
+            in template UInt8 p_gnNextHeader := *,
+            in template UInt8 p_gnHeaderType := *,
+            in template UInt8 p_gnHeaderSubtype := *,
+            in template UInt32 p_gnLifetime := *,
+            in template UInt8 p_gnTrafficClass := *
+        ) modifies mw_spatInd := { 
+            gnNextHeader := p_gnNextHeader,
+            gnHeaderType := p_gnHeaderType,
+            gnHeaderSubtype := p_gnHeaderSubtype,
+            gnLifetime := p_gnLifetime,
+            gnTrafficClass := p_gnTrafficClass
+        }
+        
+    }
+
+    group utPrimitives {
+            
+        /**
+         * @desc    Send template for Upper Tester event initialization
+         * @member hashedId8 In case of secured mode set, hashedId8 indicate which certificate the IUT shall use
+        */
+        template (value) UtInitialize m_mapSpatInitialize := {
+            hashedId8 := '0000000000000000'O
+        }
+
+        /**
+        * @desc    Send template for Upper Tester Trigger event
+        */
+            template (value) UtMapSpatTrigger m_utTriggerEvent ( Event p_event ) := {
+                event    := p_event
+        }
+    }
+
+    group mapSpatPduTemplates {
+        
+        /**
+         * @desc    Send template for MAP PDU
+         * @param   p_map  The MAP Message
+         */
+        template (value) MAP_PDU m_mapPdu (
+            template (value) MapData p_map
+        ) := {
+            header := m_itsPduHeader ( - , - ,ItsPduHeader_messageID_map_ ),
+            mapData := p_map
+        }
+
+        /**
+         * @desc    Send template for SPAT PDU
+         * @param   p_map  The SPAT Message
+         */
+        template (value) SPAT_PDU m_spatPdu (
+            template (value) SPAT p_spat
+        ) := {
+            header := m_itsPduHeader ( - , - , ItsPduHeader_messageID_spat_ ),
+            spatData := p_spat
+        }
+        
+        /**
+         * @desc    Default receive template for MAP PDU
+         * @param   p_itsPduHeader  The expected ITS PDU header (Default: any)
+         * @param   p_map          The expected MAP Message (Default: any)
+         */
+        template MapMsg mw_mapPdu (
+            template (present) ItsPduHeader p_itsPduHeader := ?,
+            template (present) MapData p_map := ?
+        ) := {
+            msgMap := {
+                header := p_itsPduHeader,
+                mapData := p_map },
+            rawData := ?
+        }
+        
+        /**
+         * @desc    Default receive template for SPAT PDU
+         * @param   p_itsPduHeader  The expected ITS PDU header (Default: any)
+         * @param   p_spat          The expected SPAT Message (Default: any)
+         */
+        template SpatMsg mw_spatPdu (
+            template (present) ItsPduHeader p_itsPduHeader := ?,
+            template (present) SPAT p_spat := ?
+        ) := {
+            msgSpat := {
+                header := p_itsPduHeader,
+                spatData := p_spat },
+            rawData := ?
+        }
+        
+    } // end mapSpatPduTemplates
+    
+    group headerTemplates {
+        
+        /**
+         * @desc    Default send template for ITS PDU header
+         * @param   p_stationID         The source station ID (Default: test system station id)
+         * @param   p_protocolVersion   The protocol version (Default: current MAP SPAT protocol version)
+         * @param   p_messageID         The message Id (Default: MAp SPAT message id)
+         */
+        template (value) ItsPduHeader m_itsPduHeader(
+            template (value) StationID p_stationID := f_getTsStationId(),
+            template (value) ItsPduHeader.protocolVersion p_protocolVersion := ItsPduHeader_protocolVersion_currentVersion_,
+            template (value) ItsPduHeader.messageID p_messageID
+        ) := {
+            protocolVersion := p_protocolVersion,
+            messageID := p_messageID,
+            stationID := p_stationID
+        }
+        
+        /**
+         * @desc    Default receive template for ITS PDU header
+         * @param   p_stationID         The expected station id (Default: any)
+         * @param   p_protocolVersion   The expected protocol version (Default: current MAP SPAT protocol version)
+         * @param   p_messageID         The expected message id (Default: MAP  SPATmessage id)
+         */
+        template ItsPduHeader mw_itsPduHeader (
+            template (present) StationID p_stationID := ?,
+            template (present) ItsPduHeader.protocolVersion p_protocolVersion := ItsPduHeader_protocolVersion_currentVersion_,
+            template (present) ItsPduHeader.messageID p_messageID := ?
+        ) := {
+            protocolVersion := p_protocolVersion,
+            messageID := p_messageID,
+            stationID := p_stationID
+        }
+        
+        /**
+         * @desc    Default receive template for ITS PDU header
+         * @param   p_stationID         The expected station id (Default: any)
+         * @param   p_protocolVersion   The expected protocol version (Default: current MAP SPAT protocol version)
+         * @param   p_messageID         The expected message id (Default: MAP message id)
+         */
+        template ItsPduHeader mw_itsPduHeaderMap (
+            template (present) StationID p_stationID := ?,
+            template (present) ItsPduHeader.protocolVersion p_protocolVersion := ItsPduHeader_protocolVersion_currentVersion_,
+            template (present) ItsPduHeader.messageID p_messageID := ItsPduHeader_messageID_map_
+        ) := {
+            protocolVersion := p_protocolVersion,
+            messageID := p_messageID,
+            stationID := p_stationID
+        }
+        
+        /**
+         * @desc    Default receive template for ITS PDU header
+         * @param   p_stationID         The expected station id (Default: any)
+         * @param   p_protocolVersion   The expected protocol version (Default: current MAP SPAT protocol version)
+         * @param   p_messageID         The expected message id (Default: SPAT message id)
+         */
+        template ItsPduHeader mw_itsPduHeaderSpat (
+            template (present) StationID p_stationID := ?,
+            template (present) ItsPduHeader.protocolVersion p_protocolVersion := ItsPduHeader_protocolVersion_currentVersion_,
+            template (present) ItsPduHeader.messageID p_messageID := ItsPduHeader_messageID_spat_
+        ) := {
+            protocolVersion := p_protocolVersion,
+            messageID := p_messageID,
+            stationID := p_stationID
+        }
+        
+        /**
+         * @desc    Default receive template for the station id
+         */
+        template (present) StationID mw_anyStationId := ?;
+        
+    } // end headerTemplates
+
+    group mapSpatTemplates {
+
+        /**
+         * @desc    Send template for MAP Message
+         */
+        template (value) MapData m_map := {
+            msgID             := mapData_P,
+            msgSubID          := 1,
+            msgIssueRevision  := PX_MSG_ISSUE_REVISION,
+            layerType         := omit,
+            layerID           := omit,
+            intersections     := omit,
+            roadSegments      := omit,
+            dataParameters    := omit,
+            restrictionList   := omit,
+            regional          := omit,
+            crc               := omit
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message
+         */
+        template (present) MapData mw_anyMap := {
+            msgID             := mapData_P,
+            msgSubID          := *,  
+            msgIssueRevision  := ?,
+            layerType         := *,
+            layerID           := *,
+            intersections     := *,
+            roadSegments      := *,
+            dataParameters    := *,
+            restrictionList   := *,
+            regional          := *,
+            crc               := *
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message with SubId = 0
+         */
+        template (present) MapData mw_mapSubId1 modifies mw_anyMap := {
+            msgSubID          := 1 
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message with no MsgCrc
+         */
+        template (present) MapData mw_mapNoMsgCrc modifies mw_anyMap := {
+            crc               := omit
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message with MsgCrc as the last data elemnt of the message
+         */
+        template (present) MapData mw_mapMsgCrcLast modifies mw_anyMap := {
+            crc               := ?
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message with no LayerType
+         */
+        template (present) MapData mw_mapNoLayerType modifies mw_anyMap := {
+            layerType         := omit
+        }
+        
+        /**
+         * @desc    Receive template for MAP Message with no LayerType
+         */
+        template (present) MapData mw_mapWellFormatted modifies mw_anyMap := {
+            msgSubID          := 1,
+            layerType         := omit
+        }
+        
+        /**
+         * @desc    Send template for SPAT Message
+         */
+        template (value) SPAT m_spat := {
+            msgID          := signalPhaseAndTimingMessage_P,
+            msgSubID       := 1,
+            name           := omit, 
+            intersections  := m_intersections,
+            regional       := omit
+        }
+        template (value) IntersectionStateList m_intersections := { m_intersection };
+        template (value) IntersectionState m_intersection := {
+            name                   := omit,
+            id                   := m_intersectionReferenceID,
+            revision             := PX_INTERSECTIONSTATE_REVISION,
+            status               := PX_STATUS,
+            moy                   := omit,
+            timeStamp             := omit,
+            enabledLanes        := omit,
+            states                := m_movements,
+            maneuverAssistList    := omit,
+            priority               := omit,
+            preempt               := omit,
+            regional               := omit
+        }
+        template (value) IntersectionReferenceID m_intersectionReferenceID := {
+            region               := omit,
+            id                    := PX_INTERSECTION_ID
+        }
+        template (value) MovementList m_movements := { m_movement };
+        template (value) MovementState m_movement := {
+            movementName           := omit,
+            signalGroup            := PX_SIGNAL_GROUP_ID,    
+            state_time_speed       := m_movementEventList,
+            maneuverAssistList     := omit,
+            regional               := omit
+        }
+        template (value) MovementEventList m_movementEventList := { m_movementEvent };
+        template (value) MovementEvent m_movementEvent := {
+            eventState           := stop_Then_Proceed,
+            timing               := omit,
+            speeds              := omit,
+            regional            := omit 
+        }
+        
+        /**
+         * @desc    Receive template for SPAT Message
+         */
+        template (present) SPAT mw_anySpat := {
+            msgID          := signalPhaseAndTimingMessage_P,
+            msgSubID       := *,
+            name           := *, 
+            intersections  := ?,
+            regional       := *
+        }
+        
+        /**
+         * @desc    Receive template for SPAT Message with SubId = 0
+         */
+        template (present) SPAT mw_spatSubId1 modifies mw_anySpat := {
+            msgSubID       := 1
+        }
+
+    } // end mapSpatTemplates
+
+} // end LibItsMapSpat_Templates

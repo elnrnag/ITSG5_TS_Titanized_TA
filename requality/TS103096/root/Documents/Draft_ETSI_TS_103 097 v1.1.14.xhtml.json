@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_file": {
+            "isGenerated": false,
+            "key": "_file",
+            "origin": "2d025f76-f681-4094-b9c3-8f8bd27c8d6d",
+            "type": "STRING",
+            "value": "Draft_ETSI_TS_103 097 v1.1.14.xhtml"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "2d025f76-f681-4094-b9c3-8f8bd27c8d6d",
+            "type": "STRING",
+            "value": "Document"
+        },
+        "title": {
+            "isGenerated": false,
+            "key": "title",
+            "origin": "2d025f76-f681-4094-b9c3-8f8bd27c8d6d",
+            "type": "STRING",
+            "value": "ETSI TS 103 097 V1.1.14"
+        }
+    },
+    "uuid": "2d025f76-f681-4094-b9c3-8f8bd27c8d6d"
+}

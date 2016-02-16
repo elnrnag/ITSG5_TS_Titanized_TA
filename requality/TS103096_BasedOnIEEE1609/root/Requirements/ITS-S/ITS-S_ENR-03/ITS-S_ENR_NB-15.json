@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S accepts a valid enrolment request error having correct fields and values."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/ec7d4dd7-3907-4a82-9e65-afb4f4d599c3"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "0bf52722-e35b-48c4-8c61-8aa74d774164"
+}

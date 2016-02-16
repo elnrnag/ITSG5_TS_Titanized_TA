@@ -1,0 +1,425 @@
+/**
+ *    @author     ETSI / STF449
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DENM/LibItsDenm_Functions.ttcn $
+ *                $Id: LibItsDenm_Functions.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc        Module containing functions for DENM
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsDenm_Functions {
+    
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Time { modulepar PX_TNOAC ; function f_sleep };
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsCommon_Functions all;
+    
+    // LibIts
+    import from LibItsCommon_Functions all;
+    import from LibItsDenm_TestSystem all;
+    import from LibItsDenm_TypesAndValues all; 
+    import from LibItsDenm_Templates all; 
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    group utFuntions { 
+            
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_init The initialisation to trigger.
+         */
+        function f_utInitializeIut(template (value) UtInitialize p_init) runs on ItsDenm {
+			var UtInitializeResult v_UtInitializeResult;
+			v_UtInitializeResult.utInitializeResult := true;
+            
+            utPort.send(p_init);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtInitializeResult:v_UtInitializeResult) {
+                    tc_wait.stop;
+                    log("*** " & testcasename() & ": INFO: IUT initialized ***");
+                }
+                [] a_utDefault() {
+                  //empty on purpose
+                }
+                [] tc_wait.timeout {
+                    log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+//                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }            
+        }
+        
+        /**
+         * @desc    Requests to change the IUT with a new pseudonym
+         * @param   p_change The change to trigger.
+         */
+        function f_utChangePseudonym ( template (value) UtChangePseudonym p_change ) runs on ItsDenm {
+            var UtChangePseudonymResult v_UtChangePseudonymResult_true;
+			v_UtChangePseudonymResult_true.utChangePseudonymResult := true;
+
+			var UtChangePseudonymResult v_UtChangePseudonymResult_false;
+			v_UtChangePseudonymResult_false.utChangePseudonymResult := false;
+
+            utPort.send(p_change);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtChangePseudonymResult:v_UtChangePseudonymResult_true) {
+                    tc_wait.stop;
+                    log("*** " & testcasename() & ": INFO: IUT pseudonym changed ***");
+                }
+                [] utPort.receive(UtChangePseudonymResult:v_UtChangePseudonymResult_false) {
+                    tc_wait.stop;
+                    log("*** " & testcasename() & ": INFO: IUT pseudonym changed ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] a_utDefault() {
+                  //empty on purpose
+                }
+                [] tc_wait.timeout {
+                    log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+//                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+            
+        }
+        
+        /**
+         * @desc    Triggers an event from the application layer
+         * @param   p_event The event to trigger.
+         */
+        function f_utTriggerEvent(template (value) UtDenmTrigger p_event) runs on ItsDenm return ActionID {
+            var ActionID v_actionId;
+            var UtDenmTriggerResult v_result;
+
+	      //ELNRNAG
+              p_event.detectionTime := 1000;
+	      //ELNRNAG
+
+            utPort.send(p_event);
+	    
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtDenmTriggerResult:?) -> value v_result {
+                    tc_wait.stop;
+                    v_actionId := v_result.actionId;
+                    if ( not v_result.result ) {
+                        f_selfOrClientSyncAndVerdict("DENM Trigger failed", e_error);
+					}
+                }
+                [] a_utDefault() {
+                  //empty on purpose
+                }
+                [] tc_wait.timeout {
+                    log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+//                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+            
+            return v_actionId;
+        }
+        
+        /**
+         * @desc    Updates an event at the application layer
+         * @param   p_event The event to update.
+         */
+        function f_utUpdateEvent(template (value) UtDenmUpdate p_event) runs on ItsDenm return ActionID {
+            var ActionID v_actionId;
+            var UtDenmUpdateResult v_result;
+            
+            utPort.send(p_event);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtDenmUpdateResult:?) -> value v_result {
+                    tc_wait.stop;
+                    v_actionId := v_result.actionId;
+                }
+                [] a_utDefault() {
+                  //empty on purpose
+                }
+                [] tc_wait.timeout {
+                    log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+//                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+            
+            return v_actionId;
+        }
+        
+        /**
+         * @desc    Terminates an event at the application layer
+         * @param   p_event The event to terminate.
+         */
+        function f_utTerminateEvent(template (value) UtDenmTermination p_event) runs on ItsDenm {
+            
+            utPort.send(p_event);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtDenmTerminationResult:?) {
+                    tc_wait.stop;
+                }
+                [] tc_wait.timeout {
+                    log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [] a_utDefault() {
+                  //empty on purpose
+                }
+                [else] { // Shortcut defaults
+//                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+        }
+        
+        /**
+         * @desc    Changes the position of the IUT
+         * @param   p_latitude
+         * @param   p_longitude
+         * @param   p_elevation 
+         */
+        function f_utChangePosition(template (value) UtChangePosition p_position) runs on ItsDenm {
+            
+            utPort.send(p_position);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtChangePositionResult:?) {
+                    tc_wait.stop;
+                }
+                [] tc_wait.timeout {
+                    log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [] a_utDefault() {
+                  //empty on purpose
+                }
+                [else] { // Shortcut defaults
+//                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+        }
+        
+    } // End of group utFunctions
+
+    group denmConfigurationFunctions {
+        
+        /**
+         * @desc    Setups default configuration   
+         */
+        function f_cfUp() runs on ItsDenm {
+            
+            map(self:utPort, system:utPort);
+            map(self:denmPort, system:denmPort);
+            f_connect4SelfOrClientSync();
+            
+        } // end f_cfUp
+        
+        /**
+         * @desc    Deletes default configuration 
+         */
+        function f_cfDown() runs on ItsDenm {
+            
+            unmap(self:utPort, system:utPort);
+            unmap(self:denmPort, system:denmPort);
+            f_disconnect4SelfOrClientSync();
+            
+        } // end f_cfDown
+        
+    } //end denmConfigurationFunctions
+    
+    group altsteps {
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_default() runs on ItsDenm {
+            [] denmPort.receive(mw_denmInd(mw_denmPdu(mw_anyDenm))) { 
+                log("*** " & testcasename() & ": INFO: DENM message received in default ***");
+                vc_denmReceived := true;
+                repeat;
+            }
+            [] denmPort.receive {
+                log("*** " & testcasename() & ": ERROR: Received an unexpected message ***");
+                f_selfOrClientSyncAndVerdict("error", e_error);
+            }
+            [] tc_wait.timeout {
+                log("*** " & testcasename() & ": INCONC: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout {
+                log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                f_cfDown();
+                log("*** " & testcasename() & ": INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;   
+            }
+        }
+        
+        /**
+         * @desc The default for handling upper tester messages.
+         */
+        altstep a_utDefault() runs on ItsDenm {
+            var UtDenmEventInd v_event;
+            [] utPort.receive(UtDenmEventInd:?) -> value v_event {
+                //store every upper tester indication received
+                vc_utEvents[lengthof(vc_utEvents)] := v_event;
+                repeat;
+            }
+            [] utPort.receive {
+                log("*** " & testcasename() & ": INFO: Received unhandled/unknown UT message from IUT ***");
+                repeat;
+            }
+        }
+        
+    } // end group altsteps
+    
+    group preambles {
+        
+        /**
+         * @desc The default preamble.
+         */
+        function f_prDefault() runs on ItsDenm {
+            vc_default := activate(a_default());
+            activate(a_utDefault());
+        }
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         * @return FncRetCode 
+         */
+        function f_prInitialState() runs on ItsDenm return FncRetCode {
+            var FncRetCode v_ret := e_success;
+            
+            f_utInitializeIut(m_denmInitialize);
+            
+            f_prDefault();
+            
+            return v_ret;
+        }
+        
+    } // end group preambles
+    
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsDenm {
+            var FncRetCode v_ret := e_success;
+            //empty
+        }
+        
+        /**
+         * @desc Postamble including cancellation of an event.
+         * @param p_trigger Indicates if the cancellation have to be raised by the test system(e_ets) 
+         *                  or at the application layer of the IUT(e_iut).
+         * @param p_actionId The action ID of the event to be cancelled
+         */
+        function f_poCancelEvent(template (value) Trigger p_trigger, template (value) ActionID p_actionId) 
+        runs on ItsDenm {
+            var FncRetCode v_ret := e_success;
+            
+            if (valueof(p_trigger) == e_ets) {
+                f_sendDenMessage( m_denmCancellation ( p_actionId , f_getTsStationType( ) ) );
+                f_sleep(PX_TNOAC);
+            }
+            else {
+                f_utTerminateEvent(m_utEventCancellation(p_actionId));
+            }
+            
+            f_poDefault();
+        }
+        
+    } // end group postambles
+    
+    group sendFunctions {
+        
+        /**
+         * @desc Sends a DEN message
+         * @param p_sendMsg The DEN message to send.
+         * @param p_overrideSeqNo Overrides the sequence number with the stored one. 
+         */
+        function f_sendDenMessage(template (value) DecentralizedEnvironmentalNotificationMessage p_denm, boolean p_overrideSeqNo := true) runs on ItsDenm return ActionID {
+
+            if (p_overrideSeqNo) {
+                p_denm.management.actionID.sequenceNumber := vc_sequenceNo;
+            }
+
+            denmPort.send(
+                m_denmReq(
+                    m_denmPdu(
+                        p_denm
+                    )
+                )
+            );
+                        
+            return valueof(p_denm.management.actionID);
+        }
+        
+    } // end sendFunctions
+    
+    group receiveFunctions {
+        
+        /**
+         * @desc Awaits a DEN message and returns it
+         * @param p_rcvMsg The expected message to be received.
+         * @param p_rcvdMsg The received message - OUT.
+         */
+        function f_awaitDenMessage(in template (present) DenmInd p_rcvMsg, out DenmInd p_rcvdMsg) runs on ItsDenm {
+            
+            tc_ac.start;
+            alt {
+                [] denmPort.receive(p_rcvMsg) -> value p_rcvdMsg {
+                    tc_ac.stop;
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INFO: Timeout while awaiting the reception of a message ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+            }            
+        }
+        
+    } // end receiveFunctions
+    
+    group miscellaneousFunctions {
+        
+        /**
+         * @desc Increases the sequence number and handles the special case where the 
+         *       sequence number reaches the limit of 65535 and will be reset to 0.
+         * @param p_sequenceNumber The sequence number to increase.
+         * @return The increased sequence number.
+         */
+        function f_increaseSequenceNumber(in SequenceNumber p_sequenceNumber) return SequenceNumber {
+            // if maximum number of 65535 reached, reset it to 0
+            return ((p_sequenceNumber + 1) mod 65536);
+        }
+        
+    } // end group miscellaneousFunctions
+    
+} 
+// end LibItsDenm_Functions
+

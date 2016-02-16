@@ -1,0 +1,36 @@
+<!-- Authorization ticket certificate with a polygonal region restriction
+     representing a square centered at ETSI coordinates and having a side length of 10km
+-->
+<certificate name="CERT_IUT_D_AT">
+	<version>2</version>
+	<signer type="digest" name="CERT_TS_D_AA"/>
+	<subject type="AT" name="">
+		<!-- verification_key -->
+		<attribute type="verification_key">
+			<public_key algorythm="0">
+				<ecc_point type="uncompressed"/>
+			</public_key>
+		</attribute>
+		<!-- assurance_level -->
+		<attribute type="assurance_level">
+			<assurance level="3"/>
+		</attribute>
+		<!-- its_aid_ssp_list -->
+		<attribute type="its_aid_ssp_list">
+			<ssp aid="36">&#01;&#xFF;&#xFF;</ssp>  <!-- CAM -->
+			<ssp aid="37">&#01;&#xFF;&#xFF;&#xFF;</ssp>  <!-- DENM -->
+		</attribute>
+	</subject>
+	<validity>
+		<restriction type="time" start="2015-01-01" end="2015-04-30"/>
+		<restriction type="region">
+			<polygon>
+				<location latitude="0.044949"  longitude="-0.062157"/>
+				<location latitude="0.044949"  longitude="0.062064"/>
+				<location latitude="-0.044983" longitude="0.062064"/>
+				<location latitude="-0.044983" longitude="-0.062157"/>
+			</polygon>
+		</restriction>
+	</validity>
+	<signature algorithm="0"/>
+</certificate>

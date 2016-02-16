@@ -1,0 +1,92 @@
+elnrnag@elx1pjld12-hz:~/TITAN/ITSTRIMapper/ITSG5_TS_Titanized_TA/bin$ ttcn3_start ./ITS_Exec cfg.cfg
+ttcn3_start: Starting the test suite
+spawn /home/elnrnag/git/titan/Install/bin/mctr_cli cfg.cfg
+
+*************************************************************************
+* TTCN-3 Test Executor - Main Controller 2                              *
+* Version: CRL 113 200/5 R3A                                            *
+* Copyright (c) 2000-2014 Ericsson Telecom AB                           *
+* All rights reserved. This program and the accompanying materials      *
+* are made available under the terms of the Eclipse Public License v1.0 *
+* which accompanies this distribution, and is available at              *
+* http://www.eclipse.org/legal/epl-v10.html                             *
+*************************************************************************
+
+Using configuration file: cfg.cfg
+MC@elx1pjld12-hz: Unix server socket created successfully.
+MC@elx1pjld12-hz: Listening on TCP port 9999.
+MC2> elx1pjld12-hz is the default
+spawn ././ITS_Exec elx1pjld12-hz 9999
+TTCN-3 Host Controller (parallel mode), version CRL 113 200/5 R3A
+MC@elx1pjld12-hz: New HC connected from productsearch.ubuntu.com [127.0.0.1]. elx1pjld12-hz: Linux 3.13.0-63-generic on x86_64.
+cmtc
+MC@elx1pjld12-hz: Downloading configuration file to all HCs.
+HC@elx1pjld12-hz: *** f_getCurrentTime: INFO: calling fx_getCurrentTime() ***
+HC@elx1pjld12-hz: *** f_getCurrentTime: INFO: calling fx_getCurrentTime() ***
+HC@elx1pjld12-hz: *** f_getCurrentTime: INFO: calling fx_getCurrentTime() ***
+HC@elx1pjld12-hz: *** f_getCurrentTime: INFO: calling fx_getCurrentTime() ***
+MC@elx1pjld12-hz: Configuration file was processed on all HCs.
+MC@elx1pjld12-hz: Creating MTC on host productsearch.ubuntu.com.
+MC@elx1pjld12-hz: MTC is created.
+MC2> smtc
+Executing all items of [EXECUTE] section.
+MC2> MTC@elx1pjld12-hz: Test case TC_BTP_PGA_BV_01 started.
+MTC@elx1pjld12-hz: Warning: Test port parameter TRI_mapper_address is not supported on port syncPort.
+MTC@elx1pjld12-hz: Warning: Test port parameter TRI_mapper_address is not supported on port syncSendPort.
+MTC@elx1pjld12-hz: Warning: Test port parameter TRI_mapper_port is not supported on port syncPort.
+MTC@elx1pjld12-hz: Warning: Test port parameter TRI_mapper_port is not supported on port syncSendPort.
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { reg := { portid := { portName := "utPort", portTypeName := "UpperTesterPort", component_ := { componentId := '00000001'O, componentName := "MTC", componentTypeName := "N/A" }, portindex := omit }, type_list := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A302C226D7367223A7B22726567223A7B22706F72746964223A7B22706F72744E616D65223A227574506F7274222C22706F7274547970654E616D65223A225570706572546573746572506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303031222C22636F6D706F6E656E744E616D65223A224D5443222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":0,\"msg\":{\"reg\":{\"portid\":{\"portName\":\"utPort\",\"portTypeName\":\"UpperTesterPort\",\"component_\":{\"componentId\":\"00000001\",\"componentName\":\"MTC\",\"componentTypeName\":\"N/A\"}}}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A302C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":0,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { reg := { portid := { portName := "btpPort", portTypeName := "BtpPort", component_ := { componentId := '00000001'O, componentName := "MTC", componentTypeName := "N/A" }, portindex := omit }, type_list := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A302C226D7367223A7B22726567223A7B22706F72746964223A7B22706F72744E616D65223A22627470506F7274222C22706F7274547970654E616D65223A22427470506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303031222C22636F6D706F6E656E744E616D65223A224D5443222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":0,\"msg\":{\"reg\":{\"portid\":{\"portName\":\"btpPort\",\"portTypeName\":\"BtpPort\",\"component_\":{\"componentId\":\"00000001\",\"componentName\":\"MTC\",\"componentTypeName\":\"N/A\"}}}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A302C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":0,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { mapped := { portid := { portName := "utPort", portTypeName := "UpperTesterPort", component_ := { componentId := '00000001'O, componentName := "System", componentTypeName := "N/A" }, portindex := omit } } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A312C226D7367223A7B226D6170706564223A7B22706F72746964223A7B22706F72744E616D65223A227574506F7274222C22706F7274547970654E616D65223A225570706572546573746572506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303031222C22636F6D706F6E656E744E616D65223A2253797374656D222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":1,\"msg\":{\"mapped\":{\"portid\":{\"portName\":\"utPort\",\"portTypeName\":\"UpperTesterPort\",\"component_\":{\"componentId\":\"00000001\",\"componentName\":\"System\",\"componentTypeName\":\"N/A\"}}}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A312C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":1,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { mapped := { portid := { portName := "btpPort", portTypeName := "BtpPort", component_ := { componentId := '00000001'O, componentName := "System", componentTypeName := "N/A" }, portindex := omit } } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A312C226D7367223A7B226D6170706564223A7B22706F72746964223A7B22706F72744E616D65223A22627470506F7274222C22706F7274547970654E616D65223A22427470506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303031222C22636F6D706F6E656E744E616D65223A2253797374656D222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":1,\"msg\":{\"mapped\":{\"portid\":{\"portName\":\"btpPort\",\"portTypeName\":\"BtpPort\",\"component_\":{\"componentId\":\"00000001\",\"componentName\":\"System\",\"componentTypeName\":\"N/A\"}}}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A312C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":1,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 2, msg := { sendmsg := { addr := omit, data := { encoded_data := '0000000000000000'O } } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A322C226D7367223A7B2273656E646D7367223A7B2264617461223A7B22656E636F6465645F64617461223A2230303030303030303030303030303030227D7D7D7D'O ("{\"msg_id\":2,\"msg\":{\"sendmsg\":{\"data\":{\"encoded_data\":\"0000000000000000\"}}}}")
+MTC@elx1pjld12-hz: Warning: An [else] branch of an alt construct has been reached. Re-configuring the snapshot manager to call the event handlers even when taking the first snapshot.
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A322C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":2,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 2, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: *** f_utInitializeIut: INFO: IUT could not be initialized in time ***
+MTC@elx1pjld12-hz: setverdict(inconc): none -> inconc
+MTC@elx1pjld12-hz: **** f_selfSyncStop: MTC requests to stop test case (itself). ****
+MTC@elx1pjld12-hz: **** f_selfSyncStop: Stopping MTC without shutdown - either no shutdown default active or missing syncPort connection ****
+MTC@elx1pjld12-hz: setverdict(inconc): inconc -> inconc, component reason not changed
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 3, msg := { unmapped := { } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A332C226D7367223A7B22756E6D6170706564223A7B7D7D7D'O ("{\"msg_id\":3,\"msg\":{\"unmapped\":{}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A332C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":3,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 3, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 4, msg := { unregister := { } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A342C226D7367223A7B22756E7265676973746572223A7B7D7D7D'O ("{\"msg_id\":4,\"msg\":{\"unregister\":{}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A342C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":4,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 4, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 2, msg := { unmapped := { } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A322C226D7367223A7B22756E6D6170706564223A7B7D7D7D'O ("{\"msg_id\":2,\"msg\":{\"unmapped\":{}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A322C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":2,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 2, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 3, msg := { unregister := { } } }
+MTC@elx1pjld12-hz: TRI_encode(): Stream after encoding: '7B226D73675F6964223A332C226D7367223A7B22756E7265676973746572223A7B7D7D7D'O ("{\"msg_id\":3,\"msg\":{\"unregister\":{}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Stream before decoding: '7B226D73675F6964223A332C226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D7D'O ("{\"msg_id\":3,\"msg\":{\"result\":{\"result\":\"TRI_ok\"}}}")
+MTC@elx1pjld12-hz: TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 3, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+MTC@elx1pjld12-hz: Setting final verdict of the test case.
+MTC@elx1pjld12-hz: Local verdict of MTC: inconc
+MTC@elx1pjld12-hz: No PTCs were created.
+MTC@elx1pjld12-hz: Test case TC_BTP_PGA_BV_01 finished. Verdict: inconc
+MC@elx1pjld12-hz: Test execution finished.
+Execution of [EXECUTE] section finished.
+emtc
+MC@elx1pjld12-hz: Terminating MTC.
+MC@elx1pjld12-hz: MTC terminated.
+MC2> exit
+MC@elx1pjld12-hz: Shutting down session.
+MC@elx1pjld12-hz: Shutdown complete.
+elnrnag@elx1pjld12-hz:~/TITAN/ITSTRIMapper/ITSG5_TS_Titanized_TA/bin$ 

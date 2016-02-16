@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_USE_RECTANGULAR_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_RECTANGULAR_REGION",
+            "origin": "a9482e81-9cbd-4c5e-868d-adca01d57eea",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "a9482e81-9cbd-4c5e-868d-adca01d57eea",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "a9482e81-9cbd-4c5e-868d-adca01d57eea",
+            "type": "STRING",
+            "value": "Check that the secured DENM contains exactly one HeaderField generation_location which is inside the rectangular region containing in the validity restriction of the certificate pointed by the signer_info field"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "a9482e81-9cbd-4c5e-868d-adca01d57eea",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT has been authorized with the AT certificate (CERT_IUT_C_AT) {\r\n\t\tcontaining validity_restrictions ['region'] {\r\n\t\t\tcontaining region{\r\n\t\t\t\tcontaining region_type\r\n\t\t\t\t\tindicating 'rectangle'\r\n\t\t\t\tcontaining rectangular_region\r\n\t\t\t\t\tcontaining instance of RectangularRegion\r\n\t\t\t\t\t\tindicating REGION\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send DENM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining exactly one header_field ['generation_location']\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating value inside the REGION\r\n\t\t\tcontaining header_field ['its_aid'] {\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "a9482e81-9cbd-4c5e-868d-adca01d57eea",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a9482e81-9cbd-4c5e-868d-adca01d57eea",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "a9482e81-9cbd-4c5e-868d-adca01d57eea"
+}

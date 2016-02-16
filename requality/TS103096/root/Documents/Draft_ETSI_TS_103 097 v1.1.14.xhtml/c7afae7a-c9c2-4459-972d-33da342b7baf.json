@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "These <a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"ype\">\n<font style=\"font-family: 'Courier New'; font-size: 10pt;\">HeaderField<\/font>\n<\/a>\n<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Times New Roman'; font-size: 10pt;\"> elements shall be included in all CAMs.<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "9b6c230e-acf3-4fd8-ad40-c1a50f4c592c"
+}

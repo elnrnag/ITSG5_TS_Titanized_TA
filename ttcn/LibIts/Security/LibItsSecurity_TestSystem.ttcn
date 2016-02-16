@@ -1,0 +1,72 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Security/LibItsSecurity_TestSystem.ttcn3 $
+ *            $Id: LibItsSecurity_TestSystem.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Test System module for Security Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsSecurity_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_DataStrings all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Pixits all;
+    
+    group componentDefinitions {
+        
+        /**
+         * @desc ITS Security Component 
+         */
+        type component ItsSecurityBaseComponent {
+            
+            // Certificates
+            var Certificate vc_aaCertificate;                                   /** Test Adapter AT certificate */
+            var Certificate vc_atCertificate;                                   /** Test Adapter AT certificate */
+            var Certificate vc_lastAtCertificateUsed;                           /** Last Test Adapter certificate used in 'f_buildGnSecuredXXX' functions */
+            var charstring  vc_hashedId8ToBeUsed := PX_IUT_DEFAULT_CERTIFICATE;  /** Digest value of the AT certificate to be used by the IUT. Default: CERT_IUT_A_AT */
+            
+            // Private keys
+            var Oct32 vc_signingPrivateKey; 
+            var Oct32 vc_encryptPrivateKey; 
+            
+            // Generation position. See Draft ETSI TS 103 097 V1.1.14 Clause 7.2    Security profiles for DENMs
+            var ThreeDLocation vc_location; 
+            
+            // Test Adapter certificates & private keys - Valid behavior
+            const charstring cc_taCert_A  := "CERT_TS_A_AT"; /** Default certificate, without region validity restriction, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_taCert_B  := "CERT_TS_B_AT"; /** Default certificate, with circular region, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_taCert_C  := "CERT_TS_C_AT"; /** Certificate with a rectangular region, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_taCert_D  := "CERT_TS_D_AT"; /** Certificate with a polygonal region, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_taCert_E  := "CERT_TS_E_AT"; /** Certificate with a region identifier, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_taCert_F  := "CERT_TS_F_AT"; /** Certificate that can be used as an unknown certificate for IUT. */
+            const charstring cc_taCert_G  := "CERT_TS_G_AT"; /** to be defined */
+            const charstring cc_taCert_EC := "CERT_TS_A_EC"; /** Certificate with a subject type indicating 'enrolment_credentials', to be used when secured messages are sent from TA to IUT */
+            const charstring cc_taCert_AA := "CERT_TS_A_AA"; /** Certificate with a subject type indicating 'authorisation_authority', to be used when secured messages are sent from TA to IUT */
+            // Test Adapter certificates & private keys - Inoportune behavior
+            const charstring cc_taCert_B_BO  := "CERT_TS_B_BO_AT"; /** Certificate with a circular region, the IUT position is outside of the region */
+            const charstring cc_taCert_C_BO  := "CERT_TS_C_BO_AT"; /** Certificate with a rectangular region, the IUT position is outside of the region */
+            const charstring cc_taCert_D_BO  := "CERT_TS_D_BO_AT"; /** Certificate with a polygonal region, the IUT position is outside of the region */
+            const charstring cc_taCert_E_BO  := "CERT_TS_E_BO_AT"; /** Certificate with a region identifier, the IUT position is outside of the region */
+            const charstring cc_taCert0101BO := "CERT_TS_01_01_BO_AT"; /**  */
+            const charstring cc_taCert0102BO := "CERT_TS_01_02_BO_AT"; /**  */
+            const charstring cc_taCert0103BO := "CERT_TS_01_03_BO_AT"; /**  */
+            const charstring cc_taCert0104BO := "CERT_TS_01_04_BO_AT"; /**  */
+            
+            // IUT certificates & private keys
+            const charstring cc_iutCert_A := "CERT_IUT_A_AT"; /** Default certificate, without region validity restriction, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_iutCert_B := "CERT_IUT_B_AT"; /** Default certificate, with circular region, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_iutCert_C := "CERT_IUT_C_AT"; /** Certificate with a rectangular region, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_iutCert_D := "CERT_IUT_D_AT"; /** Certificate with a polygonal region, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_iutCert_E := "CERT_IUT_E_AT"; /** Certificate with a region identifier, to be used when secured messages are sent from TA to IUT */
+            const charstring cc_iutCert_F := "CERT_IUT_F_AT"; /** Certificate with a subject type indicating 'enrolment_credentials', to be used when secured messages are sent from TA to IUT */
+        } // End of ItsSecurityBaseComponent
+        
+    } // End of group componentDefinitions
+    
+} // End of module LibItsSecurity_TestSystem
+

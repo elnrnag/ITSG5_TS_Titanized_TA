@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="org/etsi/its/adapter/ports/V2GPort.java" kind="src" path="javasrc/adapter"/>
+	<classpathentry kind="src" path="javasrc/certificatesio"/>
+	<classpathentry excluding="org/etsi/ttcn/codec/its/v2g/|org/etsi/ttcn/codec/generic2/|org/etsi/ttcn/codec/generic/Verdict.java|org/etsi/ttcn/codec/generic/UniversalCharstring.java|org/etsi/ttcn/codec/generic/SetOf.java|org/etsi/ttcn/codec/generic/Hexstring.java" kind="src" path="javasrc/codec"/>
+	<classpathentry kind="src" path="javasrc/common"/>
+	<classpathentry kind="src" path="javasrc/extfunc"/>
+	<classpathentry kind="src" path="javasrc/geodesic"/>
+	<classpathentry excluding="adapter/|certificatesio/|codec/|common/|extfunc/|geodesic/|tool/org/etsi/its/tool/elvior/|tool/org/etsi/its/tool/|tool/org/etsi/its/|tool/org/etsi/|tool/org/|tool/" kind="src" path="javasrc"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/jnetpcap-1.3.0/jnetpcap.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/jnetpcap-1.4.r1425/jnetpcap.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/JSon/gson-2.3.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/bcprov-jdk16-146.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/commons-codec-1.4.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/CryptoLib.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/de.fraunhofer.sit.c2x.pki.ca.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/de.fraunhofer.sit.c2x.pki.etsi_ts103097v1114.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/de.fraunhofer.sit.c2x.pki.libs.custom-guice.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/joda-time-2.0.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EtsiItsAdapter/Preserve/pax-logging-api-1.6.10.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/LibItsCam_asn1/lib/LibItsCam_asn1.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/LibItsCdd_asn1/lib/LibItsCdd_asn1.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/LibItsDenm_asn1/lib/LibItsDenm_asn1.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/LibItsMapSpat_asn1/lib/LibItsMapSpat_asn1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="tt3plugins/EclipseTitan/java-json.jar"/>
+	<classpathentry kind="lib" path="tt3plugins/EclipseTitan/TRI.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

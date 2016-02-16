@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "7e5d7a93-ec6c-420b-ae88-77f9a270f370",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/84d2bdc6-985e-48eb-b396-6b9a7c047ca2"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "7e5d7a93-ec6c-420b-ae88-77f9a270f370",
+            "type": "STRING",
+            "value": "DENM profile"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "7e5d7a93-ec6c-420b-ae88-77f9a270f370",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "7e5d7a93-ec6c-420b-ae88-77f9a270f370"
+}

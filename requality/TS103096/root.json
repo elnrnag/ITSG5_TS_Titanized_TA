@@ -1,0 +1,19 @@
+{
+    "attributes": {
+        "_sort_by_locations": {
+            "isGenerated": false,
+            "key": "_sort_by_locations",
+            "origin": "14c95c76-f88e-4665-ac98-eeb018369db8",
+            "type": "BOOL",
+            "value": false
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "14c95c76-f88e-4665-ac98-eeb018369db8",
+            "type": "STRING",
+            "value": "DBRoot"
+        }
+    },
+    "uuid": "14c95c76-f88e-4665-ac98-eeb018369db8"
+}

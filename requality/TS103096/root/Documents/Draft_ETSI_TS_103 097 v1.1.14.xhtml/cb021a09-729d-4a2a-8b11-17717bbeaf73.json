@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_28\"><font style=\"font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\"><a name=\"cb021a09-729d-4a2a-8b11-17717bbeaf73\" id=\"id_cb021a09-729d-4a2a-8b11-17717bbeaf73\" class=\"requality_id\"><\/a>As <\/span><a href=\"type\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">ValidityRestriction<\/span><\/font><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><\/a><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\"> field restricting the time of validity, <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">time_start_and_end<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\"> shall be included.<\/span><\/font><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><\/font><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><\/font><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><\/p><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><h3 xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_33\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><font style=\"font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_cb021a09-729d-4a2a-8b11-17717bbeaf73\">\n<\/span><a id=\"_Toc388367904\"><\/a><\/font><\/h3>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "2e2e1a7f-bb03-4fca-9fb1-9eaed31a767e"
+}

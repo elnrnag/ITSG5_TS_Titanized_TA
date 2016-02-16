@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "1d798f87-f769-4b5e-87f6-2d8dc77baa61",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "a1fbc14c-b512-459a-875b-6b4067ded30f",
+            "type": "STRING",
+            "value": "Check that the IUT discards a message when the validity period of the issuing certificate of signing certificate is not started yet\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "a1fbc14c-b512-459a-875b-6b4067ded30f",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'].signer.certificate (CERT_TS_11_04_BO_AT)\r\n\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\treferencing to CERT_TS_11_04_BO_AA\r\n\t\t\t\t\t\tcontaining validity_restrictions['time_start_and_end'] {\r\n\t\t\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\t\t\tindicating END_VALIDITY_AA\r\n\t\t\t\t\t\t\tcontaining end_validity\r\n\t\t\t\t\t\t\t\tindicating END_VALIDITY_AA + 365d\r\n\t\t\t\t\t\t}\r\n\t\t\t\tcontaining validity_restrictions['time_start_and_end'] {\r\n\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\tindicating START_VALIDITY_AA\r\n\t\t\t\t\tcontaining end_validity\r\n\t\t\t\t\t\tindicating END_VALIDITY_AA +365d\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "1d798f87-f769-4b5e-87f6-2d8dc77baa61",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "1d798f87-f769-4b5e-87f6-2d8dc77baa61",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "a1fbc14c-b512-459a-875b-6b4067ded30f"
+}

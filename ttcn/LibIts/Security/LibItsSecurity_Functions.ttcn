@@ -1,0 +1,1700 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Security/LibItsSecurity_Functions.ttcn3 $
+ *            $Id: LibItsSecurity_Functions.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Module containing functions for Security Protocol
+ *
+ */
+module LibItsSecurity_Functions {
+    
+    // Libcommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+
+    // LibItsCommon
+    import from LibItsCommon_Functions all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Templates all;
+    import from LibItsSecurity_Pixits all;
+    import from LibItsSecurity_TestSystem all;
+    
+    group helpersFunctions {
+        
+        /**
+        * @desc    Produces a 256-bit (32-byte) hash value
+        * @param   p_toBeHashedData Data to be used to calculate the hash value
+        * @return  The hash value
+        */
+        function f_hashWithSha256(
+                                  in octetstring p_toBeHashedData
+        ) return Oct32 {
+            return fx_hashWithSha256(p_toBeHashedData);
+        } // End of function f_hashWithSha256
+        
+        /**
+        * @desc    Produces a Elliptic Curve Digital Signature Algorithm (ECDSA) signaturee
+        * @param   p_toBeSignedSecuredMessage    The data to be signed
+        * @return  The signature value
+        */
+        function f_signWithEcdsaNistp256WithSha256(
+                                                   in octetstring p_toBeSignedSecuredMessage,
+                                                   in Oct32 p_privateKey
+        ) runs on ItsSecurityBaseComponent return octetstring {
+            return fx_signWithEcdsaNistp256WithSha256(
+                p_toBeSignedSecuredMessage,
+                p_privateKey
+            );
+            
+        } // End of function f_signWithEcdsaNistp256WithSha256
+        
+        /**
+        * @desc Compute the HashedId8 value from the hash value
+        * @param p_hash The hash value
+        * @return The HashedId8 value
+        * @verdict
+        */
+        function f_HashedId8FromSha256(
+                                       in Oct32 p_hash
+        ) return HashedId8 {
+            return substr(p_hash, lengthof(p_hash) - 8, 8);
+        } // End of function f_HashedId8FromSha256
+        
+        /**
+        * @desc Compute the HashedId3 value from the HashedId8 value
+        * @param p_hashp_hashedId8 The HashedId8 value
+        * @return The HashedId3 value
+        * @verdict Unchanged
+        */
+        function f_HashedId3FromHashedId8(
+                                          in HashedId8 p_hashedId8
+        ) return HashedId3 {
+            return substr(p_hashedId8, lengthof(p_hashedId8) - 3, 3);
+        }  // End of function f_HashedId3FromHashedId8
+        
+        /**
+        * @desc    Verify the signature of the specified data
+        * @param   p_toBeVerifiedData          The data to be verified
+        * @param   p_signature                 The signature
+        * @param   p_ecdsaNistp256PublicKeyX   The public key (x coordinate)
+        * @param   p_ecdsaNistp256PublicKeyY   The public key (y coordinate)
+        * @return  true on success, false otherwise
+        */
+        function f_verifyWithEcdsaNistp256WithSha256(
+                                                     in octetstring p_toBeVerifiedData,
+                                                     in octetstring p_signature,
+                                                     in octetstring p_ecdsaNistp256PublicKeyX,
+                                                     in octetstring p_ecdsaNistp256PublicKeyY
+        ) return boolean {
+//            log("f_verifyWithEcdsaNistp256WithSha256: toBeVerifiedData", p_toBeVerifiedData);
+//            log("f_verifyWithEcdsaNistp256WithSha256: toBeVerifiedData length", lengthof(p_toBeVerifiedData));
+//            log("f_verifyWithEcdsaNistp256WithSha256: signature", p_signature);
+//            log("f_verifyWithEcdsaNistp256WithSha256: ecdsaNistp256PublicKeyX", p_ecdsaNistp256PublicKeyX);
+//            log("f_verifyWithEcdsaNistp256WithSha256: ecdsaNistp256PublicKeyY", p_ecdsaNistp256PublicKeyY);
+            return fx_verifyWithEcdsaNistp256WithSha256(
+                p_toBeVerifiedData,
+                p_signature,
+                p_ecdsaNistp256PublicKeyX,
+                p_ecdsaNistp256PublicKeyY);
+        } // End of function f_verifyWithEcdsaNistp256WithSha256
+        
+        /**
+        * @desc    Calculate digest over the certificate
+        * @param   p_cert The certificate
+        * @return  the HashedId8 value
+        * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.13   HashedId8
+        */
+        function f_calculateDigestFromCertificate(
+                                                  in Certificate p_cert
+        ) return HashedId8 {
+            var octetstring v_toBeHashedData;
+            var octetstring v_hash;
+                        
+            v_toBeHashedData := bit2oct(encvalue(p_cert));
+            v_hash := f_hashWithSha256(v_toBeHashedData);
+            return substr(v_hash, lengthof(v_hash) - 8, 8);
+        } // End of function f_calculateDigestFromCertificate
+        
+        group hostSignatureHelpers {
+            
+            /**
+            * @desc    Initialize [out] certificates according to the specified certificate name
+            * @param   p_certificateName The certificate name to be used
+            * @param   p_aaCertificate The AA certificate [out]
+            * @param   p_atCertificate The AT certificate [out]
+            * @return  true on succes, false otherwise
+            * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.13   HashedId8
+            */
+            function f_prepareCertificates(
+                                           in template (omit) charstring p_certificateName,
+                                           out Certificate p_aaCertificate,
+                                           out Certificate p_atCertificate
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Load certificates if required
+                if (ispresent(p_certificateName) and (valueof(p_certificateName) != cc_taCert_A)) {
+                    if (f_readCertificate(valueof(p_certificateName), p_atCertificate) == false){
+                        return false;
+                    }
+                    if (f_readCertificate(oct2str(p_atCertificate.signer_info.signerInfo.digest), p_aaCertificate) == false) {
+                        return false;
+                    }
+                } else {
+                    p_atCertificate := vc_atCertificate;
+                    p_aaCertificate := vc_aaCertificate;
+                }
+                // Store the certificte to build this message
+                vc_lastAtCertificateUsed := p_atCertificate;
+                
+                return true;
+            } // End of function f_prepareCertificates
+            
+            /**
+             * @desc  This function build and sign the SecureMessage part covered by the signature process
+             * @param p_securedMessage      The signed  SecureMessage part
+             * @param p_payloadField       Payloads to be included in the message
+             * @param p_mandatoryHeaders    Mandatory headers for the selected profile 
+             * @param p_headerFields        HeaderFields to be inserted in the message
+             * @param p_securityProfile     Selected security profile
+             * @return true on success, false otherwise
+             */
+            function f_buildGnSecuredMessage(
+                                             out template (value) SecuredMessage p_securedMessage,
+                                             in template (value) charstring p_certificateName,
+                                             in template (value) SecPayload p_payloadField,
+                                             in template (value) HeaderFields p_mandatoryHeaders,
+                                             in template (omit) HeaderFields p_headerFields := omit
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var octetstring v_secPayload, v_signature;
+                var Oct32 v_hash;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var integer i, j, k, n;
+                var HeaderFields v_headerFields := {};
+                var SecPayload v_toBeSignedPayload;
+                var Oct32 v_privateKey;
+                
+                // Prepare headers
+                if (not(ispresent(p_headerFields))) {
+                    v_headerFields := valueof(p_mandatoryHeaders);
+                } else {
+                    // Merge p_headerFields and v_mandatoryHeaders into v_headerFields
+                        
+                    i := 0; // index for p_headerFields
+                    j := 0; // index for v_mandatoryHeaders
+                    k := 0; // index for v_headerFields
+                        
+                    // Special processing for signer_info
+                    if (lengthof(valueof(p_headerFields)) > 0 and valueof(p_headerFields[i].type_) == e_signer_info) {
+                        v_headerFields[k] := valueof(p_headerFields[i]);
+                        k := k + 1;
+                        i := i + 1;
+                    }
+                    
+                    for (j := j; j < lengthof(p_mandatoryHeaders); j := j + 1) {
+                        // Search for mandatory header in p_HeaderFields
+                        for (n := 0; n < lengthof(p_headerFields); n := n + 1) {
+                            if (valueof(p_headerFields[n].type_) == valueof(p_mandatoryHeaders[j].type_)) {
+                                // mandatory header already in p_HeaderFields
+                                break;
+                            }
+                        } // End of 'for' statement
+                        if (n >= lengthof(p_headerFields)) {
+                            if (valueof(p_mandatoryHeaders[j].type_) != e_signer_info) {
+                                // Add headers from p_headerFields having lower number than mandatory header
+                                for (n := i; n < lengthof(p_headerFields) and valueof(p_headerFields[n].type_) < valueof(p_mandatoryHeaders[j].type_); n := n + 1) {
+                                    v_headerFields[k] := valueof(p_headerFields[n]);
+                                    k := k + 1;
+                                    i := i + 1;
+                                }
+                            }
+                            // Add mandatory header
+                            v_headerFields[k] := valueof(p_mandatoryHeaders[j]);
+                            k := k + 1;
+                        }
+                    } // End of 'for' statement
+                        
+                    // Add remaining headers from p_HeaderFields
+                    for ( i := i; i < lengthof(p_headerFields); i := i + 1) {
+                        // Add headers from p_headerFields having lower number than mandatory header
+                        v_headerFields[k] := valueof(p_headerFields[i]);
+                        k := k + 1;
+                    } // End of 'for' statement
+                }
+                
+                // Prepare payload to be signed
+                v_toBeSignedPayload := valueof(p_payloadField);
+                
+                v_toBeSignedSecuredMessage := m_toBeSignedSecuredMessage(
+                    v_headerFields,
+                    v_toBeSignedPayload,
+                    e_signature
+                );
+                
+                v_secPayload := bit2oct(encvalue(v_toBeSignedSecuredMessage));
+                
+                // Signed payload
+                if (ispresent(p_certificateName) and (valueof(p_certificateName) != cc_taCert_A)) {
+                    if(not f_readSigningKey(valueof(p_certificateName), v_privateKey)){
+                        return false;
+                    }
+                } else {
+                    if(not f_readSigningKey(valueof(cc_taCert_A), v_privateKey)){
+                        return false;
+                    }
+                }
+                v_signature := f_signWithEcdsaNistp256WithSha256(
+                    v_secPayload, 
+                    v_privateKey 
+                );
+                
+                p_securedMessage := m_securedMessage(
+                    v_toBeSignedSecuredMessage.header_fields,
+                    p_payloadField,
+                    {
+                        m_trailer_field_signature(
+                            m_signature(
+                                m_ecdsaSignature(
+                                    m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only(
+                                        substr(v_signature, 2, 32)
+                                    ),
+                                    substr(v_signature, 34, 32)
+                                )
+                            )
+                        )
+                    }
+                );
+                
+                return true;
+            } // End of function f_buildGnSecuredMessage
+            
+            /**
+             * @desc  This function build and sign the SecureMessage part covered by the signature process including wrong elements of protocols. It is used for BO test cases
+             * @param p_securedMessage      The signed  SecureMessage part
+             * @param p_certificateName     The certificate name
+             * @param  p_protocolVersion    The protocol version to be set. Default: 2
+             * @param  p_trailerStatus      The Traile behaviour:
+             *                              <li>0 for no trailer</li>
+             *                              <li>1 for invalid trailer</li>
+             *                              <li>2 for duplicated trailer</li>
+             * @param p_payloadField        Payloads to be included in the message
+             * @param p_mandatoryHeaders    Mandatory headers for the selected profile 
+             * @param p_headerFields        HeaderFields to be inserted in the message
+             * @param p_securityProfile     Selected security profile
+             * @return true on success, false otherwise
+             */
+            function f_buildGnSecuredMessage_Bo(
+                                                out template (value) SecuredMessage p_securedMessage,
+                                                in template (value) charstring p_certificateName,
+                                                in integer p_protocolVersion := c_protocol_version,
+                                                in integer p_trailerStatus := 0,
+                                                in template (value) SecPayload p_payloadField,
+                                                in template (value) HeaderFields p_mandatoryHeaders,
+                                                in template (omit) HeaderFields p_headerFields := omit
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var octetstring v_secPayload, v_signature;
+                var Oct32 v_hash;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var integer i, j, k, n;
+                var HeaderFields v_headerFields := {};
+                var SecPayload v_toBeSignedPayload;
+                var Oct32 v_privateKey;
+                var UInt8 v_trailerSize;
+                
+                // Prepare headers
+                if (not(ispresent(p_headerFields))) {
+                    v_headerFields := valueof(p_mandatoryHeaders);
+                } else {
+                    // Merge p_headerFields and v_mandatoryHeaders into v_headerFields
+                        
+                    i := 0; // index for p_headerFields
+                    j := 0; // index for v_mandatoryHeaders
+                    k := 0; // index for v_headerFields
+                        
+                    // Special processing for signer_info
+                    if (lengthof(valueof(p_headerFields)) > 0 and valueof(p_headerFields[i].type_) == e_signer_info) {
+                        v_headerFields[k] := valueof(p_headerFields[i]);
+                        k := k + 1;
+                        i := i + 1;
+                    }
+                    
+                    for (j := j; j < lengthof(p_mandatoryHeaders); j := j + 1) {
+                        // Search for mandatory header in p_HeaderFields
+                        for (n := 0; n < lengthof(p_headerFields); n := n + 1) {
+                            if (valueof(p_headerFields[n].type_) == valueof(p_mandatoryHeaders[j].type_)) {
+                                // mandatory header already in p_HeaderFields
+                                break;
+                            }
+                        } // End of 'for' statement
+                        if (n >= lengthof(p_headerFields)) {
+                            if (valueof(p_mandatoryHeaders[j].type_) != e_signer_info) {
+                                // Add headers from p_headerFields having lower number than mandatory header
+                                for (n := i; n < lengthof(p_headerFields) and valueof(p_headerFields[n].type_) < valueof(p_mandatoryHeaders[j].type_); n := n + 1) {
+                                    v_headerFields[k] := valueof(p_headerFields[n]);
+                                    k := k + 1;
+                                    i := i + 1;
+                                }
+                            }
+                            // Add mandatory header
+                            v_headerFields[k] := valueof(p_mandatoryHeaders[j]);
+                            k := k + 1;
+                        }
+                    } // End of 'for' statement
+                        
+                    // Add remaining headers from p_HeaderFields
+                    for ( i := i; i < lengthof(p_headerFields); i := i + 1) {
+                        // Add headers from p_headerFields having lower number than mandatory header
+                        v_headerFields[k] := valueof(p_headerFields[i]);
+                        k := k + 1;
+                    } // End of 'for' statement
+                }
+                
+                // Prepare payload to be signed
+                v_toBeSignedPayload := valueof(p_payloadField);
+                if (p_trailerStatus == 0) {
+                    v_trailerSize := 0;
+                } else if (p_trailerStatus == 1) {
+                    v_trailerSize := 67;
+                } else if (p_trailerStatus == 2) {
+                    v_trailerSize := 2 * 67;
+                } else {
+                    v_trailerSize := 67;
+                }
+                v_toBeSignedSecuredMessage := m_toBeSignedSecuredMessage_wrong_protocol(
+                    v_headerFields,
+                    v_toBeSignedPayload,
+                    e_signature,
+                    p_protocolVersion,
+                    v_trailerSize
+                );
+                
+                v_secPayload := bit2oct(encvalue(v_toBeSignedSecuredMessage));
+                
+                // Signed payload
+                if (ispresent(p_certificateName) and (valueof(p_certificateName) != cc_taCert_A)) {
+                    if(not f_readSigningKey(valueof(p_certificateName), v_privateKey)){
+                        return false;
+                    }
+                } else {
+                    if(not f_readSigningKey(valueof(cc_taCert_A), v_privateKey)){
+                        return false;
+                    }
+                }
+                v_signature := f_signWithEcdsaNistp256WithSha256(
+                    v_secPayload, 
+                    v_privateKey 
+                );
+                
+                if (p_trailerStatus == 0) { // No signature
+                    p_securedMessage := m_securedMessage(
+                        v_toBeSignedSecuredMessage.header_fields,
+                        p_payloadField,
+                        { }
+                    );
+                    v_trailerSize := 0;
+                } else if (p_trailerStatus == 2) { // Duplicate signature
+                    p_securedMessage := m_securedMessage(
+                        v_toBeSignedSecuredMessage.header_fields,
+                        p_payloadField,
+                        {
+                            m_trailer_field_signature(
+                                m_signature(
+                                    m_ecdsaSignature(
+                                        m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only(
+                                            substr(v_signature, 2, 32)
+                                        ),
+                                        substr(v_signature, 34, 32)
+                                    )
+                                )
+                            ), 
+                            m_trailer_field_signature(
+                                m_signature(
+                                    m_ecdsaSignature(
+                                        m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only(
+                                            substr(v_signature, 2, 32)
+                                        ),
+                                        substr(v_signature, 34, 32)
+                                    )
+                                )
+                            ) 
+                        }
+                    );
+                } else { // Invalid signature
+                    p_securedMessage := m_securedMessage(
+                        v_toBeSignedSecuredMessage.header_fields,
+                        p_payloadField,
+                        {
+                            m_trailer_field_signature(
+                                m_signature(
+                                    m_ecdsaSignature(
+                                        m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only(
+                                            substr(v_signature, 2, 32)
+                                        ),
+                                        substr(v_signature, 34, 32)
+                                    )
+                                )
+                            )
+                        }
+                    );
+                    p_securedMessage.trailer_fields[0].trailerField.signature_.signature_.ecdsa_signature.s := not4b(valueof(p_securedMessage.trailer_fields[0].trailerField.signature_.signature_.ecdsa_signature.s));
+                } 
+                
+                return true;
+            } // End of function f_buildGnSecuredMessage_Bo
+            
+            /**
+            * @desc This function build and sign the SecureMessage part covered by the signature process
+            * @param p_securedMessage       The signed  SecureMessage part
+            * @param p_payloadField         Payloads to be included in the message
+            * @param p_signerInfoType       Add digest or AT certificate or certificate chain
+            * @param p_threeDLocation       The 3D location
+            * @param p_headerFields         HeaderFields to be inserted in the message
+            * @param p_certificateName      The certificate identifier to be used. Default: TA_CERT_A
+            * @param p_addMissingHeaders    Whether to add mandatory headers not present in p_headerFields
+            * @return true on success, false otherwise
+            * 
+            * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.1  Security profile for CAMs
+            */
+            function f_buildGnSecuredCam(
+                                         out template (value) SecuredMessage p_securedMessage,
+                                         in template (value) SecPayload p_payloadField,
+                                         in template (omit) SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                         in template (omit) HeaderFields p_headerFields := omit,
+                                         in template (omit) charstring p_certificateName := omit,
+                                         in boolean p_addMissingHeaders := true
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var Certificate v_aaCertificate, v_atCertificate;
+                var HeaderFields v_mandatoryHeaders := {};
+                var HeaderField v_signerInfo;
+                 
+                // Load certificates if required
+                if (f_prepareCertificates(p_certificateName, v_aaCertificate, v_atCertificate) == false) {
+                    return false;
+                }
+                
+                if (p_addMissingHeaders == true) {
+                    // Prepare mandatory headers
+                    if (valueof(p_signerInfoType) == e_certificate) { // Add the AT certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificate(
+                                    v_atCertificate
+                        )));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_chain) { // Add the AT certificate + AA Certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificates(
+                                    {
+                                        v_aaCertificate,
+                                        v_atCertificate
+                                    }
+                                )
+                        ));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_digest_with_sha256) { // Add the AT certificate digest
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_digest(
+                                    f_calculateDigestFromCertificate(v_atCertificate)
+                        )));
+                    }
+                    v_mandatoryHeaders := {
+                        v_signerInfo,
+                        valueof(m_header_field_generation_time(1000 * f_getCurrentTime())), // In us
+                        valueof(m_header_field_its_aid(c_its_aid_CAM))
+                    }
+                }
+                
+                return f_buildGnSecuredMessage(p_securedMessage, p_certificateName, p_payloadField, v_mandatoryHeaders, p_headerFields);
+                
+            } // End of function f_buildGnSecuredCam
+            
+            /**
+            * @desc This function build and sign the SecureMessage part covered by the signature process including wrong elements of protocols. It is used for BO test cases
+            * @param p_securedMessage       The signed  SecureMessage part
+            * @param  p_protocolVersion     The protocol version to be set. Default: 2
+            * @param  p_trailerStatus       The Traile behaviour:
+            *                               <li>0 for no trailer</li>
+            *                               <li>1 for invalid trailer</li>
+            *                               <li>2 for duplicated trailer</li>
+            * @param p_payloadField         Payloads to be included in the message
+            * @param p_signerInfoType       Add digest or AT certificate or certificate chain
+            * @param p_threeDLocation       The 3D location
+            * @param p_headerFields         HeaderFields to be inserted in the message
+            * @param p_certificateName      The certificate identifier to be used. Default: TA_CERT_A
+            * @param p_addMissingHeaders    Whether to add mandatory headers not present in p_headerFields
+            * @return true on success, false otherwise
+            * 
+            * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.1  Security profile for CAMs
+            */
+            function f_buildGnSecuredCam_Bo(
+                                            out template (value) SecuredMessage p_securedMessage,
+                                            in integer p_protocolVersion := c_protocol_version,
+                                            in integer p_trailerStatus := 0,
+                                            in template (value) SecPayload p_payloadField,
+                                            in template (omit) SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                            in template (omit) HeaderFields p_headerFields := omit,
+                                            in template (omit) charstring p_certificateName := omit,
+                                            in boolean p_addMissingHeaders := true
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var Certificate v_aaCertificate, v_atCertificate;
+                var HeaderFields v_mandatoryHeaders := {};
+                var HeaderField v_signerInfo;
+                 
+                // Load certificates if required
+                if (f_prepareCertificates(p_certificateName, v_aaCertificate, v_atCertificate) == false) {
+                    return false;
+                }
+                
+                if (p_addMissingHeaders == true) {
+                    // Prepare mandatory headers
+                    if (valueof(p_signerInfoType) == e_certificate) { // Add the AT certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificate(
+                                    v_atCertificate
+                        )));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_chain) { // Add the AT certificate + AA Certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificates(
+                                    {
+                                        v_aaCertificate,
+                                        v_atCertificate
+                                    }
+                                )
+                        ));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_digest_with_sha256) { // Add the AT certificate digest
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_digest(
+                                    f_calculateDigestFromCertificate(v_atCertificate)
+                        )));
+                    }
+                    v_mandatoryHeaders := {
+                        v_signerInfo,
+                        valueof(m_header_field_generation_time(1000 * f_getCurrentTime())), // In us
+                        valueof(m_header_field_its_aid(c_its_aid_CAM))
+                    }
+                }
+                
+                return f_buildGnSecuredMessage_Bo(p_securedMessage, p_certificateName, p_protocolVersion, p_trailerStatus, p_payloadField, v_mandatoryHeaders, p_headerFields);
+                
+            } // End of function f_buildGnSecuredCam_Bo
+            
+            /**
+             * @desc This function build and sign the SecureMessage part covered by the signature process
+             * @param p_securedMessage       The signed  SecureMessage part
+             * @param p_payloadField        Payloads to be included in the message
+             * @param p_signerInfoType       Add digest or AT certificate or certificate chain
+             * @param p_threeDLocation       The 3D location
+             * @param p_headerFields         HeaderFields to be inserted in the message
+             * @param p_certificateName      The certificate identifier to be used. Default: TA_CERT_A
+             * @param p_addMissingHeaders    Whether to add mandatory headers not present in p_headerFields
+             * @return true on success, false otherwise
+             */
+            function f_buildGnSecuredDenm(
+                                          out template (value) SecuredMessage p_securedMessage,
+                                          in template (value) SecPayload p_payloadField,
+                                          in template (omit) SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                          in ThreeDLocation p_threeDLocation,
+                                          in template (omit) HeaderFields p_headerFields := omit,
+                                          in template (omit) charstring p_certificateName := omit,
+                                          in boolean p_addMissingHeaders := true
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var Certificate v_aaCertificate, v_atCertificate;
+                var HeaderFields v_mandatoryHeaders := {};
+                var HeaderField v_signerInfo;
+                 
+                // Load certificates if required
+                if (f_prepareCertificates(p_certificateName, v_aaCertificate, v_atCertificate) == false) {
+                    return false;
+                }
+                
+                // Add additional headers if required
+                if (p_addMissingHeaders == true) {
+                    // Prepare mandatory headers
+                    if (valueof(p_signerInfoType) == e_certificate) { // Add the AT certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificate(
+                                    v_atCertificate
+                        )));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_chain) { // Add the AT certificate + AA Certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificates(
+                                    {
+                                        v_aaCertificate,
+                                        v_atCertificate
+                                    }
+                                )
+                        ));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_digest_with_sha256) { // Add the AT certificate digest
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_digest(
+                                    v_atCertificate.signer_info.signerInfo.digest
+                        )));
+                    }
+                    v_mandatoryHeaders := {
+                        v_signerInfo,
+                        valueof(m_header_field_generation_time(1000 * f_getCurrentTime())), // In us
+                        valueof(m_header_field_generation_location(p_threeDLocation)),
+                        valueof(m_header_field_its_aid(c_its_aid_DENM))
+                    }
+                }
+                
+                // Build the secured message and return it
+                return f_buildGnSecuredMessage(p_securedMessage, p_certificateName, p_payloadField, v_mandatoryHeaders, p_headerFields);
+                
+            } // End of function f_buildGnSecuredDenm
+            
+            /**
+             * @desc This function build and sign the SecureMessage part covered by the signature process including wrong elements of protocols. It is used for BO test cases
+             * @param p_securedMessage       The signed  SecureMessage part
+             * @param  p_protocolVersion     The protocol version to be set. Default: 2
+             * @param  p_trailerStatus       The Traile behaviour:
+             *                               <li>0 for no trailer</li>
+             *                               <li>1 for invalid trailer</li>
+             *                               <li>2 for duplicated trailer</li>
+             * @param p_payloadField        Payloads to be included in the message
+             * @param p_signerInfoType       Add digest or AT certificate or certificate chain
+             * @param p_threeDLocation       The 3D location
+             * @param p_headerFields         HeaderFields to be inserted in the message
+             * @param p_certificateName      The certificate identifier to be used. Default: TA_CERT_A
+             * @param p_addMissingHeaders    Whether to add mandatory headers not present in p_headerFields
+             * @return true on success, false otherwise
+             */
+            function f_buildGnSecuredDenm_Bo(
+                                             out template (value) SecuredMessage p_securedMessage,
+                                             in integer p_protocolVersion := c_protocol_version,
+                                             in integer p_trailerStatus := 0,
+                                             in template (value) SecPayload p_payloadField,
+                                             in template (omit) SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                             in ThreeDLocation p_threeDLocation,
+                                             in template (omit) HeaderFields p_headerFields := omit,
+                                             in template (omit) charstring p_certificateName := omit,
+                                             in boolean p_addMissingHeaders := true
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var Certificate v_aaCertificate, v_atCertificate;
+                var HeaderFields v_mandatoryHeaders := {};
+                var HeaderField v_signerInfo;
+                 
+                // Load certificates if required
+                if (f_prepareCertificates(p_certificateName, v_aaCertificate, v_atCertificate) == false) {
+                    return false;
+                }
+                
+                // Add additional headers if required
+                if (p_addMissingHeaders == true) {
+                    // Prepare mandatory headers
+                    if (valueof(p_signerInfoType) == e_certificate) { // Add the AT certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificate(
+                                    v_atCertificate
+                        )));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_chain) { // Add the AT certificate + AA Certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificates(
+                                    {
+                                        v_aaCertificate,
+                                        v_atCertificate
+                                    }
+                                )
+                        ));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_digest_with_sha256) { // Add the AT certificate digest
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_digest(
+                                    v_atCertificate.signer_info.signerInfo.digest
+                        )));
+                    }
+                    v_mandatoryHeaders := {
+                        v_signerInfo,
+                        valueof(m_header_field_generation_time(1000 * f_getCurrentTime())), // In us
+                        valueof(m_header_field_generation_location(p_threeDLocation)),
+                        valueof(m_header_field_its_aid(c_its_aid_DENM))
+                    }
+                }
+                
+                // Build the secured message and return it
+                return f_buildGnSecuredMessage_Bo(p_securedMessage, p_certificateName, p_protocolVersion, p_trailerStatus, p_payloadField, v_mandatoryHeaders, p_headerFields);
+                
+            } // End of function f_buildGnSecuredDenm_Bo
+            
+            /**
+            * @desc This function build and sign the SecureMessage part covered by the signature process
+            * @param p_securedMessage       The signed  SecureMessage part
+            * @param p_payloadField         Payloads to be included in the message
+            * @param p_signerInfoType       Add digest or AT certificate or certificate chain
+            * @param p_threeDLocation       The 3D location
+            * @param p_headerFields         HeaderFields to be inserted in the message
+            * @param p_certificateName      The certificate identifier to be used. Default: TA_CERT_A
+            * @param p_addMissingHeaders    Whether to add mandatory headers not present in p_headerFields
+            * @return true on success, false otherwise
+            */
+            function f_buildGnSecuredOtherMessage(
+                                                  out template (value) SecuredMessage p_securedMessage,
+                                                  in template (value) SecPayload p_payloadField,
+                                                  in template (omit) SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                                  in ThreeDLocation p_threeDLocation,
+                                                  in template (omit) HeaderFields p_headerFields := omit,
+                                                  in template (omit) charstring p_certificateName := omit,
+                                                  in boolean p_addMissingHeaders := true
+            ) runs on ItsSecurityBaseComponent return boolean {
+                
+                // Local variables
+                var Certificate v_aaCertificate, v_atCertificate;
+                var HeaderFields v_mandatoryHeaders := {};
+                var HeaderField v_signerInfo;
+                 
+                // Load certificates if required
+                if (f_prepareCertificates(p_certificateName, v_aaCertificate, v_atCertificate) == false) {
+                    return false;
+                }
+                
+                // Add additional headers if required
+                if (p_addMissingHeaders == true) {
+                    // Prepare mandatory headers
+                    if (valueof(p_signerInfoType) == e_certificate) { // Add the AT certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificate(
+                                    v_atCertificate
+                        )));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_chain) { // Add the AT certificate + AA Certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificates(
+                                    {
+                                        v_aaCertificate,
+                                        v_atCertificate
+                                    }
+                                )
+                        ));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_digest_with_sha256) { // Add the AT certificate digest
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_digest(
+                                    v_atCertificate.signer_info.signerInfo.digest
+                        )));
+                    }
+                    v_mandatoryHeaders := {
+                        v_signerInfo,
+                        valueof(m_header_field_generation_time(1000 * f_getCurrentTime())), // In us
+                        valueof(m_header_field_generation_location(p_threeDLocation))
+                    }
+                }
+                
+                // Build the secured message and return it
+                return f_buildGnSecuredMessage(p_securedMessage, p_certificateName, p_payloadField, v_mandatoryHeaders, p_headerFields);
+            } // End of function f_buildGnSecuredOtherMessage
+            
+        } // End of group hostSignatureHelpers
+        
+        group deviceSignatureHelpers {
+            
+            /**
+             * @desc Retrieve the HashedId8 to be sent to the IUT, based on the provided certificate identifier
+             * @param p_certificateName The certificate the IUT shall use
+             * @return The HashedId8 to be sent to the IUT in the UtInitialize command
+             * @verdict Unchanged
+             * @remark Component variable vc_hashedId8ToBeUsed shall be set with the IUT certificate to be used
+             */
+            function f_setupIutCertificate(
+                                           in charstring p_certificateName
+            ) runs on ItsSecurityBaseComponent return HashedId8 {
+                // Local variables
+                var Certificate v_atCertificate;
+                var HashedId8   v_hashedId8 := '0000000000000000'O;
+                
+                // Sanity check
+                if (lengthof(p_certificateName) == 0) {
+                    return v_hashedId8;
+                }
+                
+                // Load certificates
+                if(f_getCertificateDigest(p_certificateName, v_hashedId8) == false) {
+                    v_hashedId8 := '0000000000000000'O;
+                }
+                
+                return v_hashedId8;
+            } // End of function f_setupIutCertificate
+             
+            /**
+            * @desc Verify the signature of the provided certificate
+            * @param p_certificateToBeVerified Certificate to be verified
+            * @param p_publicKey               Public key to verify the certificate signature
+            * @return true on success, false otherwise
+            * @verdict
+            */
+            function f_verifyCertificateSignatureWithPublicKey(
+                                                               in template (value) Certificate p_certificateToBeVerified,
+                                                               in template (value) PublicKey   p_publicKey
+            ) return boolean {
+                // Local variables
+                var octetstring toBeVerifiedData;
+                var octetstring v_signature;
+                var boolean v_result := false;
+                var template (value) ToBeSignedCertificate v_toBeSignedCertificate;
+                
+                // Create Certificate payload to be verified
+                v_toBeSignedCertificate := m_toBeSignedCertificate(p_certificateToBeVerified);
+                toBeVerifiedData := bit2oct(encvalue(v_toBeSignedCertificate));
+                               
+                // Build the signature
+                v_signature :=
+                    '0000'O &
+                    valueof(p_certificateToBeVerified.signature_.signature_.ecdsa_signature.r.x) &
+                    valueof(p_certificateToBeVerified.signature_.signature_.ecdsa_signature.s);
+                
+                log("toBeVerifiedData: ", toBeVerifiedData);
+                log("v_signature     : ", v_signature);
+                log("PublicKey       :", p_publicKey);
+                
+                // Verify the certificate
+                v_result := f_verifyWithEcdsaNistp256WithSha256(
+                    toBeVerifiedData,
+                    v_signature,
+                    valueof(p_publicKey.public_key.eccPoint.x),
+                    valueof(p_publicKey.public_key.eccPoint.y.y)
+                );
+                
+                return v_result;
+            } // End of finction f_verifyCertificateSignatureWithPublicKey
+            
+            /**
+            * @desc Verify the signature of the provided secured message
+            * @param p_certificateToBeVerified Certificate to be verified
+            * @param p_issuingCertificate      Issuing certificate
+            * @return true on success, false otherwise
+            * @verdict
+            */
+            function f_verifyCertificateSignatureWithIssuingCertificate(
+                                                                        in template (value) Certificate p_certificateToBeVerified,
+                                                                        in template (value) Certificate p_issuingCertificate
+            ) return boolean {
+                for (var integer v_counter := 0; v_counter < lengthof(p_issuingCertificate.subject_attributes); v_counter := v_counter + 1) {
+                    if (valueof(p_issuingCertificate.subject_attributes[v_counter].type_) == e_verification_key) {
+                        return f_verifyCertificateSignatureWithPublicKey(
+                            p_certificateToBeVerified,
+                            p_issuingCertificate.subject_attributes[v_counter].attribute.key);
+                    }
+                } // End of 'for' statement
+                
+                return false;
+            } // End of function f_verifyCertificateSignatureWithIssuingCertificate
+            
+            /**
+            * @desc Verify the signature of the provided secured message
+            * @param p_securedMessage  The message to be verified
+            * @param p_publicKey       The ECDSA public key to verify a signature
+            * @param p_certificate     Certificate to be used to verify the message
+            * @return true on success, false otherwise
+            * @verdict
+            */
+            function f_verifyGnSecuredMessageSignatureWithPublicKey(
+                                                                    in template (value) SecuredMessage p_securedMessage,
+                                                                    in template (value) PublicKey p_publicKey
+            ) return boolean {
+                
+                // Local variables
+                var octetstring v_secPayload;
+                var octetstring v_signedData;
+                var Oct32 v_hash;
+                var integer v_counter;
+                var boolean v_result := false;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                
+//                log(">>> f_verifyGnSecuredMessageSignatureWithPublicKey: p_securedMessage= ", p_securedMessage);
+//                log(">>> f_verifyGnSecuredMessageSignatureWithPublicKey: p_publicKey= ", p_publicKey);
+                
+                // Create SecuredMessage payload to be signed
+                v_toBeSignedSecuredMessage := m_toBeSignedSecuredMessage(
+                    p_securedMessage.header_fields,
+                    p_securedMessage.payload_field,
+                    e_signature
+                );
+                log("f_verifyGnSecuredMessageSignatureWithPublicKey: v_toBeSignedSecuredMessage=", v_toBeSignedSecuredMessage);
+                
+                v_secPayload := bit2oct(encvalue(v_toBeSignedSecuredMessage));
+                log("f_verifyGnSecuredMessageSignatureWithPublicKey: v_secPayload=", v_secPayload);
+                
+                // FIXME BUG Framework already compute the hash
+//                // Calculate the hash of the SecuredMessage payload to be signed
+//                v_hash := fx_hashWithSha256(v_secPayload);
+//                log("f_verifyGnSecuredMessageSignatureWithPublicKey: v_hash=", v_hash);
+//                
+                // Verify payload
+                for (v_counter := 0; v_counter < lengthof(p_securedMessage.trailer_fields); v_counter := v_counter + 1) {
+                    var SecuredMessage v_securedMessage := valueof(p_securedMessage);
+                    if (
+                        (v_securedMessage.trailer_fields[v_counter].type_ == e_signature) and
+                        (v_securedMessage.trailer_fields[v_counter].trailerField.signature_.algorithm == e_ecdsa_nistp256_with_sha256)
+                    ) {
+                        v_signedData :=
+                        '0000'O &
+                        v_securedMessage.trailer_fields[v_counter].trailerField.signature_.signature_.ecdsa_signature.r.x &
+                        v_securedMessage.trailer_fields[v_counter].trailerField.signature_.signature_.ecdsa_signature.s;
+                        log("f_verifyGnSecuredMessageSignatureWithPublicKey: v_signedData=", v_signedData);
+                        v_result := f_verifyWithEcdsaNistp256WithSha256(
+                            v_secPayload, // FIXME BUG Framework already compute the hash v_hash,
+                            v_signedData,
+                            valueof(p_publicKey.public_key.eccPoint.x),
+                            valueof(p_publicKey.public_key.eccPoint.y.y)
+                        );
+                        break;
+                    }
+                } // End of 'for' statement
+                
+                log("f_verifyGnSecuredMessageSignatureWithPublicKey: v_result=", v_result);
+                return v_result;
+            } // End of function f_verifyCertificateSignatureWithPublicKey
+            
+            /**
+            * @desc Verify the signature of the provided secured message
+            * @param p_securedMessage
+            * @param p_certificate     Certificate to be used to verify the message
+            * @return true on success, false otherwise
+            * @verdict
+            */
+            function f_verifyGnSecuredMessageSignatureWithCertificate(
+                                                                      in template (value) SecuredMessage p_securedMessage,
+                                                                      in template (value) Certificate p_certificate
+            ) return boolean {
+                
+                for (var integer v_counter := 0; v_counter < lengthof(p_certificate.subject_attributes); v_counter := v_counter + 1) {
+                    var SubjectAttribute v_subjectAttribute := valueof(p_certificate.subject_attributes[v_counter]);
+                    
+                    log("f_verifyGnSecuredMessageSignatureWithCertificate: processing ", v_subjectAttribute);
+                    if (v_subjectAttribute.type_ == e_verification_key) {
+                        return f_verifyGnSecuredMessageSignatureWithPublicKey(
+                            p_securedMessage,
+                            p_certificate.subject_attributes[v_counter].attribute.key);
+                    }
+                } // End of 'for' statement
+                
+                return false;
+            } // End of function f_verifyGnSecuredOtherMessageWithDeviceCertificate
+            
+        } // End of group deviceSignatureHelpers
+        
+        group messageGetters {
+            
+            /**
+            * @desc    return SecuredMessage header field of given type or null if none
+            * @param   p_msg the SecuredMessage
+            * @param   p_type header field type
+            * @return  HeaderField of given type if any or null
+            */
+            function f_getMsgHeaderField(
+                                         in  SecuredMessage p_securedMessage,
+                                         in  HeaderFieldType p_headerFieldType,
+                                         out HeaderField p_return
+            ) return boolean {
+                var integer v_length := lengthof(p_securedMessage.header_fields);
+                
+                for (var integer i := 0; i < v_length; i := i + 1) {
+                    if (p_securedMessage.header_fields[i].type_ == p_headerFieldType) {
+                        p_return := p_securedMessage.header_fields[i];
+                        return true;
+                    }
+                }
+                
+                log("f_getMsgHeaderField: return false");
+                return false;
+            }
+            
+            /**
+            * @desc    return SignerInfo SecuredMessage field
+            */
+            function f_getMsgSignerInfo (
+                                         in SecuredMessage p_securedMessage,
+                                         out SignerInfo p_signerInfo
+            ) return boolean {
+                var HeaderField v_hf;
+                
+                if (f_getMsgHeaderField(p_securedMessage, e_signer_info, v_hf) == true) {
+                    if (isbound(v_hf.headerField.signer)) {
+                        p_signerInfo := v_hf.headerField.signer;
+                        return true;
+                    }
+                }
+                
+                log("f_getMsgSignerInfo: return false");
+                return false;
+            }
+            
+        }// End of group messageGetters
+        
+        group certificateGetters {
+            
+            /**
+             * @desc Set the generation location as defined in Draft ETSI TS 103 097 V1.1.14 Clause 7.2 Security profile for DENMs
+             * @param p_latitude    The latitude value of the ITS-S position
+             * @param p_longitude   The longitude value of the ITS-S position
+             * @param p_elevation   The elevation value of the ITS-S position
+             * @verdict Unchanged
+             */
+            function f_setGenerationLocation(
+                                             in WGSLatitude p_latitude,
+                                             in WGSLongitude p_longitude,
+                                             in Oct2 p_elevation := '0000'O
+            ) runs on ItsSecurityBaseComponent {
+                vc_location := {
+                    p_latitude,
+                    p_longitude,
+                    p_elevation
+                }
+            } // End of function f_setGenerationLocation
+            
+            /**
+            * @desc    Load in memory cache the certificates available
+            * @param   p_configId      A configuration identifier
+            * @remark  This method SHALL be call before any usage of certificates
+            * @return  true on success, false otherwise
+            */
+            function f_loadCertificates(
+                                        in charstring p_configId
+            ) runs on ItsSecurityBaseComponent return boolean {
+                var boolean v_result;
+                
+                // Setup certificates memory cache
+                if (fx_loadCertificates(PX_CERTIFICATE_POOL_PATH, p_configId) == true) {
+                    // Setup security component variables
+                    if(f_readCertificate(cc_taCert_A, vc_atCertificate)) {
+                        if(f_readCertificate(oct2str(vc_atCertificate.signer_info.signerInfo.digest), vc_aaCertificate)) {
+                            if(f_readSigningKey(cc_taCert_A, vc_signingPrivateKey)) {
+                                f_readEncryptingKey(cc_taCert_A, vc_encryptPrivateKey);
+                                return true;
+                            }
+                            log("f_loadCertificates: Failed to load signing key for ", cc_taCert_A);
+                        }else{
+                            log("f_loadCertificates: Failed to load AA certificate for ", cc_taCert_A);
+                        }
+                    }else{
+                        log("f_loadCertificates: Failed to load AA certificate for ", cc_taCert_A);
+                    }
+                }else{
+                    log("f_loadCertificates: Failed to load certificates from ", PX_CERTIFICATE_POOL_PATH);
+                }
+                return false;
+            } // End of function f_loadCertificates
+            
+            /**
+            * @desc    Unload from memory cache the certificates available
+            * @return  true on success, false otherwise
+            */
+            function f_unloadCertificates() runs on ItsSecurityBaseComponent return boolean {
+                // Reset security component variables
+                vc_signingPrivateKey := '0000000000000000000000000000000000000000000000000000000000000000'O;
+                vc_encryptPrivateKey := '0000000000000000000000000000000000000000000000000000000000000000'O;
+                // Clear certificates memory cache
+                return fx_unloadCertificates();
+            } // End of function f_unloadCertificates
+            
+            /**
+            * @desc    Read the specified certificate
+            * @param   p_certificateId the certificate identifier
+            * @param   p_certificate   the expected certificate
+            * @return  true on success, false otherwise
+            */
+            function f_readCertificate(
+                                       in charstring p_certificateId,
+                                       out Certificate p_certificate
+            ) runs on ItsSecurityBaseComponent return boolean {
+                var octetstring v_certificate;
+                
+                if (fx_readCertificate(p_certificateId, v_certificate) == true) {
+                    var bitstring v_oct2bit;
+                    var integer v_result;
+                    
+                    v_oct2bit := oct2bit(v_certificate);
+                    v_result := decvalue(v_oct2bit, p_certificate);
+                    if (v_result == 0) {
+                        return true;
+                    }
+                }
+                
+                log("f_readCertificate: Failed to retrieve ", p_certificateId);
+                return false;
+            } // End of function f_readCertificate
+
+            /**
+            * @desc    Read the specified certificate
+            * @param   p_certificateId the certificate identifier
+            * @param   p_certificate   the expected certificate
+            * @return  true on success, false otherwise
+            */
+            function f_getCertificateDigest(
+                                       in charstring p_certificateId,
+                                       out HashedId8 p_digest
+            ) runs on ItsSecurityBaseComponent return boolean {
+                if( not fx_readCertificateDigest(p_certificateId, p_digest)){
+                    log("f_getCertificateDigest: Failed to retrieve digest for ", p_certificateId);
+                    return false;
+                }
+                return true;
+            } // End of function f_getCertificateDigest
+            
+            /**
+            * @desc    Read the signing private key for the specified certificate
+            * @param   p_keysId            the keys identifier
+            * @param   p_signingPrivateKey the signing private key
+            * @return  true on success, false otherwise
+            */
+            function f_readSigningKey(
+                                       in charstring p_keysId,
+                                       out Oct32 p_signingPrivateKey
+            ) runs on ItsSecurityBaseComponent return boolean {
+                return fx_readSigningKey(p_keysId, p_signingPrivateKey);
+            } // End of function f_readSigningKey
+            
+            /**
+            * @desc    Read the encrypting private keys for the specified certificate
+            * @param   p_keysId            the keys identifier
+            * @param   p_encryptPrivateKey the encrypt private key
+            * @return  true on success, false otherwise
+            */
+            function f_readEncryptingKey(
+                                       in charstring p_keysId,
+                                       out Oct32 p_encryptPrivateKey
+            ) runs on ItsSecurityBaseComponent return boolean {
+                return fx_readEncryptingKey(p_keysId, p_encryptPrivateKey);
+            } // End of function f_readEncryptingKey
+            
+            function f_getCertificateValidityRestriction(
+                                                         in template (value) Certificate p_cert,
+                                                         in ValidityRestrictionType p_type,
+                                                         out ValidityRestriction p_return
+            ) return boolean {
+                
+                for (var integer i := 0; i < lengthof(p_cert.validity_restrictions); i := i + 1) {
+                    if (valueof(p_cert.validity_restrictions[i].type_) == p_type) {
+                        p_return := valueof(p_cert.validity_restrictions[i]);
+                        return true;
+                    }
+                } // End of 'for' statement
+                
+                log("f_getCertificateValidityRestriction: Failed to retrieve ", p_type);
+                return false;
+            } // End of function f_getCertificateValidityRestriction
+            
+            function f_getCertificateSignerInfo(
+                                                in template (value) Certificate p_cert,
+                                                out SignerInfo p_si
+            ) return boolean {
+                if (isbound(valueof(p_cert.signer_info))) {
+                    p_si := valueof(p_cert.signer_info);
+                    return true;
+                }
+                
+                log("f_getCertificateSignerInfo: Failed to retrieve ");
+                return false;
+            }
+            
+            function f_getCertificateSubjectAttribute(
+                                                      in template (value) Certificate p_cert,
+                                                      in SubjectAttributeType p_type,
+                                                      out SubjectAttribute p_return
+            ) return boolean {
+                for (var integer i := 0; i < lengthof(p_cert.subject_attributes); i := i + 1) {
+                    if (valueof(p_cert.subject_attributes[i].type_) == p_type) {
+                        p_return := valueof(p_cert.subject_attributes[i]);
+                        return true;
+                    }
+                }
+                
+                log("f_getCertificateSubjectAttribute: Failed to retrieve ", p_type);
+                return false;
+            }
+            
+        }// End of group certificateGetters
+        
+    } // End of group helpersFunctions
+
+   	group externalFunctions {
+        
+        group signing {
+            
+            /**
+            * @desc    Produces a 256-bit (32-byte) hash value
+            * @param   p_toBeHashedData Data to be used to calculate the hash value
+            * @return  The hash value
+            */
+            external function fx_hashWithSha256(in octetstring p_toBeHashedData) return Oct32;
+            
+            /**
+            * @desc    Produces a Elliptic Curve Digital Signature Algorithm (ECDSA) signaturee
+            * @param   p_toBeSignedSecuredMessage    The data to be signed
+            * @param   p_privateKey        The private key
+            * @return  The signature value
+            */
+            external function fx_signWithEcdsaNistp256WithSha256(in octetstring p_toBeSignedSecuredMessage, in octetstring/*UInt64*/ p_privateKey) return octetstring;
+            
+            /**
+            * @desc    Verify the signature of the specified data
+            * @param   p_toBeVerifiedData          The data to be verified
+            * @param   p_signature                 The signature
+            * @param   p_ecdsaNistp256PublicKeyX   The public key (x coordinate)
+            * @param   p_ecdsaNistp256PublicKeyY   The public key (y coordinate)
+            * @return  true on success, false otherwise
+            */
+            external function fx_verifyWithEcdsaNistp256WithSha256(in octetstring p_toBeVerifiedData, in octetstring p_signature, in octetstring p_ecdsaNistp256PublicKeyX, in octetstring p_ecdsaNistp256PublicKeyY) return boolean;
+            
+            /**
+            * @desc    Produce a new public/private key pair based on Elliptic Curve Digital Signature Algorithm (ECDSA) algorithm.
+            *          This function should not be used by the ATS
+            * @param   p_privateKey    The new private key value
+            * @param   p_publicKeyX    The new public key value (x coordinate)
+            * @param   p_publicKeyX    The new public key value (y coordinate)
+            * @return  true on success, false otherwise
+            */
+            external function fx_generateKeyPair(out octetstring/*UInt64*/ p_privateKey, out octetstring p_publicKeyX, out octetstring p_publicKeyY) return boolean;
+            
+        } // End of group signing
+        
+        group encryption {
+            
+        } // End of group encryption
+        
+        group certificatesLoader {
+            
+            /**
+            * @desc    Load in memory cache the certificates available in the specified directory
+            * @param   p_rootDirectory Root directory to access to the certificates identified by the certificate ID
+            * @param   p_configId      A configuration identifier
+            * @remark  This method SHALL be call before any usage of certificates
+            * @return  true on success, false otherwise
+            */
+            external function fx_loadCertificates(in charstring p_rootDirectory, in charstring p_configId) return boolean;
+            
+            /**
+            * @desc    Unload from memory cache the certificates
+            * @return  true on success, false otherwise
+            */
+            //external function fx_unloadCertificates() return boolean;
+            
+            /**
+            * @desc    Read the specified certificate
+            * @param   p_certificateId the certificate identifier
+            * @param   p_certificate   the expected certificate
+            * @return  true on success, false otherwise
+            */
+            external function fx_readCertificate(in charstring p_certificateId, out octetstring p_certificate) return boolean;
+
+            /**
+            * @desc    Read the specified certificate digest
+            * @param   p_certificateId the certificate identifier
+            * @param   p_digest   the expected certificate
+            * @return  true on success, false otherwise
+            */
+            external function fx_readCertificateDigest(in charstring p_certificateId, out HashedId8 p_digest) return boolean;
+            
+            /**
+            * @desc    Read the private keys for the specified certificate
+            * @param   p_keysId            the keys identifier
+            * @param   p_signingPrivateKey the signing private key
+            * @return  true on success, false otherwise
+            */
+
+            external function fx_readSigningKey(in charstring p_keysId, out Oct32 p_signingPrivateKey) return boolean;
+
+            /**
+            * @desc    Read the private keys for the specified certificate
+            * @param   p_keysId            the keys identifier
+            * @param   p_encryptPrivateKey the encrypt private key
+            * @return  true on success, false otherwise
+            */
+
+            external function fx_readEncryptingKey(in charstring p_keysId, out Oct32 p_encryptingPrivateKey) return boolean;
+
+        } // End of group certificatesLoader
+        
+        group geodesic {
+            
+            /**
+            * @desc    Check that given polygon doesn't have neither self-intersections nor holes.
+            * @param   p_region   Polygonal Region
+            * @return  true on success, false otherwise
+            * @verdict Unchanged
+            */
+            external function fx_isValidPolygonalRegion(in PolygonalRegion p_region) return boolean;
+            
+            /**
+            * @desc Check if a polygonal regin is inside another one
+            * @param p_parent  The main polygonal region
+            * @param p_region  The polygonal region to be included
+            * @return true on success, false otherwise
+            * @verdict Unchanged
+            */
+            external function fx_isPolygonalRegionInside(in PolygonalRegion p_parent, in PolygonalRegion p_region) return boolean;
+            
+            /**
+            * @desc Check that the location is inside a circular region
+            * @param p_region      The circular region to consider
+            * @param p_location    The device location
+            * @return true on success, false otherwise
+            * @verdict Unchanged
+            */
+            external function fx_isLocationInsideCircularRegion(in CircularRegion p_region, in ThreeDLocation p_location) return boolean;
+            
+            /**
+            * @desc Check that the location is inside a rectangular region
+            * @param p_region      The rectangular region to consider
+            * @param p_location    The device location
+            * @return true on success, false otherwise
+            * @verdict Unchanged
+            */
+            external function fx_isLocationInsideRectangularRegion(in RectangularRegions p_region, in ThreeDLocation p_location) return boolean;
+            
+            /**
+            * @desc Check that the location is inside a polygonal region
+            * @param p_region      The polygonal region to consider
+            * @param p_location    The device location
+            * @return true on success, false otherwise
+            * @verdict Unchanged
+            */
+            external function fx_isLocationInsidePolygonalRegion(in PolygonalRegion p_region, in ThreeDLocation p_location) return boolean;
+            
+            /**
+            * @desc Check if the location is inside an identified region
+            * @param p_region      The identified region to consider
+            * @param p_location    The device location
+            * @return true on success, false otherwise
+            * @verdict Unchanged
+            */
+            external function fx_isLocationInsideIdentifiedRegion(in IdentifiedRegion p_region, in ThreeDLocation p_location) return boolean;
+            
+            /**
+            * @desc Convert a spacial coordinate from DMS to Dms
+            * @param p_degrees The degrees (D)
+            * @param p_minutes The minutes (M)
+            * @param p_seconds The seconds (S)
+            * @param p_latlon  The latitude/longitude: (N|S|E|W)
+            * @return The decimal coordinate on success, 0.0, otherwise
+            * @verdict Unchanged
+            */
+            external function fx_dms2dd(in Int p_degrees, in Int p_minutes, in float p_seconds, in Oct1 p_latlon) return float;
+            
+        } // End of group geodesic
+        
+    }// End of group externalFunctions
+
+
+    
+    group geometryFunctions {
+        
+        /**
+        * @desc    Check that given location is valid
+        * @param   p_location    location to be checked
+        * @return  true on success, false otherwise
+        */
+        function f_isValidTwoDLocation(
+                                       in template (value) TwoDLocation p_location
+        ) return boolean {
+            return
+                (valueof(p_location.longitude) != c_maxLongitude + 1) and
+                (valueof(p_location.latitude) != c_maxLatitude + 1);
+        } // End of function f_isValidTwoDLocation
+
+        /**
+        * @desc    Check that two given rectanlular regions are intersected
+        *          Note: Regions must be normalized(northwest.latitude >= southeast.latitude)
+        *          TODO: Add case when
+        * @param   p_r1    Region 1
+        * @param   p_r2    Region 2
+        *
+        * @return  true on success, false otherwise
+        */
+        function f_isRectangularRegionsIntersected(
+                                                   in template (value) RectangularRegion p_r1,
+                                                   in template (value) RectangularRegion p_r2
+        ) return boolean {
+            return not (
+                valueof(p_r2.northwest.longitude) > valueof(p_r1.southeast.longitude) or 
+                valueof(p_r2.southeast.longitude) < valueof(p_r1.northwest.longitude) or 
+                valueof(p_r2.southeast.latitude)  > valueof(p_r1.northwest.latitude) or 
+                valueof(p_r2.northwest.latitude)  < valueof(p_r1.southeast.latitude)
+            );
+        } // End of function f_isRectangularRegionsIntersected
+        
+        function f_isContinuousRectangularRegions(
+                                                  in template (value) RectangularRegions regions
+        ) return boolean {
+            // TODO: call external function
+            return true;
+        } // End of function f_isRectangularRegionsIntersected
+        
+        /**
+        * @desc Check if a polygonal regin is inside another one
+        * @param p_parent  The main polygonal region
+        * @param p_region  The polygonal region to be included
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isRectangularRegionsInside(
+                                              in template (value) RectangularRegions p_parent,
+                                              in template (value) RectangularRegions p_region
+        ) return boolean {
+            // TODO: convert rectangular regions to polygons and check polygons
+            return true;
+        } // End of function f_isRectangularRegionsInside
+        
+        /**
+        * @desc    Check that given polygon doesn't have neither self-intersections nor holes.
+        * @param   p_region   Polygonal Region
+        * @return  true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isValidPolygonalRegion(
+            in template (value) PolygonalRegion p_region
+        ) return boolean {
+            // Sanity check
+            if (not isbound(p_region) or (lengthof(p_region) == 0)) {
+                return false;
+            }
+            
+            return fx_isValidPolygonalRegion(valueof(p_region));
+        } // End of function f_isValidPolygonalRegion
+        
+        /**
+        * @desc Check if a polygonal regin is inside another one
+        * @param p_parent  The main polygonal region
+        * @param p_region  The polygonal region to be included
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isPolygonalRegionInside(
+                                           in template (value) PolygonalRegion p_parent,
+                                           in template (value) PolygonalRegion p_region
+        ) return boolean {
+            // Sanity check
+            if (not isbound(p_parent) or not isbound(p_region) or (lengthof(p_parent) == 0) or (lengthof(p_region) == 0)) {
+                return false;
+            }
+            
+            return fx_isPolygonalRegionInside(valueof(p_parent), valueof(p_region));
+        } // End of function f_isPolygonalRegionInside
+        
+        /**
+        * @desc
+        */
+        function f_isIdentifiedRegionInside(
+                                            in template (value) UInt16 p_parent,
+                                            in template (value) UInt16 p_region
+        ) return boolean {
+            return valueof(p_parent) == valueof(p_region);
+        } // End of function f_isIdentifiedRegionInside
+        
+        /**
+        * @desc Check that the location is inside a region
+        * @param p_region      The region to consider
+        * @param p_location    The device location
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isLocationInsideRegion(
+                                          in template (value) GeographicRegion p_region,
+                                          in template (value) ThreeDLocation p_location
+        ) return boolean {
+            var boolean v_ret := false;
+            
+            select (valueof(p_region.region_type)) {
+                case (e_none) {
+                    v_ret := true;
+                }
+                case (e_circle) {
+                    v_ret := f_isLocationInsideCircularRegion(p_region.region.circular_region, p_location);
+                }
+                case (e_rectangle) {
+                    v_ret := f_isLocationInsideRectangularRegion(p_region.region.rectangular_region, p_location);
+                }
+                case (e_polygon) {
+                    v_ret := f_isLocationInsidePolygonalRegion(p_region.region.polygonal_region, p_location);
+                }
+                case (e_id) {
+                    v_ret := f_isLocationInsideIdentifiedRegion(p_region.region.id_region, p_location);
+                }
+                case else {
+                    v_ret := f_isLocationInsideOtherRegion(p_region.region.other_region, p_location);
+                }
+            }
+            
+            return v_ret;
+        } // End of function f_isLocationInsideRegion
+        
+        /**
+        * @desc Check that the location is inside a circular region
+        * @param p_region      The circular region to consider
+        * @param p_location    The device location
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isLocationInsideCircularRegion(
+                                                  in template (value) CircularRegion p_region,
+                                                  in template (value) ThreeDLocation p_location
+        ) return boolean {
+            // Sanity check
+            if (not isbound(p_region) or not isbound(p_location)) {
+                return false;
+            }
+            
+            return fx_isLocationInsideCircularRegion(valueof(p_region), valueof(p_location));
+        } // End of function f_isLocationInsideCircularRegion
+        
+        /**
+        * @desc Check that the location is inside a rectangular region
+        * @param p_region      The rectangular region to consider
+        * @param p_location    The device location
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isLocationInsideRectangularRegion(
+                                                     in template (value) RectangularRegions p_region,
+                                                     in template (value) ThreeDLocation p_location
+        ) return boolean {
+            // Sanity check
+            if (not isbound(p_region) or not isbound(p_location) or (lengthof(p_region) == 0)) {
+                return false;
+            }
+//            log("f_isLocationInsideRectangularRegion: p_polygonalArea: ", p_region);
+//            log("f_isLocationInsideRectangularRegion: p_location: ", p_location);
+            
+            return fx_isLocationInsideRectangularRegion(valueof(p_region), valueof(p_location));
+        } // End of function f_isLocationInsideRectangularRegion
+        
+        /**
+        * @desc Check that the location is inside a polygonal region
+        * @param p_region      The polygonal region to consider
+        * @param p_location    The device location
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isLocationInsidePolygonalRegion(
+                                                   in template (value) PolygonalRegion  p_region,
+                                                   in template (value) ThreeDLocation p_location
+        ) return boolean {
+            // Sanity check
+            if (not isbound(p_region) or not isbound(p_location) or (lengthof(p_region) == 0)) {
+                return false;
+            }
+//            log("f_isLocationInsidePolygonalRegion: p_polygonalArea: ", p_region, " - ", valueof(p_region));
+//            log("f_isLocationInsidePolygonalRegion: p_location: ", p_location, " - ", valueof(p_location));
+            
+            return fx_isLocationInsidePolygonalRegion(valueof(p_region), valueof(p_location));
+        } // End of function f_isLocationInsidePolygonalRegion
+        
+        /**
+        * @desc Check if the location is inside an identified region
+        * @param p_region      The identified region to consider
+        * @param p_location    The device location
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isLocationInsideIdentifiedRegion(
+                                                    in template (value) IdentifiedRegion p_region,
+                                                    in template (value) ThreeDLocation p_location
+        ) return boolean {
+            // Sanity check
+            if (not isbound(p_region) or not isbound(p_location)) {
+                return false;
+            }
+            
+            return fx_isLocationInsideIdentifiedRegion(valueof(p_region), valueof(p_location));
+        } // End of function f_isLocationInsideIdentifiedRegion
+        
+        /**
+        * @desc Check if the location is inside an undefined region
+        * @param p_region      The identified region to consider
+        * @param p_location    The device location
+        * @return true on success, false otherwise
+        * @verdict Unchanged
+        */
+        function f_isLocationInsideOtherRegion(
+                                               in template (value) octetstring p_region,
+                                               in template (value) ThreeDLocation p_location
+        ) return boolean {
+            // FIXME To be removed
+            return false;
+        } // End of function f_isLocationInsideOtherRegion
+        
+        /**
+        * @desc Convert a spacial coordinate from DMS to Dms
+        * @param p_degrees The degrees (D)
+        * @param p_minutes The minutes (M)
+        * @param p_seconds The seconds (S)
+        * @param p_latlon  The latitude/longitude: (N|S|E|W)
+        * @return The decimal coordinate on success, 0.0, otherwise
+        * @verdict Unchanged
+        */
+        function f_dms2dd(
+                          in integer p_degrees,
+                          in integer p_minutes,
+                          in float p_seconds,
+                          in charstring p_latlon
+        ) return float {
+            var Oct1 v_latlon;
+            
+            // Sanity checks
+            if (lengthof(p_latlon) != 1) {
+                return 0.0;
+            } else if ((p_latlon != "N") and (p_latlon != "S") and (p_latlon != "E") and (p_latlon != "W")) {
+                return 0.0;
+            }
+            v_latlon := char2oct(p_latlon);
+            
+            return fx_dms2dd(p_degrees, p_minutes, p_seconds, v_latlon);
+        } // End of function f_dms2dd
+        
+        /**
+        * @desc Convert the latitude from float to int
+        * @param p_latitude The latitude to be converted. Significand length shall be 7 digits length
+        * @return The converted latitude
+        * @verdict Unchanged
+        */
+        function f_ddlat2int(
+                             in float p_latitude
+        ) return WGSLatitude {
+            return float2int(p_latitude * 10000000.0); // Significand length shall be 7 digits length
+        }
+        
+        /**
+        * @desc Convert the longitude from float to int
+        * @param p_longitude The longitude to be converted. Significand length shall be 6 digits length
+        * @return The converted longitude
+        * @verdict Unchanged
+        */
+        function f_ddlon2int(
+                             in float p_longitude
+        ) return WGSLongitude {
+            return float2int(p_longitude * 1000000.0); // Significand length shall be 6 digits length
+        }
+        
+    } // End of group geometryFunctions
+    
+} // End of module LibItsSecurity_Functions

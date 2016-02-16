@@ -1,0 +1,74 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL:$
+ *              $Id:$
+ *  @desc       test control file for ITS station-internal management communications protocol (ISO 24102-4)
+ */
+module ItsIicp_TestControl {
+    
+    // ATS IICP
+    import from ItsIicp_TestCases {testcase all};
+    
+    // LibIts
+    import from LibItsIicp_Pics all; 
+    
+    // Test Execution
+    control {
+        
+//      8.1 Management
+        if (PICS_IICP_MGM) {
+/*            execute(TC_IICP_MGM_BV_01());
+            execute(TC_IICP_MGM_BV_02());
+            execute(TC_IICP_MGM_BV_03());
+            execute(TC_IICP_MGM_BV_04());
+            execute(TC_IICP_MGM_BV_05());
+            execute(TC_IICP_MGM_BV_06());*/
+        }
+        if (PICS_IICP_MGM) {
+/*            execute(TC_IICP_MGM_BI_01());
+            execute(TC_IICP_MGM_BI_02());
+            execute(TC_IICP_MGM_BI_03());*/
+        }
+        
+        // 8.2 Communications
+/*        execute(TC_IICP_COM_BV_01());
+        execute(TC_IICP_COM_BV_02());*/
+/*        if (PICS_ROLE_HONLY or PICS_ROLE_RH) {
+            execute(TC_IICP_COM_BV_03());
+        }*/
+/*        execute(TC_IICP_COM_BV_04());
+        execute(TC_IICP_COM_BV_05());
+        execute(TC_IICP_COM_BV_06());
+        execute(TC_IICP_COM_BV_07());
+        execute(TC_IICP_COM_BV_08());
+        execute(TC_IICP_COM_BV_09());
+        execute(TC_IICP_COM_BV_10());
+        execute(TC_IICP_COM_BV_11());*/
+        execute(TC_IICP_COM_BV_12());
+/*        execute(TC_IICP_COM_BV_13());
+        execute(TC_IICP_COM_BV_14());
+        execute(TC_IICP_COM_BV_15());
+        execute(TC_IICP_COM_BV_16());
+        execute(TC_IICP_COM_BV_17());
+        execute(TC_IICP_COM_BV_18());
+        execute(TC_IICP_COM_BV_19());
+        execute(TC_IICP_COM_BV_20());
+        execute(TC_IICP_COM_BV_21());
+        execute(TC_IICP_COM_BV_22());
+        execute(TC_IICP_COM_BV_23());*/
+
+/*        execute(TC_IICP_COM_BI_01());*/
+        if (PICS_ROLE_RONLY) { 
+/*            execute(TC_IICP_COM_BI_02());*/
+        }
+        if (PICS_ROLE_HONLY) { 
+/*            execute(TC_IICP_COM_BI_03());*/
+        }
+/*        execute(TC_IICP_COM_BI_04());
+        execute(TC_IICP_COM_BI_05());
+        execute(TC_IICP_COM_BI_06());
+        execute(TC_IICP_COM_BI_07());*/
+        
+    } // End of control
+    
+} // End of module ItsFsap_TestControl

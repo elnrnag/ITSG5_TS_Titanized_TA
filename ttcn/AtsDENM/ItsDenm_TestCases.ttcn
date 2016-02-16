@@ -1,0 +1,2044 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsDENM/ItsDenm_TestCases.ttcn $
+ *              $Id: ItsDenm_TestCases.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *    @desc     DENM Testcases (TS 102 869-2 V<2.1.1> (<2012-09>))
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module ItsDenm_TestCases {
+    
+    // ATS ITS
+    import from ItsDenm_TpFunctions all;
+    
+    // LibIts
+    import from LibItsDenm_TestSystem all;
+    
+    // 5.2.1
+    group denMessageTransmission {
+        
+      // 5.2.1.1
+      group denMessageFormat {
+          
+          /**
+           * @desc    Check that protocolVersion is set to 1 and messageID is set to 1
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_Trigger request from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing ITS PDU header,
+           *                  containing protocolVersion
+           *                      indicating value 1
+           *                  and containing messageID
+           *                      indicating value 1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSGF/BV-01, ETSI EN 302 637-3, Annex B.1
+           */
+          testcase TC_DEN_MSGF_BV_01() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_MSGF_BV_01();
+              
+          } // end TC_DEN_MSGF_BV_01
+          
+          /**
+           * @desc    Check that sent DENM contains at least one 'trace' DE
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_Trigger request from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing location container
+           *                  containing at least one 'trace'
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSGF/BV-02, ETSI EN 302 637-3, clause  6.1.3.2
+           */
+          testcase TC_DEN_MSGF_BV_02() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_MSGF_BV_02();
+              
+          } // end TC_DEN_MSGF_BV_02
+          
+      } // end denMessageFormat
+      
+      // 5.2.1.2
+      group denEventGeneration {
+        
+          /**
+           * @desc    Check that DEN Basic Service generates a new DENM on reception of a valid AppDENM_Trigger request
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_Trigger request from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-01, ETSI EN 302 637-3, clause 6.1.2.1
+           */
+          testcase TC_DEN_EVGN_BV_01() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_01();
+              
+          } // end TC_DEN_EVGN_BV_01
+          
+          /**
+           * @desc    Check that a new ActionID value is assigned for each newly generated DENM
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated several events
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to generate a new event
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating an unused value
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-02, ETSI EN 302 637-3, clause 6.1.1.1
+           */
+          testcase TC_DEN_EVGN_BV_02() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_02();
+              
+          } // end TC_DEN_EVGN_BV_02
+          
+          /**
+           * @desc    Check that a newly created ActionID contains the StationID of the originating ITS-S that detected the event
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to generate a new event
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      containing originatingStationID
+           *                          indicating its own StationID
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-03, ETSI EN 302 637-3, clause 6.1.1.1
+           */
+          testcase TC_DEN_EVGN_BV_03() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_03();
+              
+          } // end TC_DEN_EVGN_BV_03
+          
+          /**
+           * @desc    Check that Cause and subcause values included in DENM as provided by application
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_trigger request from the application layer
+           *              containing situation container
+           *                  containing eventType
+           *                      containing causeCode
+           *                          indicating Value1
+           *                      containing subCauseCode
+           *                          indicating Value2
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing situation container
+           *                  containing eventType
+           *                      containing causeCode
+           *                          indicating Value1
+           *                      containing subCauseCode
+           *                          indicating Value2
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-04, ETSI EN 302 637-3, clause 7.1.3
+           */
+          testcase TC_DEN_EVGN_BV_04() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_04();
+              
+          } // end TC_DEN_EVGN_BV_04
+          
+          /**
+           * @desc    Check that referenceTime is set to the current time when generating a DENM for a new event
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated several events
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to generate a new event
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing referenceTime
+           *                      indicating CLT
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-05, ETSI EN 302 637-3, clause 8.2.1.3
+           */
+          testcase TC_DEN_EVGN_BV_05() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_05();
+              
+          } // end TC_DEN_EVGN_BV_05
+          
+          /**
+           * @desc    Check that sequenceNumber is set to a next unused value each time an event is detected
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated several events
+           *      and the IUT having generated its last DENM
+           *          containing management container
+           *              containing actionID
+           *                  containing sequenceNumber
+           *                      indicating SEQ1
+           *      and no active event being associated with sequenceNumber SEQ1 + 1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to generate a new event
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      containing sequenceNumber
+           *                          indicating SEQ1 + 1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-07, ETSI EN 302 637-3, clauses 6.1.1.1, 8.2.1.2
+           */
+          testcase TC_DEN_EVGN_BV_07() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_07();
+              
+          } // end TC_DEN_EVGN_BV_07
+          
+          /**
+           * @desc    Check that actionID are generated using newly assigned stationID when a pseudonym change occurs
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated several events
+           *          containing management container
+           *              containing actionID
+           *                  containing originatingStationID
+           *                      indicating STATION_ID_1
+           *      and the IUT having changed its StationID
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to generate a new event
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      containing originatingStationID
+           *                          indicating its new StationID
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVGN/BV-10, ETSI EN 302 637-3, clauses 6.1.1.2
+           */
+          testcase TC_DEN_EVGN_BV_10() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVGN_BV_10();
+              
+          } // end TC_DEN_EVGN_BV_10
+          
+      } // end denEventGeneration
+      
+      // 5.2.1.3
+      group denEventUpdate {
+          
+          /**
+           * @desc    Check that DEN Basic Service generates an update DENM on reception of a valid AppDENM_update request
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_update request from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVUP/BV-01, ETSI EN 302 637-3, clause 6.1.2.2
+           */
+          testcase TC_DEN_EVUP_BV_01() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVUP_BV_01();
+              
+          } // end TC_DEN_EVUP_BV_01
+          
+          /**
+           * @desc    Check that the actionID is not changed by DENM update, as long as the stationID of the originating ITS-S remains unchanged
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           * 	  and the IUT not having changed its stationID
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_update request associated with ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVUP/BV-02, ETSI EN 302 637-3, clauses 6.1.2.2, 8.1.1.1
+           */
+          testcase TC_DEN_EVUP_BV_02() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVUP_BV_02();
+              
+          } // end TC_DEN_EVUP_BV_02
+          
+          /**
+           * @desc    Check that referenceTime is set to the current time when generating a DENM for an updated eventCheck 
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *              containing referenceTime
+           *                  indicating REFERENCETIME1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_update request associated with ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *                  and containing referenceTime
+           *                      indicating CLT > REFERENCETIME1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVUP/BV-03, ETSI EN 302 637-3, clause 6.1.2.2
+           */
+          testcase TC_DEN_EVUP_BV_03() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVUP_BV_03();
+              
+          } // end TC_DEN_EVUP_BV_03
+          
+          /**
+           * @desc    Check that DEN Basic Service does not send any update DENM if actionID is not in originating ITS-S message table
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *      and the IUT not having sent an event being associated with actionID ACTION_ID1
+           *          containing originatorStationID
+           *              indicating its own stationID
+           *          and containing sequenceNumber
+           *              indicating SEQ1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to update an event associated to ACTION_ID1
+           *      }
+           *      then {
+           *          the IUT does not send send any DENM for this event
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVUP/BO-04, ETSI EN 302 637-3, clause 8.1.2
+           */
+          testcase TC_DEN_EVUP_BO_04() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVUP_BO_04();
+              
+          } // end TC_DEN_EVUP_BO_04
+              
+      } // end denEventUpdate
+      
+      // 5.2.1.4
+      group denEventTermination {
+          
+          /**
+           * @desc    Check that DEN Basic Service generates a cancellation DENM when application indicates the 
+           *          premature termination of an event for which it is the originator
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *              and containing validityDuration
+           *                  indicating DURATION_1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_termination request associated to ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *                  and containing termination
+           *                     indicating value isCancellation
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BV-01, ETSI EN 302 637-3, clauses 6.1.2.4, 8.2.1.3
+           */
+          testcase TC_DEN_EVTR_BV_01() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BV_01();
+              
+          } // end TC_DEN_EVTR_BV_01
+          
+          /**
+           * @desc    Check that DEN Basic Service generates a negation DENM when application indicates the 
+           *          premature termination of an event for which it is not the originator
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *                      containing originatorStationID
+           *                          indicating stationID different from its own stationID
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_termination request associated to ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *                  and containing termination
+           *                      indicating value isNegation
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BV-02, ETSI EN 302 637-3, clause 6.1.2.4
+           */
+          testcase TC_DEN_EVTR_BV_02() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BV_02();
+              
+          } // end TC_DEN_EVTR_BV_02
+          
+          /**
+           * @desc   Check that referenceTime is set to the latest value received for this event in negation DENM
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *                      containing originatorStationID
+           *                          indicating stationID different from its own stationID
+           *              and containing referenceTime
+           *                  indicating REFERENCETIME1
+           *      and the IUT having received an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *              and containing referenceTime
+           *                  indicating REFERENCETIME2 > REFERENCETIME1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_termination request associated to ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *                  and containing referenceTime
+           *                      indicating value REFERENCETIME2
+           *                  and containing termination
+           *                      indicating value isNegation
+           *      }
+           *  }
+           * </pre>
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BV-03, ETSI EN 302 637-3, clauses 6.1.2.4, 8.2.1.3
+           */
+          testcase TC_DEN_EVTR_BV_03() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BV_03();
+              
+          } // end TC_DEN_EVTR_BV_03
+          
+          /**
+           * @desc    Check that situation container, location container  and alacarte container are not present in a cancellation DENM
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_termination request associated to ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *                  and containing termination
+           *                      indicating value isCancellation
+           *              and not containing situation container
+           *              and not containing location container
+           *              and not containing alacarte container
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BV-04, ETSI EN 302 637-3, clause 7.1.1
+           */
+          testcase TC_DEN_EVTR_BV_04() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BV_04();
+              
+          } // end TC_DEN_EVTR_BV_04
+          
+          /**
+           * @desc    Check that situation container, location container and alacarte container are not present in a negation DENM
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *                      containing originatorStationID
+           *                          indicating stationID different from its own stationID
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_termination request associated to ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+           *                  and containing termination
+           *                      indicating value isNegation
+           *              and not containing situation container
+           *              and not containing location container
+           *              and not containing alacarte container
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BV-05, ETSI EN 302 637-3, clause 7.1.1
+           */
+          testcase TC_DEN_EVTR_BV_05() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BV_05();
+              
+          } // end TC_DEN_EVTR_BV_05
+          
+          /**
+           * @desc    Check that DEN Basic Service does not send any termination DENM if actionID is not in 
+           *          originating ITS-S message table or receiving ITS-S message table (own stationID)
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated several events
+           *      and the IUT not having send event being associated with ACTION_ID1
+           *          containing originatingStationID
+           *              indicating its own stationID
+           *          and containing sequenceNumber
+           *              indicating SEQ1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to terminate an event associated to ACTION_ID1
+           *              containing originatingStationID
+           *                  indicating its own stationID
+           *              and containing sequenceNumber
+           *                  indicating SEQ1
+           *      }
+           *      then {
+           *          the IUT does not send send any termination DENM for this event
+           *      }
+           *  }
+           *  NOTE: Event associated to ACTION_ID1 cannot be present in receiving ITS-S message 
+           *        table as its stationID is IUT’s stationID (see TP/DEN/EVTR/BO-07)
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BO-06, ETSI EN 302 637-3, clauses 8.2.2
+           */
+          testcase TC_DEN_EVTR_BO_06() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BO_06();
+              
+          } // end TC_DEN_EVTR_BO_06
+              
+          /**
+           * @desc    Check that DEN Basic Service does not send any termination DENM if actionID is not in 
+           *          originating ITS-S message table or receiving ITS-S message table (other stationID)
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received several events
+           *      and the IUT not having received event being associated with ACTION_ID1
+           *          containing originatingStationID
+           *              indicating STATION_ID1 different from its own stationID
+           *          and containing sequenceNumber
+           *              indicating SEQ1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is requested to terminate an event associated to ACTION_ID1
+           *              containing originatingStationID
+           *                  indicating STATION_ID1
+           *              and containing sequenceNumber
+           *                  indicating SEQ1
+           *      }
+           *      then {
+           *          the IUT does not send send any termination DENM for this event
+           *      }
+           *  }
+           *  NOTE: Event associated to ACTION_ID1 cannot be present in originating ITS-S message table as its 
+           *        stationID is not IUT’s stationID (see TP/DEN/EVTR/BO-06)
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BO-07, ETSI EN 302 637-3, clauses 8.2.2
+           */
+          testcase TC_DEN_EVTR_BO_07() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BO_07();
+              
+          } // end TC_DEN_EVTR_BV_07
+          
+          /**
+           * @desc    Check that referenceTime is set to to the current time when generating a cancellation DENM
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having generated an event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+		   *	          and containing validityDuration
+		   * 		          indicating DURATION_1
+           *              and containing referenceTime
+           *                  indicating REFERENCETIME1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT receives an AppDENM_termination request associated with ACTION_ID1 from the application layer
+           *      }
+           *      then {
+           *          the IUT sends a valid DENM
+           *              containing management container
+           *                  containing actionID
+           *                      indicating ACTION_ID1
+		   *	              and containing termination
+		   *		              indicating value isCancellation
+           *                  and containing referenceTime
+           *                      indicating CLT
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVTR/BV-08, ETSI EN 302 637-3, clause 8.2.1.3
+           */
+          testcase TC_DEN_EVTR_BV_08() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVTR_BV_08();
+              
+          } // end TC_DEN_EVTR_BV_08
+          
+      } // end denEventTermination
+      
+      // 5.2.1.5
+      group denMessageRepetition {
+          
+          /**
+           * @desc    Check that DEN Basic Sercive repeats DENM transmission according to repetitionInterval parameter provided by application
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from the application layer
+           *          containing repetitionInterval
+           *              indicating INTERVAL_1
+           *          and containing repetitionDuration
+           *              indicating DURATION_1
+           *          and containing validityDuration
+           *              indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated an the corresponding event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *              and containing validityDuration
+           *                  indicating DURATION_1
+           *              and containing transmissionInterval
+           *                  indicating INTERVAL_1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is alerted of expiration of the time associated with INTERVAL_1
+           *      }
+           *      then {
+           *          the IUT repeats the transmission of the valid DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/TI-01, ETSI EN 302 637-3, clause 6.1.2.3 and 8.2.2
+           */
+          testcase TC_DEN_EVRP_TI_01() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_TI_01();
+              
+          } // end TC_DEN_EVRP_TI_01
+              
+          /**
+           * @desc    Check that the repeated DENM is always the most up-to-date message
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from the application layer
+           *          containing repetitionInterval
+           *              indicating INTERVAL_1
+           *          and containing repetitionDuration
+           *              indicating DURATION_1
+           *          and containing validityDuration
+           *              indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated an the corresponding event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *      and the IUT having generated an update of the event associated with ACTION_ID1 modifying partly the event
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is alerted of expiration of the time associated with INTERVAL_1
+           *      }
+           *      then {
+           *          the IUT repeats the transmission of the valid DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-02, ETSI EN 302 637-3, clause 6.1.2.3 and 8.2.2
+           */
+          testcase TC_DEN_EVRP_BV_02() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_02();
+              
+          } // end TC_DEN_EVRP_BV_02
+          
+          /**
+           * @desc    Check that DEN Basic Service stops retransmitting DENM after event’s validityDuration 
+           *          expiration
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *          containing repetitionInterval
+           *              indicating INTERVAL_1
+           *          and containing repetitionDuration
+           *              indicating DURATION_1
+           *          and containing validityDuration
+           *              indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated the corresponding event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *              and containing validityDuration
+           *                  indicating DURATION_1
+           *      and the IUT having repeated (one or more times) the transmission of the valid DENM associated with ACTION_ID1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is alerted of expiration of the time associated with DURATION_2
+           *      }
+           *      then {
+           *          the IUT stops the retransmission of the DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-03, ETSI EN 302 637-3, clauses 6.1.2.4 and 8.2.2
+           */
+          testcase TC_DEN_EVRP_BV_03() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_03();
+              
+          } // end TC_DEN_EVRP_BV_03
+          
+          /**
+           * @desc    Check that DEN Basic Service stops retransmitting DENM after event’s repetitionDuration 
+           *          expiration
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *          containing repetitionInterval
+           *              indicating INTERVAL_1
+           *          and containing repetitionDuration
+           *              indicating DURATION_1
+           *          and containing validityDuration
+           *              indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated the corresponding event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *              and containing validityDuration
+           *                  indicating DURATION_2
+           *      and the IUT having repeated (one or more times) the transmission of the valid DENM associated with ACTION_ID1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is alerted of expiration of the time associated with DURATION_2
+           *      }
+           *      then {
+           *          the IUT stops the retransmission of the most up-to-date valid DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-04, ETSI EN 302 637-3, clause 8.2.2
+           */
+          testcase TC_DEN_EVRP_BV_04() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_04();
+              
+          } // end TC_DEN_EVRP_BV_04
+          
+          /**
+           * @desc    Check that DEN Basic Service does not repeat transmission of DENM if repetitionInterval is 
+           *          not provided by application
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *          not containing repetitionInterval
+           *      and the IUT having generated an the corresponding event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT has detected that repetitionInterval is not provided for the event associated with ACTION_ID1
+           *      }
+           *      then {
+           *          the IUT does not repeat the transmission of the valid DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-05, ETSI EN 302 637-3, clause 8.1.2
+           */
+          testcase TC_DEN_EVRP_BV_05() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_05();
+              
+          } // end TC_DEN_EVRP_BV_05
+          
+          /**
+           * @desc    Check that DEN Basic Service does not repeat transmission of DENM if repetitionDuration is 
+           *          not provided by application
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *          not containing repetitionDuration
+           *      and the IUT having generated an the corresponding event
+           *          containing management container
+           *              containing actionID
+           *                  indicating ACTION_ID1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT has detected that repetitionDuration is not provided for the event associated with ACTION_ID1
+           *      }
+           *      then {
+           *          the IUT does not repeat the transmission of the valid DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-06, ETSI EN 302 637-3, clause 8.1.2
+           */
+          testcase TC_DEN_EVRP_BV_06() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_06();
+              
+          } // end TC_DEN_EVRP_BV_06
+          
+          /**
+           * @desc    Check that existing actionID in originating ITS-S are updated when stationID is modified
+           *
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *      	containing repetitionInterval
+           *      		indicating INTERVAL_1
+           *      	and containing repetitionDuration
+           *      		indicating DURATION_1
+           *      	and containing validityDuration
+           *      		indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated the corresponding event
+           *      	containing management container
+           *      		containing actionID
+           *      			containing originatororiginatingStationID
+           *      				indicating STATION_ID_1
+           *      		and containing validityDuration
+           *      			indicating DURATION_1
+           *     and the IUT having changed its StationID
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT changes its StationID and is alerted of expiration of the time associated with INTERVAL_1
+           *      }
+           *      then {
+           *      		the IUT repeats the transmission of the valid DENM
+           *      			containing management container
+           *      				containing actionID
+           *      					containing originatingStationID
+           *      						indicating its new StationID
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-08, ETSI EN 302 637-3, clause 6.1.1.2
+           */
+          testcase TC_DEN_EVRP_BV_08() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_08();
+              
+          } // end TC_DEN_EVRP_BV_08
+           
+          /**
+           * @desc		Check that actionID is not modified in repetitions of DENM if stationID is not modified
+           *
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *      	containing repetitionInterval
+           *      		indicating INTERVAL_1
+           *      	and containing repetitionDuration
+           *      		indicating DURATION_1
+           *      	and containing validityDuration
+           *      		indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated the corresponding event
+           *      	containing management container
+           *      		containing actionID
+           *      			indicating ACTION_ID_1
+           *      		and containing validityDuration
+           *      			indicating DURATION_1
+           *     and the IUT not having changed its StationID
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is alerted of expiration of the time associated with INTERVAL_1
+           *      }
+           *      then {
+           *      		the IUT repeats the transmission of the valid DENM
+           *      			containing management container
+           *      				containing actionID
+           *      					indicating its ACTION_ID_1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-09, ETSI EN 302 637-3, clause 8.2.1.2
+           */
+          testcase TC_DEN_EVRP_BV_09() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_09();
+              
+          } // end TC_DEN_EVRP_BV_09
+           
+          /**
+           * @desc		Check that actionID is not modified in repetitions of DENM if stationID is not modified
+           *
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *      	containing repetitionInterval
+           *      		indicating INTERVAL_1
+           *      	and containing repetitionDuration
+           *      		indicating DURATION_1
+           *      	and containing validityDuration
+           *      		indicating DURATION_2 > DURATION_1
+           *      and the IUT having generated the corresponding event
+           *      	containing management container
+           *      		containing actionID
+           *      			indicating ACTION_ID_1
+           *      		and containing validityDuration
+           *      			indicating DURATION_2
+           *      		and containing referenceTime
+           *      			indicating REFERENCE_TIME_1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when { 
+           *          the IUT is alerted of expiration of the time associated with INTERVAL_1
+           *      }
+           *      then {
+           *      		the IUT repeats the transmission of the valid DENM
+           *      			containing management container
+           *      				containing actionID
+           *      					indicating its ACTION_ID_1
+           *      				and containing referenceTime
+           *      					indicating REFERENCE_TIME_1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-10, ETSI EN 302 637-3, clause 8.2.1.2
+           */
+          testcase TC_DEN_EVRP_BV_10() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_10();
+              
+          } // end TC_DEN_EVRP_BV_10
+           
+          /**
+           * @desc		Check that DEN Basic Service stops retransmitting DENM after event's validityDuration expiration, 
+           *            when validityDuration was not provided
+           *
+           * <pre>        
+           * PICS Selection: none 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *      and the IUT having received an AppDENM_trigger request from application layer
+           *      	containing repetitionInterval
+           *      		indicating INTERVAL_1
+           *      	and containing repetitionDuration
+           *      		indicating DURATION_1 > defaultValidityDuration
+           *      	and not containing validityDuration
+           *      and the IUT having generated the corresponding event
+           *      	containing management container
+           *      		containing actionID
+           *      			indicating ACTION_ID_1
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when {
+           *          the IUT is alerted of expiration of the defaultValidityDuration
+           *      }
+           *      then {
+           *      		the IUT stops the retransmission of the DENM associated with ACTION_ID1
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/EVRP/BV-11, ETSI EN 302 637-3, clause 8.2.1.5
+           */
+          testcase TC_DEN_EVRP_BV_11() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_EVRP_BV_11();
+              
+          } // end TC_DEN_EVRP_BV_11
+              
+      } // end denMessageRepetition
+              
+      // 5.2.1.6
+      group denMessageLowerLayerParameters {
+
+          /**
+           * @desc    Check that DENM is encapsulated in BTP type B packet
+           * <pre>        
+           * PICS Selection: PICS_DENM_GENERATION 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when {
+           *          a DENM is generated
+           *      }
+           *      then {
+           *          the IUT sends a DENM
+           *              encapsulated in a BTP-B packet
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/PAR/BV-01, EN 302 637-3 clause 5.4.2.2
+           */
+          testcase TC_DEN_PAR_BV_01() runs on ItsDenm system ItsDenmSystem {
+          
+              f_DEN_PAR_BV_01();
+      
+          } // end TC_DEN_PAR_BV_01
+
+          /**
+           * @desc    Check that DENM is encapsulated in a GBC packet
+           * <pre>        
+           * PICS Selection: PICS_DENM_GENERATION 
+           * Initial conditions:
+           *  with {
+           *      the IUT being in the "initial state"
+           *  }
+           * Expected behaviour:
+           *  ensure that {
+           *      when {
+           *          a DENM is generated
+           *      }
+           *      then {
+           *          the IUT sends a DENM
+           *              encapsulated in a GBC packet
+           *      }
+           *  }
+           * </pre>
+           * 
+           * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/PAR/BV-02, EN 302 637-3 clause 5.4.2.2
+           */
+          testcase TC_DEN_PAR_BV_02() runs on ItsDenm system ItsDenmSystem {
+              
+              f_DEN_PAR_BV_02();
+              
+          } // end TC_DEN_PAR_BV_02          
+
+      } // end denMessageLowerLayerParameters
+                
+    } // end denMessageTransmission
+    
+    // 5.2.2
+    group denMessageReception {
+        
+        /**
+         * @desc    Check that receiving ITS-S transmits DENM to application if it concerns an unknown ActionID and if it is not a termination DENM
+         *         
+         * <pre>
+         * PICS Selection: none
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT not having received DENM
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a DENM that is not a termination
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *      }
+         *      then {
+         *          the IUT transmits the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BV-01, ETSI EN 302 637-3, clause 8.4.2
+         */
+        testcase TC_DEN_MSRV_BV_01() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BV_01();
+            
+        } // end TC_DEN_MSRV_BV_01
+        
+        /**
+         * @desc    Check that receiving ITS-S transmits DENM to application if it concerns a known ActionID 
+         *          and referenceTime is greater than highest value received for this ActionID
+         * <pre>
+         * PICS Selection: none
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received DENM
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *              and containing referenceTime
+         *                  indicating  REFERENCETIME_1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a DENM
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *                  and containing referenceTime
+         *                      indicating REFERENCETIME_2 greater than REFERENCETIME_1
+
+         *      }
+         *      then {
+         *          the IUT transmits the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BV-02, ETSI EN 302 637-3, clause 8.4.2
+         */
+        testcase TC_DEN_MSRV_BV_02() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BV_02();
+            
+        } // end TC_DEN_MSRV_BV_02
+                
+        /**
+         * @desc    Check that receiving ITS-S discards termination DENM if it concerns an unknown ActionID (own actionID)
+         * <pre>
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received several events
+         *      and the IUT not having received DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a termination DENM
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *      }
+         *      then {
+         *          the IUT discards the DENM
+         *          and the IUT does not forward the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BO-03, ETSI EN 302 637-3, clause 8.3.2
+         */
+        testcase TC_DEN_MSRV_BO_03() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BO_03();
+            
+        } // end TC_DEN_MSRV_BO_03
+            
+        /**
+         * @desc    Check that receiving ITS-S discards termination DENM if it concerns an unknown ActionID (other actionID)
+         * <pre>
+         * PICS Selection: none 
+         * Initial conditions:
+         *  with {
+         *      and the IUT having received several events
+         *      and the IUT not having received DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a termination DENM
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *      }
+         *      then {
+         *          the IUT discards the DENM
+         *          and the IUT does not forward the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BO-04, ETSI EN 302 637-3, clause 8.3.2
+         */
+        testcase TC_DEN_MSRV_BO_04() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BO_04();
+            
+        } // end TC_DEN_MSRV_BO_04
+            
+        /**
+         * @desc    Check that receiving ITS-S discards DENM if referenceTime is lower than highest value received for this ActionID
+         * <pre>
+         * PICS Selection: none
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received DENM
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *              and containing referenceTime
+         *                  indicating REFERENCETIME_1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a DENM
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *                  and containing referenceTime
+         *                      indicating REFERENCETIME_2 lower than REFERENCETIME_1
+         *      }
+         *      then {
+         *          the IUT discards the DENM
+         *          and the IUT does not forward the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BO-05, ETSI EN 302 637-3, clause 8.3.2
+         */
+        testcase TC_DEN_MSRV_BO_05() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BO_05();
+            
+        } // end TC_DEN_MSRV_BO_05
+            
+        /**
+         * @desc    Check that receiving ITS-S discards DENM if detectionTime is smaller than highest value received for this ActionID
+         *          
+         * <pre>
+         * PICS Selection: none
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received DENM
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *              and containing referenceTime
+         *                  indicating REFERENCETIME_1
+         *              and containing detectionTime
+         *                  indicating TIME_1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a DENM
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *                  and containing referenceTime
+         *                      indicating REFERENCETIME_1
+         *                  and containing detectionTime
+         *                      indicating TIME_2 not more recent than TIME_1
+         *      }
+         *      then {
+         *          the IUT discards the DENM
+         *          and the IUT does not forward the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BO-06, ETSI EN 302 637-3, clause 8.3.2
+         */
+        testcase TC_DEN_MSRV_BO_06() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BO_06();
+            
+        } // end TC_DEN_MSRV_BO_06
+            
+        /**
+         * @desc    Check that receiving ITS-S transmits DENM to application if it concerns a known ActionID and referenceTime 
+         *          is equal to highest received value and detectionTime is more recent
+         * <pre>
+         * PICS Selection: none
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received DENM
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *              and containing referenceTime
+         *                  indicating REFERENCETIME_1
+         *              and containing detectionTime
+         *                  indicating TIME_1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a DENM
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *                  and containing referenceTime
+         *                      indicating REFERENCETIME_1
+         *                  and containing detectionTime
+         *                      indicating TIME_2 more recent than TIME_1
+         *      }
+         *      then {
+         *          the IUT transmits the DENM content to upper layer
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BV-07, ETSI EN 302 637-3, clause 8.3.2
+         */
+        testcase TC_DEN_MSRV_BV_07() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_MSRV_BV_07();
+            
+        } // end TC_DEN_MSRV_BV_07
+        
+        /**
+         * @desc    Check that receiving ITS-S replies to requestResponseIndication
+         *          
+         * <pre>
+         * PICS Selection: none
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT receives a DENM
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *              and containing alacarte container
+         *                  containing ImpactReductionContainer
+         *                  	containing requestResponseIndication
+         *                      	indicating request(0)
+         *      }
+         *      then {
+         *          the IUT sends a DENM
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID2
+         *              and containing alacarte container
+         *                  containing ImpactReductionContainer
+         *                  	containing requestResponseIndication
+         *                      	indicating response(1)
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/MSRV/BV-10, ETSI EN 302 637-3, clause B.40
+         */
+        testcase TC_DEN_MSRV_BV_10() runs on ItsDenm system ItsDenmSystem {
+
+            f_DEN_MSRV_BV_10();
+
+        } // end TC_DEN_MSRV_BV_10
+        
+    } // end denMessageReception
+    
+    // 5.2.3
+    group denKeepAliveForwarding {
+
+        /**
+         * @desc    Check that forwarding ITS-S forwards DENM if no DENM with same ActionId has been received during forwarding delay
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *          and the IUT having received a DENM
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *              and containing transmissionInterval
+         *                  indicating TRANS_INTERVAL1
+         *              and containing validityDuration
+         *                  indicating value more than 3 times greater than TRANS_INTERVAL1
+         *          and the IUT having starting timer T_Forwarding for this DENM
+         *          and the IUT not having received further DENM 
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-01, ETSI EN 302 637-3, clause 8.2.2
+         */
+        testcase TC_DEN_KAFW_BV_01() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_01();
+            
+        } // end TC_DEN_KAFW_BV_01
+        
+        /**
+         * @desc    Check that forwarding ITS-S forwards DENM if no DENM with same ActionId and referenceTime greater 
+         *          or equal to the last received DENM has been received during forwarding delay
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *          and containing referenceTime
+         *              indicating REFERENCETIME_1
+         *          and containing validityDuration
+         *              indicating value more than 3 times greater than TRANS_INTERVAL1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT having received DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing referenceTime
+         *              indicating value REFERENCETIME_2 < REFERENCETIME_1
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing referenceTime
+         *              indicating value REFERENCETIME_3 > REFERENCETIME_1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-02, ETSI EN 302 637-3, clause 8.2.2
+         */
+        testcase TC_DEN_KAFW_BV_02() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_02();
+            
+        } // end TC_DEN_KAFW_BV_02
+                
+        /**
+         * @desc    Check that forwarding delay is set to min(2*transmissionInterval + rnd(0, 150ms), validityDuration)
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *          and containing validityDuration
+         *              indicating value DURATION_1 more than 3 times greater than TRANS_INTERVAL1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1 at a point of time corresponding to
+         *          min ( 2*transmissionInterval + rnd ( 0, 150ms ), validityDuration )
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/TI-03, ETSI EN 302 637-3, clause 8.2.1.4
+         */
+        testcase TC_DEN_KAFW_TI_03() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_TI_03();
+            
+        } // end TC_DEN_KAFW_TI_03
+            
+        /**
+         * @desc    Check that Forwarding ITS-S replaces the ITS PDU header of forwarded DENMs
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *          and containing validityDuration
+         *              indicating value more than 3 times greater than TRANS_INTERVAL1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1
+         *              containing ITS PDU header
+         *                  containing StationID
+         *                      indicating its own stationID
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-04, ETSI EN 302 637-3, clause 8.2.1.6
+         */
+        testcase TC_DEN_KAFW_BV_04() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_04();
+            
+        } // end TC_DEN_KAFW_BV_04
+
+        /**
+         * @desc    Check that forwarding ITS-S does not change actionID
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *          and containing validityDuration
+         *              indicating value more than 3 times greater than TRANS_INTERVAL1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM 
+         *              containing management container
+         *                  containing actionID
+         *                      indicating ACTION_ID1
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-05, ETSI EN 302 637-3, clause 8.2.1.1
+         */
+        testcase TC_DEN_KAFW_BV_05() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_05();
+            
+        } // end TC_DEN_KAFW_BV_05
+        
+        /**
+         * @desc    Check that forwarding ITS-S does not change referenceTime
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *          and containing validityDuration
+         *              indicating value DURATION_1 more than 3 times greater than TRANS_INTERVAL1
+         *          and containing referenceTime
+         *              indicating REFERENCETIME_1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1
+         *              containing management container
+         *                  containing referenceTime
+         *                      indicating REFERENCETIME_1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-06, ETSI EN 302 637-3, clause 8.2.1.2
+         */
+        testcase TC_DEN_KAFW_BV_06() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_06();
+            
+        } // end TC_DEN_KAFW_BV_06
+
+        /**
+         * @desc    Check that forwarding ITS-S does not change termination
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *          and containing validityDuration
+         *              indicating value DURATION_1 more than 3 times greater than TRANS_INTERVAL1
+         *          and containing termination
+         *              indicating isNegation
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1
+         *              containing management container
+         *                  containing termination
+         *                      indicating isNegation
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-07, ETSI EN 302 637-3, clause 8.2.1.3
+         */
+        testcase TC_DEN_KAFW_BV_07() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_07();
+            
+        } // end TC_DEN_KAFW_BV_07
+
+        /**
+         * @desc    Check that Forwarding ITS-S does not modify management, situation, location and alacarte containers 
+         *          when forwarding a DENM
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received a DENM
+         *          containing management container
+         *              indicating MANACEMENTCONTAINER_1
+         *          and containing situation container
+         *              indicating SITUATION_1
+         *          and containing location container
+         *              indicating LOCATION_1
+         *          and containing alacarte container
+         *              indicating ALACARTE_1
+         *          and containing transmissionInterval
+         *              indicating TRANS_INTERVAL1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the timer T_Forwarding expires
+         *      }
+         *      then {
+         *          the IUT reconstructs and sends the DENM associated to ACTION_ID1
+         *              containing management container
+         *                  indicating MANACEMENTCONTAINER_1
+         *              and containing situation container
+         *                  indicating SITUATION_1
+         *              and containing location container
+         *                  indicating LOCATION_1
+         *              and containing alacarte container
+         *                  indicating ALACARTE_1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-08, ETSI EN 302 637-3, clause 8.2.1.6
+         */
+        testcase TC_DEN_KAFW_BV_08() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_08();
+            
+        } // end TC_DEN_KAFW_BV_08
+
+        /**
+         * @desc    Check that forwarding ITS-S stops forwarding DENM after validity expiration
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received an event
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *              and containing validityDuration
+         *                  indicating DURATION_1
+         *          	and containing transmissionInterval
+         *              	indicating TRANS_INTERVAL1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT is alerted of expiration of the time associated with DURATION_1
+         *      }
+         *      then {
+         *          the IUT stops to reconstruct and to send the DENM associated with ACTION_ID1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-09, ETSI EN 302 637-3, clause 8.2.2
+         */
+        testcase TC_DEN_KAFW_BV_09() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_09();
+            
+        } // end TC_DEN_KAFW_BV_09
+                                  
+        /**
+         * @desc    Check that forwarding ITS-S stops forwarding DENM if it is outside relevance area
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *      and the IUT having received an event
+         *          containing management container
+         *              containing actionID
+         *                  indicating ACTION_ID1
+         *          	and containing transmissionInterval
+         *              	indicating TRANS_INTERVAL1
+         *      and the IUT having starting timer T_Forwarding for this DENM
+         *      and the IUT not having received further DENM 
+         *          containing actionID
+         *              indicating ACTION_ID1
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when { 
+         *          the IUT is alerted that its position is now outside of the relevance area associated with ACTION_ID1
+         *      }
+         *      then {
+         *          the IUT stops to reconstruct and to send the DENM associated with ACTION_ID1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-10, ETSI EN 302 637-3, clause 8.2.2
+         */
+        testcase TC_DEN_KAFW_BV_10() runs on ItsDenm system ItsDenmSystem {
+            
+            f_DEN_KAFW_BV_10();
+            
+        } // end TC_DEN_KAFW_BV_10
+        
+        /**
+         * @desc    Check that forwarding ITS-S does not forward DENM is transmissionInterval is not present
+         * <pre>
+         * PICS Selection: PICS_KAF 
+         * Initial conditions:
+         *  with {
+         *      the IUT being in the "initial state"
+         *  }
+         * Expected behaviour:
+         *  ensure that {
+         *      when {
+         *          the IUT receives a DENM
+         *          	containing actionID
+         *          		indicating ACTION_ID1
+         *          	and not containing transmissionInterval
+         *      }
+         *      then {
+         *          the IUT does not reconstruct and send the DENM associated with ACTION_ID1
+         *      }
+         *  }
+         * </pre>
+         * 
+         * @see     ETSI TS 102 869-2 v1.4.1 TP/DEN/KAFW/BV-10, ETSI EN 302 637-3, clause 8.2.2
+         */
+        testcase TC_DEN_KAFW_BV_11() runs on ItsDenm system ItsDenmSystem {
+
+            f_DEN_KAFW_BV_11();
+            
+        } // end TC_DEN_KAFW_BV_11
+        
+    } // end denKeepAliveForwarding
+    
+} // end ItsDenm_TestCases
+

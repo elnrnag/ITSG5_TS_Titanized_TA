@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a signed 1609.2 message if it contains a secured data exchange, identified not localized scope with a PSID SSPs of more than 31 octets."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/e0d78e08-4c86-4a92-a5a8-e72e8568b553"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "ad5a9fb4-a930-4d5e-aee6-90a564822e9d"
+}

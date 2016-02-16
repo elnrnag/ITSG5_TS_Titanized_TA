@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S discards an authorization response having the subordinate certificate's validity region not wholly contained in the issuing certificate's validity region."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/a6b7d90a-bc10-47d1-8342-b6c91bac83a6"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "53f1e734-fa0d-4ba6-b888-fed7609962d7"
+}

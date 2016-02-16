@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "73bc6d5b-4fbc-4720-b0e3-b2c41b24526d",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "73bc6d5b-4fbc-4720-b0e3-b2c41b24526d",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured GN Beacon if the header_fields contain a signer of type 'certificate_digest_with_other_algorithm'"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "73bc6d5b-4fbc-4720-b0e3-b2c41b24526d",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields['signer_info']\r\n\t\t\t\tcontaining signer.type\r\n\t\t\t\t\tindicating 'certificate_digest_with_other_algorithm'\r\n\t\t\tand containing header_fields['generation_time']\r\n\t\t\tand containing header_fields['generation_location']\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand not containing other header fields\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "73bc6d5b-4fbc-4720-b0e3-b2c41b24526d",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "73bc6d5b-4fbc-4720-b0e3-b2c41b24526d",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "73bc6d5b-4fbc-4720-b0e3-b2c41b24526d"
+}

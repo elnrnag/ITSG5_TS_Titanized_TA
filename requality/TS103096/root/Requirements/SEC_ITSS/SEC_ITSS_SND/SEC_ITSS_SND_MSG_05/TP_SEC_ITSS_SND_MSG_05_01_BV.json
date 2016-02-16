@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "fe261037-3291-4dbb-9ed6-ae425f88edc5",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "fe261037-3291-4dbb-9ed6-ae425f88edc5",
+            "type": "STRING",
+            "value": "Check that the SecuredMessage signature containes the ECC point of type set to either compressed_lsb_y_0, compressed_lsb_y_1 or x_coordinate_only"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "fe261037-3291-4dbb-9ed6-ae425f88edc5",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid']\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\tand containing trailer_fields['signature']\r\n\t\t\t\tcontaining signature.ecdsa_signature\r\n\t\t\t\t\tcontaining R.type\r\n\t\t\t\t\t\tindicating compressed_lsb_y_0\r\n\t\t\t\t\t\tor indicating compressed_lsb_y_1 \r\n\t\t\t\t\t\tor indicating x_coordinate_only\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "fe261037-3291-4dbb-9ed6-ae425f88edc5",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "fe261037-3291-4dbb-9ed6-ae425f88edc5",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "fe261037-3291-4dbb-9ed6-ae425f88edc5"
+}

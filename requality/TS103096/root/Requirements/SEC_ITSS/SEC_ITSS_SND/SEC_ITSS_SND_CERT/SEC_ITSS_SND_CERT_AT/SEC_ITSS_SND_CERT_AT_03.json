@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "8a72a3c8-625f-4d64-a60c-a31bb4d07934",
+            "type": "STRING",
+            "value": "If ITS-S sends an AT certificate check that the subject_name is empty"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "8a72a3c8-625f-4d64-a60c-a31bb4d07934",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/129932b3-d851-4f39-af43-ccec6d18c13b"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "8a72a3c8-625f-4d64-a60c-a31bb4d07934",
+            "type": "STRING",
+            "value": "03. Check subject name"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "8a72a3c8-625f-4d64-a60c-a31bb4d07934",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "8a72a3c8-625f-4d64-a60c-a31bb4d07934"
+}

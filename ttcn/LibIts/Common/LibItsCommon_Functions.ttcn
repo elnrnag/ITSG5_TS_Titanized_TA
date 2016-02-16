@@ -1,0 +1,221 @@
+/**
+ *    @author     ETSI / STF405 / STF449
+ *    @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Common/LibItsCommon_Functions.ttcn $
+ *                $Id: LibItsCommon_Functions.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc       Module containing common functions for ITS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+ 
+module LibItsCommon_Functions {
+
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from LibItsCommon_Pixits all;
+    import from ITS_Container language "ASN.1:1997" all;
+
+    
+    group generalFunctions {
+        
+        /** 
+         * @desc    function to generate integer random values
+         *            
+         * @see        ttcn-3 - rnd()
+         * @param     p_lowerbound lowest number in range
+         * @param     p_upperbound highest number in range
+         * @return     random integer
+         *
+        */
+        function f_random(    in integer p_lowerbound,
+                            in integer p_upperbound )
+        return integer {
+            //Variables
+            var integer v_random := 0;
+            v_random := float2int(int2float(p_upperbound - p_lowerbound +1)*rnd()) + p_lowerbound;
+    
+            log("*** f_random: INFO: OK - random value = " & int2str(v_random) & " ***");
+            return v_random;
+    
+        } // end function f_random
+
+        /**
+         * @desc    Computes the absolute value of an integer 
+         * @param   p_number    the number
+         * @return  Absolute value of the number
+         */
+        function f_abs(in integer p_number) 
+        return integer {
+            
+            if(p_number < 0) {
+                return 0 - p_number;
+            }
+            return p_number;    
+        }
+
+        /**
+         * @desc    Compares two values and returns the lowest onde  
+         * @param   p_a     First value
+         * @param   p_b     Second value
+         * @return  Lowest value
+         */
+        function f_min(in integer p_a, in integer p_b) 
+        return integer {
+            
+            if(p_a < p_b) {
+                return p_a;
+            }
+            return p_b;    
+        }
+
+        /** 
+         * @desc    Removes unsignificant right-most 0 bits of a bitstring
+         *            
+         * @param     p_bitstring Bitstring to be reduced
+         * @return    Reduced bitstring
+         *
+        */    
+        function f_removeUnsignificantBits(in bitstring p_bitstring)
+        return bitstring {
+            var integer i, len;
+            
+            len := lengthof(p_bitstring);
+            for(i:=len-1; i >=0 and p_bitstring[i] == '0'B; i:=i-1) {}
+            return substr(p_bitstring, 0, i + 1);
+        } 
+    
+        /**
+         * @desc    Gets the current time since 01/01/2004
+         * @return  Timestamp - current time since 01/01/2004 in milliseconds
+         */
+        function f_getCurrentTime() return TimestampIts {
+            var TimestampIts v_timeStamp := 0;
+            
+			log("*** f_getCurrentTime: INFO: calling fx_getCurrentTime() ***");
+            v_timeStamp := fx_getCurrentTime();
+
+            
+            return v_timeStamp;
+        }
+           
+    } // end generalFunctions  
+       
+    group itsFunctions { 
+
+        /** 
+         * @desc    Gets the station identifier of implementation under test (IUT)
+         * @return  IUT's station ID
+         * @see     PX_IUT_STATION_ID
+         */
+        function f_getIutStationId()
+        return StationID {
+            
+            return PX_IUT_STATION_ID;
+                
+        } // end f_getIutStationId
+        
+        function f_getIutStationType()
+        return StationType {
+            
+            return PX_IUT_STATION_TYPE;
+                
+        } // end f_getIutStationType
+        
+        /** 
+         * @desc    Gets the station identifier of test system
+         * @return  Test system's station ID
+         * @see     PX_TESTER_STATION_ID
+         */
+        function f_getTsStationId()
+        return StationID {
+            
+            return PX_TESTER_STATION_ID;
+                
+        } // end f_getTsStationId
+        
+        function f_getTsStationType()
+        return StationType {
+            
+            return PX_TESTER_STATION_TYPE;
+                
+        } // end f_getTsStationType
+        
+        /**
+         * @desc    Gets the current latitude of test system
+         * @return  Test system's latitude
+         */
+        function f_getTsLatitude() return Latitude {
+            
+            return PX_TS_LATITUDE;
+            
+        } // end f_getTsLatitude
+
+        /**
+         * @desc    Gets the current longitude of test system
+         * @return  Test system's latitude
+         */
+        function f_getTsLongitude() return Longitude {
+            
+            return PX_TS_LONGITUDE;
+            
+        } // end f_getTsLongitude
+                
+    } // end itsFunctions       
+  
+    group externalFunctions {
+
+        /**
+         * @desc    This external function gets the current time
+         * @return  Timestamp - current time since 01/01/2014 in milliseconds
+         */
+        external function fx_getCurrentTime() return TimestampIts;
+        
+        /**
+         * @desc    External function to compute distance between two points
+         * @param   p_latitudeA   Latitude of first point
+         * @param   p_longitudeA  Longitude of first point
+         * @param   p_latitudeB   Latitude of second point
+         * @param   p_longitudeB  Longitude of second point
+         * @return  Computed distance in meters
+         */
+        external function fx_computeDistance(
+            in Int32 p_latitudeA, in Int32 p_longitudeA, 
+            in Int32 p_latitudeB, in Int32 p_longitudeB
+        ) return float;
+        
+        /**
+         * @desc    External function to compute a position using a reference position, a distance and an orientation 
+         * @param   p_iutLongPosVector  Reference position
+         * @param   p_distance          Distance to the reference position (in meter)
+         * @param   p_orientation       Direction of the computed position (0 to 359; 0 means North)
+         * @param   p_latitude          Computed position's latitude
+         * @param   p_longitude         Computed position's longitude
+         */        
+        external function fx_computePositionUsingDistance(
+            in Int32 p_refLatitude, 
+            in Int32 p_refLongitude, 
+            in integer p_distance, 
+            in integer p_orientation,
+            out Int32 p_latitude,
+            out Int32 p_longitude
+        );
+        
+        /**
+         * @desc    External function to compute radius of a given circular area
+         * @param   p_squareMeters  Square meters of an circular area
+         * @return  Computed radius in meters
+         */
+        external function fx_computeRadiusFromCircularArea(
+            in float p_squareMeters
+        ) return float;
+        
+    } // end externalFunctions
+
+
+} // end of module
+

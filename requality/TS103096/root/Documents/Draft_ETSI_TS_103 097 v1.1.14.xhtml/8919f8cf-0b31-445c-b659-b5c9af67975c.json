@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_8919f8cf-0b31-445c-b659-b5c9af67975c\"><a name=\"8919f8cf-0b31-445c-b659-b5c9af67975c\" id=\"id_8919f8cf-0b31-445c-b659-b5c9af67975c\" class=\"requality_id\"><\/a> this field shall contain an element of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">certificate<font style=\"font-family: Times New Roman;\">.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "841d471e-38d5-4060-ad76-f24004c876b5"
+}

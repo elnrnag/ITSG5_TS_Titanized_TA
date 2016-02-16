@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "88b8e656-43d0-48dd-a93f-f613e65baf06",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "88b8e656-43d0-48dd-a93f-f613e65baf06",
+            "type": "STRING",
+            "value": "Check that the sent Secured DENM contains exactly one HeaderField its_aid that is set to 'AID_DENM'"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "88b8e656-43d0-48dd-a93f-f613e65baf06",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a DENM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid']\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "88b8e656-43d0-48dd-a93f-f613e65baf06",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "88b8e656-43d0-48dd-a93f-f613e65baf06",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "88b8e656-43d0-48dd-a93f-f613e65baf06"
+}

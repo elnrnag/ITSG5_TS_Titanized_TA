@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/b44017ee-61e4-4aae-bf8e-3f7d39b086e9"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "03. Enrolment Request Error acceptance"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d9685bad-d957-4695-a8cc-7d35eeaca155"
+}

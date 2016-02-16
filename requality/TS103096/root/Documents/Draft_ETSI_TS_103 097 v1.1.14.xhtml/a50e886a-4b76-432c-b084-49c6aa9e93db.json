@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\"><a name=\"a50e886a-4b76-432c-b084-49c6aa9e93db\" id=\"id_a50e886a-4b76-432c-b084-49c6aa9e93db\" class=\"requality_id\"><\/a>\t \n\t\tThe EccPointType of <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\">R<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\"> shall be set to either \n\t\t<\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\">compressed_lsb_y_0<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\">, \n\t\t<\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\">compressed_lsb_y_1<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\"> or \n\t\t<\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\">x_coordinate_only<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a50e886a-4b76-432c-b084-49c6aa9e93db\">. \n\t\n<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "a50e886a-4b76-432c-b084-49c6aa9e93db"
+}

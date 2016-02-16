@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "d5eae6f9-4530-43de-8b92-6d4982cdcc22",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d5eae6f9-4530-43de-8b92-6d4982cdcc22",
+            "type": "STRING",
+            "value": "Check that IUT discards a Secured CAM containing protocol version set to a value greater then 2"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "d5eae6f9-4530-43de-8b92-6d4982cdcc22",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (CAM)\r\n\t\t\tcontaining protocol_version \r\n\t\t\t\tindicating 3\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_CAM'\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "d5eae6f9-4530-43de-8b92-6d4982cdcc22",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d5eae6f9-4530-43de-8b92-6d4982cdcc22",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "d5eae6f9-4530-43de-8b92-6d4982cdcc22"
+}

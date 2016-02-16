@@ -1,0 +1,834 @@
+module test_LibItsExternalFunctions {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues {type UInt8;}
+    
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_Functions all;
+    
+    // LibItsCam
+    import from LibItsCam_Templates all;
+    
+    // LibItsIpv6OverGeoNetworking
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues {
+        type Ipv6Address, RouterAdvertisementMsg;
+    }
+    import from LibItsIpv6OverGeoNetworking_Functions all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Functions all;
+    
+    import from test_CommonCodec all;
+    
+    template (value) UInt8 m_ICMPv6_protocoId := 58; // = 0x3a: ICMPv6 protocol ID
+    
+    group externalFunction_testCases {
+        
+        group testValues_01 {
+            
+            template (value) Ipv6Address m_src_01 := 'fe80000000000000020086fffe0580da'O; // fe80::200:86ff:fe05:80da
+            
+            template (value) Ipv6Address m_dst_01 := 'fe80000000000000026097fffe0769ea'O; // fe80::260:97ff:fe07:69ea
+            
+            template (value) octetstring m_ipv6Payload_01 := '8700000000000000fe80000000000000026097fffe0769ea01010000860580da'O;
+    //        template (value) octetstring m_ipv6Payload_01 := '870068bd00000000fe80000000000000026097fffe0769ea01010000860580da'O;
+            /*template (value) RouterAdvertisementMsg m_ipv6Payload := {
+                icmpType := c_rtAdvMsg,
+                icmpCode := 0,
+                checksum := '68bd'O,
+                curHopLimit := ,
+                managedConfigFlag,
+                otherConfigFlag,
+                homeAgentFlag,
+                reserved,
+                routerLifetime,
+                reachableTime,
+                retransTimer,
+                rtAdvOptions := omit
+            }*/
+            
+            template (value) integer m_payloadLength_01 := 32;
+            
+            template octetstring mw_checksum_01 := '68bd'O; 
+            
+        } // End of group testValues_01
+        
+        group testValues_02 {
+            
+            template (value) Ipv6Address m_src_02 := '2001ffff000000000000000000000002'O; 
+            
+            template (value) Ipv6Address m_dst_02 := '2001ffff000000000000000000000001'O; 
+            
+            template (value) octetstring m_ipv6Payload_02 := '80000000636801004a43ec45d23f0b0008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637'O;
+    //        template (value) octetstring m_ipv6Payload_02 := '8000dc4b636801004a43ec45d23f0b0008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637'O;
+            
+            template (value) integer m_payloadLength_02 := 64;
+            
+            template octetstring mw_checksum_02 := 'dc4b'O; 
+            
+        } // End of group testValues_02
+        
+        group testValues_03 {
+            
+            template (value) Ipv6Address m_src_03 := '2001ffff000000000000000000000001'O; // 2001:ffff::1 
+    
+            template (value) Ipv6Address m_dst_03 := '2001ffff000000000000000000000002'O; // 2001:ffff::2 
+            
+            template (value) octetstring m_ipv6Payload_03 := '8100000072680500b043ec45f3500b0008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637'O;
+    //        template (value) octetstring m_ipv6Payload_03 := '8100413a72680500b043ec45f3500b0008090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031323334353637'O;
+            
+            template (value) integer m_payloadLength_03 := 64;
+            
+            template octetstring mw_checksum_03 := '413a'O; 
+            
+        } // End of group testValues_03
+        
+        group externalFunctionsGN {
+            
+            testcase tc_computePositionUsingDistance_01() runs on TCType system TCType {
+                var ReferencePosition v_referencePosition;
+                var integer v_offSet;
+                
+                v_referencePosition := valueof(m_tsPosition);
+                v_offSet := 1000;
+                
+                log("v_referencePosition = ", v_referencePosition);
+                fx_computePositionUsingDistance(
+                    v_referencePosition.latitude,
+                    v_referencePosition.longitude,
+                    v_offSet,
+                    v_referencePosition.positionConfidenceEllipse.semiMajorOrientation,
+                    v_referencePosition.latitude,
+                    v_referencePosition.longitude
+                );
+                log("New position = lat:", v_referencePosition.latitude, ", lon:", v_referencePosition.longitude);
+                
+                setverdict(pass);
+            }
+            
+            testcase tc_computeIPv6Checksum_01() runs on TCType system TCType {
+                var octetstring v_checksum;
+                
+                v_checksum := f_computeIPv6CheckSum(
+                    m_src_01, 
+                    m_dst_01, 
+                    m_payloadLength_01, 
+                    m_ipv6Payload_01, 
+                    m_ICMPv6_protocoId); 
+                
+                if (match(v_checksum, mw_checksum_01) == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_computeIPv6Checksum_02() runs on TCType system TCType {
+                var octetstring v_checksum;
+                
+                v_checksum := f_computeIPv6CheckSum(
+                    m_src_02, 
+                    m_dst_02, 
+                    m_payloadLength_02, 
+                    m_ipv6Payload_02, 
+                    m_ICMPv6_protocoId); 
+                
+                if (match(v_checksum, mw_checksum_02) == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_computeIPv6Checksum_03() runs on TCType system TCType {
+                var octetstring v_checksum;
+                
+                v_checksum := f_computeIPv6CheckSum(
+                    m_src_03, 
+                    m_dst_03, 
+                    m_payloadLength_03, 
+                    m_ipv6Payload_03, 
+                    m_ICMPv6_protocoId); 
+                
+                if (match(v_checksum, mw_checksum_03) == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+        } // End of group externalFunctionsGN
+        
+        group externalFunctionsSec {
+            
+            testcase tc_generateKeyPair_01() runs on TCType system TCType {
+                var boolean v_result;
+                var octetstring/*UInt64*/ v_privateKey;
+                var octetstring v_publicKeyX;
+                var octetstring v_publicKeyY;
+                
+                v_result := fx_generateKeyPair(v_privateKey, v_publicKeyX, v_publicKeyY); 
+                log("v_result = ", v_result);
+                log("privateKey = ", v_privateKey);
+                log("publicKeyX = ", v_publicKeyX);
+                log("publicKeyY = ", v_publicKeyY);
+                
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_hashWithSha256_01() runs on TCType system TCType {
+                var octetstring v_data;
+                var octetstring v_hash := ''O;
+                
+                v_data := 'DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF'O;
+                v_hash := f_hashWithSha256(v_data); 
+                log("v_hash = ", v_hash);
+                
+                setverdict(pass);
+            }
+            
+            testcase tc_signWithEcdsaNistp256WithSha256_01() runs on TCType system TCType {
+                var boolean v_result;
+                var octetstring v_toBeSignedSecuredMessage;
+                var octetstring/*UInt64*/ v_privateKey;
+                var octetstring v_publicKeyX;
+                var octetstring v_publicKeyY;
+                var octetstring v_hash, v_sign;
+                
+                fx_generateKeyPair(v_privateKey, v_publicKeyX, v_publicKeyY); 
+                log("privateKey = ", v_privateKey);
+                log("publicKeyX = ", v_publicKeyX);
+                log("publicKeyY = ", v_publicKeyY);
+    
+                v_toBeSignedSecuredMessage := '0203811D80020209010727A031EE3F372C01008091000004EA807A2D6CC220D563C6C74047C764407AF5F21240C403A40697294A94CF3CF0846C8DF447DA62EAC49DBA51EEC4AF7C8B1E0BCC67822626B2112E2FC56BE4C1010100044F0CBC2A8AF10F5476AE4180828D9C62D82215E0EDCBDCAB74AA49C1B6D260455E949EA97B9A98F64BDA55FA2441F4BE82BB45DB1B4F9B194B5471A6058F6E8602202006C04080C04081240153C13EED5A391AED0303181DB9CF7C052616001DB9566E0526872A1D53F0D0052783500000EBEECFB8A931E5FBA5138808836CEC66EE5C99095693DDFE235076B91C8E2B0013DEAEB76EC813F6C205333E0050434FE7F29F2980C352B7FB1578CE2AA6F394000000004E526ED10203000004D20000162E002F2200200010800000000100BC21A4FEDECABEEF0001E240000012F8000002A38037269401'O;
+                v_hash := f_hashWithSha256(v_toBeSignedSecuredMessage); 
+                log("length v_hash = ", lengthof(v_hash));
+                log("v_hash = ", v_hash);
+                v_sign := fx_signWithEcdsaNistp256WithSha256(v_toBeSignedSecuredMessage, v_privateKey); 
+                log("length v_sign = ", lengthof(v_sign));
+                log("v_sign = ", v_sign);
+                
+                
+                log(substr(v_sign, 2, 32));
+                log(substr(v_sign, 34, 32));
+                
+                
+                v_result := fx_verifyWithEcdsaNistp256WithSha256(v_toBeSignedSecuredMessage, v_sign, v_publicKeyX, v_publicKeyY);
+                log("v_result = ", v_result);
+                
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+        } // End of group externalFunctionsSec
+        
+        group externalFunctionsGeodesic {
+            
+            testcase tc_dms2dd() runs on TCType system TCType {
+                
+                if (48.857253 != f_dms2dd(48, 51, 26.1108, "N")) { // Latitude Paris
+                    setverdict(fail);
+                }
+                if (2.294489 != f_dms2dd(2, 17, 40.16, "E")) { // Longitude Paris
+                    setverdict(fail);
+                }
+                if (42.560225 != f_dms2dd(42, 33, 36.81, "N")) { // Latitude Ackley, Iowa
+                    setverdict(fail);
+                }
+                if (-93.057803 != f_dms2dd(93, 3, 28.09, "W")) { // Longitude Ackley, Iowa
+                    setverdict(fail);
+                }
+                if (-33.962156 != f_dms2dd(33, 57, 43.76, "S")) { // Latitude Port Elisabeth, South Africa
+                    setverdict(fail);
+                }
+                if (25.623722 != f_dms2dd(25, 37, 25.40, "E")) { // Longitude , Port ElisabethSouth Africa
+                    setverdict(fail);
+                }
+                if (35.674131 != f_dms2dd(35, 40, 26.87, "N")) { // Latitude Tokyo
+                    setverdict(fail);
+                }
+                if (139.770375 != f_dms2dd(139, 46, 13.35, "E")) { // Longitude Tokyo
+                    setverdict(fail);
+                }
+                if (-37.823108 != f_dms2dd(37, 49, 23.19, "S")) { // Latitude Melbourne
+                    setverdict(fail);
+                }
+                if (144.977039 != f_dms2dd(144, 58, 37.34, "E")) { // Longitude Melbourne
+                    setverdict(fail);
+                }
+                if (-54.657792 != f_dms2dd(54, 39, 28.05, "S")) { // Latitude Faro San Diego
+                    setverdict(fail);
+                }
+                if (65.119572 != f_dms2dd(65, 7, 10.46, "E")) { // Longitude Faro San Diego
+                    setverdict(fail);
+                }
+                if (42.0 != f_dms2dd(42, 0, 0.0, "N")) { // Longitude Faro San Diego
+                    setverdict(fail);
+                }
+                if (0.0 != f_dms2dd(37, 49, 23.29, "A")) { // Latitude
+                    setverdict(fail);
+                }
+                else { 
+                    setverdict(pass);
+                }
+            }
+            
+            testcase tc_isValidPolygonalRegion_01() runs on TCType system TCType {
+                var boolean v_result;
+                var PolygonalRegion v_polygonalArea;
+                
+                v_result := f_isValidPolygonalRegion(v_polygonalArea);
+                
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isValidPolygonalRegion_02() runs on TCType system TCType {
+                var boolean v_result;
+                var PolygonalRegion v_polygonalArea;
+                
+                v_polygonalArea := {};
+                
+                v_result := f_isValidPolygonalRegion(v_polygonalArea);
+                
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isValidPolygonalRegion_03() runs on TCType system TCType {
+                var boolean v_result;
+                var PolygonalRegion v_polygonalArea;
+                
+                v_polygonalArea := {
+                    { // Darmstadt, Germany
+                        latitude    := 498716540, 
+                        longitude   := 8638208
+                    }, 
+                    {
+                        latitude    := 498685550, 
+                        longitude   := 8641105
+                    }, 
+                    {
+                        latitude    := 492040400, 
+                        longitude   := 8647560
+                    } 
+                };
+                
+                v_result := f_isValidPolygonalRegion(v_polygonalArea);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsidePolygonalRegion_01() runs on TCType system TCType {
+                var boolean v_result;
+                var PolygonalRegion v_polygonalArea;
+                var ThreeDLocation v_location;
+                
+                v_polygonalArea := {
+                    { // Sisteron, France
+                        latitude    := f_ddlat2int(f_dms2dd(44, 11, 56.91, "N")), 
+                        longitude   := f_ddlon2int(f_dms2dd(5, 56, 33.28, "E")) 
+                    }, 
+                    { // Nice, France
+                        latitude    := 437101728, 
+                        longitude   := 7261953
+                    }, 
+                    { // Marseille, france
+                        latitude    := f_ddlat2int(f_dms2dd(43, 17, 39.40, "N")), 
+                        longitude   := f_ddlon2int(f_dms2dd(5, 21, 29.19, "E"))
+                    }, 
+                    { // Cevennes National Park, france
+                        latitude    := f_ddlat2int(f_dms2dd(44, 19, 23.34, "N")), 
+                        longitude   := f_ddlon2int(f_dms2dd(3, 35, 39.21, "E"))
+                    } 
+                };
+                v_location := { // Location outside: Brest, France
+                    latitude    := f_ddlat2int(f_dms2dd(48, 23, 35.91, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(4, 29, 16.65, "W")),
+                    elevation   := '0000'O
+                };
+                v_result := f_isLocationInsidePolygonalRegion(v_polygonalArea, v_location);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_location := { // Location inside: Forcalquier, France
+                    latitude    := f_ddlat2int(f_dms2dd(43, 57, 47.40, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(5, 46, 47.42, "E")),
+                    elevation   := '0000'O
+                };
+                v_result := f_isLocationInsidePolygonalRegion(v_polygonalArea, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsidePolygonalRegion_03() runs on TCType system TCType {
+                var boolean v_result;
+                var PolygonalRegion v_polygonalArea;
+                var ThreeDLocation v_location;
+                
+                v_polygonalArea := { // Florida, Usa
+                    { // Upper left corner
+                        latitude    := 310002130, 
+                        longitude   := -87584839 
+                    }, 
+                    { 
+                        latitude    := 310096290, 
+                        longitude   := -85003052
+                    }, 
+                    { 
+                        latitude    := 307267260, 
+                        longitude   := -84838257
+                    }, 
+                    { 
+                        latitude    := 305849620, 
+                        longitude   := -82168579
+                    }, 
+                    { 
+                        latitude    := 307361700, 
+                        longitude   := -81476441
+                    }, 
+                    { // Upper right corner
+                        latitude    := 290023750, 
+                        longitude   := -80795288
+                    }, 
+                    { 
+                        latitude    := 268965980, 
+                        longitude   := -79938355
+                    }, 
+                    { 
+                        latitude    := 258137380, 
+                        longitude   := -80059204
+                    }, 
+                    { 
+                        latitude    := 249302800, 
+                        longitude   := -80454712
+                    }, 
+                    { 
+                        latitude    := 244011350, 
+                        longitude   := -81817017
+                    }, 
+                    { 
+                        latitude    := 247009270, 
+                        longitude   := -81959839
+                    }, 
+                    { 
+                        latitude    := 249502030, 
+                        longitude   := -81124878
+                    }, 
+                    { 
+                        latitude    := 260015000, 
+                        longitude   := -82014771
+                    }, 
+                    { 
+                        latitude    := 278332470, 
+                        longitude   := -83014527
+                    }, 
+                    { 
+                        latitude    := 288389000, 
+                        longitude   := -82871704
+                    }, 
+                    { 
+                        latitude    := 299872930, 
+                        longitude   := -84091187
+                    }, 
+                    { 
+                        latitude    := 295390530, 
+                        longitude   := -85134888
+                    }, 
+                    { 
+                        latitude    := 302723520, 
+                        longitude   := -86475220
+                    }, 
+                    { 
+                        latitude    := 302818390, 
+                        longitude   := -87628784
+                    }
+                };
+                v_location := { // Location inside: Forcalquier, France
+                    latitude    := 308211200, 
+                    longitude   := -87255249,
+                    elevation   := '0000'O
+                };
+                v_result := f_isLocationInsidePolygonalRegion(v_polygonalArea, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_location := { // Location outside: Forcalquier, France
+                    latitude    := 439599330, 
+                    longitude   := 5780711,
+                    elevation   := '0000'O
+                };
+                v_result := f_isLocationInsidePolygonalRegion(v_polygonalArea, v_location);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsideRectangularRegion_01() runs on TCType system TCType {
+                var boolean v_result;
+                var RectangularRegions v_rectangularAreas;
+                var ThreeDLocation v_location;
+                
+                v_rectangularAreas := 
+                {
+                    { // Wyoming, USA
+                        { // Upper left corner
+                            latitude    := f_ddlat2int(f_dms2dd(45, 0, 0.0, "N")), 
+                            longitude   := f_ddlon2int(f_dms2dd(111, 0, 0.0, "W"))
+                        }, 
+                        { // Lower right corner
+                            latitude    := f_ddlat2int(f_dms2dd(41, 0, 0.0, "N")), 
+                            longitude   := f_ddlon2int(f_dms2dd(104, 0, 0.0, "W"))
+                        } 
+                    }
+                };
+                v_location := { // Location outside: Kimball Muni/robert E Arraj Field, Nebraska
+                    latitude    := f_ddlat2int(f_dms2dd(41, 11, 17.0, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(103, 40, 38.6, "W")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideRectangularRegion(v_rectangularAreas, v_location);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_location := { // Location inside: Bridger Creek Airport, Wyoming
+                    latitude    := f_ddlat2int(f_dms2dd(43, 20, 25.85, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(107, 41, 13.29, "W")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideRectangularRegion(v_rectangularAreas, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsideCircularRegion_01() runs on TCType system TCType {
+                var boolean v_result;
+                var CircularRegion v_circularArea;
+                var ThreeDLocation v_location;
+                
+                v_circularArea := 
+                {
+                    { // Center: Heathrow Airport, Great Britain
+                        latitude    := f_ddlat2int(f_dms2dd(51, 28, 20.57, "N")), 
+                        longitude   := f_ddlon2int(f_dms2dd(0, 27, 3.38, "W"))
+                    }, 
+                    2000 // Radius in meters: 2 Km
+                };
+                v_location := { // Location outside: Sheffield Town Hall, Great Britain
+                    latitude    := f_ddlat2int(f_dms2dd(53, 22, 49.38, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(1, 28, 12.12, "W")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideCircularRegion(v_circularArea, v_location);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                v_location := { // Location inside: Harlington Baptist Church, Great Britain
+                    latitude    := f_ddlat2int(f_dms2dd(51, 29, 12.73, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(0, 26, 7.6, "W")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideCircularRegion(v_circularArea, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsideIdentifiedRegion_01() runs on TCType system TCType {
+                var boolean v_result;
+                var IdentifiedRegion v_area;
+                var ThreeDLocation v_location;
+                
+                v_area := {
+                    region_dictionary   := e_iso_3166_1,    // ISO 3166-1
+                    region_identifier   := 250,             // France
+                    local_region        := 83               // Var
+                }
+                
+                v_location := { // Location ouside: Harlington Baptist Church, Great Britain
+                    latitude    := f_ddlat2int(f_dms2dd(51, 29, 12.73, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(0, 26, 7.6, "W")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_location := { // Location inside: Les oliviers de la mairie, place Villeneuve Bargemon, Marseille, France
+                    latitude    := f_ddlat2int(f_dms2dd(43, 17, 48.57, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(5, 22, 9.61, "E")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_location := { // Location inside: Cattedrale St Leonce e battistero, Frejus, France
+                    latitude    := f_ddlat2int(f_dms2dd(43, 25, 58.13, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(6, 44, 11.18, "E")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsideIdentifiedRegion_02() runs on TCType system TCType {
+                var boolean v_result;
+                var IdentifiedRegion v_area;
+                var ThreeDLocation v_location;
+                
+                v_area := {
+                    region_dictionary   := e_iso_3166_1,    // ISO 3166-1
+                    region_identifier   := 1024,            // Unknown country code
+                    local_region        := 0
+                }
+                
+                v_location := { // Location outside: Les oliviers de la mairie, place Villeneuve Bargemon, Marseille, France
+                    latitude    := f_ddlat2int(f_dms2dd(43, 17, 48.57, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(5, 22, 9.61, "E")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsideIdentifiedRegion_03() runs on TCType system TCType {
+                var boolean v_result;
+                var IdentifiedRegion v_area;
+                var ThreeDLocation v_location;
+                
+                v_area := {
+                    region_dictionary   := e_un_stats,  // UN states
+                    region_identifier   := 250,         // France code in UN
+                    local_region        := 0
+                }
+                
+                v_location := { // Location inside: Les oliviers de la mairie, place Villeneuve Bargemon, Marseille, France
+                    latitude    := f_ddlat2int(f_dms2dd(43, 17, 48.57, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(5, 22, 9.61, "E")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_location := { // Location inside: Les oliviers de la mairie, place Villeneuve Bargemon, Marseille, France
+                    latitude    := f_ddlat2int(f_dms2dd(43, 17, 48.57, "N")), 
+                    longitude   := f_ddlon2int(f_dms2dd(5, 22, 9.61, "E")),
+                    elevation   := '0000'O
+                }
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isLocationInsideIdentifiedRegion_04() runs on TCType system TCType {
+                var boolean v_result;
+                var IdentifiedRegion v_area;
+                var ThreeDLocation v_location;
+                
+                v_area := {
+                    region_dictionary   := e_iso_3166_1,    // ISO 3166-1
+                    region_identifier   := 528,             // France
+                    local_region        := 0               // Var
+                }
+                
+                v_location := { latitude := 51478701, longitude := 5654746, elevation := '0000'O };
+                v_result := f_isLocationInsideIdentifiedRegion(v_area, v_location);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            
+            testcase tc_isPolygonalRegionInside_01() runs on TCType system TCType {
+                var boolean v_result;
+                var PolygonalRegion v_parent, v_region;
+                
+                v_parent := {
+                }
+                v_region := {
+                }
+                
+                v_result := f_isPolygonalRegionInside(v_parent, v_region);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_parent := {
+                    { // Forteza, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(3, 51, 51.317, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(38, 23, 10.429, "W"))
+                    },
+                    { // Sao Paulo, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(23, 43, 30.042, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(46, 30, 58.007, "W"))
+                    },
+                    { // Douradina, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(21, 59, 1.685, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(54, 38, 45.585, "W"))
+                    },
+                    { // Sorriso, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(12, 58, 59.332, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(55, 5, 13.476, "W"))
+                    }
+                };
+                v_region := {
+                };
+                
+                v_result := f_isPolygonalRegionInside(v_parent, v_region);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_result := f_isPolygonalRegionInside(v_parent, v_region);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_region := { // Part of the region inside
+                    { // Goias, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(13, 9, 15.754, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(49, 38, 10.429, "W"))
+                    },
+                    { // Araguaiana, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(15, 9, 25.105, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(51, 31, 33.164, "W"))
+                    },
+                    { // Espirito Santo, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(20, 52, 45.635, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(40, 48, 11.601, "W"))
+                    }
+                }
+                v_result := f_isPolygonalRegionInside(v_parent, v_region);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_region := { // Region inside
+                    { // Goias, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(13, 9, 15.754, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(49, 38, 10.429, "W"))
+                    },
+                    { // Araguaiana, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(15, 9, 25.105, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(51, 31, 33.164, "W"))
+                    },
+                    { // Piaui, Brasil
+                        latitude    := f_ddlat2int(f_dms2dd(10, 8, 30.954, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(45, 21, 45.175, "W"))
+                    }
+                }
+                v_result := f_isPolygonalRegionInside(v_parent, v_region);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_region := { // Region Outside
+                    { // Naramjos, Peru
+                        latitude    := f_ddlat2int(f_dms2dd(5, 44, 49.827, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(77, 30, 50.537, "W"))
+                    },
+                    { // Tarapoto, Peru
+                        latitude    := f_ddlat2int(f_dms2dd(6, 30, 3.237, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(76, 20, 18.603, "W"))
+                    },
+                    { // Cajamarca, Peru
+                        latitude    := f_ddlat2int(f_dms2dd(7, 10, 37.923, "S")), 
+                        longitude   := f_ddlon2int(f_dms2dd(78, 30, 49.658, "W"))
+                    }
+                }
+                v_result := f_isPolygonalRegionInside(v_parent, v_region);
+                if (v_result == false) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+                v_result := f_isPolygonalRegionInside(v_region, v_region);
+                if (v_result == true) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+                
+            }
+            
+        } // End of group externalFunctionsGeodesic
+        
+    } // End of group externalFunction_testCases
+    
+} // End of module test_LibItsExternalFunctions

@@ -1,0 +1,53 @@
+/**
+ *  @author   ETSI / STF449
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Common/LibItsCommon_Pixits.ttcn $
+ *            $Id: LibItsCommon_Pixits.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Common PIXITS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCommon_Pixits {
+    
+    /**
+     * @desc IUT Station Id
+     *       Station Id used in CAM/DENM messages sent by the tester
+     */
+    modulepar integer PX_IUT_STATION_ID := 1;
+    
+    /**
+     * @desc IUT Station Type
+     *       Station Type used in CAM/DENM messages sent by the IUT
+     */
+    modulepar integer PX_IUT_STATION_TYPE := 5;
+    
+    /**
+     * @desc Tester Station Id
+     *       Station Id used in CAM/DENM messages sent by the tester
+     */
+    modulepar integer PX_TESTER_STATION_ID := 111111;
+    
+    /**
+     * @desc Tester Station Type
+     *       Station Type used in CAM/DENM messages sent by the tester
+     */
+    modulepar integer PX_TESTER_STATION_TYPE := 3;
+    
+    /**
+     *  @desc The Latitude of the tester.
+     */
+    modulepar integer PX_TS_LATITUDE := 436175790;
+
+    /**
+     *  @desc The Longitude of the tester.
+     */
+    modulepar integer PX_TS_LONGITUDE := 70546480;
+
+    /**
+     * @desc Tolerance to be applied when checking timestamps (ms)
+     */
+    modulepar integer PX_TIME_DELTA := 1000;
+    
+} // end LibItsCommon_Pixits
+

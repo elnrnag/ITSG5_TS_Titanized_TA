@@ -1,0 +1,23 @@
+module test_all /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+
+    import from test_LibItsGeoNetworking_TypesAndValues all;
+
+    import from test_LibItsIpv6OverGeoNetworking_TypesAndValues all;
+
+    import from test_LibItsBtp_TypesAndValues all;
+
+    import from test_LibItsCam_TypesAndValues all;
+
+    import from test_LibItsDenm_TypesAndValues all;
+    
+    import from test_LibItsFntp_TypesAndValues all;
+    
+    import from test_LibItsFsap_TypesAndValues all;
+    
+    import from test_LibItsExternalFunctions all;
+    
+    import from test_LibItsSecurity_TypesAndValues all;
+    
+    import from test_LibItsMapSpat_TypesAndValues all;
+    
+} // End of module test_all

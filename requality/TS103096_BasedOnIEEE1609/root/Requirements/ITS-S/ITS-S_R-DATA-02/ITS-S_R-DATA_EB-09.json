@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards valid signed data from another ITS-S when the generation location of the received data is beyond the range considered valid by the IUT."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/4a160830-f5c8-4c48-ba03-1bbfd2123474"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "8a904187-cb63-4596-a7d2-4af9edc8e820"
+}

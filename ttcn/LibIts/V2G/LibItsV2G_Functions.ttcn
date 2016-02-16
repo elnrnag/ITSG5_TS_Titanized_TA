@@ -1,0 +1,296 @@
+/**
+ *  @author     ETSI / STFS46
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/V2G/LibItsV2G_Functions.ttcn $
+ *              $Id: LibItsV2G_Functions.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Module containing functions for V2G application layer protocols
+ *
+ */
+ 
+ module LibItsV2G_Functions {
+     
+    // LibCommon
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    import from LibItsCommon_Functions all;
+    import from LibItsV2G_TestSystem all;
+    import from LibItsV2G_TypesAndValues all;
+    import from LibItsV2G_Templates all;
+    import from LibItsV2G_Pixits all;
+
+    group utFuntions { 
+            
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_init The initialisation to trigger.
+         */
+        function f_utInitializeIut(template (value) UtInitialize p_init) runs on ItsV2G {
+            
+            utPort.send(p_init);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                    log("*** f_utInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+            
+        }
+        
+        /**
+         * @desc    Triggers event from the application layer
+         * @param   p_event The event to trigger.
+         */
+        function f_utTriggerEvent(template (value) UtEvent p_event) runs on ItsV2G {
+            var template (value) UtTrigger v_utMsg := { p_event };
+            
+            utPort.send(v_utMsg);
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                }
+                [] tc_wait.timeout {
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+        }
+        
+        /**
+         * @desc Checks that the event was indicated at the application layer
+         * @param p_event The event to check.
+         * @param   p_discard The event should not appear. Default value: FALSE.
+         */
+        function f_utCheckEvent(template (value) UtEvent p_event, boolean p_discard) runs on ItsV2G {
+            var template (value) UtCheck v_utMsg := { p_event };
+            
+            utPort.send(v_utMsg);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                    if (p_discard == false) {
+                        log("*** f_utCheckEvent: INFO: Event correctly indicated at application layer ***");
+                    }
+                    else {
+                        log("*** f_utCheckEvent: ERROR: Event indicated at application layer where it should be discarded ***");
+                        f_selfOrClientSyncAndVerdict("error", e_error);
+                    }
+                }
+                [] utPort.receive(UtResult:false) {
+                    tc_wait.stop;
+                    if (p_discard == false) {
+                        log("*** f_utCheckEvent: ERROR: Event not correctly indicated at application layer ***");
+                        f_selfOrClientSyncAndVerdict("error", e_error);
+                    }
+                    else {
+                        log("*** f_utCheckEvent: INFO: Event not indicated at application layer***");
+                    }
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utCheckEvent: ERROR: Timeout while waiting for event check result ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);                    
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+        }
+                    
+    } // End of group utFunctions
+     
+    group configurationFunctions {
+        
+        /**
+         * @desc    Setups default configuration   
+         */
+        function f_cfUp() runs on ItsV2G {
+            
+            map(self:utPort, system:utPort);
+            map(self:v2gPort, system:v2gPort);
+            
+        } // end f_cfUp
+        
+        /**
+         * @desc    Deletes default configuration 
+         */
+        function f_cfDown() runs on ItsV2G {
+            
+            unmap(self:utPort, system:utPort);
+            unmap(self:v2gPort, system:v2gPort);
+            
+        } // end f_cfDown
+        
+    } // end configurationFunctions
+    
+    group v2gAltsteps {
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_default() runs on ItsV2G {
+            
+            [] v2gPort.receive {
+                log("*** a_default: ERROR: Received an unexpected message ***");
+                f_selfOrClientSyncAndVerdict("error", e_error);
+            }
+            [] tc_wait.timeout {
+                log("*** a_default: INCONC: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout {
+                log("*** a_default: INCONC: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                f_cfDown();
+                log("*** a_default: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;   
+            }
+        }
+    } //end v2gAltsteps
+
+    group preambles {
+        
+        /**
+         * @desc The default preamble.
+         */
+        function f_prDefault() runs on ItsV2G {
+            activate(a_default());
+        }
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         */
+        function f_prInitialState() runs on ItsV2G {
+            
+            f_utInitializeIut(m_v2gInitialize);
+			f_prDefault();
+        }
+        //      E X A M P L E 
+		/**
+		 * @desc Brings the IUT into Session Discovery state completed.
+		 */
+		function f_prSessionDiscoveryCompleted() runs on ItsV2G {
+    
+			f_utInitializeIut(m_v2gInitialize);
+			f_prDefault();
+			//f_sessionDiscoveryCompleted();
+
+		}
+        //		E X A M P L E
+		/**
+		 * @desc Performs Supported Application Protocol.
+		 */
+		function f_supportedApplicationCompleted() runs on ItsV2G {
+
+			//TODO
+
+		}
+
+		/**
+		 * @desc Performs preamble up to received a SDP Request
+		 * @param p_sdpReponse If function must send a SDP Response or must not
+		 * @see f_prInitialState()
+		 */
+		function f_prSdpRequestReceived() runs on ItsV2G {
+			f_prInitialState();
+			f_receiveSdpRequest();
+		}
+
+		/**
+		 * @desc Performs preamble sending a SDP Message
+		 * @param p_sdpMessage SDP message to be sent
+		 * @see f_prInitialState()
+		 * @see f_sendv2gMessage()
+		 */
+		function f_prSendSdpMessage(in template Sdp_Message p_sdpMessage) runs on ItsV2G {
+			f_prInitialState();
+			f_sendV2Gmessage(m_sdpReq(p_sdpMessage));
+		}
+        
+    } // end of group preambles    
+    
+	group sdpFunctions {
+		/**
+		 * @desc Received a SDP Request
+		 * @param p_response If function must send a SDP Response or must not
+		 */
+		function f_receiveSdpRequest() runs on ItsV2G {
+			tc_v2g_secc_sequenceTimeout.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpRequestMessage (mw_sdpRequestHeader, mw_sdpRequestPayload_generic))) -> value vc_v2gIndMessage
+				{ 
+					tc_v2g_secc_sequenceTimeout.stop;
+                    log("*** TP_EVCC_SDP_CLI_BV_01: PASS: SDP request message received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_v2g_secc_sequenceTimeout.timeout {
+                    log("*** TP_EVCC_SDP_CLI_BV_01: FAIL: SDP session request message not receive ***");
+                    setverdict(fail);
+                }         
+            }
+		}
+
+		/**
+		 * @desc Send a SDP Response message based on content of SDP Request
+		 * @param p_sdpRequest SDP Request Message
+		 */
+		function f_sendSdpResponse(in Sdp_Message p_sdpRequest) runs on ItsV2G
+		{
+			// To be completed!!! -> Use templates for sending and not variables!
+			var V2Greq v_sdpResponseMessage;
+
+			v_sdpResponseMessage.sdpOut.sdpPayload.sdpResponse.security := p_sdpRequest.sdpPayload.sdpRequest.security;
+			v_sdpResponseMessage.sdpOut.sdpPayload.sdpResponse.transportProtocol := p_sdpRequest.sdpPayload.sdpRequest.transportProtocol;
+			
+			v2gPort.send(v_sdpResponseMessage);
+		}		
+
+	} // end of sdp functions
+
+ 	group v2gFunctions {
+		
+		/**
+		 * @desc Send a V2G message
+		 * @param p_v2gMessage V2G message to be sent
+		 */
+		function f_sendV2Gmessage(in template V2Greq p_v2gMessage) runs on ItsV2G
+		{			
+			v2gPort.send(p_v2gMessage);
+		}
+
+	} // end of v2g functions
+
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsV2G {
+            //empty
+        }
+        
+    } // end postambles
+    
+} // end LibItsV2G_Functions

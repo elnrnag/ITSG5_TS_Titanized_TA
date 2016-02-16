@@ -1,0 +1,146 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/MGT/LibItsMgt_Functions.ttcn3 $
+ *              $Id: LibItsMgt_Functions.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       ITS station management (ISO 24102-3) functions
+ */
+module LibItsMgt_Functions {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues {
+        const 
+            c_uInt8Max;
+    };
+    import from LibCommon_Sync {
+        function
+            f_selfOrClientSyncAndVerdict, f_selfOrClientSyncAndVerdictPreamble
+    };
+    import from LibCommon_VerdictControl all;
+    
+    // LibIts
+    import from CALMiitsscu language "ASN.1:1997" { 
+        type 
+            PduCounter 
+    }; 
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+            MedType, CIaClass, CIclass 
+    }; 
+    import from CALMmanagement language "ASN.1:1997" {
+        type 
+            ITS_scuId
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type 
+            CommandRef, 
+            MN_Request_request, FWTupdate, 
+            MF_Request_request 
+    };
+//    import from CALMfsap language "ASN.1:1997" {
+//        type
+//            GCregServer, GCregClient, GCderegClient, GCctxTxCmd, CTXrxNot
+//    };
+    import from LibItsMgt_Templates all;
+    import from LibItsMgt_Pixits all;
+    import from LibItsCalm_Interface {
+        type 
+            ItsMgt/*, 
+            MgtMnSapCommandReq FXME To be removed */
+    };
+    
+    group preambule {
+        
+    } // End of group preambule
+    
+    group testerFunctions {
+        
+        /**
+         * @desc    Increments the pdu counter and returns the new even value
+         * @return  The new pdu counter value
+         * 
+         * @see ISO/WD 24102-4 - Clause 6.2.1
+         */
+        function f_getNextPduCounter() runs on ItsMgt return PduCounter {
+            vc_pduCounter := (vc_pduCounter + 2) mod (c_uInt8Max - 1); // ISO/WD 24102-4 - Clause 6.2.1: modulus 254
+            return vc_pduCounter;
+        } // End of function f_getNextPduCounter
+        
+        /**
+         * @desc    Increments the commandRef value and returns it
+         * @return  The new commandRef value
+         */
+        function f_getNextCommandRef() runs on ItsMgt return CommandRef {
+            vc_commandRef := (vc_commandRef + 1) mod (c_uInt8Max + 1);
+            return vc_commandRef;
+        } // End of function f_getNextCommandRef
+        
+    } // End of group testerFunctions
+    
+    group iutFunctions {
+        
+        /**
+         * @desc    Get the ITS-SCU-ID of the source ITS-SCU which produces the request
+         * @return  The ITS-SCU-ID of the source ITS-SCU which produces the request
+         * @see     PX_SRC_ITS_SCU_ID
+         */
+        function f_getIutSourceItsScuId() return ITS_scuId {
+            return PX_SRC_ITS_SCU_ID;
+        }
+        
+        /**
+         * @desc    Get the ITS-SCU-ID of the source ITS-SCU which produces AliveMessages
+         * @return  The ITS-SCU-ID of the source ITS-SCU which produces AliveMessages
+         * @see     PX_SRC_ITS_SCU_ID_ALIVE
+         */
+        function f_getIutSourceItsScuIdAlive() return ITS_scuId {
+            return PX_SRC_ITS_SCU_ID_ALIVE;
+        }
+        
+        /**
+         * @desc    Get the Host ITS-SCU-ID
+         * @return  The Host ITS-SCU-ID
+         * @see     PX_DST_ITS_SCU_ID
+         */
+        function f_getIutDestItsScuId() return ITS_scuId {
+            return PX_DST_ITS_SCU_ID;
+        }
+        
+        /**
+         * @desc    Get an other ITS-SCU-ID
+         * @return  The other ITS-SCU-ID
+         * @see     PX_OTHER_ITS_SCU_ID
+         */
+        function f_getIutOtherItsScuId() return ITS_scuId {
+            return PX_OTHER_ITS_SCU_ID;
+        }
+        
+        /**
+         * @desc    Get the type of access technology (medium)
+         * @return  The type of access technology (medium)
+         * @see     PX_MED_TYPE
+         */
+        function f_getIutMedType() return MedType { 
+            return PX_MED_TYPE; 
+        }
+        
+        /**
+         * @desc    Get the CI access class
+         * @return  The CI access class
+         * @see     PX_CIACLASS
+         */
+        function f_getIutCiAccessClass() return CIaClass { 
+            return PX_CIACLASS; 
+        }
+        
+        /**
+         * @desc    Get the CI class
+         * @return  The CI class
+         * @see     PX_CICLASS
+         */
+        function f_getIutCiClass() return CIclass { 
+            return PX_CICLASS; 
+        }
+        
+    } // End of group iutFunctions
+    
+} // End of module LibItsMgt_Functions

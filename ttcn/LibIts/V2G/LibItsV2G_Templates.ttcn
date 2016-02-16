@@ -1,0 +1,248 @@
+/**
+ *  @author   ETSI / STFS46
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/V2G/LibItsV2G_Templates.ttcn $
+ *            $Id: LibItsV2G_Templates.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     V2G application layer protocols Templates
+ *
+ */
+module LibItsV2G_Templates {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+ 
+	// LibIts
+    import from LibItsV2G_TestSystem all;
+    import from LibItsV2G_TypesAndValues all;
+    import from LibItsV2G_Pixits all;
+    
+    //XSD
+    import from iso_15118_2_2010_MsgDef all;
+    import from iso_15118_2_2010_MsgDataTypes all;
+        
+    group v2gPrimitivesTemplates {
+
+        
+    
+        group utPrimitives {
+            
+            /**
+             * @desc Initializes the V2G IUT. 
+             */
+            template (value) UtInitialize m_v2gInitialize := {
+                utV2Ginitialize := {
+                }
+            }
+            
+             /**
+             * @desc Upper Tester template for checking that V2G payload has been transmitted to upper layer
+             * @param p_payload Payload to be checked
+             */
+            template (value) UtEvent m_checkPayload(in V2G_Message.Body p_body) := {
+                utV2Gevent := {
+                    v2gBody := p_body
+                }
+            }
+            
+        } // end utPrimitives
+        
+    } // v2gPrimitivesTemplates
+    
+    group v2gPduTemplates {
+    	
+		/**
+		* @desc    Receive template for V2G Message (V2Gport Primitive)
+		* @param   p_v2gMsg V2G Message to be received
+		*/
+	   template V2Gind mw_v2gInd (
+		   in template (present) V2G_Message p_v2gMsg
+	   ) := { 
+		   v2gIn := p_v2gMsg 
+	   };
+
+	   	/**
+		* @desc    Receive template for SDP Message (V2Gport Primitive)
+		* @param   p_sdpMsg SDP Message to be received
+		*/
+	   template V2Gind mw_sdpInd (
+		   in template (present) Sdp_Message p_sdpMsg
+	   ) := { 
+		   sdpIn := p_sdpMsg 
+	   };
+
+	   template V2Greq m_sdpReq (
+	   		in template (present) Sdp_Message p_sdpMsg
+	   ) := {
+		   sdpOut := p_sdpMsg
+	   };
+
+	   /**
+		* @desc    Send template for V2G Message (V2Gport Primitive)
+		* @param   p_v2gMsg V2G Message to be sent
+		*/    
+	   template (value) V2Greq m_v2gReq (
+		   in template (value) V2G_Message p_v2gMsg
+	   ) := { 
+		   v2gOut := p_v2gMsg 
+	   };
+	   
+	   //      E X A M P L E 
+	   /**
+		* @desc    Receive template for V2G Message for Session Request
+		*/
+	   template V2G_Message mw_v2gMsg_sessionRequest (in template (present) sessionIDType_TYPE p_sId,
+	     in template (present) evccIDType_TYPE p_evccId ):= {
+		   Header := {
+			   SessionID := p_sId,
+			   Notification := omit,
+			   Signature := omit
+		   },
+		   Body := {
+			   BodyElement := omit//p_evccId
+			   }
+		   }
+
+	} // end v2gPduTemplates
+
+	group sdpMessageTemplates {   
+		/**
+         * @desc    Receive template for Generic Header SDP
+         */
+		template Sdp_Header mw_sdpHeader_generic := {
+			protocolVersion := ?,
+			inverseProtocolVersion := ?,
+			payloadType := ?,
+			payloadLength := ?
+		}
+
+		/**
+         * @desc    Receive template for Header SDP Request Message
+		 * @see		mw_sdpGenericHeader
+         */
+		template Sdp_Header mw_sdpRequestHeader modifies mw_sdpHeader_generic := {
+			protocolVersion := c_protocolVersion1,
+			inverseProtocolVersion := c_inverseProtocolVersion1,
+			payloadType := c_sdpRequestMessagePayloadType,
+			payloadLength := c_sdpRequestPayloadLength
+		}
+
+		/**
+         * @desc    Receive template for Header SDP Response Message
+		 * @see		mw_sdpGenericHeader
+         */
+		template Sdp_Header mw_sdpReponseHeader modifies mw_sdpHeader_generic := {
+			protocolVersion := c_protocolVersion1,
+			inverseProtocolVersion := c_inverseProtocolVersion1,
+			payloadType := c_sdpResponseMessagePayloadType,
+			payloadLength := c_sdpResponsePayloadLength
+		}
+
+		/**
+         * @desc    Receive template for Generic Payload of a SDP Request Message
+         */
+		template Sdp_Request mw_sdpRequestPayload_generic := {
+			security := ?,
+			transportProtocol := ?
+		}
+
+		/**
+         * @desc    Receive template for Generic Payload of a SDP Response Message
+         */
+		template Sdp_Response mw_sdpResponsePayload_generic := {
+			seccIPAddress := ?,
+			seccPort := ?,
+			security := ?,
+			transportProtocol := ?
+		}
+
+		/**
+         * @desc    Receive template for Specific Payload of a SDP Response Message
+		 * @param p_sec Security Encoding field
+		 * @param p_transProto Transport Protocol field
+		 * @see	mw_sdpResponsePayload_generic
+         */
+		template Sdp_Response mw_sdpResponsePayload(in Oct1 p_sec, in Oct1 p_transProto)
+		modifies mw_sdpResponsePayload_generic := {
+			seccIPAddress := ?,
+			seccPort := ?,
+			security := p_sec,
+			transportProtocol := p_transProto
+		}
+
+		/**
+         * @desc    Receive template for Specific Payload of a SDP Request Message
+		 * @param p_sec Security Encoding field
+		 * @param p_transProto Transport Protocol field
+		 * @see	mw_sdpGenericPayloadRequest
+         */
+		template Sdp_Request mw_sdpRequestPayload(in Oct1 p_sec, in Oct1 p_transProto)
+		modifies mw_sdpRequestPayload_generic := {
+			security := p_sec,
+			transportProtocol := p_transProto
+		}
+
+		/**
+         * @desc    Receive template for SDP Request Message
+		 * @param p_sdpH	Header of the message
+		 * @param p_sdpP	Payload of a Request message
+         */
+		template Sdp_Message mw_sdpRequestMessage (in template Sdp_Header p_sdpH,
+		in template Sdp_Request p_sdpP) := {
+			sdpHeader := p_sdpH,
+			sdpPayload := {
+				sdpRequest := p_sdpP
+			}
+		}
+
+		/**
+         * @desc    Receive template for SDP Response Message
+		 * @param p_sdpH	Header of the message
+		 * @param p_sdpP	Payload of a Response message
+         */
+		template Sdp_Message mw_sdpResponseMessage (in template Sdp_Header p_sdpH,
+		in template Sdp_Response p_sdpP) := {
+			sdpHeader := p_sdpH,
+			sdpPayload := {
+				sdpResponse := p_sdpP
+			}
+		}
+
+		/**
+         * @desc    Send template for SDP Request Message
+		 * @param p_sdpH	Header of the message
+		 * @param p_sdpP	Payload of a Request message
+         */
+		template Sdp_Message m_sdpRequestMessage (in template Sdp_Header p_sdpH,
+		in template Sdp_Request p_sdpP) := {
+			sdpHeader := p_sdpH,
+			sdpPayload := {
+				sdpRequest := p_sdpP
+			}
+		}
+		
+		/**
+		 * @desc    Send template for SDP Request Message Header
+		 * @see     mw_sdpGenericHeader
+		 */
+		template Sdp_Header m_sdpRequestHeader := {
+			protocolVersion := c_protocolVersion1,
+			inverseProtocolVersion := c_inverseProtocolVersion1,
+			payloadType := c_sdpRequestMessagePayloadType,
+			payloadLength := c_sdpRequestPayloadLength
+		}
+		
+		/**
+		 * @desc    Send template for SDP Request Message Payload
+		 * @param p_sec Security Encoding field
+		 * @param p_transProto Transport Protocol field
+		 * @see mw_sdpGenericPayloadRequest
+		 */
+		template Sdp_Request m_sdpRequestPayload(in Oct1 p_sec, in Oct1 p_transProto) := {
+			security := p_sec,
+			transportProtocol := p_transProto
+		}
+
+    } // end sdpMessageTemplates
+    
+    
+} // end LibItsV2G_Templates

@@ -1,0 +1,1067 @@
+/**
+ *  @author     ETSI / STF455
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/ATSP/LibItsAtsp_Templates.ttcn3 $
+ *              $Id: LibItsAtsp_Templates.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Template definitions for Access Technology Support Protocols (ISO 21218)
+ */
+module LibItsAtsp_Templates {
+
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+			Link_ID, MedID, MedType, CIstatus,
+            INsapPrimitivesDown, INsapPrimitivesUp, 
+            IN_UNITDATA_request, IN_UNITDATA_indication, IN_UNITDATA_STATUS_indication,
+			UserPriority,
+			LLserviceAddr, INdata, IN_SAPaddress, EUI64, Link_ID,
+			AccessParameters,
+		    NullType, Errors, INtxStatus
+    };
+	
+    import from CALMmsap language "ASN.1:1997" { 
+        type 
+			CIstateChng, WakeUp, RIcmd, RI,
+			RegCmd, RegReq, Events21218, 
+			PrioReg, RTSreq,RTSackCmd, RTScmd, RTSackReq,
+			E21218_3, E21218_4, E21218_5, E21218_7,
+            StationID, CommandRef, ErrStatus, 
+            MI_Command_request, MI_Command_confirm,
+			MI_Request_request, MI_Request_confirm,
+			MI_Get_request, MI_Get_confirm,
+			MI_Set_request, MI_Set_confirm,
+            SimIUTcmd ,
+			CONcmd, VciCmd, UnitData,
+			DataUnitData, ParameterUnitData
+    };
+	
+	import from CALMmanagement language "ASN.1:1997" { 
+        type 
+            ITS_scuId 
+    };
+	
+	import from LibItsCalm_Pixits { 
+        modulepar 
+			PX_LOC_ITS_ATSP_ACCESS_SETTINGS_MX_SAP_SET, PX_LOC_ITS_ATSP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+			PX_IUT_LOWER_LAYER_USED, PX_IUT_LOWER_LAYER_UNUSED, 
+            PX_IUT_TEST_MODE_ON 
+    }; 
+	import from LibItsCalm_Interface all;
+	import from LibItsAtsp_TypesAndValues all;
+	import from LibItsMgt_TypesAndValues {
+        type IParamNoList, IParamList
+    }; 
+
+
+        group sendOperation {
+			
+			group cfPort {
+				
+				/**
+	        	* @desc    Send template
+				* CfAtspEvent for sending MI-REQUEST.confirm over cfPort
+	        	* @param   p_miReqConfirm:  The MI-REQUEST.confirm primitive
+	        	*/
+				template CfAtspEvent m_cfAtspMIRequest_confirm(
+					in template(value) MI_Request_confirm p_miReqConfirm
+				) := {
+					miRequestConfirm := p_miReqConfirm
+				} // End of template m_cfAtspMIRequest_confirm
+				
+				/**
+	        	* @desc    Send template
+				* CfAtspEvent for sending MI-GET.request over cfPort
+	        	* @param   p_miGetRequest:		Get request to send
+	        	*/
+				template CfAtspEvent m_cfAtspGetReqEvent(
+					in template(value) MI_Get_request p_miGetRequest
+				) := {
+					miGetRequest := p_miGetRequest
+				} // End of template m_cfAtspGetReqEvent
+				
+				/**
+	        	* @desc    Send template
+				* CfAtspEvent for sending MI-SET.request over cfPort
+	        	* @param   p_miSetRequest:		Set request to send
+	        	*/
+				template CfAtspEvent m_cfAtspSetReqEvent(
+					in template(value) MI_Set_request p_miSetRequest
+				) := {
+					miSetRequest := p_miSetRequest
+				} // End of template m_cfAtspSetReqEvent
+		
+				/**
+	        	* @desc    Send template
+				* CfAtspEvent for sending MI-COMMAND.request over cfPort
+	        	* @param   p_miCommandRequest:		Command request to send
+	        	*/
+				template CfAtspEvent m_cfAtspCommandReqEvent(
+					in template(value) MI_Command_request p_miCommandRequest
+				) := {
+					miCommandRequest := p_miCommandRequest
+				} // End of template m_cfAtspCommandReqEvent
+		
+			} // End of group cfPort
+			
+			group cfPortTools {
+				
+				/**
+	        	* @desc    Send template
+				* MI-REQUEST.confirm to send
+	        	* @param   p_MI_REQUEST_Request:	The MI-REQUEST.request to confirm
+				* @param   p_errorStatus:			ErrStatus value of the confirmation
+	        	*/
+				template MI_Request_confirm m_cfAtspRequestConfirm(
+					in template(value) MI_Request_request p_MI_REQUEST_Request,
+					in template(value) ErrStatus p_errorStatus
+	        	) := {
+					linkID := p_MI_REQUEST_Request.linkID,
+					commandRef := p_MI_REQUEST_Request.commandRef,
+					errStatus := p_errorStatus
+				} // End of template m_cfAtspRequestConfirm
+					
+				/**
+	        	* @desc    Send template
+				* Registration Command to confirm with
+	        	* @param   p_sourceLinkID 
+				* @param   p_destinationLinkID
+				* @param   p_data
+				* @param   p_priority
+				* @param   p_parameter
+	        	*/
+				template UnitData m_unitDataCommand(
+					in template(value) Link_ID p_sourceLinkID,
+					in template(value) Link_ID p_destinationLinkID,
+					in template(value) DataUnitData p_data,
+					in template(value) UserPriority p_priority,
+					in template(value) ParameterUnitData p_parameter
+				) := {
+					sourceAddr := p_sourceLinkID,
+					destAddr := p_destinationLinkID,
+					data := p_data,
+					priority := p_priority,
+					parameter := p_parameter
+				} // End of template m_unitDataCommand
+
+				/**
+	        	* @desc    Send template
+				* UnitData Command 
+	        	* @param   p_scudId:		ITS-SCU-ID value
+				* @param   p_medType:		MedID value
+	        	*/
+				template RegCmd m_regCommand(
+					in template(value) ITS_scuId p_scudId,
+					in template(value) MedID p_medType
+				) := {
+					scuId := p_scudId,
+					medID := p_medType
+				} // End of template m_regCommand
+
+				/**
+                * @desc Send template for MI-COMMAND.request containing registration command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_regCmd			Registration command primitive
+                */
+                template (value) MI_Command_request m_miRegistrationCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,  
+                   	in template (value) RegCmd p_regCmd 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_regCmd,
+					command_param := {RegCmd := p_regCmd}
+                } // End of template m_miRegistrationCommandRequest
+				
+				/**
+                * @desc Send template for MI-COMMAND.request containing UnitDataCmd command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_regCmd			Registration command primitive
+                */
+                template (value) MI_Command_request m_miUnitDataCmdCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,  
+                   	in template (value) UnitData p_unitData 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_unitDataCmd,
+					command_param := {UnitData := p_unitData}
+                } // End of template MI_Command_request m_miUnitDataCmdCommandRequest
+
+				/**
+               	* @desc Generic send template for MI-COMMAND.confirm service primitive
+               	* @param   p_linkID		   Link-ID of VCI / CI. 
+               	* @param   p_commandRef    Unique cyclic reference number of command. 
+               	* @param   p_errorStatus   Unique identifier of error status.
+               	*/
+               	template (value) MI_Command_confirm m_miCommandConfirm( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef, 
+                   	in template (value) ErrStatus p_errorStatus 
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					errStatus := p_errorStatus
+               	} // End of template m_miCommandConfirm
+				
+				/**
+                * @desc Send template for MI-COMMAND.request containing state change command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_stateChng		State change primitive
+                */
+				template (value) MI_Command_request m_miRTSackCmdCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,  
+                   	in template (value) RTSackCmd p_rTSackCmd 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_rTSackCmd,
+					command_param := {RTSackCmd := p_rTSackCmd}
+                } // End of template m_miRTSackCmdCommandRequest
+					
+				/**
+                * @desc Send template for MI-COMMAND.request containing state change command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_stateChng		State change primitive
+                */
+				template (value) MI_Command_request m_miStateChangeCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,  
+                   	in template (value) CIstateChng p_stateChng 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_ciState,
+					command_param := {CIstateChng := p_stateChng}
+                } // End of template m_miStateChangeCommandRequest
+
+				/**
+    	        * @desc Generic send template for MI-SET.request service primitive
+        	    * @param   p_linkID        Link ID of the peer station
+            	* @param   p_commandRef    Unique cyclic reference number of command
+                * @param   p_setParam		List of parameters to be set
+                * @see ISO 24102-3 6.3.1 MI-SET.request
+                * @see ISO 21218 Annex A (normative) I parameters
+                */
+                template (value) MI_Set_request m_miSetRequest( 
+                   	in template (value) Link_ID p_linkId,
+                   	in template (value) CommandRef p_commandRef,
+                   	in template (value) IParamList p_setParam
+                ) := {
+                   	linkID := p_linkId, 
+                   	commandRef := p_commandRef, 
+                   	set_param := p_setParam
+			    } // End of template m_miGetRequest
+
+				/**
+				* @desc Generic send template for MI-GET.request service primitive
+        	    * @param   p_linkID        Link ID of the peer station
+                * @param   p_commandRef    Unique cyclic reference number of command
+                * @param   p_getParamNo	List of reference numbers of parameters to be retrieved
+                * @see ISO 24102-3 6.3.1 MI-GET.request
+                * @see ISO 21218 Annex A (normative) I parameters
+                */
+                template (value) MI_Get_request m_miGetRequest( 
+                   	in template (value) Link_ID p_linkId,
+                   	in template (value) CommandRef p_commandRef,
+                   	in template (value) IParamNoList p_getParamNo
+                ) := {
+                   	linkID := p_linkId, 
+                   	commandRef := p_commandRef, 
+                   	get_param_no := p_getParamNo
+                } // End of template m_miGetRequest
+				
+				/**
+                * @desc Send template for MI-COMMAND.request containing CONcmd command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_conCmd			Registration command primitive
+                */
+                template (value) MI_Command_request m_miCONcmdCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,  
+                   	in template (value) CONcmd p_conCMD 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_cONcmd,
+					command_param := {CONcmd := p_conCMD}
+                } // End of template m_miCONcmdCommandRequest
+
+				/**
+                * @desc Send template for MI-COMMAND.request containing wake up command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_wakeUp			State change primitive
+                */
+				template (value) MI_Command_request m_miWakeUpCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,
+					in template (value) WakeUp p_wakeUp 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_wakeUp,
+					command_param := {WakeUp := p_wakeUp}
+                } // End of template m_miWakeUpCommandRequest
+					
+				/**
+                * @desc Send template for MI-COMMAND.request containing regulatory info command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_riCmd			Regulatory information primitive
+                */
+				template (value) MI_Command_request m_miRICmdCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,
+					in template (value) RIcmd p_riCmd 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_rIcmd,
+					command_param := {RIcmd := p_riCmd}
+                } // End of template m_miRICmdCommandRequest
+					
+				/**
+                * @desc Send template for MI-COMMAND.request containing regulatory info command service primitive
+                * @param   p_linkID		Link-ID of VCI / CI. 
+                * @param   p_ri    		Regulatory information
+                */
+				template (value) RIcmd m_miRICmd( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) RI p_ri 
+                ) := { 
+                   	linkID := p_linkID,
+					ri := p_ri 
+                } // End of template m_miRICmd
+				
+				/**
+                * @desc Send template for MI-COMMAND.request containing VCIcmd command service primitive
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+				* @param   p_vciCmd			VCIcmd value
+                */
+				template (value) MI_Command_request m_miVCIcmdCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef,  
+                   	in template (value) VciCmd p_vciCmd 
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_vciCmd,
+					command_param := {VciCmd := p_vciCmd}
+                } // End of template m_miVCIcmdCommandRequest
+
+				/**
+                * @desc Send template for MI-COMMAND.request containing unknown command
+                * @param   p_linkID		   	Link-ID of VCI / CI. 
+                * @param   p_commandRef    	Unique cyclic reference number of command. 
+                */
+                template (value) MI_Command_request m_miUnknwonCommandRequest( 
+					in template (value) Link_ID p_linkID, 
+					in template (value) CommandRef p_commandRef  
+                ) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_UnknownCmd,
+					command_param := {UnknownCommand := 100}
+                } // End of template m_miUnknownCommandRequest
+				
+			} // End of group cfPortTools
+			
+			group atspPort {
+
+				/**
+	        	* @desc    Send template
+				* Allows ITS test system to request frame transmission to IUT
+	        	* @param   p_inSapPrimitiveDown: IN-SAP primitive to send
+	        	*/
+				template AtspReq m_atspReq(
+					template(value) INsapPrimitivesDown p_inSapPrimitiveDown
+				) := {
+					msgOut:= p_inSapPrimitiveDown
+				} // End of template m_atspReq
+				
+			} // End of group atspPort
+			
+			group utPort {
+				
+				/**
+	        	* @desc    Send template INsapPrimitivesDown
+				* UtAtspEvent for sending any of the IN SAP primitives over utPort
+	        	* @param   p_inSapPrimitiveDown:	IN SAP primitive to send
+	        	*/
+				template UtAtspEvent m_utAtspEventDown(
+					in template(value) INsapPrimitivesDown p_inSapPrimitiveDown
+				) := {
+					inSapPrimitivesDown := p_inSapPrimitiveDown
+				} // End of template m_utAtspEventDown
+				
+				/**
+	        	* @desc    Receive template INsapPrimitivesUp
+				* UtAtspEvent for receiving any of the IN SAP primitives over utPort
+	        	* @param   p_inSapPrimitiveUp:	IN SAP primitive to be received
+	        	*/
+				template UtAtspEventInd m_utAtspEventInd(
+					in template(value) INsapPrimitivesUp p_inSapPrimitiveUp
+				) := {
+					inSapPrimitivesUp := p_inSapPrimitiveUp
+				} // End of template m_utAtspEventUp
+
+			} // End of group utPort
+			
+			group ut_astpPortTools {
+				
+				/**
+	        	* @desc    Send template
+				* UtAtspEvent for sending IN-UNITDATA.request 
+	        	* @param   p_inUnitdataRequest:		IN-UNITDATA.request primitive to send
+	        	*/
+				template INsapPrimitivesDown m_inPrimitivesDownUDR(
+					in template(value) IN_UNITDATA_request p_inUnitdataRequest
+				) := {
+					spRef := 0,
+					servPrimitive := {
+						IN_UNITDATA_request := p_inUnitdataRequest
+					}
+				} // End of template m_inPrimitivesDownUDR
+
+				/**
+	        	* @desc    Send template
+				* AccessParameters default value template used for sending
+	        	*/
+				template(value) AccessParameters m_inUnitdataDefaultAP := {
+					apRef := 0,
+					aParameter := {
+						NullType := NULL
+					}
+				} // End of template m_inUnitdataDefaultAP
+		
+				/**
+	        	* @desc    Send template
+				* IN-UNITDATA.request message for sending
+	        	* @param   p_source_addr:	Source address
+				* @param   p_dest_addr:	Destination address
+				* @param   p_data:			Data to send
+				* @param   p_priority:		User priority value
+	        	*/
+				template(value) IN_UNITDATA_request m_inUnitDataRequest(
+					in template(value) LLserviceAddr p_source_addr,
+					in template(value) LLserviceAddr p_dest_addr,
+					in template(value) INdata p_data,
+					in template(value) UserPriority p_priority
+				) := {
+					source_addr := p_source_addr,
+					dest_addr := p_dest_addr,
+					data := p_data,
+					priority := p_priority,
+					accessParams := m_inUnitdataDefaultAP
+				} // End of template m_inUnitDataRequest
+				
+				/**
+	    	    * @desc    Send template
+				* Used for creating source and destination addres values for IN-UNITDATA.request(STATUS)
+	    	    * @param   p_SAPAddress:	IN-SAP part of the address 
+				* @param   p_linkID:		LinkID used to create address
+	    	    */
+				template LLserviceAddr m_inLLServiceAddr(
+					in template(value) IN_SAPaddress p_SAPAddress,
+					in template(value) Link_ID p_linkID
+				) := {
+					csap := p_SAPAddress,
+					linkID := p_linkID
+				} // End of template m_inLLServiceAddr
+					
+				/**
+	        	* @desc    Send template
+				* Default empty data
+	        	*/
+				template(value) INdata m_inDataEmpty := ''O; 
+				// End of template m_inDataEmpty
+			
+				/**
+	        	* @desc    Send template
+				* 'AA' data
+	        	*/
+				template(value) INdata m_inDataAA := 'AA'O; 
+				// End of template m_inDataEmpty
+				
+				/**
+	        	* @desc    Send template
+				* 'BB' data
+	        	*/
+				template(value) INdata m_inDataBB := 'AA'O; 
+				// End of template m_inDataEmpty
+				
+				/**
+	        	* @desc    Send template
+				* Lowest user priority value
+	        	*/
+				template(value) UserPriority m_inUserPriorityLowest := 0; 
+				// End of template m_inUserPriorityLowest
+
+				/**
+	        	* @desc    Send template
+				* Highest user priority value
+	        	*/
+				template(value) UserPriority m_inUserPriorityHighest := 255; 
+				// End of template m_inUserPriorityHighest
+
+				/**
+	        	* @desc    Send template
+				* Average user priority value
+	        	*/
+				template(value) UserPriority m_inUserPriorityAverage := 127; 
+				// End of template m_inUserPriorityAverage
+
+				
+			} // End of group ut_astpPortTools
+
+					
+		} // End of group sendOperation
+            
+    	group recvOperation {
+			
+			group cfPort {
+				
+				/**
+	            * @desc    Receive template
+				* CfAtspEventInd to notify reception of an expected frame given by p_miRequestReq
+	            * @param   p_miRequestReq:  The MI_REQUEST.request primitive
+	            */
+				template CfAtspEventInd mw_cfAtspRequestRequest(in template MI_Request_request p_miRequestReq) := {
+					miRequestRequest:= p_miRequestReq
+				} // End of template mw_cfAtspRequestRequest
+				
+				/**
+	            * @desc    Receive template
+				* CfAtspEventInd to notify reception of an expected frame given by p_miCommandConfirm
+	            * @param   p_miCommandConfirm:  The MI-COMMAND.confirm primitive
+	            */
+				template CfAtspEventInd mw_cfAtspCommandConfirm(in template MI_Command_confirm p_miCommandConfirm) := {
+					miCommandConfirm:= p_miCommandConfirm
+				} // End of template mw_cfAtspCommandConfirm
+				
+				/**
+	            * @desc    Receive template
+				* CfAtspEventInd to notify reception of an expected frame given by p_miGetConfirm
+	            * @param   p_miGetConfirm:  The MI-GET.confirm primitive
+	            */
+				template CfAtspEventInd mw_cfAtspEventIndGetConf(in template MI_Get_confirm p_miGetConfirm) := {
+					miGetConfirm := p_miGetConfirm
+				} // End of template mw_cfAtspEventIndGetConf
+				
+				/**
+	            * @desc    Receive template
+				* CfAtspEventInd to notify reception of an expected frame given by p_miSetConfirm
+	            * @param   p_miSetConfirm:  The MI-SET.confirm primitive
+	            */
+				template CfAtspEventInd mw_cfAtspEventIndSetConf(in template MI_Set_confirm p_miSetConfirm) := {
+					miSetConfirm := p_miSetConfirm
+				} // End of template mw_cfAtspEventIndSetConf
+				
+			} // End of group cfPort
+			
+			group cfPortTools {
+			
+				/**
+               	* @desc Generic receive template for registration request in MI-REQUEST.request service primitive
+				* @param   p_linkID		   Link-ID of VCI / CI. 
+				* @param   p_commandRef    Unique cyclic reference number of command. 
+				* @param   p_regReq		   Registration request primitive
+               	*/
+				template MI_Request_request mw_miRegRequest( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template RegReq p_regReq 
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miReq_regReq,
+					request_param := {
+						RegReq := p_regReq
+					}
+               	} // End of template mw_miRegRequest
+				
+				/**
+               	* @desc Generic receive template for registration request with a specific MedType
+				* @param   p_medType		Expected MedType 
+               	*/
+				template RegReq m_regRequest(
+					in template(value) MedType p_medType
+				) := {
+					medType	:= p_medType
+				} // End of template m_regRequest
+				
+				/**
+               	* @desc Generic receive template for notifications of IParameters in MI-REQUEST.request service primitive
+				* @param   p_parameter    	Parameter monitor event data
+               	*/
+				template Events21218 mw_miEvent21218_5(
+					in template E21218_5 p_parameter
+               	) := { 
+                   	eventNo := 5,
+					event := {
+						E21218_5 := p_parameter
+					}
+               	} // End of template mw_miEvent21218_5
+
+				/**
+               	* @desc Generic receive template for VCI notifications in MI-REQUEST.request service primitive
+				* @param   p_parameter    	VCI created event data
+               	*/
+				template Events21218 mw_miEvent21218_3(
+					in template E21218_3 p_parameter  
+               	) := { 
+                   	eventNo := 3,
+					event := {
+						E21218_3 := p_parameter
+					}
+               	} // End of template mw_miEvent21218_3
+				
+				/**
+               	* @desc Generic receive template for VCI notifications in MI-REQUEST.request service primitive
+				* @param   p_parameter    	VCI deleted event data
+               	*/
+				template Events21218 mw_miEvent21218_4(
+					in template Link_ID p_parameter
+               	) := { 
+                   	eventNo := 4,
+					event := {
+						E21218_4 := p_parameter
+					}
+               	} // End of template mw_miEvent21218_4
+				
+				/**
+               	* @desc Generic receive template for notifications of CIstatus in MI-REQUEST.request service primitive
+				* @param   p_ciStatus    	CiStatus parameter notification data
+               	*/
+				template E21218_5 mw_miCIStatusParam(
+					in template CIstatus p_ciStatus
+               	) := { 
+					paramNo := c_ciIParamNoCiStatus,
+					parameter := {
+						CIstatus := p_ciStatus
+					}
+               	} // End of template mw_miCIStatusParam
+				
+				/**
+               	* @desc Generic receive template for VCI notifications in MI-REQUEST.request service primitive
+				* @param   p_parameter    	VCI reset event data
+               	*/
+				template Events21218 mw_miEvent21218_7(
+					in template E21218_7 p_parameter  
+               	) := { 
+                   	eventNo := 7,
+					event := {
+						E21218_7 := p_parameter
+					}
+               	} // End of template mw_miEvent21218_3
+				
+				/**
+               	* @desc Generic receive template for event notification in MI-REQUEST.request service primitive
+				* @param   p_linkID		   Link-ID of VCI / CI. 
+				* @param   p_commandRef    Unique cyclic reference number of command. 
+				* @param   p_event		   Event notification primitive
+               	*/
+				template MI_Request_request mw_miEventsRequest( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template Events21218 p_event
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miReq_events,
+					request_param := {
+						Events21218 := p_event
+					}
+               	} // End of template mw_miEventsRequest
+				
+				/**
+               	* @desc Generic receive template for prioritization registration request in MI-REQUEST.request service primitive
+				* @param   p_linkID		   Link-ID of VCI / CI. 
+				* @param   p_commandRef    Unique cyclic reference number of command. 
+				* @param   p_regReq		   Registration request primitive
+               	*/
+				template MI_Request_request mw_miPrioRegRequest( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template PrioReg p_prioReg 
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miReq_prioReg,
+					request_param := {
+						PrioReg := p_prioReg
+					}
+               	} // End of template mw_miPrioRegRequest
+
+				/**
+               	* @desc Generic receive template for prioritization registration request in MI-REQUEST.request service primitive
+				* @param   p_linkID		   Link-ID of VCI / CI. 
+				* @param   p_commandRef    Unique cyclic reference number of command. 
+				* @param   p_regReq		   Registration request primitive
+               	*/
+				template MI_Request_request mw_miRTSackReqRequest( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template RTSackReq p_rTSackReq 
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miReq_rTSackReq,
+					request_param := {
+						RTSackReq := p_rTSackReq
+					}
+               	} // End of template mw_miRTSackReqRequest
+				
+				/**
+               	* @desc Generic receive template for prioritization request in MI-REQUEST.request service primitive
+				* @param   p_linkID		   Link-ID of VCI / CI. 
+				* @param   p_commandRef    Unique cyclic reference number of command. 
+				* @param   p_regReq		   Registration request primitive
+               	*/
+				template MI_Request_request mw_miRTSreqRequest( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template RTSreq p_rTSreq 
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miReq_prioReg,
+					request_param := {
+						RTSreq := p_rTSreq
+					}
+               	} // End of template mw_miRTSreqRequest
+				
+				/**
+               	* @desc Generic receive template for prioritization request in MI-REQUEST.request service primitive
+				* @param   p_linkID		   Link-ID of VCI / CI. 
+				* @param   p_commandRef    Unique cyclic reference number of command. 
+				* @param   p_regReq		   Registration request primitive
+               	*/
+				template MI_Request_request mw_miRTScmdRequest( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template RTScmd p_rTScmd 
+               	) := { 
+                   	linkID := p_linkID,
+					commandRef := p_commandRef, 
+					ref := c_miCmd_rTScmd,
+					request_param := {
+						RTScmd := p_rTScmd
+					}
+               	} // End of template mw_miRTScmdRequest
+
+				/**
+    	        * @desc Generic receive template for MI-SET.confirm service primitive
+        	    * @param   p_linkID        Link ID of the peer station
+            	* @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MI-SET.request
+                * @param   p_errors		List of errors
+                * @see ISO 24102-3 6.3.1 MI-SET.confirm
+                * @see ISO 21218 Annex A (normative) I parameters
+                */
+				template MI_Set_confirm mw_miSetConfirm( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template Errors p_iErrors
+                ) := { 
+                	linkID := p_linkID,
+					commandRef := p_commandRef,
+					set_param := p_iErrors
+                } // End of template mw_miSetConfirm
+					
+				/**
+    	        * @desc Generic receive template for MI-GET.confirm service primitive
+        	    * @param   p_linkID        Link ID of the peer station
+                * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MI-GET.request
+				* @param   p_getParam	    List of reference parameters returned
+                * @see ISO 24102-3 6.3.1 MI-GET.confirm
+                * @see ISO 21218 Annex A (normative) I parameters
+                */
+				template MI_Get_confirm mw_miGetConfirm( 
+					in template Link_ID p_linkID, 
+					in template CommandRef p_commandRef, 
+                   	in template IParamList p_iParams
+                ) := { 
+                   		linkID := p_linkID,
+						commandRef := p_commandRef,
+						get_param := p_iParams
+                } // End of template mw_miGetConfirm
+					
+				/**
+               	* @desc Generic receive template for VCI Created / Deleleted / Reset notifications in MI-REQUEST.request service primitive
+				* @param   p_remoteCIID    	RemoteCIID of the VCI event data
+				* @param   p_localCIID    	LocalCIID of the VCI event data
+               	*/
+				template Link_ID mw_miVCICreDelRes(
+					in template EUI64 p_remoteCIID,
+					in template EUI64 p_localCIID
+               	) := { 
+					remoteCIID := p_remoteCIID,
+					localCIID := p_localCIID
+            	} // End of template mw_miVCICreDelRes
+				
+				/**
+               	* @desc Generic receive template for matching any LinkID value
+               	*/
+				template Link_ID mw_miLinkIndAny :=
+				{
+					remoteCIID := ?,
+					localCIID := ?
+				} // End of template mw_miLinkIndAny
+					
+				template CfAtspEventInd mw_miEventMI_RequestRequest_any := { 
+					miRequestRequest := ?
+				} // End of template mw_miEventMI_RequestRequest_any
+				
+				/**
+               	* @desc Generic receive template for notifications of errors in MI-REQUEST.request service primitive
+               	*/
+				template E21218_5 mw_miCIStatusErrors := { 
+					paramNo := 0,
+					parameter := {
+						Errors := ? 
+					}
+               	} // End of template mw_miCIStatusErrors
+				
+			} // End of group cfPortTools
+
+			group atspPort {
+				
+				/**
+	        	* @desc    Receive template
+				* Allows ITS test system to receive frame from IUT
+	        	* @param   p_inSapPrimitiveUp: IN-SAP primitive to receive
+	        	*/
+				template(present) AtspInd mw_atspInd(
+					template INsapPrimitivesUp p_inSapPrimitiveUp
+				) := {
+					msgIn:= p_inSapPrimitiveUp
+				} // End of template m_atspInd
+				
+			} // End of group atspPort
+
+			group utPort {
+				
+				
+				
+				
+			} // End of group utPort
+			
+			group ut_atspPortTools {
+
+	        	/**
+	        	* @desc    Receive template
+				* Generic template for notifications from a CI via the IN-SAP
+	        	* @see     ISO 21218 - Clause 8.3.1
+	        	*/
+	        	template INsapPrimitivesUp mw_InSapPrimitiveUp_any := {
+					spRef := ?, 
+	        	    servPrimitive := ? 
+	        	} // End of template mw_InSapPrimitiveUp_any
+
+				/**
+	        	* @desc    Receive template
+				* IN-UNITDATA.indication to notify reception of any frame from any CI
+	        	* @see     ISO 21218 - Clause 8.3.1
+	        	*/
+	        	template INsapPrimitivesUp mwd_inUnitDataInd_any modifies mw_InSapPrimitiveUp_any:= {
+	        	    spRef := 0, 
+	        	    servPrimitive := { IN_UNITDATA_indication := ? } 
+	        	} // End of template mwd_inUnitDataInd_any
+
+				/**
+	        	* @desc    Receive template
+				* IN-UNITDATA.indication to notify reception of an expected frame given by p_inUnitdataInd
+	        	* @param   p_inUnitdataInd:  The IN-UNITDATA.indication primitive
+	        	* @see     ISO 21218 - Clause 8.3.1
+	        	*/
+	        	template INsapPrimitivesUp mwd_inUnitDataInd(
+	        		in template (present) IN_UNITDATA_indication p_inUnitdataInd
+	        	) modifies mwd_inUnitDataInd_any:= {
+	        	    spRef := 0, 
+	        	    servPrimitive := { IN_UNITDATA_indication := p_inUnitdataInd } 
+	        	}  // End of template mwd_inUnitDataInd
+					
+				/**
+	            * @desc    Receive template
+				* IN-UNITDATA-Status.indication to notify any status of any previous transmission request
+	            * @see     ISO 21218 - Clause 8.3.1
+	            */
+	            template INsapPrimitivesUp mw_inUnitDataStatusInd_any := {
+					spRef := 1, 
+	                servPrimitive := { IN_UNITDATA_STATUS_indication := ? } 
+				} // End of template mw_inUnitDataStatusInd_any
+
+				/**
+	            * @desc    Receive template
+				* IN-UNITDATA-Status.indication to notify an expected status of a previous transmission request
+				* given by p_inUnitdataStatusInd
+	            * @param   p_inUnitdataStatusInd:  The IN-UNITDATA-Status.indication primitive
+	            * @see     ISO 21218 - Clause 8.3.1
+	            */
+	            template INsapPrimitivesUp mwd_inUnitDataStatusInd(
+	                in template (value) IN_UNITDATA_STATUS_indication p_inUnitdataStatusInd
+	            ) modifies mw_inUnitDataStatusInd_any := {
+	                spRef := 1, 
+	                servPrimitive := { IN_UNITDATA_STATUS_indication := p_inUnitdataStatusInd } 
+	            } // End of template mw_inUnitDataStatusInd
+				
+	            /**
+	            * @desc IN-UNITDATA.indication primitive
+	            * @param p_insap_source_address    Source LinkId
+	            * @param p_insap_dest_address      Destination LinkId
+	            * @param p_inData                  Data in octetstring format
+				* @param p_priority				User Priority
+				* @param p_accessParameters		Access Parameters
+	            * @see   ISO 21218 - Clause 8.3.3
+	            */
+	            template (present) IN_UNITDATA_indication mw_inUnitDataInd( 
+	                in template LLserviceAddr p_insapSourceAddress, 
+	                in template LLserviceAddr p_insapDestAddress, 
+	                in template INdata p_inData,
+					in template UserPriority p_priority,
+					in template AccessParameters p_accessParameters
+	            ) := { 
+	                source_addr    := p_insapSourceAddress,
+	                dest_addr := p_insapDestAddress,
+	                data := p_inData,
+	                priority := p_priority,
+	                accessParams := p_accessParameters 
+	            }; // End of template m_inUnitDataInd
+				
+	            /**
+	            * @desc IN-UNITDATA-STATUS.indication primitive
+	            * @param p_insap_source_address    Source LinkId
+	            * @param p_insap_dest_address      Destination LinkId
+	            * @param p_inData                  Data in octetstring format
+				* @param p_priority				User Priority
+				* @param p_accessParameters		Access Parameters
+	            * @see   ISO 21218 - Clause 8.3.3
+	            */
+	            template (present) IN_UNITDATA_STATUS_indication mw_inUnitDataStatusInd( 
+	                in template LLserviceAddr p_insapSourceAddress, 
+	                in template LLserviceAddr p_insapDestAddress, 
+	                in template INdata p_inData,
+					in template UserPriority p_priority,
+					in template AccessParameters p_accessParameters,
+					in template INtxStatus p_txStatus
+	            ) := { 
+	                source_addr    := p_insapSourceAddress,
+	                dest_addr := p_insapDestAddress,
+	                data := p_inData,
+	                priority := p_priority,
+	                accessParams := p_accessParameters,
+					txStatus := p_txStatus
+	            }; // End of template m_inUnitDataStatusInd
+
+				/**
+	            * @desc Send template
+				* IN-UNITDATA.request primitive
+	            * @param p_insap_source_address    Source linkId
+	            * @param p_insap_dest_address      Destination linkId
+	            * @param p_inData                  Data in octetstring format
+				* @param p_priority				User Priority
+				* @param p_accessParameters		Access Parameters
+	            * @see   ISO 21218 - Clause 8.3.3
+	            */
+	            template (value) IN_UNITDATA_indication m_inUnitDataInd( 
+	                in template LLserviceAddr p_insapSourceAddress, 
+	                in template LLserviceAddr p_insapDestAddress, 
+	                in template INdata p_inData,
+					in template UserPriority p_priority,
+					in template AccessParameters p_accessParameters
+	            ) := { 
+	                source_addr    := p_insapSourceAddress,
+	                dest_addr := p_insapDestAddress,
+	                data := p_inData,
+	                priority := p_priority,
+	                accessParams := p_accessParameters 
+	            }; // End of template m_inUnitDataInd
+
+	            /**
+	            * @desc    Send template
+				* LLserviceAddr (IN-SAP source and destination address)
+	            * @param   p_inSAPaddress    DSAP/SSAP address of the N&T layer protocol
+	            * @param   p_linkId          Link identifier of the CI
+	            * @see     ISO 21218 - Clause 8.2.2
+	            */
+	            template (value) LLserviceAddr m_llServiceAddr(
+	                in template IN_SAPaddress p_inSAPaddress,
+					in template Link_ID p_linkId
+	            ) := {
+	                csap := p_inSAPaddress,
+	                linkID := p_linkId
+	            }; // End of template m_llServiceAddr
+
+	            /**
+	            * @desc    Send template 
+				* Link-ID based on the combination of remote and local CIID
+	            * @param   p_remoteLinkId  Remote link ID
+	            * @param   p_localLinkId   Local link ID
+	            * @see     ISO 21218 - Clause 8.2.2
+	            */
+	            template (value) Link_ID m_linkId(
+	                in template EUI64 p_remoteLinkId,
+	                in template EUI64 p_localLinkId
+	            ) := {
+	                remoteCIID := p_remoteLinkId,
+	                localCIID := p_localLinkId
+	            }; // End of template m_linkID
+				
+			} // End of group ut_atspPortTools
+			
+		} // End of group recvOperation
+			
+	
+	group atspInitPrimitives {    
+        /**
+         * @desc Templates used to 
+         * <li>trigger message on Upper Tester</li>
+         * <li>capture indication message sent by the IUT</li>
+         */
+        group utPrimitives {
+
+            /**
+             * @desc Initializes the SUT for ATSP testing 
+             * See Test System Configuration Access to SUT
+             */
+			template (value) UtInitialize m_utAtspInitialize := { 
+                utAtspInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := '100000'B, // PX_LOC_ITS_ATSP_ACCESS_SETTINGS_MX_SAP_SET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_USED,
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utAtspInitialize' 
+            } // End of template m_utAtspInitialize 
+            
+        } // End of group utPrimitives
+        
+        group cfPrimitives { 
+            
+            /**
+             * @desc Initializes the Configuration tester
+             */
+            template (value) CfInitialize m_cfAtspInitialize := { 
+                cfAtspInitialize := { 
+                } // End of field 'cfAtspInitialize' 
+				
+            } // End of template m_cfAtspInitialize 
+	
+		} // End of group cfPrimitives
+
+	} // End of group atspInitPrimitives
+	
+
+} // End of module LibItsAtsp_Templates

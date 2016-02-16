@@ -1,0 +1,99 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/IICP/LibItsIicp_TypesAndValues.ttcn3 $
+ *              $Id: LibItsIicp_TypesAndValues.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Types and constants definitions for Inter-ITS-SCU communications (ISO 24102-4)
+ */
+module LibItsIicp_TypesAndValues {
+    
+    // LibCommon
+    
+    // LibIts
+    
+    // LibItsCalm
+    import from CALMiitsscu language "ASN.1:1997" {
+        type 
+            McmdRq, McmdRs, 
+            SimUt 
+    };
+	import from CALMmsap language "ASN.1:1997" {
+        type 
+		    MF_Command_request, MF_Command_confirm, MN_Command_request, MN_Command_confirm, MI_Command_request, MI_Command_confirm, 
+		    MF_Request_request, MN_Request_request, MI_Request_request, 
+		    MI_Get_request, MI_Set_request, MI_Get_confirm, MI_Set_confirm  
+    };
+    
+    group utPrimitives {
+        
+        /**
+         * @desc Trigger to initialize the IUT.
+         * @member McmdRq IICPrequests/McmdRq message to initialize the upper tester
+         * 
+         * @see ISO 24102-4
+         */
+        type record UtIicpInitialize { 
+            McmdRq    mcmdRq 
+        }  with {
+            encode (mcmdRq) "LibItsIicp_asn1"  
+        }
+        
+        /**
+         * @desc Events at the application layer of the IUT.
+         * @member mcmdRs McmdRs confirm 
+         */
+        type union UtIicpEvent { 
+            McmdRs mcmdRs,
+			MF_Request_request mf_Request_request,
+			MN_Request_request mn_Request_request,
+			MI_Request_request mi_Request_request,
+			MI_Get_request mi_Get_request,
+			MI_Set_request mi_Set_request,
+			MF_Command_confirm mf_Command_confirm, 
+			MN_Command_confirm mn_Command_confirm, 
+			MI_Command_confirm mi_Command_confirm,
+			MI_Get_confirm mi_Get_confirm,
+			MI_Set_confirm mi_Set_confirm
+        }
+        with {
+            encode (mcmdRs) "LibItsIicp_asn1"  
+            encode (mf_Request_request) "LibItsCALMmsap_asn1"  
+            encode (mn_Request_request) "LibItsCALMmsap_asn1"  
+            encode (mi_Request_request) "LibItsCALMmsap_asn1"  
+            encode (mi_Get_request) "LibItsCALMmsap_asn1"  
+            encode (mi_Set_request) "LibItsCALMmsap_asn1"  
+            encode (mf_Command_confirm) "LibItsCALMmsap_asn1"  
+            encode (mn_Command_confirm) "LibItsCALMmsap_asn1"  
+            encode (mi_Command_confirm) "LibItsCALMmsap_asn1"  
+            encode (mi_Get_confirm) "LibItsCALMmsap_asn1"  
+            encode (mi_Set_confirm) "LibItsCALMmsap_asn1"  
+        }
+        
+        /**
+         * @desc Send a IICPpdu primitive from Facility layer through a SAP. FIXME Check the comment
+         * @member mcmdRq McmdReq data structure 
+         */
+        type union UtIicpEventInd { 
+            McmdRq mcmdRq,
+			MF_Command_request mf_Command_request, 
+			MN_Command_request mn_Command_request, 
+			MI_Command_request mi_Command_request, 
+			MI_Get_request mi_Get_request, 
+			MI_Set_request mi_Set_request 
+        }
+        with {
+            encode (mcmdRq) "LibItsIicp_asn1"  
+            encode (mf_Command_request) "LibItsCALMmsap_asn1"  
+            encode (mn_Command_request) "LibItsCALMmsap_asn1"  
+            encode (mi_Command_request) "LibItsCALMmsap_asn1"  
+            encode (mi_Get_request) "LibItsCALMmsap_asn1"  
+            encode (mi_Set_request) "LibItsCALMmsap_asn1"  
+        }
+        
+    } with {
+        encode "UpperTester"
+    } // End of group utPrimitives
+    
+}
+with {
+    encode "LibItsIicp"
+} // End of module LibItsIicp_TypesAndValues

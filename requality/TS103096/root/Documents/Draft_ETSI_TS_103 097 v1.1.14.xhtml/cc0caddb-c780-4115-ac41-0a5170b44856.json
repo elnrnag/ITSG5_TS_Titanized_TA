@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_cc0caddb-c780-4115-ac41-0a5170b44856\"><a name=\"cc0caddb-c780-4115-ac41-0a5170b44856\" id=\"id_cc0caddb-c780-4115-ac41-0a5170b44856\" class=\"requality_id\"><\/a>In case of <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">rectangle<font style=\"font-family: Times New Roman;\">, the region shall consist of a variable-length vector of rectangles that may be overlapping or disjoint. The variable-length vector shall not contain more than 6 rectangles. The region covered by the rectangles shall be continuous and shall not contain holes.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "c4feb90c-70df-4091-8b24-8f3bc13dffc0"
+}

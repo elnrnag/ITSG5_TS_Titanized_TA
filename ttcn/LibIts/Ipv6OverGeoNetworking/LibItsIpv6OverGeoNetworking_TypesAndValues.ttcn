@@ -1,0 +1,312 @@
+/**
+ *  @author   ETSI / STF405 / STF449
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Ipv6OverGeoNetworking/LibItsIpv6OverGeoNetworking_TypesAndValues.ttcn $
+ *            $Id: LibItsIpv6OverGeoNetworking_TypesAndValues.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     Types and values for IPv6 over GeoNetworking Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+
+//TODO: Fix strange encodings!
+module LibItsIpv6OverGeoNetworking_TypesAndValues {
+    
+    //LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    //LibIts
+    import from LibItsExternal_TypesAndValues all;
+    
+    group ipv6OverGeoConfigurationTypes {
+        
+        /**
+         * @desc    Entry of GVL table
+         * @member  key             Reference key of the entry
+         * @member  prefix          Prefix associated with the GVL
+         * @member  prefixLength    Prefix length   
+         * @member  area            GeoArea associated with th e GVL
+         * @member  interface       IUT's interface associated with the GVL
+         */
+        type record GvlTableEntry {
+            charstring  key,
+            Oct16       prefix,
+            UInt8       prefixLength,
+            charstring  area,
+            charstring  interface
+        } with { variant "" };
+        
+        /**
+         * @desc    Table containing GVL information
+         */
+        type record of GvlTableEntry GvlTable with { variant "" };
+        
+        /**
+         * @desc    Entry of Address table
+         * @member  key             Reference key of the entry
+         * @member  macAddress      Link-layer address
+         * @member  macSolNodeMca   Link-layer solicited node multicast address
+         * @member  lla             IPv6 link-local address
+         * @member  solNodeMca      IPv6 solicited node multicast address
+         */
+        type record AddressTableEntry {
+            charstring key,
+            MacAddress macAddress,
+            MacAddress  macSolNodeMca,
+            Ipv6Address lla,
+            Ipv6Address solNodeMca
+        } with { variant "" };
+        
+        /**
+         * @desc    Table containing Address information
+         */
+        type record of AddressTableEntry AddressTable with { variant "" };
+  
+    } // end ipv6OverGeoConfigurationTypes
+
+    group ipv6OverGeoConfigurationValues {
+        
+        type record of integer GvlIdxList with { variant "" };
+        
+        type record of UInt32 UInt32List with { variant "" };
+        
+        const integer c_gvl1 := 0;
+        const integer c_gvl2 := 1;
+        const integer c_gvl3 := 2;
+        
+        const charstring c_gvl1_name := "GVL1";
+        const charstring c_gvl2_name := "GVL2";
+        const charstring c_gvl3_name := "GVL3";
+        
+        const charstring c_gvlArea1 := "GVL_AREA1";
+        const charstring c_gvlArea2 := "GVL_AREA2";
+        const charstring c_gvlArea3 := "GVL_AREA3";
+    
+    } // end ipv6OverGeoConfigurationValues
+
+    group ethernet {
+        
+        const MacAddress c_macBroadcastAddr := '333300000001'O;
+        
+    } // end ethernet
+    
+    group ipv6 {
+        
+        /**
+         * @desc PDU type derived from RFC2460
+         */
+        type record Ipv6Packet {
+            Ipv6Header          ipv6Hdr,
+            ExtensionHeaderList extHdrList optional,
+            Ipv6Payload         ipv6Payload optional
+        } with { variant "" };
+        
+        /**
+         * @desc Derived from RFC 2460 Section 3
+         * @url http://www.ietf.org/rfc/rfc2460.txt
+         */
+        type record Ipv6Header  {
+            UInt4       version,
+            UInt8       trafficClass,
+            UInt20      flowLabel, 
+            UInt16      payloadLength,
+            UInt8       nextHeader,
+            UInt8       hopLimit,
+            Ipv6Address sourceAddress,
+            Ipv6Address destinationAddress
+        } with { variant "" };
+                
+        group gn6ExtensionHeaderIds {
+            const UInt8   c_hopHdr := 0;
+            const UInt8   c_tcpHdr := 6;
+            const UInt8   c_udpHdr := 17;
+            const UInt8   c_tunneledIpHdr := 41;
+            const UInt8   c_routeHdr := 43;
+            const UInt8   c_fragHdr := 44;
+            const UInt8   c_espHdr := 50;
+            const UInt8   c_authHdr := 51;
+            const UInt8   c_icmpHdr := 58;
+            const UInt8   c_noNextHdr := 59;
+            const UInt8   c_dstHdr := 60;
+            const UInt8   c_mobileHdr := 135;
+        }
+        
+        /**
+         * @desc IPv6 extension header list
+         */
+        type octetstring ExtensionHeaderList with { variant "" };
+        
+        /**
+         * @desc IPv6 payload
+         */
+        type union Ipv6Payload {
+            RouterAdvertisementMsg  routerAdvMsg,
+            octetstring             octetstringMsg
+        } with { variant "" };
+        
+        /**
+         * @desc IPv6 Address
+         */
+        type Oct16 Ipv6Address with { variant "FIELDLENGTH(16)" };
+        
+        group rfc2461MessageTypes {
+          const UInt8   c_prefixInfo := 3 ;
+          const UInt8   c_rtAdvMsg := 134;
+        } // end group rfc2461MessageTypes
+        
+        group ipv6Address {
+            //Prefix
+            const Oct2 c_llaMcaPrefix := 'FF02'O ;
+            const Oct2 c_llaPrefix := 'FE80'O ;
+            //Postfix
+            const Oct2 c_allNodesMcaPostfix := '0001'O ;
+            const Oct2 c_allRoutersMcaPostfix := '0002'O ;
+            const Oct2 c_anycastPostfix := 'FFFF'O ;
+            const Oct1 c_haAnycastPostfix := '7E'O ;
+            //Wellknown Multicast Address
+            const Ipv6Address c_allNodesMca := c_llaMcaPrefix & c_12ZeroBytes & c_allNodesMcaPostfix ;
+            const Ipv6Address c_allRoutersMca := c_llaMcaPrefix & c_12ZeroBytes & c_allRoutersMcaPostfix ;
+            //Unspecified
+            const Ipv6Address c_unspecified := '00000000000000000000000000000000'O;
+            
+            //geographic
+            const Bit7 c_itsGn6aslGeoAnycastID := '1111101'B; //TODO TDB by IANA
+        }//end group ipv6Address
+               
+        /**
+         * @desc PDU type derived from RFC2461 clause 4.2
+         */
+        type record RouterAdvertisementMsg {
+            UInt8         icmpType(c_rtAdvMsg),
+            UInt8         icmpCode,
+            Oct2          checksum,
+            UInt8         curHopLimit,
+            UInt1         managedConfigFlag,
+            UInt1         otherConfigFlag,
+            UInt1         homeAgentFlag,
+            UInt5         reserved,
+            UInt16        routerLifetime,
+            UInt32        reachableTime,
+            UInt32        retransTimer,
+            RtAdvOptions  rtAdvOptions optional
+        } with { variant "" };
+		//with { variant (checksum) "MarkForIPv6ChecksumCalculation" }
+        
+        /**
+         * @desc RouterAdvertisement option list
+         *
+         * @remark Any RtAdvOptions value should at least have 
+         *         one of the first three options present!
+        */
+        type set RtAdvOptions {
+            SrcLinkLayerAddress   srcLinkLayerAddr optional,
+//            MtuOption             mtuOption optional,
+            PrefixInfoList        prefixInfoList optional,
+//            AdvertisementInterval advertisementInterval optional,
+//            HomeAgentInfo         homeAgentInfo optional,
+            octetstring           otherOption optional
+        } with { variant "" };
+        
+        /**
+         * @desc Derived from RFC2461 clause4.6.1 + MIPv6
+         * @url http://www.ietf.org/rfc/rfc2461.txt
+         */
+        type record SrcLinkLayerAddress {
+            UInt8         icmpType(c_srcLinkLayerAddress),
+            UInt8         optionLength,
+            Oct6to15      linkLayerAddr
+        } with { variant "" };
+        
+        type set length (1..c_maxNrPrefixInfo) of PrefixInfo PrefixInfoList with { variant "" };
+        
+        /**
+         * @desc Derived from RFC 2461 clause 4.6.2
+         */
+        type record PrefixInfo {
+            UInt8   icmpType(c_prefixInfo),
+            UInt8   optionLength,
+            UInt8   prefixLength,
+            UInt1   linkFlag,
+            UInt1   autoConfigFlag,
+            UInt1   rtAddrFlag,
+            UInt5   reserved1,
+            UInt32  validLifetime,
+            UInt32  preferredLifetime,
+            UInt32  reserved2,
+            Prefix  prefix
+        } with { variant "" };
+        
+        type Ipv6Address Prefix with { variant "" };
+        
+        group neighbourDiscoveryConstants {
+            const UInt8 c_maxNrPrefixInfo := 10;
+            const UInt1 c_rtAddrFlag0 := 0;
+            
+            const UInt1 c_aFlag0 := 0;
+            const UInt1 c_aFlag1 := 1;
+            const UInt1 c_rFlag0 := 0;
+            const UInt1 c_rFlag1 := 1;
+            const UInt1 c_sFlag0 := 0;
+            const UInt1 c_sFlag1 := 1;
+            const UInt1 c_oFlag0 := 0;
+            const UInt1 c_oFlag1 := 1;
+            const UInt1 c_mFlag0 := 0;
+            const UInt1 c_mFlag1 := 1;
+            const UInt1 c_lFlag0 := 0;
+            const UInt1 c_lFlag1 := 1;
+            
+            const UInt16 c_zeroLifetime := 0 ;
+            const UInt32 c_validLifetime20s := 20;
+            const UInt32 c_validLifetime30s := 30;
+            const UInt32 c_preferredLifetime30s := 30;
+            
+        } // end group neighbourDiscoveryConstants
+        
+        const UInt8 c_srcLinkLayerAddress := 1;
+        const UInt8 c_prefixInfoLen := 4;
+        
+    } // end group ipv6
+    
+    group acPrimitives {
+        
+        /**
+         * @desc    GN6 TA primitives
+         * @member  getInterfaceInfos   Primitive for querying IUT's interface information
+         */
+        type union AcGn6Primitive {
+            integer getInterfaceInfos  
+        } with { variant "" };
+        
+        /**
+         * @desc    GN6 TA responses
+         * @member  interfaceInfoList   Primitive for retrieving IUT's interface information
+         */
+        type union AcGn6Response {
+            AcGn6InterfaceInfoList interfaceInfoList
+        } with { variant "" };
+        
+        /**
+         * @desc    List of interface informations
+         */
+        type record of AcGn6InterfaceInfo AcGn6InterfaceInfoList with { variant "" };
+        
+        /**
+         * @desc    Interface informations
+         * @member interfaceName    Interface name
+         * @member ipv6AddressList  Configured IPv6 addresses for this interface
+         */
+        type record AcGn6InterfaceInfo {
+            charstring interfaceName,
+            Ipv6AddressList ipv6AddressList      
+        } with { variant "" };
+        
+        /**
+         * @desc    List of IPv6 addresses
+         */
+        type record of Ipv6Address Ipv6AddressList with { variant "" };
+        
+    } // end acPrimitives
+    
+} with { encode "RAW" };
+

@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "a88198eb-4c31-4982-bb36-15fd8a07ac1c",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2adf210a-7c7b-4225-a0ed-f5a25b1b430d"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "a88198eb-4c31-4982-bb36-15fd8a07ac1c",
+            "type": "STRING",
+            "value": "CAM Profile"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a88198eb-4c31-4982-bb36-15fd8a07ac1c",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "a88198eb-4c31-4982-bb36-15fd8a07ac1c"
+}

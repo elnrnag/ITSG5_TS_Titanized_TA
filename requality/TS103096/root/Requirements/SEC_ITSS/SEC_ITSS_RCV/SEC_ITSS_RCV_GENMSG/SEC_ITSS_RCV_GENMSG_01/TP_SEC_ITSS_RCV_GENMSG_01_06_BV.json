@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "3e0d7a57-a460-424b-a140-23a5a519481f",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "3e0d7a57-a460-424b-a140-23a5a519481f",
+            "type": "STRING",
+            "value": "Check that IUT accepts a well-formed Secured GN Message containing payload of type signed_external"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "3e0d7a57-a460-424b-a140-23a5a519481f",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tand containing header_fields[0] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\t\tand containing signer.type \r\n\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\tand containing signer.certificate\r\n\t\t\t\t\tindicating CERT_TS_AT_A\r\n\t\t\t}\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand containing payload_field \r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed_external'\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "3e0d7a57-a460-424b-a140-23a5a519481f",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "3e0d7a57-a460-424b-a140-23a5a519481f",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "3e0d7a57-a460-424b-a140-23a5a519481f"
+}

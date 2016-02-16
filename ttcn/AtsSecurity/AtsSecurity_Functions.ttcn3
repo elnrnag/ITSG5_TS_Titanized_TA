@@ -1,0 +1,538 @@
+/**
+ *  @author     ETSI / STF481
+ *  @version    $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsSecurity/AtsSecurity_Functions.ttcn3 $
+ *              $Id: AtsSecurity_Functions.ttcn3 2230 2015-06-03 09:11:02Z mullers $
+ *  @desc       Module containing functions for the secured GN ATS
+ *
+ */
+module AtsSecurity_Functions {
+    
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_Time all;
+    
+    // LibIts
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    import from ITS_Container language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCommon_Functions all;
+    
+    // LibItsDenm
+    import from LibItsDenm_TypesAndValues all;
+    import from LibItsDenm_Templates all;
+    import from LibItsDenm_Functions all;
+    import from LibItsDenm_TestSystem all;
+    
+    // LibItsCam
+    import from LibItsCam_Templates all;
+    import from LibItsCam_Functions all;
+    import from LibItsCam_TestSystem all;
+    
+    // LibItsGeoNetworking
+    import from LibItsGeoNetworking_TestSystem all;
+    import from LibItsGeoNetworking_Functions all;
+    import from LibItsGeoNetworking_Templates all;
+    import from LibItsGeoNetworking_TypesAndValues all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Templates all;
+    import from LibItsSecurity_Functions all;
+    import from LibItsSecurity_Pixits all;
+    
+    group secCam {
+        
+        /**
+        * @desc   Prepare a secured CAM
+        * @param  p_configId            The configuration identifier to be used
+        * @param  p_headerFields        HeaderFields to be inserted in the message
+        * @param  p_signerInfoType      Add digest or AT certificate or certificate chain
+        * @param  p_addMissingHeaders   Whether to add mandatory headers not present in p_headerFields
+        * @return Secured GeoNetworking packet containing a CAM
+        */
+        function f_prepareSecuredCam(
+                                     in charstring p_configId,
+                                     in template (omit) HeaderFields p_headerFields := omit,
+                                     in SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                     in boolean p_addMissingHeaders := true
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            // Local variables
+            var GnNonSecuredPacket v_gnNonSecuredPacket;
+            var octetstring v_gnPayload;
+            var template (value) SecuredMessage v_securedMessage;
+            
+            // Build signed SecuredMessage
+            v_gnNonSecuredPacket := valueof(m_geoNwShbPacket(
+                f_getPosition(c_compNodeC)
+            ));
+            
+            // Add CAM payload
+            v_gnNonSecuredPacket.payload := valueof(
+                f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg_vehicle_HF_BV(
+                                    f_getTsStationId(),
+                                    f_getCurrentTime() mod 65536, // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                                    LibItsCam_Templates.m_tsPosition
+            ))))));
+            
+            // Encode it
+            v_gnPayload := bit2oct(
+                encvalue(
+                    v_gnNonSecuredPacket
+                )
+            );
+            f_buildGnSecuredCam(
+                v_securedMessage,
+                m_payload_signed(v_gnPayload),
+                p_signerInfoType,
+                p_headerFields,
+                p_configId,
+                p_addMissingHeaders
+            );
+            
+            // Return secured Gn packet
+            return valueof(m_geoNwSecPdu(v_gnNonSecuredPacket, v_securedMessage));
+        } // End of function f_prepareSecuredCam
+        
+        /**
+         * @desc   Prepare a secured CAM including wrong elements of protocols. It is used for BO test cases
+         * @param  p_configId            The configuration identifier to be used
+         * @param  p_protocolVersion     The protocol version to be set. Default: 2
+         * @param  p_trailerStatus       The Traile behaviour:
+         *                               <li>0 for no trailer</li>
+         *                               <li>1 for invalid trailer</li>
+         *                               <li>2 for duplicated trailer</li>
+         * @param  p_headerFields        HeaderFields to be inserted in the message
+         * @param  p_signerInfoType      Add digest or AT certificate or certificate chain
+         * @param  p_addMissingHeaders   Whether to add mandatory headers not present in p_headerFields
+         * @return Secured GeoNetworking packet containing a CAM
+         */
+        function f_prepareSecuredCam_Bo(
+                                        in charstring p_configId,
+                                        in integer p_protocolVersion := c_protocol_version,
+                                        in integer p_trailerStatus := 0,
+                                        in template (omit) HeaderFields p_headerFields := omit,
+                                        in SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256,
+                                        in boolean p_addMissingHeaders := true
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            // Local variables
+            var GnNonSecuredPacket v_gnNonSecuredPacket;
+            var octetstring v_gnPayload;
+            var template (value) SecuredMessage v_securedMessage;
+            
+            // Build signed SecuredMessage
+            v_gnNonSecuredPacket := valueof(m_geoNwShbPacket(
+                f_getPosition(c_compNodeC)
+            ));
+            
+            // Add CAM payload
+            v_gnNonSecuredPacket.payload := valueof(
+                f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg_vehicle_HF_BV(
+                                    f_getTsStationId(),
+                                    f_getCurrentTime() mod 65536, // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                                    LibItsCam_Templates.m_tsPosition
+            ))))));
+            
+            // Encode it
+            v_gnPayload := bit2oct(
+                encvalue(
+                    v_gnNonSecuredPacket
+                )
+            );
+            f_buildGnSecuredCam_Bo(
+                v_securedMessage,
+                p_protocolVersion,
+                p_trailerStatus,
+                m_payload_signed(v_gnPayload),
+                p_signerInfoType,
+                p_headerFields,
+                p_configId,
+                p_addMissingHeaders
+            );
+            
+            // Return secured Gn packet
+            return valueof(m_geoNwSecPdu(v_gnNonSecuredPacket, v_securedMessage));
+        } // End of function f_prepareSecuredCam_Bo
+        
+        /**
+        * @desc   Sends a secured CAM
+        * @param  p_configId        The configuration identifier to be used
+        * @param  p_headerFields    Additional HeaderFields
+        * @param  p_signerInfoType  Add digest or AT certificate or certificate chain
+        * @return GeoNetworking payload
+        */
+        function f_sendSecuredCam(
+                                  in charstring p_configId,
+                                  in template (omit) HeaderFields p_headerFields := omit,
+                                  in SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            
+            // Local variables
+            var GeoNetworkingPdu v_securedGnPdu := f_prepareSecuredCam(p_configId, p_headerFields, p_signerInfoType);
+                   
+            f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(v_securedGnPdu));
+                        
+            return v_securedGnPdu;
+            
+        } // End of function f_sendSecuredCam
+        
+        /**
+        * @desc   Sends a secured CAM including wrong elements of protocols. It is used for BO test cases
+        * @param  p_configId        The configuration identifier to be used
+         * @param  p_protocolVersion     The protocol version to be set. Default: 2
+         * @param  p_trailerStatus       The Traile behaviour:
+         *                               <li>0 for no trailer</li>
+         *                               <li>1 for invalid trailer</li>
+         *                               <li>2 for duplicated trailer</li>
+        * @param  p_headerFields    Additional HeaderFields
+        * @param  p_signerInfoType  Add digest or AT certificate or certificate chain
+        * @return GeoNetworking payload
+        */
+        function f_sendSecuredCam_Bo(
+                                     in charstring p_configId,
+                                     in integer p_protocolVersion := c_protocol_version,
+                                     in integer p_trailerStatus := 1,
+                                     in template (omit) HeaderFields p_headerFields := omit,
+                                     in SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            
+            // Local variables
+            var GeoNetworkingPdu v_securedGnPdu := f_prepareSecuredCam_Bo(p_configId, p_protocolVersion, p_trailerStatus, p_headerFields, p_signerInfoType);
+                   
+            f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(v_securedGnPdu));
+                        
+            return v_securedGnPdu;
+            
+        } // End of function f_sendSecuredCam
+        
+    } // End of group secCam
+    
+    group secDenm {
+        
+        /**
+        * @desc   Prepare a secured DENM
+        * @param  p_configId            The configuration identifier to be used
+        * @param  p_headerFields        HeaderFields to be inserted in the message
+        * @param  p_signerInfoType      Add digest or AT certificate or certificate chain
+        * @param  p_addMissingHeaders   Whether to add mandatory headers not present in p_headerFields
+        * @return Secured GeoNetworking packet containing a CAM
+        */
+        function f_prepareSecuredDenm(
+                                      in charstring p_configId,
+                                      in template (omit) HeaderFields p_headerFields := omit,
+                                      in SignerInfoType p_signerInfoType := e_certificate,
+                                      in boolean p_addMissingHeaders := true
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            // Local variables
+            var GnNonSecuredPacket v_gnNonSecuredPacket;
+            var octetstring v_gnPayload;
+            var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB); // Use NodeB
+            var template (value) SecuredMessage v_securedMessage;
+            var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+            
+            // Build signed SecuredMessage
+            v_gnNonSecuredPacket := valueof(
+                m_geoNwBroadcastPacket(
+                    v_longPosVectorNodeB,
+                    vc_localSeqNumber,
+                    f_getGeoBroadcastArea(
+                        c_area1                 // Select area1 (see ETSI TS 102 871-2 Clause 4.2 Configuration 1)
+            )));
+            
+            // Add the DENM payload
+            v_gnNonSecuredPacket.payload := valueof(
+                f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+            )))))));
+            
+            // Encode it
+            v_gnPayload := bit2oct(
+                encvalue(
+                    v_gnNonSecuredPacket
+                )
+            );
+            f_buildGnSecuredDenm(
+                v_securedMessage,
+                m_payload_signed(v_gnPayload),
+                p_signerInfoType,
+                valueof(m_threeDLocation(
+                    v_longPosVectorNodeB.latitude,
+                    v_longPosVectorNodeB.longitude,
+                    '0000'O
+                )),
+                p_headerFields,
+                p_configId,
+                p_addMissingHeaders
+            );
+            
+            // Return secured Gn packet
+            return valueof(m_geoNwSecPdu(v_gnNonSecuredPacket, v_securedMessage));
+        } // End of function f_prepareSecuredDenm
+        
+        /**
+        * @desc   Prepare a secured DENM including wrong elements of protocols. It is used for BO test cases
+        * @param  p_configId            The configuration identifier to be used
+         * @param  p_protocolVersion     The protocol version to be set. Default: 2
+         * @param  p_trailerStatus       The Traile behaviour:
+         *                               <li>0 for no trailer</li>
+         *                               <li>1 for invalid trailer</li>
+         *                               <li>2 for duplicated trailer</li>
+        * @param  p_headerFields        HeaderFields to be inserted in the message
+        * @param  p_signerInfoType      Add digest or AT certificate or certificate chain
+        * @param  p_addMissingHeaders   Whether to add mandatory headers not present in p_headerFields
+        * @return Secured GeoNetworking packet containing a CAM
+        */
+        function f_prepareSecuredDenm_Bo(
+                                         in charstring p_configId,
+                                         in integer p_protocolVersion := c_protocol_version,
+                                         in integer p_trailerStatus := 0,
+                                         in template (omit) HeaderFields p_headerFields := omit,
+                                         in SignerInfoType p_signerInfoType := e_certificate,
+                                         in boolean p_addMissingHeaders := true
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            // Local variables
+            var GnNonSecuredPacket v_gnNonSecuredPacket;
+            var octetstring v_gnPayload;
+            var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB); // Use NodeB
+            var template (value) SecuredMessage v_securedMessage;
+            var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+            
+            // Build signed SecuredMessage
+            v_gnNonSecuredPacket := valueof(
+                m_geoNwBroadcastPacket(
+                    v_longPosVectorNodeB,
+                    vc_localSeqNumber,
+                    f_getGeoBroadcastArea(
+                        c_area1                 // Select area1 (see ETSI TS 102 871-2 Clause 4.2 Configuration 1)
+            )));
+            
+            // Add the DENM payload
+            v_gnNonSecuredPacket.payload := valueof(
+                f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+            )))))));
+            
+            // Encode it
+            v_gnPayload := bit2oct(
+                encvalue(
+                    v_gnNonSecuredPacket
+                )
+            );
+            f_buildGnSecuredDenm_Bo(
+                v_securedMessage,
+                p_protocolVersion,
+                p_trailerStatus,
+                m_payload_signed(v_gnPayload),
+                p_signerInfoType,
+                valueof(m_threeDLocation(
+                    v_longPosVectorNodeB.latitude,
+                    v_longPosVectorNodeB.longitude,
+                    '0000'O
+                )),
+                p_headerFields,
+                p_configId,
+                p_addMissingHeaders
+            );
+            
+            // Return secured Gn packet
+            return valueof(m_geoNwSecPdu(v_gnNonSecuredPacket, v_securedMessage));
+        } // End of function f_prepareSecuredDenm_Bo
+        
+        /**
+         * @desc   Sends a secured DENM
+         * @param  p_configId        The configuration identifier to be used
+         * @param  p_headerFields    Additional HeaderFields
+         * @param  p_signerInfoType  Add digest or AT certificate or certificate chain
+         * @return GeoNetworking payload
+         */
+        function f_sendSecuredDenm(
+                                  in charstring p_configId,
+                                  in template (omit) HeaderFields p_headerFields := omit,
+                                  in SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            // Local variables
+            var GeoNetworkingPdu v_securedGnPdu := f_prepareSecuredDenm(p_configId, p_headerFields, p_signerInfoType);
+                   
+            f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(v_securedGnPdu));
+                        
+            return v_securedGnPdu;
+            
+        } // End of function f_sendSecuredDenm
+        
+        /**
+         * @desc   Sends a secured DENM including wrong elements of protocols. It is used for BO test cases
+         * @param  p_configId        The configuration identifier to be used
+         * @param  p_protocolVersion     The protocol version to be set. Default: 2
+         * @param  p_trailerStatus       The Traile behaviour:
+         *                               <li>0 for no trailer</li>
+         *                               <li>1 for invalid trailer</li>
+         *                               <li>2 for duplicated trailer</li>
+         * @param  p_headerFields    Additional HeaderFields
+         * @param  p_signerInfoType  Add digest or AT certificate or certificate chain
+         * @return GeoNetworking payload
+         */
+        function f_sendSecuredDenm_Bo(
+                                      in charstring p_configId,
+                                      in integer p_protocolVersion := c_protocol_version,
+                                      in integer p_trailerStatus := 1,
+                                      in template (omit) HeaderFields p_headerFields := omit,
+                                      in SignerInfoType p_signerInfoType := e_certificate_digest_with_sha256
+        ) runs on ItsGeoNetworking return GeoNetworkingPdu {
+            // Local variables
+            var GeoNetworkingPdu v_securedGnPdu := f_prepareSecuredDenm_Bo(p_configId, p_protocolVersion, p_trailerStatus, p_headerFields, p_signerInfoType);
+                   
+            f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(v_securedGnPdu));
+                        
+            return v_securedGnPdu;
+            
+        } // End of function f_sendSecuredDenm_Bo
+        
+    } // End of group secDenm 
+    
+    group camTrigger {
+        
+        /**
+        * @desc    Triggers a CAM change speed events to get a CAM frequency greather than 1 Hz (i.e. more than one CAM per seconds)
+        * @return  Reference to the component used to send the trigger
+        * @remark  This function spawns an ItsCam component in alive mode
+        * @see     fb_changeCamFrequencyGreatherThan1Hz()
+        */
+        function f_setCamFrequencyGreatherThan1Hz() runs on ItsBaseComponent return ItsCam {
+            var ItsCam v_camComponent;
+            
+            v_camComponent := ItsCam.create("CAM Trigger");
+            v_camComponent.start(fb_setCamFrequencyGreatherThan1Hz());
+            
+            return v_camComponent;
+        } // End of function f_setCamFrequencyGreatherThan1Hz
+        
+        /**
+        * @desc    Terminate CAM component execution
+        * @param   Reference to the component used to send the trigger
+        */
+        function f_terminateCam(inout ItsCam p_camComponent) runs on ItsBaseComponent {
+            
+            p_camComponent.done;
+            p_camComponent.kill;
+            
+        } // End of function f_terminateCam
+        
+        /**
+        * @desc Behaviour function for triggering a CAM change speed event on IUT
+        */
+        function fb_setCamFrequencyGreatherThan1Hz() runs on ItsCam {
+            
+            // Local variables
+            var SpeedValue v_speedValues[5] := { 1000, 2000, 3000, 4000, 5000 } //cm/s
+            var integer v_cntSpeed;
+            var float v_timer := 0.2; // 1 / 5;
+            
+            map(self:utPort, system:camUtPort);
+            vc_default := activate(LibItsCam_Functions.a_utDefault());
+            
+            for (v_cntSpeed := 0; v_cntSpeed < lengthof(v_speedValues); v_cntSpeed:=v_cntSpeed + 1) {
+                LibItsCam_Functions.f_utTriggerEvent(valueof(m_changeSpeed(v_speedValues[v_cntSpeed])));
+                f_sleep(v_timer);
+            } // End of 'for' statement
+            
+            unmap(self:utPort, system:camUtPort);
+        }  // End of function fb_setCamFrequencyGreatherThan1Hz
+        
+    } // End of group camTrigger 
+    
+    group denmTrigger {
+        
+        /**
+        * @desc    Triggers a DENM event on IUT
+        * @remark  This function spawns an ItsDenm component in alive mode
+        * @see     fb_secTriggerDenmEvent()
+        * @return  Reference to the component used to send the trigger
+        */
+        function f_triggerDenmEvent() runs on ItsBaseComponent return ItsDenm {
+            var ItsDenm v_denmComponent;
+            
+            v_denmComponent := ItsDenm.create("DENM Trigger") alive;
+            v_denmComponent.start(fb_secTriggerDenmEvent());
+            v_denmComponent.done;
+            
+            return v_denmComponent;
+        } // End of function f_triggerDenmEvent
+        
+        /**
+        * @desc    Cancels all previously triggered DENM events on IUT
+        * @param   p_denmComponent     Reference of the component previously used to trigger DENM events
+        * @see     fb_secCancelDenmEvent()
+        */
+        function f_cancelDenmEvent(ItsDenm p_denmComponent) runs on ItsBaseComponent {
+            p_denmComponent.start(fb_secCancelDenmEvent());
+            p_denmComponent.done;
+            p_denmComponent.kill;
+        } // End of function f_cancelDenmEvent
+        
+        /**
+        * @desc Behaviour function for triggering a DENM event on IUT
+        */
+        function fb_secTriggerDenmEvent() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+            
+            map(self:utPort, system:denmUtPort);
+            f_connect4SelfOrClientSync();
+            vc_default := activate(LibItsDenm_Functions.a_utDefault());
+            
+            vc_utActionIDs[0] := LibItsDenm_Functions.f_utTriggerEvent(m_utTriggerEvent(v_situation, defaultValidity));
+            log("actionId=", vc_utActionIDs[0]);
+            
+        }  // End of function f_secTriggerDenmEvent
+        
+        /**
+        * @desc Behaviour function for cancelling previously triggered DENM events on IUT
+        */
+        function fb_secCancelDenmEvent() runs on ItsDenm {
+            
+            // Local variables
+            var integer v_counter;
+            
+            for (v_counter := 0; v_counter < lengthof(vc_utActionIDs); v_counter := v_counter + 1) {
+                LibItsDenm_Functions.f_utTerminateEvent(m_utEventCancellation(vc_utActionIDs[v_counter]));
+            } // End of 'for' statement
+            
+            unmap(self:utPort, system:denmUtPort);
+            f_disconnect4SelfOrClientSync();
+            deactivate(vc_default);
+            
+        } // End of function f_secTriggerDenmEvent
+        
+    } // End of group denmTrigger
+    
+} // End of module AtsSecurity_Functions

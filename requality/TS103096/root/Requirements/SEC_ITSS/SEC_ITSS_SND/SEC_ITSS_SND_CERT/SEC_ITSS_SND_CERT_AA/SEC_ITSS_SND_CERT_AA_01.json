@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "9b44de2b-e63e-4c56-b59f-855a1c4cb539",
+            "type": "STRING",
+            "value": "If ITS-S sends an AA certificate check that the subject_type is set to authorization_authority"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "9b44de2b-e63e-4c56-b59f-855a1c4cb539",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/621ed828-7b05-439f-828c-5d88c6ad36fe"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "9b44de2b-e63e-4c56-b59f-855a1c4cb539",
+            "type": "STRING",
+            "value": "01. Check the subject type"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "9b44de2b-e63e-4c56-b59f-855a1c4cb539",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9b44de2b-e63e-4c56-b59f-855a1c4cb539"
+}

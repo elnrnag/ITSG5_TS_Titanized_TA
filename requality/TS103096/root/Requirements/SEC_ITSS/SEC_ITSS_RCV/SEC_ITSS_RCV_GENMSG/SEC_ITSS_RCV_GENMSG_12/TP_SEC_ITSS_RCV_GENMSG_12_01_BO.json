@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "1f2972c1-1f13-417c-8a29-3c1291afdc57",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "1f2972c1-1f13-417c-8a29-3c1291afdc57",
+            "type": "STRING",
+            "value": "Check that IUT discards a Secured DENM if the signer certificate of the message contains the subject type \"enrolment_credential\""
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "1f2972c1-1f13-417c-8a29-3c1291afdc57",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer.type\r\n\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\tcontaining signer.certificate.subject_info.subject_type\r\n\t\t\t\t\tindicating 'enrolment_credentials'\r\n\t\t\t}\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "1f2972c1-1f13-417c-8a29-3c1291afdc57",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "1f2972c1-1f13-417c-8a29-3c1291afdc57",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "1f2972c1-1f13-417c-8a29-3c1291afdc57"
+}

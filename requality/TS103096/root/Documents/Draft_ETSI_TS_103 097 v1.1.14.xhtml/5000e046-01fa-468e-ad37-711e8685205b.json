@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": " The points shall be linked to each other, with the last point linked to the first. No intersections shall occur and at least 3 and no more than 12 points shall be given. The specified region shall be continuous and shall not contain holes."
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "3045b46e-9c2a-4dc8-8bac-0b57e1130d97"
+}

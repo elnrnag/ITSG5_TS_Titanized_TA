@@ -1,0 +1,405 @@
+/**
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FSAP/LibItsFsap_Pixits.ttcn3 $
+ *              $Id: LibItsFsap_Pixits.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Fast service advertisement protocol (ISO 24102-5) Pixits
+ */
+module LibItsFsap_Pixits {
+    
+    // LibCommon
+    
+    // LibIts
+    import from CALMllsap language "ASN.1:1997" all;
+    import from CITSapplMgmtApplReg language "ASN.1:1997" {
+        type ITSaid 
+    };
+    import from CALMmanagement language "ASN.1:1997" {
+        type 
+            ApplicationID, 
+            ITS_scuId, StationID, 
+            Talive 
+    };
+    import from CALMfsap language "ASN.1:1997" {
+        type 
+            FmtID, VersionFSAP, 
+            GCsched, NonipService, ServiceDataReg, 
+            ContextData
+    };
+    import from CALMfntp language "ASN.1:1997" {
+        type 
+            PortNumber 
+    };
+    import from LibItsFntp_TypesAndValues {
+        const 
+            c_portNon 
+    };
+    import from LibItsMgt_TypesAndValues {
+        group asn1Constants, constants  
+    };
+    import from LibItsFsap_Pics {
+        modulepar  
+            PICS_SAM_RETRANSMIT_TIMER 
+    };
+    
+    /**
+     * @desc    Source and destination Ports
+     * @see     ISO/WD 29281-2 Clause 6.2.2.2
+     */
+    group portNumbers {
+        
+        /**
+         * @desc Indicate the application port number, used instead of c_portDyn
+         */
+        modulepar PortNumber PX_APP_PORT_NUMBER := { portLong := 12345 } ;
+        
+        /**
+         * @desc Indicate the source port number, i.e. the local endpoint
+         */
+        modulepar PortNumber PX_LOCAL_PORT_NUMBER := { portLong := 5555 } ;
+        
+        /**
+         * @desc Indicate the destination port number, i.e. the peer ITS-SP
+         */
+        modulepar PortNumber PX_REMOTE_PORT_NUMBER := { portLong := 5556 } ;
+        
+    } // End of group portNumbers
+    
+    /**
+     * @desc Local settings
+     */
+    group local {
+        
+        /**
+         * @desc Identifies the CI on ITS-S host 
+         * @see ISO 21218 - Clause 6.2 Link Identifier 
+         */
+        modulepar EUI64 PX_WL_LOCAL_CIID := '03000AFFFFFF0000'O; 
+        
+        /**
+         * @desc Identifies the VCI on ITS-S host 
+         */
+        modulepar EUI64 PX_SRC_REMOTE_CIID := 'FF000AFFFFFFFFFF'O;
+        
+        /**
+         * @desc Priority of the ITS-S application
+         */
+        modulepar UserPriority PX_USER_PRIORITY := 0; 
+        
+    } // End of group local
+    
+    group iutVcisMac {
+        
+        modulepar EUI64 PX_IUT_MEDTYPE_ISO21215_LOCAL_CIID := '0A0B0CFFFE0D0E10'O; // Commsignia settings
+//        modulepar EUI64 PX_IUT_MEDTYPE_ISO21215_LOCAL_CIID := '000C42FFFF974497'O; // Peek settings
+
+        modulepar EUI64 PX_IUT_MEDTYPE_ISO21215_REMOTE_CIID := '0A0B0CFFFE0D0E10'O; // Commsignia settings
+//        modulepar EUI64 PX_IUT_MEDTYPE_ISO21215_REMOTE_CIID := '000C42FFFF974497'O; // Peek settings
+
+        modulepar EUI64 PX_IUT_MEDTYPE_OTHER_LOCAL_CIID := '0A0B0CFFFE0D0E0F'O;
+
+        modulepar EUI64 PX_IUT_MEDTYPE_OTHER_REMOTE_CIID := '0A0B0CFFFE0D0E0F'O;
+
+    } // End of group iutVcisMac 
+    
+    group cRegServer {
+        
+        /**
+         * @desc The service provider ITS station
+         */
+        modulepar StationID PX_SERVER_ID := '11111111'O;
+        
+        /**
+         * @desc The service client ITS station
+         */
+//        modulepar StationID PX_IUT_ID := '0000473A'O; // Commsignia setting (ITS-S box)
+        modulepar StationID PX_IUT_ID := '00003039'O; // Commsignia setting (laptop)
+//        modulepar StationID PX_IUT_ID := '5045454B'O; // Peek setting
+        
+        /**
+         * @desc The service client ITS station
+         */
+        modulepar StationID PX_LOCAL_ID := '00003930'O; // Commsignia setting
+//        modulepar StationID PX_LOCAL_ID := '5045454B'O; // Peek setting
+        
+        /**
+         * @desc The globally unique ITS-AID of the ITS-S application
+         */
+        modulepar ITSaid PX_ITS_AID := { content := 8 }
+        
+        
+        /**
+         * @desc The globally unique ITS-AID of the ITS-S application is case of change channel 
+         * TODO Add phrasing here
+         */
+        modulepar ITSaid PX_ITS_AID_CHANNEL_CHANGE := { content := 99 }
+        
+        /**
+         * @desc An unknown ITS-AID of the ITS-S application
+         */
+        modulepar ITSaid PX_UNKNOWN_ITS_AID := { content := 126 }
+        
+        /**
+         * @desc    A session port value
+         */
+        modulepar PortNumber PX_SESSION_PORT := { portLong := 7896 }
+        
+        /**
+         * @desc    An unspecified session port value
+         */
+        modulepar PortNumber PX_NO_SESSION_PORT := c_unknown_portLong;
+        
+        /**
+         * @desc    An unnknown session port value
+         */
+        modulepar PortNumber PX_UNKNOWN_SESSION_PORT := { portLong := 1234 }
+        
+        /**
+         * @desc    ITS application object ID (ITS-AID) for GCregServer MF-REQUEST 
+         * @see     ISO EN 17419
+         * @see     ISO 24102-5 Clause 8.3.1 Groupcast registration
+         */
+        modulepar ApplicationID PX_APPLICATION_ID := {
+            hostITS_scuId := 1,
+            seqNumber := {
+                itsaid := PX_ITS_AID,
+                instance := 1,
+                flowNo := 0
+            }
+        }
+        
+        /**
+         * @desc    ITS application object ID (ITS-AID) for GCregClient MF-REQUEST 
+         * @see     ISO EN 17419
+         * @see     ISO 24102-5 Clause 8.3.1 Groupcast registration
+         */
+        modulepar ApplicationID PX_CLIENT_APPLICATION_ID := {
+            hostITS_scuId := 2,
+            seqNumber := {
+                itsaid := PX_ITS_AID,
+                instance := 1,
+                flowNo := 0
+            }
+        }
+        
+        /**
+         * @desc    Scheduling information for registration / deregistration request in order to select the proper VCI in the ITS-station for communication
+         * 'medium' field indicates a request of specific access technology
+         * @see ISO/CD 24102-5 Clause 8.2.4 Groupcast communication management
+         */
+        modulepar GCsched PX_GSCHED_ACCESS_TECH_NONIP := {
+            medium := c_medType_iso21215, 
+            directivity := {
+                mode := 0, // FIXME Check why TTwb raises an error using DirMode_fixed_ 
+                dirPredef := 0,
+                fill := '0000000'B,  
+                dirVar := { // For Commsignia: shall be empty
+                    /*{ 
+                        fill := '0000000'B,
+                        bsAzimuth := 0, 
+                        bsElevation    := 0,
+                        openHorizontal := 128, 
+                        openVertical := 180
+                    }*/
+                }
+            }, // End of field 'directivity'
+            gcInterval := float2int(PICS_SAM_RETRANSMIT_TIMER) // SAM Repeat timer in ms
+        } // End of modulepar PX_GSCHED_ACCESS_TECH_NONIP
+        
+        /**
+         * @desc    Scheduling information for registration / deregistration request in order to select the proper VCI in the ITS-station for communication,
+         *          with a long period time value
+         * 'medium' field indicates a request of specific access technology
+         * Used for TC_FSAP_SP_HR_BV_05 
+         * @see ISO/CD 24102-5 Clause 8.2.4 Groupcast communication management
+         */
+        modulepar GCsched PX_GSCHED_LOG_PERIOD_TIME_ACCESS_TECH_NONIP := {
+            medium := c_medType_iso21215, // IR 
+            directivity := {
+                mode := c_dirMode_fixed, 
+                dirPredef := 0,
+                fill := '0000000'B,  
+                dirVar := { }
+            }, // End of field 'directivity'
+            gcInterval := 30000 // SAM Repeat timer in ms
+        } // End of modulepar PX_GSCHED_ACCESS_TECH_NONIP
+        
+        /**
+         * @desc    Scheduling information for registration / deregistration request in order to select the proper VCI in the ITS-station for communication
+         * 'medium' field indicates a request of an unknown access technology
+         * For TC_FSAP_SP_HR_BV_05, increase 
+         * @see ISO/CD 24102-5 Clause 8.2.4 Groupcast communication management
+         */
+        modulepar GCsched PX_GSCHED_ACCESS_UNKNOWN_TECH_NONIP := { 
+            medium := c_medType_iso21214, // IR 
+            directivity := {
+                mode := c_dirMode_fixed, 
+                dirPredef := 0,
+                fill := '0000000'B,  
+                dirVar := { }
+            }, // End of field 'directivity'
+            gcInterval := float2int(PICS_SAM_RETRANSMIT_TIMER) // SAM Repeat timer in ms
+        } // End of modulepar PX_GSCHED_ACCESS_TECH_NONIP
+        
+        /**
+         * @desc    Scheduling information for registration / deregistration request in order to select the proper VCI in the ITS-station for communication
+         * 'medium' field indicates no request of specific access technology
+         * @see ISO/CD 24102-5 Clause 8.2.4 Groupcast communication management
+         */
+        modulepar GCsched PX_GSCHED_NONIP := {
+            medium := c_medType_any, // FIXME Check why TTwb raises an error using MedType_any_
+            directivity := {
+                mode := 0, // FIXME Check why TTwb raises an error using DirMode_fixed_
+                dirPredef := 0,
+                fill := '0000000'B,  
+                dirVar := { }
+            }, // End of field 'directivity'
+            gcInterval := float2int(PICS_SAM_RETRANSMIT_TIMER) // SAM Repeat timer in ms
+        } // End of modulepar PX_GSCHED_NONIP
+        
+        /**
+         * @desc    Receive template for advertisement details with no session phase
+         */
+        modulepar ServiceDataReg PX_SERVICE_DATA_REG_WITH_NO_SESSION_PHASE := {
+            fill := '0000000'B,
+            datareg := {
+                nonipData := {
+                    serviceID := PX_ITS_AID, 
+                    serviceData := ''O,
+                    providerPort := PX_NO_SESSION_PORT
+                } // End of field 'nonipData'
+            } // End of field 'datareg'
+        } // End of modulepar PX_SERVICE_DATA_REG_WITH_NO_SESSION_PHASE
+        
+        /**
+         * @desc    Receive template for advertisement details with session phase
+         */
+        modulepar ServiceDataReg PX_SERVICE_DATA_REG_WITH_SESSION_PHASE := {
+            fill := '0000000'B,
+            datareg := {
+                nonipData := {
+                    serviceID := PX_ITS_AID, 
+                    serviceData := ''O,
+                    providerPort := PX_SESSION_PORT
+                } // End of field 'nonipData'
+            } // End of field 'datareg'
+        } // End of modulepar PX_SERVICE_DATA_REG_WITH_SESSION_PHASE
+        
+        /**
+         * @desc    Receive template for advertisement details with session phase and channel change requested
+         */
+        modulepar ServiceDataReg PX_SERVICE_DATA_REG_WITH_SESSION_PHASE_AND_CHANNEL_CHANGE := {
+            fill := '0000000'B,
+            datareg := {
+                nonipData := {
+                    serviceID := PX_ITS_AID_CHANNEL_CHANGE, 
+                    serviceData := ''O,
+                    providerPort := PX_SESSION_PORT
+                } // End of field 'nonipData'
+            } // End of field 'datareg'
+        } // End of modulepar PX_SERVICE_DATA_REG_WITH_SESSION_PHASE_AND_CHANNEL_CHANGE
+        
+    } // End of group cRegServer
+    
+    group sam {
+        
+        /**
+         * @desc    TODO
+         */
+        modulepar integer PX_NO_SESSION_CHANNEL := 0;
+        
+        /**
+         * @desc    TODO
+         */
+        modulepar integer PX_SESSION_CHANNEL := 1;
+        
+        /**
+         * @desc    Non-IP information on services offered, with no session phase and no channel change requested
+         * @see ISO 24102-5 Figure 9 — serviceList
+         */
+        modulepar NonipService PX_NO_IP_SERVICE_WITH_NO_SESSION_AND_NO_CHANGE_CHANNEL := {
+            serviceID := PX_ITS_AID,
+            serviceData := ''O,
+            serverPort := PX_NO_SESSION_PORT,
+            sessionChannel := PX_NO_SESSION_CHANNEL
+        } // End of modulepar PX_NO_IP_SERVICE_WITH_NO_SESSION_AND_NO_CHANGE_CHANNEL
+        
+        /**
+         * @desc    Non-IP information on services offered, with session phase and no channel change requested
+         * @see ISO 24102-5 Figure 9 — serviceList
+         */
+        modulepar NonipService PX_NO_IP_SERVICE_WITH_SESSION_AND_NO_CHANGE_CHANNEL := {
+            serviceID := PX_ITS_AID,
+            serviceData := ''O,
+            serverPort := PX_SESSION_PORT,
+            sessionChannel := PX_NO_SESSION_CHANNEL
+        } // End of modulepar PX_NO_IP_SERVICE_WITH_SESSION_AND_NO_CHANGE_CHANNEL
+        
+        /**
+         * @desc    Non-IP information on services offered, with no session phase and channel change requested
+         * @see ISO 24102-5 Figure 9 — serviceList
+         */
+        modulepar NonipService PX_NO_IP_SERVICE_WITH_SESSION_AND_CHANNEL_CHANGE := {
+            serviceID := PX_ITS_AID_CHANNEL_CHANGE,
+            serviceData := ''O,
+            serverPort := PX_SESSION_PORT,
+            sessionChannel := 1
+        } // End of modulepar PX_NO_IP_SERVICE_WITH_SESSION_AND_CHANNEL_CHANGE
+        
+        /**
+         * @desc    Non-IP information on an unknown services offered, with session phase and no channel change requested
+         * @see ISO 24102-5 Figure 9 — serviceList
+         */
+        modulepar NonipService PX_NO_IP_SERVICE_WITH_UNKNOWN_SERVICE_ID := {
+            serviceID := PX_UNKNOWN_ITS_AID,
+            serviceData := ''O,
+            serverPort := PX_SESSION_PORT,
+            sessionChannel := PX_SESSION_CHANNEL
+        } // End of modulepar PX_NO_IP_SERVICE_WITH_UNKNOWN_SERVICE_ID
+        
+        /**
+         * @desc    Non-IP information on services offered, with session phase and channel change requested on an unknown channel
+         * @see ISO 24102-5 Figure 9 — serviceList
+         */
+        modulepar NonipService PX_NO_IP_SERVICE_WITH_UNKNOWN_CHANNEL := {
+            serviceID := PX_ITS_AID,
+            serviceData := ''O,
+            serverPort := PX_UNKNOWN_SESSION_PORT,
+            sessionChannel := PX_SESSION_CHANNEL
+        } // End of modulepar PX_NO_IP_SERVICE_WITH_UNKNOWN_CHANNEL
+        
+        modulepar ContextData PX_CONTEXT_DATA := '4743726567436C69656E74'O;
+        
+    } // End of group sam
+    
+    group parametrisation {
+        
+        /**
+         * @desc    SAM tag identifier
+         * @see ISO 24102-5 Clause 7.2.1 Overview
+         */
+        modulepar FmtID PX_FMTID_SAM := 0; // FIXME Check why TTWB raises an error using CLAMfsap.FmtID_sam_
+        
+        /**
+         * @desc    CTX tag identifier
+         * @see ISO 24102-5 Clause 7.2.1 Overview
+         */
+        modulepar FmtID PX_FMTID_CTX := 1; // FIXME Check why TTWB raises an error using CLAMfsap.FmtID_ctx_
+        
+        /**
+         * @desc    FSAP version number
+         * @see ISO 24102-5 Clause 7.2.2 Service advertisement message
+         */
+        modulepar VersionFSAP PX_VERSION_FSAP := 0;
+        
+        /**
+         * Wait until the IUT is in a stable situation (beaconing...)
+         */
+        modulepar float PX_WAIT_FOR_IUT_READY := 1.0;
+        
+        /**
+         * @desc Time necessary for IUT to detect SAM messages (in seconds)
+         */
+        modulepar float PX_SP_DISCOVERY_DELAY := PICS_SAM_RETRANSMIT_TIMER * 2.0 / 1000.0;
+        
+    } // End of group parametrisation 
+    
+} // End of module LibItsFsap_Pixits

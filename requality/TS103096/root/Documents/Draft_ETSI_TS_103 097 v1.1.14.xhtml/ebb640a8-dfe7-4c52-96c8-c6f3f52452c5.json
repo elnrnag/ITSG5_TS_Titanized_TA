@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\"><a name=\"ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\" id=\"id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\" class=\"requality_id\"><\/a>If the ITS-S finds a <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">HashedId3<\/span><\/font><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\"> of its own, currently used authorization ticket and not of the authorization authority in that list, it shall include a <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">signer_info<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\"> field of type <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">certificate<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\"> immediately in its next CAM, instead of including a <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">signer_info<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\"> field of type <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">certificate_digest_with_sha256<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_ebb640a8-dfe7-4c52-96c8-c6f3f52452c5\">.<\/span><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "ebb640a8-dfe7-4c52-96c8-c6f3f52452c5"
+}

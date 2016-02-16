@@ -1,0 +1,52 @@
+/**
+ *  @author   ETSI / STF405
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/BTP/LibItsBtp_Pixits.ttcn $
+ *            $Id: LibItsBtp_Pixits.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     Basic Transport Protocol Templates
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsBtp_Pixits {
+    
+    // LibIts
+    import from LibItsBtp_TypesAndValues all;
+    
+
+        /**
+         * @desc BTP source port of the IUT
+         * 		 
+         */
+    	modulepar BtpPortId PX_SOURCE_PORT := 0;
+
+        /**
+         * @desc BTP Destination port of the IUT
+         * 		 
+         */
+    	modulepar BtpPortId PX_DESTINATION_PORT := 0;
+
+        /**
+         * @desc BTP Unknown Destination port of the IUT
+         * 		 
+         */
+    	modulepar BtpPortId PX_UNKNOWN_DESTINATION_PORT := 0;
+
+        /**
+         * @desc BTP Destination port Info of the IUT
+         * 		 
+         */
+    	modulepar BtpPortId PX_DESTINATION_PORT_INFO := 0;
+
+        /**
+         * @desc Payload to be sent to the IUT for testing matter
+         * 		 
+         */
+    	modulepar BtpPayload PX_PAYLOAD := { 
+    	    //decodedPayload := omit, 
+    	    rawPayload := '0102030405'O 
+    	};
+
+    
+} // end LibItsBtp_Pixits
+

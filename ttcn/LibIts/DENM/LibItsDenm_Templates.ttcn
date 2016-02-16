@@ -1,0 +1,797 @@
+/**
+ *    @author     ETSI / STF449
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DENM/LibItsDenm_Templates.ttcn $
+ *                $Id: LibItsDenm_Templates.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc        Module containing base template definitions for DENM
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsDenm_Templates {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+     
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_Pixits all;
+    
+    // LibItsDenm
+    import from LibItsDenm_TestSystem all;
+    import from LibItsDenm_TypesAndValues all;
+    
+    group asn1Constants {
+        
+        const integer HeadingValue_wgs84North   := 0;
+        const integer HeadingValue_wgs84East    := 900;
+        const integer HeadingValue_wgs84South   := 1800;
+        const integer HeadingValue_wgs84West    := 2700;
+        const integer HeadingValue_unavailable  := 3600;
+        
+        const integer HeadingConfidence_withinZeroPointOneDegree    := 1;
+        const integer HeadingConfidence_withinOneDegree             := 10;
+        const integer HeadingConfidence_outOfRange                  := 126;
+        const integer HeadingConfidence_unavailable                 := 127;
+        
+    } // End of group asn1Constants 
+    
+    group primitivesTemplates {
+        
+        /**
+         * @desc    Send template for DEN Message (DenmPort Primitive)
+         * @param   p_denMsg    The DEN Message to be sent
+         */
+        template (value) DenmReq m_denmReq(
+            template (value) DENM p_denMsg
+        ) := {
+            msgOut := p_denMsg
+        }
+        
+        /**
+         * @desc    Receive template for DEN Message (DenmPort Primitive)
+         * @param   p_denMsg    The expected DEN Message
+         */
+        template (present) DenmInd mw_denmInd(
+            template (present) DENM p_denMsg
+        ) := {
+            msgIn := p_denMsg,
+            gnNextHeader := *,
+            gnHeaderType := *,
+            gnHeaderSubtype := *,
+            gnLifetime := *,
+            gnTrafficClass := *,
+            btpDestinationPort := *,
+            btpInfo := * 
+        }
+
+        /**
+         * @desc    Receive template for DEN Message (DenmPort Primitive)
+         * @param   p_denMsg            The expected DEN Message
+         * @param   p_gnNextHeader      GN next header value
+         * @param   p_gnHeaderType      GN header type value
+         * @param   p_gnHeaderSubtype   GN header subtype value
+         * @param   p_gnLifetime        GN packet lifetime value (ms)
+         * @param   p_gnTrafficClass    GN traffic class value
+         */
+        template (present) DenmInd mw_denmIndWithGnParameters (
+            template (present) DENM p_denMsg,
+            in template UInt8 p_gnNextHeader := *,
+            in template UInt8 p_gnHeaderType := *,
+            in template UInt8 p_gnHeaderSubtype := *,
+            in template UInt32 p_gnLifetime := *,
+            in template UInt8 p_gnTrafficClass := *
+        ) modifies mw_denmInd := { 
+            gnNextHeader := p_gnNextHeader,
+            gnHeaderType := p_gnHeaderType,
+            gnHeaderSubtype := p_gnHeaderSubtype,
+            gnLifetime := p_gnLifetime,
+            gnTrafficClass := p_gnTrafficClass    
+        };
+        
+        /**
+         * @desc    Receive template for DEN Message (DenmPort Primitive)
+         * @param   p_denMsg                The expected DEN Message
+         * @param   p_btpDestinationPort    BTP destination port value
+         * @param   p_btpInfo               BTP destination port info value (if BTP-B) or BTP source port value (if BTP-A)
+         */
+        template (present) DenmInd mw_denmIndWithBtpParameters (
+            template (present) DENM p_denMsg,
+            in template UInt8 p_btpDestinationPort := *,
+            in template UInt8 p_btpInfo := *
+        ) modifies mw_denmInd := { 
+            btpDestinationPort := p_btpDestinationPort,
+            btpInfo := p_btpInfo     
+        };
+        
+        group utPrimitives {
+            
+            /**
+             * @desc    Send template for Upper Tester event initialization
+             */
+            template (value) UtInitialize m_denmInitialize := {
+                hashedId8 := '0000000000000000'O
+            }
+            
+            /**
+             * @desc    Send template for Upper Tester event changePseudonym
+             */
+            template (value) UtChangePseudonym m_utChangePseudonym := {
+            }
+            
+            /**
+             * @desc    Send template for Upper Tester Trigger event
+             * @param   p_situation                     The Situation Container
+             * @param   p_location                      The Location Container
+             * @param   p_validityDuration              The validity duration (Default: omit)
+             * @param   p_repetitionDuration            The repetition duration (Default: omit)
+             * @param   p_repetitionInterval            The repetition interval (Default: omit)
+             * @param   p_transmissionInterval          The transmission interval (Default: omit)
+             * @param   p_alacarte                      The Alacarte container (Default: omit)
+             */
+            template (value) UtDenmTrigger m_utTriggerEvent(
+                template (value) SituationContainer p_situation,
+                template (omit) ValidityDuration p_validityDuration := c_duration_2sec,
+                template (omit) ValidityDuration p_repetitionDuration := omit,
+                template (omit) TransmissionInterval p_repetitionInterval := omit,
+                template (omit) TransmissionInterval p_transmissionInterval := omit,
+                template (omit) AlacarteContainer p_alacarte := omit
+            ) := {
+                detectionTime := f_getCurrentTime(),
+                validityDuration := p_validityDuration,
+                repetitionDuration := p_repetitionDuration,
+                situation := p_situation,
+                relevanceDistance := lessThan50m,
+                relevanceTrafficDirection := allTrafficDirections,
+                transmissionInterval := p_transmissionInterval,
+                repetitionInterval := p_repetitionInterval,
+                alacarte := p_alacarte
+            }
+            
+            /**
+             * @desc Send template for Upper Tester event update
+             * @param p_actionId                    The action id
+             * @param p_situation                   The Situation Container (Default: omit)
+             * @param p_location                    The Location Container (Default: omit)
+             * @param p_validityDuration            The validity duration (Default: omit)
+             * @param p_relevanceDistance           The relevance distance (Default: omit)
+             * @param p_relevanceTrafficDirection   The relevance traffic direction (Default: omit)
+             * @param p_trafficClass                The traffic class (Default: omit)
+             * @param p_repetitionInterval            The repetition interval (Default: omit)
+             * @param p_transmissionInterval        The transmission interval (Default: omit)
+             * @param p_alacarte                    The Alacarte Container (Default: omit)
+             */
+            template (value) UtDenmUpdate m_utUpdateEvent(
+                template (value) ActionID p_actionId,
+                template (omit) SituationContainer p_situation := omit,
+                template (omit) LocationContainer p_location := omit,
+                template (omit) ValidityDuration p_validityDuration := omit,
+                template (omit) RelevanceDistance p_relevanceDistance := omit,
+                template (omit) RelevanceTrafficDirection p_relevanceTrafficDirection := omit,
+                template (omit) ValidityDuration p_repetitionDuration := omit,
+                template (omit) TransmissionInterval p_repetitionInterval := omit,
+                template (omit) TransmissionInterval p_transmissionInterval := omit,
+                template (omit) AlacarteContainer p_alacarte := omit
+            ) := {
+                actionId := p_actionId,
+                detectionTime := f_getCurrentTime(),
+                validityDuration := p_validityDuration,
+                situation := p_situation,
+                location := p_location,
+                relevanceDistance := p_relevanceDistance,
+                relevanceTrafficDirection := p_relevanceTrafficDirection,
+                transmissionInterval := p_transmissionInterval,
+                repetitionInterval := p_repetitionInterval,
+                alacarte := p_alacarte
+            }
+            
+            /**
+             * @desc    Send template for Upper Tester event cancellation
+             * @param   p_actionId  The action id
+             */
+            template (value) UtDenmTermination m_utEventCancellation(
+                template (value) ActionID p_actionId
+            ) := {
+                actionId := p_actionId
+            }
+            
+            /**
+             * @desc Send template for Upper Tester event change position
+             * @param p_latitude    The new latitude
+             * @param p_longitude   The new longitude
+             * @param p_elevation   The new elevation (Default: 0)
+             */
+            template (value) UtChangePosition m_utChangePosition(
+                template (value) integer p_latitude,
+                template (value) integer p_longitude,
+                template (value) integer p_elevation := 0
+            ) := {
+                latitude := p_latitude,
+                longitude := p_longitude,
+                elevation := p_elevation
+            }
+            
+        } // end utPrimitives
+      
+    } // end primitives
+    
+    group denmPduTemplates {
+        
+        /**
+         * @desc    Send template for DENM PDU
+         * @param   p_denm  The DEN Message
+         */
+        template (value) DENM m_denmPdu(
+            template (value) DecentralizedEnvironmentalNotificationMessage p_denm
+        ) := {
+            header := m_itsPduHeader,
+            denm := p_denm
+        }
+        
+        /**
+         * @desc    Default receive template for DENM PDU
+         * @param   p_itsPduHeader  The expected ITS PDU header (Default: any)
+         * @param   p_denm          The expected DEN Message (Default: any)
+         */
+        template DENM mw_anyDenmPdu(
+            template (present) ItsPduHeader p_itsPduHeader := ?,
+            template (present) DecentralizedEnvironmentalNotificationMessage p_denm := ?
+        ) := {
+            header := p_itsPduHeader,
+            denm := p_denm
+        }
+        
+        /**
+         * @desc    Receive template for DENM PDU
+         * @param   p_denm              The expected DEN Message 
+         * @param   p_stationID         The expected station id (Default: any)
+         * @param   p_protocolVersion   The expected protocol version (Default: current DEN protocol version)
+         * @param   p_messageID         The expected message id (Default: DEN message id)
+         */
+        template (present) DENM mw_denmPdu(
+            template (present) DecentralizedEnvironmentalNotificationMessage p_denm,
+            template (present) StationID p_stationID := ?,
+            template (present) ItsPduHeader.protocolVersion p_protocolVersion := c_protocolVersionDenm,
+            template (present) ItsPduHeader.messageID p_messageID := c_messageIdDenm
+        ) := {
+            header := mw_itsPduHeader(p_stationID, p_protocolVersion, p_messageID),
+            denm := p_denm
+        }
+        
+    } // end denmPduTemplates
+    
+    group headerTemplates {
+        
+        /**
+         * @desc    Default send template for ITS PDU header
+         * @param   p_stationID         The source station ID (Default: test system station id)
+         * @param   p_protocolVersion   The protocol version (Default: current DEN protocol version)
+         * @param   p_messageID         The message Id (Default: DEN message id)
+         */
+        template (value) ItsPduHeader m_itsPduHeader(
+            template (value) StationID p_stationID := f_getTsStationId(),
+            template (value) ItsPduHeader.protocolVersion p_protocolVersion := c_protocolVersionDenm,
+            template (value) ItsPduHeader.messageID p_messageID := c_messageIdDenm
+        ) := {
+            protocolVersion := p_protocolVersion,
+            messageID := p_messageID,
+            stationID := p_stationID
+        }
+        
+        /**
+         * @desc    Default receive template for ITS PDU header
+         * @param   p_stationID         The expected station id (Default: any)
+         * @param   p_protocolVersion   The expected protocol version (Default: current DEN protocol version)
+         * @param   p_messageID         The expected message id (Default: DEN message id)
+         */
+        template ItsPduHeader mw_itsPduHeader(
+            template (present) StationID p_stationID := ?,
+            template (present) ItsPduHeader.protocolVersion p_protocolVersion := c_protocolVersionDenm,
+            template (present) ItsPduHeader.messageID p_messageID := c_messageIdDenm
+        ) := {
+            protocolVersion := p_protocolVersion,
+            messageID := p_messageID,
+            stationID := p_stationID
+        }
+        
+        /**
+         * @desc    Default receive template for the station id
+         */
+        template (present) StationID mw_anyStationId := ?;
+        
+    } // end headerTemplates
+    
+    group timeTemplates {
+        
+        /**
+         * @desc    Receive template for TimestampIts check with delta
+         * @param   p_time The expected timestamp
+         */
+        template TimestampIts mw_timestampIts_withDelta(
+            in template (value) TimestampIts p_time
+        )  := (valueof(p_time)-PX_TIME_DELTA .. valueof(p_time)+PX_TIME_DELTA);
+        
+    } // end timeTemplates
+    
+    group positionTemplates {
+        
+        /**
+         * @desc    Send template for the test system position
+         * @param   p_longitude The longitude (Default: Test system's longitude)
+         * @param   p_latitude  The latitude (Default: Test system's latitude)
+         * @see     m_posConfidenceEllipse
+         * @see     m_elevation
+         */
+        template (value) ReferencePosition m_tsPosition(
+            template (value) Longitude p_longitude := f_getTsLongitude(),
+            template (value) Latitude p_latitude := f_getTsLatitude()
+        ) := {
+			latitude := p_latitude,
+            longitude := p_longitude,
+            positionConfidenceEllipse := m_posConfidenceEllipse,
+            altitude := m_altitude
+        }
+        
+        /**
+         * @desc    Send template for the position confidence
+         * @param   p_semiMajorConfidence   The major confidence (Default: 1cm)
+         * @param   p_semiMinorConfidence   The minor confidence (Default: 1cm)
+         * @param   p_semiMajorOrientation  The major orientation (Default: HeadingValue_wgs84North)
+         */
+        template (value) PosConfidenceEllipse m_posConfidenceEllipse(
+            template (value) SemiAxisLength p_semiMajorConfidence := c_semiAxisLengthOneCentimeter,
+            template (value) SemiAxisLength p_semiMinorConfidence := c_semiAxisLengthOneCentimeter,
+            template (value) HeadingValue p_semiMajorOrientation := HeadingValue_wgs84North
+        ) := {
+            semiMajorConfidence := p_semiMajorConfidence,
+            semiMinorConfidence := p_semiMinorConfidence,
+            semiMajorOrientation := p_semiMajorOrientation
+        }
+        
+        /**
+         * @desc    Send template for altitude
+         * @param   p_altitudeValue        The altitude (Default: Sea level)
+         * @param   p_altitudeConfidence   The confidence of the elevation (Default: within one meter)
+         */
+        template (value) Altitude m_altitude(
+            template (value) AltitudeValue p_altitudeValue := c_altitudeValue_seaLevel,
+            template (value) AltitudeConfidence p_altitudeConfidence := alt_000_01
+        ) := {
+            altitudeValue := p_altitudeValue,
+            altitudeConfidence := p_altitudeConfidence
+        }
+        
+    } // end positionTemplates
+    
+    group decentralizedEnvironmentalNotificationMessageTemplates {
+        
+        /**
+         * @desc    Send template for DEN Message
+         * @param   p_management    The Management Container
+         * @param   p_situation     The Situation Container
+         * @param   p_location      The Location Container
+         * @param   p_alacarte      The Alacarte Container (Default: omit)
+         */
+        template (value) DecentralizedEnvironmentalNotificationMessage m_denm(
+            template (value) ManagementContainer p_management,
+            template (omit) SituationContainer p_situation,
+            template (omit) LocationContainer p_location,
+            template (omit) AlacarteContainer p_alacarte := omit
+        ) := {
+            management := p_management, 
+            situation := p_situation, 
+            location := p_location,
+            alacarte := p_alacarte
+        }
+        
+        /**
+         * @desc    Default receive template for DEN Message
+         */
+        template (present) DecentralizedEnvironmentalNotificationMessage mw_anyDenm := {
+            management := ?, 
+            situation := *, 
+            location := *,
+            alacarte := *
+        }
+        
+        /**
+         * @desc    Receive template for DEN Message
+         * @param   p_management    The expected Management Container (Default: any)
+         * @param   p_situation     The expected Situation Container (Default: any or omit)
+         * @param   p_location      The expected location Container (Default: any or omit)
+         * @param   p_alacarte      The expected Alacarte Container (Default: any or omit)
+         */
+        template (present) DecentralizedEnvironmentalNotificationMessage mw_denm(
+            template (present) ManagementContainer p_management := ?,
+            template SituationContainer p_situation := *,
+            template LocationContainer p_location := *,
+            template AlacarteContainer p_alacarte := *
+        ) modifies mw_anyDenm := {
+            management := p_management, 
+            situation := p_situation, 
+            location := p_location,
+            alacarte := p_alacarte
+        }
+        
+        /**
+         * @desc    Send template for DEN Message for event termination.
+         * @param   p_actionID  The action id
+         */
+        template (value) DecentralizedEnvironmentalNotificationMessage m_denmCancellation(
+            template (value) ActionID p_actionID,
+            template (value) StationType p_stationType
+        ) := {
+            management := m_denmMgmtConTermination(p_actionID, p_stationType, 1, -, -, -, isCancellation), 
+            situation := omit, 
+            location := omit,
+            alacarte := omit
+        }
+        
+    } // end group decentralizedEnvironmentalNotificationMessageTemplates
+    
+    group decentralizedManagementTemplates {
+        
+        /**
+         * @desc    Send template for Management Container
+         * @param   p_actionID              The action id
+         * @param   p_isNegation            The negation flag (Default: false)
+         * @param   p_validityDuration      The validity duration (Default: omit)
+         * @param   p_transmissionInterval  The transmission interval (Default: omit)
+         * @param   p_detectionTime         The detection time (Default: current time)
+         * @param   p_referenceTime         The reference time (Default: current time)
+         */
+        template (value) ManagementContainer m_denmMgmtCon(
+            template (value) ActionID p_actionID,
+            template (value) StationType p_stationType := f_getTsStationType(),
+            template (value) ValidityDuration p_validityDuration := defaultValidity,
+            template (omit) TransmissionInterval p_transmissionInterval := omit,
+            template (value) TimestampIts p_detectionTime := f_getCurrentTime(),
+            template (value) TimestampIts p_referenceTime := f_getCurrentTime()
+        ) := {
+            actionID := p_actionID,
+            detectionTime := p_detectionTime,
+            referenceTime := p_referenceTime,
+            termination := omit,
+            eventPosition := m_tsPosition,
+            relevanceDistance := lessThan50m,
+            relevanceTrafficDirection := allTrafficDirections,
+            validityDuration := p_validityDuration,
+            transmissionInterval := p_transmissionInterval,
+            stationType := p_stationType
+        }
+        
+        /**
+         * @desc    Send template for Management Container
+         * @param   p_actionID              The action id
+         * @param   p_isNegation            The negation flag (Default: false)
+         * @param   p_isCancellation        The cancellation flag (Default: false)
+         * @param   p_validityDuration      The validity duration (Default: omit)
+         * @param   p_transmissionInterval  The transmission interval (Default: omit)
+         * @param   p_detectionTime         The detection time (Default: current time)
+         * @param   p_referenceTime         The reference time (Default: current time)
+         */
+        template (value) ManagementContainer m_denmMgmtConTermination (
+            template (value) ActionID p_actionID,
+            template (value) StationType p_stationType := f_getTsStationType(),
+            template (value) ValidityDuration p_validityDuration := defaultValidity,
+            template (omit) TransmissionInterval p_transmissionInterval := omit,            
+            template (value) TimestampIts p_detectionTime := f_getCurrentTime(),
+            template (value) TimestampIts p_referenceTime := f_getCurrentTime(),
+            template (value) Termination p_termination
+        ) modifies m_denmMgmtCon := {
+            termination := p_termination
+        }
+        
+        /**
+         * @desc    Send template for Management Container
+         * @param   p_actionID              The action id
+         * @param   p_isNegation            The negation flag (Default: false)
+         * @param   p_isCancellation        The cancellation flag (Default: false)
+         * @param   p_validityDuration      The validity duration (Default: omit)
+         * @param   p_transmissionInterval  The transmission interval (Default: omit)
+         * @param   p_detectionTime         The detection time (Default: current time)
+         * @param   p_referenceTime         The reference time (Default: current time)
+         */
+        template (present) ManagementContainer mw_denmMgmtConTermination (
+            template (present) ActionID p_actionID,
+            template (present) StationType p_stationType := f_getIutStationType(),
+            template (present) TimestampIts p_referenceTime := ?,
+            template ValidityDuration p_validityDuration := *, // In ASN.1, a DEFAULT value constraint could be replaced by an omit
+            template TransmissionInterval p_transmissionInterval := *,
+            template Termination p_termination := *
+        ) modifies mw_denmMgmtCon := {
+            termination := p_termination
+        }
+        
+        /**
+         * @desc    Receive template for Management Container
+         * @param   p_actionID              The expected action id
+         * @param   p_referenceTime         The reference time (Default: any)
+         * @param   p_isNegation            The expected negation flag (Default: false)
+         * @param   p_validityDuration      The expected validity duration (Default: any or omit)
+         * @param   p_transmissionInterval  The expected transmission interval (Default: any or omit)
+         */
+        template (present) ManagementContainer mw_denmMgmtCon(
+            template (present) ActionID p_actionID,
+            template (present) StationType p_stationType := f_getIutStationType(),
+            template (present) TimestampIts p_referenceTime := ?,
+            template ValidityDuration p_validityDuration := *, // In ASN.1, a DEFAULT value constraint could be replaced by an omit
+            template TransmissionInterval p_transmissionInterval := *,
+            template Termination p_termination := *
+        ) := {
+            actionID := p_actionID,
+            detectionTime := ?,
+            referenceTime := p_referenceTime,
+            termination    := p_termination,
+            eventPosition := ?,
+            relevanceDistance := *,//?,
+            relevanceTrafficDirection := *,//?,
+            validityDuration := p_validityDuration,
+            transmissionInterval := p_transmissionInterval,
+            stationType    := p_stationType
+        }
+        
+        /**
+         * @desc    Send template for Test system ActionID
+         * @param   p_sequenceNumber    The sequence number (Default: 0)
+         */
+        template (value) ActionID m_tsActionId(
+            template (value) SequenceNumber p_sequenceNumber := 0
+        ) := {
+            originatingStationID := f_getTsStationId(),
+            sequenceNumber := p_sequenceNumber
+        }
+        
+        /**
+         * @desc    Default receive template for Management Container
+         */
+        template (present) ManagementContainer mw_anyDenmMgmtCon := {
+            actionID := ?,
+            detectionTime := ?,
+            referenceTime := ?,
+            termination    := *,
+            eventPosition := ?,
+            relevanceDistance := *,
+            relevanceTrafficDirection := *,
+            validityDuration := *, // It seems that a default value can be omitted (asn1studio)
+            transmissionInterval := *,
+            stationType    := ?
+        }
+        
+        /**
+         * @desc    Receive template for Management Container with the given action id
+         * @param   p_actionId  The expected action id (Default: any)
+         */
+        template (present) ManagementContainer mw_denmMgmtConWithActionID(
+            template (present) ActionID p_actionId := ?
+        ) modifies mw_anyDenmMgmtCon := {
+            actionID := p_actionId
+        }
+        
+        /**
+         * @desc    Receive template for Management Container with the given data version
+         * @param   p_referenceTime   The expected reference time (Default: any)
+         */
+        template (present) ManagementContainer mw_denmMgmtConWithReferenceTime(
+            template (present) TimestampIts p_referenceTime := ?
+        ) modifies mw_anyDenmMgmtCon := {
+            referenceTime := p_referenceTime
+        }
+        
+        /**
+         * @desc    Send template for ActionID
+         * @param   p_sequenceNumber        The sequence number
+         * @param   p_originatorStationID   The originator station id (Default: IUT's station id)
+         */
+        template (value) ActionID m_actionId(
+            template (value) SequenceNumber p_sequenceNumber,
+            template (value) ITS_Container.StationID p_originatorStationID := f_getIutStationId()
+        ) := {
+            originatingStationID := p_originatorStationID,
+            sequenceNumber := p_sequenceNumber
+        }
+        
+        /**
+         * @desc    Receive template for ActionID
+         * @param   p_originatorStationID   The expected originator station id (Default: any)
+         * @param   p_sequenceNumber        The expected sequence number (Default: any)
+         */
+        template (present) ActionID mw_actionId(
+            template (present) ITS_Container.StationID p_originatorStationID := ?,
+            template (present) SequenceNumber p_sequenceNumber := ?
+        ) := {
+            originatingStationID := p_originatorStationID,
+            sequenceNumber := p_sequenceNumber
+        }
+        
+        /**
+         * @desc    Default receive template for any ActionID
+         */
+        template (present) ActionID mw_anyActionId := ?;
+        
+    } // end group decentralizedManagementTemplates
+    
+    group decentralizedSituationTemplates {
+        
+        group situationTemplates {
+            
+            /**
+             * @desc    Send template for Situation Container
+             * @param   p_cause                 The cause code
+             * @param   p_subCause              The sub-cause code
+             * @param   p_informationQuality    The information quality (Default: 0)
+             */
+            template (value) SituationContainer m_situation(
+                template (value) CauseCodeType p_cause, 
+                template (value) SubCauseCodeType p_subCause,
+                template (value) InformationQuality p_informationQuality := 0
+            ) := {
+                informationQuality := p_informationQuality,
+                eventType := {
+                    causeCode := p_cause,
+                    subCauseCode := p_subCause
+                },
+                linkedCause := omit,
+                eventHistory := omit
+            }
+            
+            /**
+             * @desc    Receive template for Situation Container
+             * @param   p_cause                 The expected cause code
+             * @param   p_subCause              The expected sub-cause code
+             * @param   p_informationQuality    The expected information quality (Default: any)
+             */
+            template (present) SituationContainer mw_situation(
+                template (present) CauseCodeType p_cause, 
+                template (present) SubCauseCodeType p_subCause,
+                template (present) InformationQuality p_informationQuality := ?
+            ) := {
+                informationQuality := p_informationQuality,
+                eventType := {
+                    causeCode := p_cause,
+                    subCauseCode := p_subCause
+                },
+                linkedCause := *,
+                eventHistory := *
+            }
+            
+            /**
+             * @desc    Default receive template for Situation Container
+             */
+            template (present) SituationContainer mw_anySitutation := ?;
+            
+        } // end group situationTemplates
+        
+    } // end group decentralizedSituationTemplates
+    
+    group decentralizedLocationTemplates {
+        
+        /**
+         * @desc    Send template for Location Container where no delta is given
+         */
+        template (value) LocationContainer m_denmLocation_zeroDelta := {
+            eventSpeed := omit,
+            eventPositionHeading := omit,
+            traces := {
+                {
+                    {
+                        pathPosition := {
+                            deltaLatitude := 0,
+                            deltaLongitude := 0,
+                            deltaAltitude := 0
+                        },
+                        pathDeltaTime := 0
+                    }
+                }
+            },
+            roadType := omit 
+        }
+        
+        /**
+         * @desc    Default receive template for Location Container
+         */
+        template (present) LocationContainer mw_anyDenmLocation := {
+            eventSpeed := *,
+            eventPositionHeading := *,
+            traces := ?,
+            roadType := *
+        }
+        
+        /**
+         * @desc    Receive template for Location Container with the given traces
+         * @param   p_traces    The expected traces.
+         */
+        template (present) LocationContainer mw_denmLocationWithTrace(
+            template (present) Traces p_traces
+        ) := {
+            eventSpeed := *,
+            eventPositionHeading := *,
+            traces := p_traces,
+            roadType := *
+        }
+        
+    } // end group decentralizedLocationTemplates
+    
+    group alacarteTemplates {
+        
+        /**
+         * @desc    Send template for Alacarte Container including lanePosition
+         */
+        template (value) AlacarteContainer m_alacarteConLaneCount := {
+            lanePosition := 0,
+            impactReduction := omit,
+            externalTemperature := omit,
+            roadWorks := omit,
+            positioningSolution := omit,
+            stationaryVehicle := omit
+        }
+         
+        /**
+         * @desc    Send template for Alacarte Container including impactReduction
+         */
+        template (value) AlacarteContainer m_alacarteConImpactReduction := {
+            lanePosition := omit,
+            impactReduction := m_impactReduction,
+            externalTemperature := omit,
+            roadWorks := omit,
+            positioningSolution := omit,
+            stationaryVehicle := omit
+        }
+        
+        /**
+         * @desc    Send template for ImpactReduction Container
+         */
+        template (value) ImpactReductionContainer m_impactReduction := {
+            heightLonCarrLeft            := 100,
+            heightLonCarrRight            := 100,
+            posLonCarrLeft                := 127,
+            posLonCarrRight             := 127,
+            positionOfPillars             := { 30 },
+            posCentMass                    := 63,
+            wheelBaseVehicle            := 127,
+            turningRadius                := 255,
+            posFrontAx                    := 20,
+            positionOfOccupants            := '00000000000000000000'B,
+            vehicleMass                    := 1024,
+            requestResponseIndication    := request
+        }
+         
+        /**
+         * @desc    Receive template for Alacarte Container including impactReduction
+         */
+        template (present) AlacarteContainer mw_alacarteConImpactReduction := {
+            lanePosition := *,
+            impactReduction := mw_impactReduction,
+            externalTemperature := *,
+            roadWorks := *,
+            positioningSolution := *,
+            stationaryVehicle := *
+        }
+        
+        /**
+         * @desc    Receive template for ImpactReductio nContainer
+         */
+        template (present) ImpactReductionContainer mw_impactReduction := {
+            heightLonCarrLeft            := ?,
+            heightLonCarrRight            := ?,
+            posLonCarrLeft                := ?,
+            posLonCarrRight             := ?,
+            positionOfPillars             := ?,
+            posCentMass                    := ?,
+            wheelBaseVehicle            := ?,
+            turningRadius                := ?,
+            posFrontAx                    := ?,
+            positionOfOccupants            := ?,
+            vehicleMass                    := ?,
+            requestResponseIndication    := response
+        }
+        
+    } // end alacarteTemplates
+    
+} // end LibItsDenmTemplates
+

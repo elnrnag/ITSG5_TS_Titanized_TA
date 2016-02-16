@@ -1,0 +1,130 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2016 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+
+module TRI_interface_Types{
+
+external function TRI_encode(in TRI_mapper_PDU pdu) return octetstring
+with { extension "encode(JSON) prototype(convert)"}
+external function TRI_decode(in octetstring stream,out TRI_mapper_PDU pdu) return integer
+with { extension "decode(JSON) prototype(backtrack)"}
+
+// type definitions
+
+type enumerated Result_value{
+  TRI_ok (0), TRI_error (1)
+}
+
+type record TriComponentIdType{
+  octetstring  componentId,
+  charstring   componentName,
+  charstring   componentTypeName
+}
+
+type record TriPortIdType{
+  charstring   portName,
+  charstring   portTypeName,
+  TriComponentIdType  component_,
+  integer      portindex optional
+}
+
+type record TriAddressType{
+  octetstring  sut_address
+}
+
+
+// container of the data
+type union msg_data_container{
+  octetstring           encoded_data,  // already encoded data
+  Type_Value_container  tv_data        // type and 
+}
+
+type record Type_Value_container {
+  type_info     msg_type,
+  value_info    msg_value
+}
+
+type record of type_info Type_info_list;
+
+// now they are just a placeholder 
+// the octetstring should be changed as soon as we start to implement 
+// the codec interface part
+type octetstring type_info
+type octetstring value_info
+
+// messages
+
+// generic result message
+type record Result{  // Mapper -> TP
+  Result_value   result,           // The result of therequest
+  charstring     result_string optional  // detailed error text
+}
+
+// sent at the start of the port
+// answer: Result
+type record Register{   // TP -> Mapper
+  TriPortIdType    portid,   // own id to register in the TRI mapper
+  Type_info_list   type_list optional  // the list of the in types, 
+                                       // used my the mapper for decoding
+}
+
+
+
+// sent when the port is mapped
+// answer: Result
+type record Map {
+  TriPortIdType    portid  // the id of the system's port
+                           // the own id already sent in the register
+}
+
+// sent when the port is unmapped
+// answer: Result
+type record UnMap{   // TP -> Mapper
+}
+
+// sent when the port is stopped
+// answer: Result
+type record Unregister{   // TP -> Mapper
+}
+
+// sent when the send() called
+// answer: Result
+type record SendMsg{
+  TriAddressType addr optional,
+  msg_data_container    data
+}
+
+// sent when the triEnqueueMsg called in the mapper
+type record EnqueueMsg{ // Mapper -> TP
+  TriAddressType        addr optional,
+  msg_data_container    data
+}
+
+
+// The communication PDU
+// That message is sent on the wire 
+// preceeded by the TPKT header (RFC)
+// encoding: JSON
+type record TRI_mapper_PDU{
+  integer    msg_id,
+  Msg_union  msg
+}
+
+
+type union Msg_union{
+  Result     result,
+  Register   reg,
+  Map        mapped,
+  UnMap      unmapped,
+  Unregister unregister,
+  SendMsg    sendmsg,
+  EnqueueMsg enqueue_msg
+}
+
+} with {
+ encode "JSON"
+}

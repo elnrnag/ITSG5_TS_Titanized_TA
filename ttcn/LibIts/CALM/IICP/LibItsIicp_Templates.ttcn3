@@ -1,0 +1,1762 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/IICP/LibItsIicp_Templates.ttcn3 $
+ *              $Id: LibItsIicp_Templates.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Templates definitions for Inter-ITS-SCU communications (ISO 24102-4)
+ */
+module LibItsIicp_Templates {
+    
+    // LibCommon 
+    import from LibCommon_BasicTypesAndValues { 
+        type 
+            UInt8, UInt16; 
+    }; 
+    
+    // LibIts
+    
+    // LibItsCalm
+    import from CALMiitsscu language "ASN.1:1997" { 
+        type 
+            McmdRs, TestConfigIICP, 
+            IIC_Request, IICrequestTX, IICrequestRX, 
+            IIC_Response, IICresponseTX, IICresponseRX, 
+            PduRequest, PduResponse, 
+            PduCounter, 
+            McmdRq, 
+            SimUt, 
+            ITS_SCUalive, ITS_SCUtype, AliveMessage, 
+            VCI_info_req, VCI_info_res, VCI_update_req, VCI_Info, 
+            PduErrStatus 
+    }; 
+    import from CALMmanagement language "ASN.1:1997" { 
+        type ITS_scuId 
+    }; 
+    // FIXME Why ErrStatus not found?
+    import from CALMllsap language "ASN.1:1997" all;/*{ 
+        type 
+            ErrStatus, 
+            MedType , CIaClass, CIclass, CIstatus 
+    };*/
+    import from CALMmsap language "ASN.1:1997" all; 
+    import from CALMfntp language "ASN.1:1997" { 
+        type PortNumber 
+    }; 
+    import from LibItsIicp_TypesAndValues { 
+        type 
+            UtIicpEvent, UtIicpEventInd  
+    }; 
+    import from LibItsCalm_Pixits { 
+        modulepar 
+            PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_SET, PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+            PX_IUT_LOWER_LAYER_USED, PX_IUT_LOWER_LAYER_UNUSED, 
+            PX_IUT_TEST_MODE_ON 
+    }; 
+    import from LibItsMgt_Templates { 
+        template 
+            mw_mfCommandRequest_any 
+    }; 
+    import from LibItsMgt_Functions { 
+        function 
+            f_getIutSourceItsScuId, f_getIutDestItsScuId, f_getIutOtherItsScuId 
+    };
+    
+    import from LibItsCalm_Interface {
+        type 
+            IicpReq, IicpInd, 
+            UtInitialize, CfInitialize 
+    }; 
+    
+// TODO Yann Continue code review from here
+    /**
+     * @desc ASSN.1 error status definitions
+     */
+    group errorStatusCstes { 
+        
+        const ErrStatus c_errStatus_success := 0; 
+        
+        const ErrStatus c_errStatus_unspecFailure := 1; 
+        
+    } // group errorStatusCstes 
+    
+    group iicpPrimitives {
+    
+        /**
+         * @desc    Send template for Iisc packet (Inter-ITS-SCU communication Primitives)
+         * @param   p_msgOut Inter-ITS-SCU communication packet to send
+         */
+        template (value) IicpReq m_iicpReq( 
+            template (value) IIC_Request p_msgOut
+        ) := {
+            msgOut := {
+                msg_req := p_msgOut 
+            }
+        } // End of template m_iicpReq 
+        
+        /**
+         * @desc    Send template for Iisc packet (Inter-ITS-SCU communication Primitives)
+         * @param   p_msgOut Inter-ITS-SCU communication packet to send
+         */
+        template (value) IicpReq m_iicpResp( 
+            template (value) IIC_Response p_msgOut
+        ) := {
+            msgOut := {
+                msg_resp := p_msgOut 
+            }
+        } // End of template m_iicpResp 
+        
+        /**
+         * @desc    Send template for Iisc packet (Inter-ITS-SCU communication Primitives)
+         * @param   p_msgInOut Inter-ITS-SCU communication packet to send
+         */
+        template (present) IicpInd mw_iicpIndReq( 
+            template (present) IIC_Request p_msgInReq 
+        ) := {
+            msgIn := {
+                msg_req := p_msgInReq 
+            }, 
+            receptionTime := ? 
+        } // End of template mw_iicpIndReq
+    
+        template (present) IicpInd mw_iicpIndResp( 
+            template (present) IIC_Response p_msgInResp 
+        ) := {
+            msgIn := {
+                msg_resp := p_msgInResp 
+            }, 
+            receptionTime := ? 
+        } // End of template mw_iicpIndResp
+    
+        group testIicpConfig {
+        
+            /**
+             * @desc Initializes the IICP IUT including support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) PduRequest m_pduRequest_testIicpConfig := {
+                reqRef := 9,
+                iicpReq := {
+                    McmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_UNUSED, // PX_IUT_LOWER_LAYER_USED
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'McmdRq'
+                } // End of field 'iicpReq'
+            } // End of template m_pduRequest_testIicpConfig
+            
+        } // End of group testIicpConfig
+        
+        group taPrimitives {
+            
+        } // End of group taPrimitives
+        
+        /**
+         * @desc MF-SAP service primitives templates
+         * @see ISO 24102-3 Clause 8.2.2 MF-COMMAND.request
+         */
+        group mfCommandRequest { 
+            
+            group mfCommandRequestSend { 
+                
+                /**
+                 * @desc    Send template for PduRequest/MF-COMMAND.request
+                 * @param   p_mfCommandReq MF-COMMAND.request description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU
+                 */
+                template (value) PduRequest m_pduRequest_mfCommandReq( 
+                    in template (value) MF_Command_request p_mfCommandReq 
+                ) := {
+                    reqRef := 1, 
+                    iicpReq := { MF_Command_request := p_mfCommandReq }
+                } // End of template m_pduRequest_mfCommandReq
+                
+            } // End of group mfCommandRequestSend
+                
+        } // End of group mfCommandRequest
+        
+        /**
+         * @desc MF-SAP service primitives templates
+         * @see ISO 24102-3 Clause 8.2.3 MF-COMMAND.confirm
+         */
+        group mfCommandConfirm { 
+                
+            group mfCommandConfirmRecv { 
+                
+                /**
+                 * @desc    Send template for PduRequest/MF-COMMAND.confirm
+                 * @param   p_mfCommandReq MF-COMMAND.confirm description 
+                 * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU
+                 */
+                template (value) PduResponse mw_pduResponse_mfCommandConfirm( 
+                    in template (value) MF_Command_confirm p_mfCommandConfirm 
+                ) := {
+                    resRef := 1, 
+                    iicpRes := { MF_Command_confirm := p_mfCommandConfirm }
+                } // End of template mw_pduResponse_mfCommandConfirm
+                
+            } // End of group mfCommandConfirmRecv
+                
+        } // End of group mfCommandConfirm
+        
+        /**
+         * @desc MF-SAP service primitives templates
+         * @see ISO 24102-3 Clause 8.3 MF-REQUESTs
+         */
+        group mfRequestRequest {
+             
+            group mfRequestRequestSend {
+                
+                /**
+                 * @desc    Send template for PduRequest/MF-Request.request 
+                 * @param   p_mf_rreq MF-REQUEST.request mesage description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+/*FIXME To be removed                template (value) PduRequest m_pduRequest_mfRequestRequest( 
+                    in template (value) MF_Request_request p_mfReqReq 
+                ) := {
+                    reqRef := 2, 
+                    iicpReq := { MF_Request_request := p_mfReqReq } 
+                } // End of template m_pduRequest_mfRequestRequest
+*/                
+                /**
+                 * @desc    Send template for PduResponse/MF-Request.confirm 
+                 * @param   p_mf_rreq MF-REQUEST.confirm mesage description 
+                 * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                 */
+                template (value) PduResponse m_pduResponse_mfRequestConfirm( 
+                    in template (value) MF_Request_confirm p_mfReqReq 
+                ) := {
+                    resRef := 2, 
+                    iicpRes := { MF_Request_confirm := p_mfReqReq } 
+                } // End of template m_pduResponse_mfRequestConfirm 
+                
+            } // End of group mfRequestRequestSend
+            
+            group mfRequestRequestRecv {
+                
+                /**
+                 * @desc    Receive template for PduRequest/MF-REQUEST.request message 
+                 * @param   p_mfRequestReq MF-REQUEST.request message description
+                 */
+                template (present) PduRequest mw_pduRequest_mfRequestRequest( 
+                    in template (present) MF_Request_request p_mfReqReq 
+                ) := {
+                    reqRef := 2, 
+                    iicpReq := { MF_Request_request := p_mfReqReq } 
+                } // End of template mw_pduRequest_mfRequestRequest
+                
+                /**
+                 * @desc    Receive template for MF-REQUEST.request in case of forwarding the IIC-Request PDU to the IICA
+                 * @param   p_commandRef    Command reference
+                 * @param   p_iICrequestRX  IICrequestRX message description
+                 * @see ISO 24102-4 Clause 8.3.1 IIC-Request PDU
+                 */
+                template (value) MF_Request_request m_mfRequestRequest_iicRequestRx( 
+                    in template (value) CommandRef p_commandRef, 
+                    in template (value) IICrequestRX p_iicRequestRx 
+                ) := { 
+                    commandRef := p_commandRef, 
+                    ref := 12, 
+                    request_param := { IICrequestRX := p_iicRequestRx } 
+                } // End of template m_mfRequestRequest_iicRequestRx 
+                
+            } // End of group mfRequestRequestRecv
+            
+        } // End of group mfRequestRequest
+        
+        /**
+         * @desc MN-SAP service primitives templates
+         * @see ISO 24102-3 Clause 7.2 MN-COMMANDs
+         */
+        group mnCommandRequest { 
+            
+            group mnCommandRequestSend { 
+                
+                /**
+                 * @desc    Receive template for PduRequest/MN-COMMAND.request 
+                 * @param   p_mnCommandReq MN-COMMAND.request description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (value) PduRequest m_pduRequest_mnCommandReq( 
+                    in template (value) MN_Command_request p_mnCommandReq 
+                ) := {
+                    reqRef := 3, 
+                    iicpReq := { MN_Command_request := p_mnCommandReq } 
+                } // End of template m_pduRequest_mnCommandReq
+                
+            } // End of group mnCommandRequestSend
+            
+            group mnCommandRequestRecv { 
+                
+                /**
+                 * @desc    Receive template for PduRequest/MN-COMMAND.request 
+                 * @param   p_mnCommandReq MN-COMMAND.request description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (present) PduRequest mw_pduRequest_mnCommandReq( 
+                    in template (present) MN_Command_request p_mnCommandReq 
+                ) := {
+                    reqRef := 3, 
+                    iicpReq := { MN_Command_request := p_mnCommandReq } 
+                } // End of template mw_pduRequest_mnCommandReq
+                
+            } // End of group mnCommandRequestRecv
+            
+        } // End of group mnCommandRequest
+        
+        /**
+         * @desc MN-SAP service primitives templates
+         * @see ISO 24102-3 Clause 7.3 MN-REQUESTs
+         */
+        group mnRequestRequest {
+             
+            group mnRequestRequestSend {
+                
+                /**
+                 * @desc    Send template for PduRequest/MN-Request.request 
+                 * @param   p_mn_rreq MMN-Request-request mesage description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (value) PduRequest m_pduRequest_mnRequestRequest( 
+                    in template (value) MN_Request_request p_mnReqReq 
+                ) := {
+                    reqRef := 4, 
+                    iicpReq := { MN_Request_request := p_mnReqReq } 
+                } // End of template m_pduRequest_mnRequestRequest 
+                
+            } // End of group mnRequestRequestSend 
+            
+            group mnRequestRequestRecv { 
+                
+            } // End of group mnRequestRequestRecv 
+            
+        } // End of group mnRequestRequest 
+        
+        /**
+         * @desc MI-SAP service primitives templates
+         * @see ISO 24102-3 Clause 6.4 MN-COMMANDs
+         */
+        group miCommandRequest { 
+            
+            group miCommandRequestSend { 
+                
+                /**
+                 * @desc    Send template for PduRequest/MI-COMMAND.request 
+                 * @param   p_miCommandReq MI-COMMAND.request description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (value) PduRequest m_pduRequest_miCommandReq( 
+                    in template (value) MI_Command_request p_miCommandReq 
+                ) := {
+                    reqRef := 5, 
+                    iicpReq := { MI_Command_request := p_miCommandReq } 
+                } // End of template m_pduRequest_miCommandReq
+                
+            } // End of group miCommandRequestSend
+            
+            group miCommandRequestRecv { 
+                
+                /**
+                 * @desc    Receive template for PduRequest/MI-COMMAND.request 
+                 * @param   p_miCommandReq MI-COMMAND.request description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (present) PduRequest mw_pduRequest_miCommandReq( 
+                    in template (present) MI_Command_request p_miCommandReq 
+                ) := {
+                    reqRef := 5, 
+                    iicpReq := { MI_Command_request := p_miCommandReq } 
+                } // End of template mw_pduRequest_miCommandReq
+                
+            } // End of group miCommandRequestRecv
+            
+        } // End of group miCommandRequest
+        
+        /**
+         * @desc MI-SAP service primitives templates
+         * @see ISO 24102-3 Clause 6.2 MI-SETs
+         * @see ISO 24102-3 Clause 6.3 MI-GETs
+         */
+        group miGetSetRequest { 
+            
+            group miGetSetRequestSend { 
+                
+                /**
+                 * @desc    Send template for PduRequest/MI-GET.request 
+                 * @param   p_mi_rget MI-GET.request mesage description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (value) PduRequest m_pduRequest_miGetReq( 
+                    in template (value) MI_Get_request p_miReqGet 
+                ) := {
+                    reqRef := 7, 
+                    iicpReq := { MI_Get_request := p_miReqGet } 
+                } // End of template m_pduRequest_miGetReq
+                
+                /**
+                 * @desc    Send template for PduRequest/MI-SET.request 
+                 * @param   p_mi_rget MI-SET.request mesage description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (value) PduRequest m_pduRequest_miSetReq( 
+                    in template (value) MI_Set_request p_miReqSet 
+                ) := {
+                    reqRef := 8, 
+                    iicpReq := { MI_Set_request := p_miReqSet } 
+                } // End of template m_pduRequest_miSetReq
+                
+            } // End of group miGetSetRequestSend
+            
+        } // End of group miGetSetRequest
+        
+        /**
+         * @desc MI-SAP service primitives templates
+         * @see ISO 24102-3 Clause 6.5 MI-REQUESTs
+         */
+        group miRequestRequest {
+             
+            group miRequestRequestSend {
+                
+                /**
+                 * @desc    Send template for PduRequest/MF-Request.request 
+                 * @param   p_mi_rreq MI-REQUEST.request mesage description 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (value) PduRequest m_pduRequest_miRequestRequest( 
+                    in template (value) MI_Request_request p_miReqReq 
+                ) := {
+                    reqRef := 6, 
+                    iicpReq := { MI_Request_request := p_miReqReq } 
+                } // End of template m_pduRequest_miRequestRequest
+                
+            } // End of group miRequestRequestSend
+            
+            group miRequestRequestRecv {
+                
+            } // End of group miRequestRequestRecv
+            
+        } // End of group miRequestRequest
+        
+        /**
+         * @desc ITS-SCUalive templates
+         * @see ISO 24102-4 Clause 9.2 ITS-SCU-ID assignment 
+         */
+        group aliveMessages {
+            
+            group aliveMessagesSend {
+                
+                /**
+                 * @desc    Send template for IIC-Request PDU ITS-SCUalive message
+                 * @param   p_alive ITS_SCUalive message description
+                 * @see ISO 24102-4 Clause 9.2 ITS-SCU-ID assignment 
+                 */
+                template (value) PduRequest m_pduRequest_scuAlive( 
+                    in template (value) ITS_SCUalive p_alive 
+                ) := {
+                    reqRef := 0, 
+                    iicpReq := { ITS_SCUalive := p_alive } 
+                } // End of template m_pduRequest_scuAlive
+                
+                /**
+                 * @desc    Send template for IIC-Request PDU ITS-SCUalive message
+                 * @param   p_message       The Alive message (new, delete...)
+                 * @param   p_its_scuType   The type of ITS-SCU in the "Data" element
+                 * @see ISO 24102-4 Table 4 — Error handling procedure for IIC-Response PDU
+                 */
+                template (value) ITS_SCUalive m_scuAlive( 
+                    in template (value) AliveMessage p_message,
+                    in template (value) ITS_SCUtype p_itsScuType 
+                ) := {
+                    message_ := p_message,
+                    its_scuType := p_itsScuType
+                } // End of template m_scuAlive_any
+                
+            } // End of group aliveMessagesSend
+            
+            group aliveMessagesRecv {
+                
+                /**
+                 * @desc    Receive template for ITS-SCUalive message
+                 * @param   p_message       The Alive message (new, delete...)
+                 * @param   p_its_scuType   The type of ITS-SCU in the "Data" element
+                 * @see ISO 24102-4 Table 4 — Error handling procedure for IIC-Response PDU
+                 */
+                template ITS_SCUalive mw_scuAlive( 
+                    in template (present) AliveMessage p_message,
+                    in template (present) ITS_SCUtype p_itsScuType 
+                ) := { 
+                    message_ := p_message, 
+                    its_scuType := p_itsScuType 
+                } // End of template mw_scuAlive 
+                
+                /**
+                 * @desc    Receive template for IICrequestTX/SCU-Alive message
+                 * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                 * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                 * @param   p_alive                 The Alive message (new, delete...)
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template IICrequestTX mdw_iicRequestTx_scuAlive( 
+                    in template (present) ITS_scuId p_sourceItsScuId, 
+                    in template (present) ITS_scuId p_destinationItsScuId, 
+                    in template (present) ITS_SCUalive p_alive 
+                ) modifies mw_iicRequestTx_any := {
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduRequest := {
+                        reqRef := 0, 
+                        iicpReq := { ITS_SCUalive := p_alive } 
+                    } // End of 'pduRequest' field 
+                } // End of template mdw_iicRequestTx_scuAlive 
+                
+                /**
+                 * @desc    Receive template for IICrequestRX/SCU-Alive message
+                 * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                 * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                 * @param   p_alive                 The Alive message (alive, new, delete)
+                 * @see ISO 24102-4 Clause 8.3.1 IIC-Request PDU 
+                 * @see ISO 24102-4 Table B.2 — ITS-SCU-id request PDU
+                 */
+                template IICrequestRX mdw_iicRequestRx_scuAlive( 
+                    in template (present) ITS_scuId p_sourceItsScuId, 
+                    in template (present) ITS_scuId p_destinationItsScuId, 
+                    in template (present) ITS_SCUalive p_alive 
+                ) modifies mw_iicRequestTx_any := { // WARNING type IIC_Request == IICrequestTX == IICrequestRX; 
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduRequest := {
+                        reqRef := 0, 
+                        iicpReq := { ITS_SCUalive := p_alive } 
+                    } // End of 'pduRequest' field 
+                } // End of template mdw_iicRequestRx_scuAlive 
+                
+                /**
+                 * @desc    Receive template for IICresponseTX/SCU-Alive message
+                 * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                 * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                 * @param   p_alive                 The Alive message (new, delete...)
+                 * @param   p_errorStatus           Error status
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 * @see ISO 24102-4 Table 4 — Error handling procedure for IIC-Response PDU 
+                 */
+                template IICresponseTX mdw_iicResponseTx_scuAlive( 
+                    in template (present) ITS_scuId p_sourceItsScuId, 
+                    in template (present) ITS_scuId p_destinationItsScuId, 
+                    in template (present) ITS_SCUalive p_alive, 
+                    in template (present) PduErrStatus p_errorStatus
+                ) modifies mw_iicResponseTx_any := { 
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduResponse := { 
+                        resRef := 0, 
+                        iicpRes := { ITS_SCUalive := p_alive } 
+                    }, // End of 'pduResponse' field 
+                    errorStatus := p_errorStatus 
+                } // End of template mdw_iicResponseTx_scuAlive
+                
+            } // End of group aliveMessagesRecv
+            
+        } // End of group aliveMessages
+
+        /**
+         * @desc ITS-SCUalive templates
+         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU
+         * @see ISO 24102-4 Clause B.2.3 VCI-info 
+         */
+        group vciInfoReq { 
+            
+            group vciInfoReqSend { 
+                
+                /**
+                 * @desc    Send template for IIC-Request PDU VCI-info message
+                 * @param   p_vCI_info Request to all ITS-SCUs containing a router, to report about existing VCIs. Information to be stored in VCI list
+                 * @see ISO 24102-4 Clause B.2.3 VCI-info
+                 */
+                template (value) PduRequest m_pduRequest_vciInfoReq( 
+                    in template (value) VCI_info_req p_vciInfo 
+                ) := {
+                    reqRef := 9, 
+                    iicpReq := { 
+                        McmdRq := { 
+                            mCmdRef := 1, 
+                            mcmd := { VCI_info_req := p_vciInfo } 
+                        } 
+                    } 
+                } // End of template m_pduRequest_vciInfoReq
+                
+                /**
+                 * @desc    Send template for VCI-info-req message
+                 * @param   p_medType   Indicates requested type of medium as specified in ISO 21218
+                 * @param   p_iciaClass Indicates requested CI access class as specified in ISO 21218
+                 * @param   p_ciClass   Indicates requested CI class as specified in ISO 21218
+                 * @see ISO 24102-4 Table B.4 — VCI-info request PDU
+                 */
+                template (value) VCI_info_req m_vciInfoReq( 
+                    in template (value) MedType p_medType,
+                    in template (value) CIaClass p_iciaClass, 
+                    in template (value) CIclass p_ciClass 
+                ) := {
+                    medType := p_medType, 
+                    ciaClass := p_iciaClass, 
+                    ciClass := p_ciClass 
+                } // End of template m_vciInfoReq
+                
+            } // End of group vciInfoReqSend
+            
+            group vciInfoReqSendRecv {
+                
+                /**
+                 * @desc    Receive template for IICrequestTX/VCI-info message
+                 * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                 * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                 * @param   p_vCI_info              The VCI-info request
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template IICrequestRX mdw_iicRequestTx_vciInfoReq(
+                    in template (present) ITS_scuId p_sourceItsScuId, 
+                    in template (present) ITS_scuId p_destinationItsScuId, 
+                    in template (present) VCI_info_req p_vciInfo 
+                ) modifies mw_iicRequestTx_any := {
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduRequest := { 
+                        reqRef := 0, 
+                        iicpReq := { 
+                            PduRequest := {
+                                reqRef := 9, 
+                                iicpReq := { 
+                                    McmdRq := { 
+                                        mCmdRef := 1, 
+                                        mcmd := { VCI_info_req := p_vciInfo } 
+                                    } // End of 'McmdRq' field 
+                                } // End of 'iicpReq' field 
+                            } // End of 'PduRequest' field 
+                        } // End of 'iicpReq' field 
+                    } // End of 'pduRequest' field 
+                } // End of template mdw_iicRequestTx_vciInfoReq 
+                
+                /**
+                 * @desc    Receive template for VCI-info-req message
+                 * @param   p_medType   Indicates requested type of medium as specified in ISO 21218
+                 * @param   p_iciaClass Indicates requested CI access class as specified in ISO 21218
+                 * @param   p_ciClass   Indicates requested CI class as specified in ISO 21218
+                 * @see ISO 24102-4 Table B.4 — VCI-info request PDU
+                 */
+                template VCI_info_req mw_vciInfoReq(
+                    in template (present) MedType p_medType,
+                    in template (present) CIaClass p_iciaClass, 
+                    in template (present) CIclass p_ciClass 
+                ) := {
+                    medType := p_medType, 
+                    ciaClass := p_iciaClass, 
+                    ciClass := p_ciClass 
+                } // End of template mw_vciInfoReq
+                
+            } // End of group vciInfoReqSendRecv
+            
+        } // End of group vciInfoReq
+        
+        group vciInfoRes {
+            
+            /**
+             * @desc    Receive template for IICresponse/VCI-info message
+             * @param   p_sourceItsScuId       The source ITS-SCU-ID
+             * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+             * @param   p_vCI_info              The VCI-info request
+             * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+             */
+            template IIC_Response mw_iicpResponse_vciInfoRes(
+                in template (present) ITS_scuId p_sourceItsScuId, 
+                in template (present) ITS_scuId p_destinationItsScuId, 
+                in template (present) VCI_info_res p_vciInfo 
+            ) modifies mdw_iicpResponse_success := {
+                sourceITS_scuId := p_sourceItsScuId, 
+                destinationITS_scuId := p_destinationItsScuId, 
+                pduResponse := { 
+                    resRef := 9, 
+                    iicpRes := { 
+                        McmdRs := { 
+                            mCmdRef := 1, 
+                            mcmd := { VCI_info_res := p_vciInfo } 
+                        } // End of 'McmdRq' field 
+                    } // End of 'iicpRes' field 
+                } // End of 'pduResponse' field 
+            } // End of template mdw_iicRequestTx_vciInfoReq 
+            
+            template (value) McmdRs m_mcmdRs_vciInfoRes(in template (value) VCI_info_res p_vciInfoRes) := { 
+                mCmdRef := 1, 
+                mcmd := { VCI_info_res := p_vciInfoRes } 
+            } // End of template m_mcmdRs_vciInfoRes
+        
+            template (value) VCI_info_res m_vciInfoRes(in template (value) VCI_Info p_vciInfo) := {
+                p_vciInfo
+            } // End of template m_pduRequest_vciInfoReq
+            
+        } // End of group vciInfoRes
+        
+        group vciInfo {
+            
+            group vciInfoSend {
+                
+                /**
+                 * @desc    Send template for VCI-Info message
+                 * @param   p_linkId    Link identifier of the CI
+                 * @param   p_medType   Indicates requested type of medium as specified in ISO 21218
+                 * @param   p_iciaClass Indicates requested CI access class as specified in ISO 21218
+                 * @param   p_ciClass   Indicates requested CI class as specified in ISO 21218
+                 * @param   p_status    Status of the CI
+                 * @see ISO 24102-4 Table B.6 — VCI-update request PDU 
+                 */
+                template (value) VCI_Info m_vciInfo( 
+                    in template (value) Link_ID p_linkId, 
+                    in template (value) MedType p_medType,
+                    in template (value) CIaClass p_iciaClass, 
+                    in template (value) CIclass p_ciClass, 
+                    in template (value) CIstatus p_status
+                ) := {
+                    linkId := p_linkId, 
+                    medType := p_medType, 
+                    ciaClass := p_iciaClass, 
+                    ciClass := p_ciClass, 
+                    status := p_status 
+                } // End of template m_vciInfo
+                
+            } // End of group vciInfoSend
+            
+            group vciInfoRecv {
+                
+                /**
+                 * @desc    Receive template for VCI-info-res message
+                 * @param   p_linkId    Link identifier of the CI
+                 * @param   p_medType   Indicates requested type of medium as specified in ISO 21218
+                 * @param   p_iciaClass Indicates requested CI access class as specified in ISO 21218
+                 * @param   p_ciClass   Indicates requested CI class as specified in ISO 21218
+                 * @param   p_status    Status of the CI
+                 */
+                template (present) VCI_Info mw_vciInfo(
+                    in template (present) Link_ID p_linkId, 
+                    in template (present) MedType p_medType,
+                    in template (present) CIaClass p_iciaClass, 
+                    in template (present) CIclass p_ciClass, 
+                    in template (present) CIstatus p_status
+                ) := {
+                    linkId := p_linkId, 
+                    medType := p_medType, 
+                    ciaClass := p_iciaClass, 
+                    ciClass := p_ciClass, 
+                    status := p_status 
+                } // End of template mw_vciInfo
+                
+            } // End of group vciInfoRecv
+            
+        } // End of group vciInfo
+        
+        group vciUpdate {
+            
+            group vciUpdateSend {
+                
+                /**
+                 * @desc    Send template for IIC-Request PDU VCI-update message with an empty update list
+                 *          Used for VCI-update request
+                 * @see ISO 24102-4 Clause B.2.4 VCI-update 
+                 */
+                template (value) PduRequest m_pduRequest_vciUpdateReq_empty := {
+                    reqRef := 9, 
+                    iicpReq := { 
+                        McmdRq := { 
+                            mCmdRef := 2,
+                            mcmd := { VCI_update_req := {  } } 
+                        } // End of 'McmdRq' field 
+                    } // End of 'iicpReq' field 
+                } // End of template m_pduRequest_vciUpdateReq_empty
+                
+                /**
+                 * @desc    Send template for IIC-Request PDU VCI-update message
+                 * @param   p_vCI_update VCI-update message description
+                 * @see ISO 24102-4 Clause B.2.4 VCI-update 
+                 */
+                template (value) PduRequest m_pduRequest_vciUpdateReq( 
+                    in template (value) VCI_Info p_vciInfo 
+                ) modifies m_pduRequest_vciUpdateReq_empty := {
+                    iicpReq := { 
+                        McmdRq := { 
+                            mcmd := { VCI_update_req := { p_vciInfo } } 
+                        } // End of 'McmdRq' field 
+                    } // End of 'iicpReq' field 
+                } // End of template m_pduRequest_vciUpdateReq
+                
+            } // End of group vciUpdateSend
+            
+            group vciUpdateRecv {
+                
+                /**
+                 * @desc    Receive template for IICrequestTX/SCU-Alive message
+                 * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                 * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                 * @param   p_vciUpdate             The VCI-update message 
+                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                 */
+                template (present) IICrequestTX mdw_iicRequestTx_vciUpdate( 
+                    in template (present) ITS_scuId p_sourceItsScuId, 
+                    in template (present) ITS_scuId p_destinationItsScuId, 
+                    in template (present) VCI_update_req p_vciUpdate 
+                ) modifies mw_iicRequestTx_any := {
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduRequest := { 
+                        reqRef := 0, 
+                        iicpReq := { 
+                            PduRequest := {
+                                reqRef := 9, 
+                                iicpReq := { 
+                                    McmdRq := { 
+                                        mCmdRef := 2, 
+                                        mcmd := { VCI_update_req := p_vciUpdate } 
+                                    } // End of 'McmdRq' field 
+                                } // End of 'iicpReq' field 
+                            } // End of 'PduRequest' field 
+                        } // End of 'iicpReq' field 
+                    } // End of 'pduRequest' field 
+                } // End of template mdw_iicRequestTx_vciUpdate 
+                
+            } // End of group vciUpdateRecv
+            
+        } // End of group vciUpdate
+        
+        group iicpTemplates {
+            
+            group iicpTemplatesSend {
+                
+                template (value) IIC_Request m_iicRequest( 
+                    in template (value) ITS_scuId p_sourceItsScuId, 
+                    in template (value) ITS_scuId p_destinationItsScuId, 
+                    in template (value) PduCounter p_pduCounter, 
+                    in template (value) PduRequest p_pduRequest 
+                ) := { 
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduCounter := p_pduCounter, 
+                    requestID := 0,
+                    pduRequest := p_pduRequest, 
+                    secRq := {
+                        secRqRef := 0,
+                        secRq := { NullType := NULL } // No security
+                    } // End of field 'secRq' 
+                } // End of template m_iicRequest
+                
+                template (value) IIC_Response m_iicResponse( 
+                    in template (value) ITS_scuId p_sourceItsScuId, 
+                    in template (value) ITS_scuId p_destinationItsScuId, 
+                    in template (value) PduCounter p_pduCounter, 
+                    in template (value) PduResponse p_pduResponse 
+                ) := { 
+                    sourceITS_scuId := p_sourceItsScuId, 
+                    destinationITS_scuId := p_destinationItsScuId, 
+                    pduCounter := p_pduCounter, 
+                    responseID := 1,
+                    pduResponse := p_pduResponse, 
+                    secRs := {
+                        secRsRef := 0,
+                        secRs := { NullType := NULL } // No security
+                    } // End of field 'secRq' 
+                } // End of template m_iicResponse
+                
+            } // End of group iicpTemplatesSend
+            
+            group iicpTemplatesRecv {
+                
+                /**
+                 * @desc Unspecified receive template
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 * 
+                 * @see ISO 24102-4 Clause 7
+                 * 
+                 * Note that all fields are mandatory
+                 */
+                template IIC_Request mw_iicpRequest_any := { 
+                    sourceITS_scuId := ?,
+                    destinationITS_scuId := ?,
+                    pduCounter := ?,
+                    requestID := 0,
+                    pduRequest := { 
+                        reqRef := ?, 
+                        iicpReq := ? 
+                    }, // End of field 'pduRequest' 
+                    secRq := {
+                        secRqRef := 0,  // No security
+                        secRq := ?
+                    } // End of field 'secRq' 
+                } // End of template mw_iicpRequest_any
+                
+                template (present) IIC_Request mdw_iicRequest_notify( 
+                    in template (present) ITS_scuId p_sourceItsScuId, 
+                    in template (present) ITS_scuId p_destinationItsScuId, 
+                    in template (present) PduCounter p_pduCounter, 
+                    in template (present) PduRequest p_pduRequest 
+                ) modifies mw_iicpRequest_any := { 
+                    sourceITS_scuId := p_sourceItsScuId,
+                    destinationITS_scuId := p_destinationItsScuId,
+                    pduCounter := p_pduCounter,
+                    requestID := 0,
+                    pduRequest := p_pduRequest
+                } // End of template mdw_iicRequest_notify
+                
+                /**
+                 * @desc Unspecified receive template
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 * 
+                 * @see ISO 24102-4 Clause 7
+                 * 
+                 * Note that all fields are mandatory
+                 */
+                template IIC_Response mw_iicpResponse_any := {
+                    sourceITS_scuId := ?,
+                    destinationITS_scuId := ?,
+                    pduCounter := ?,
+                    responseID := 1,
+                    pduResponse := { 
+                        resRef := ?, 
+                        iicpRes := ? 
+                    }, // End of field 'pduResponse'
+                    errorStatus := ?,
+                    secRs := ?
+                } // End of template mw_iicpResponse_any
+                
+                /**
+                 * @desc Receive template for success response
+                 */
+                template IIC_Response mdw_iicpResponse_success 
+                modifies mw_iicpResponse_any := {
+                    errorStatus := c_errStatus_success 
+                } // End of template mdw_iicpResponse_success
+                
+                /**
+                 * @desc Unspecified receive template
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 * 
+                 * @see ISO 24102-4 Clause 7
+                 * 
+                 * Note that all fields are mandatory
+                 */
+                template IICresponseTX mw_iicpResponseTx_any := {
+                    sourceITS_scuId := ?,
+                    destinationITS_scuId := ?,
+                    pduCounter := ?,
+                    responseID := 1,
+                    pduResponse := { 
+                        resRef := ?, 
+                        iicpRes := ? 
+                    }, // End of field 'pduResponse'
+                    errorStatus := ?,
+                    secRs := ?
+                } // End of template mw_iicpResponseTx_any
+                
+                /**
+                 * @desc Receive template for success response
+                 */
+                template IICresponseTX mdw_iicpResponseTx_success 
+                modifies mw_iicpResponseTx_any := {
+                    errorStatus := c_errStatus_success 
+                } // End of template mdw_iicpResponseTx_success
+                
+            } // End of group iicpTemplatesRecv
+            
+            group remoteCommands {
+                
+                /**
+                 * @desc Unspecified receive template for IICRequestRx service primitive
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 */
+                template IICresponseRX mw_iicResponseRx_any := { 
+                    sourceITS_scuId := ?, 
+                    destinationITS_scuId := ?, 
+                    pduCounter := ?, 
+                    responseID := 1,
+                    pduResponse := { 
+                        resRef := ?, 
+                        iicpRes := ? 
+                    }, // End of field 'pduResponse'
+                    errorStatus := ?,
+                    secRs := {
+                        secRsRef := 0,
+                        secRs := ?
+                    } // End of field 'secRs'
+                } // End of template mw_iicResponseRx_any 
+                
+                /**
+                 * @desc Unspecified receive template for IICRequestTx service primitive
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 */
+                template IICrequestTX mw_iicRequestTx_any := { 
+                    sourceITS_scuId := ?, 
+                    destinationITS_scuId := ?, 
+                    pduCounter := ?, 
+                    requestID := 0, 
+                    pduRequest := { 
+                        reqRef := ?, 
+                        iicpReq := ? 
+                    }, // End of field 'pduRequest'
+                    secRq := {
+                        secRqRef := 0,
+                        secRq := ?
+                    } // End of field 'secRq'
+                } // End of template mw_iicRequestTx_any 
+                
+                /**
+                 * @desc Unspecified receive template for IICResponseTx service primitive
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 */
+                template IICresponseTX mw_iicResponseTx_any := { 
+                    sourceITS_scuId := ?, 
+                    destinationITS_scuId := ?, 
+                    pduCounter := ?, 
+                    responseID := 1,
+                    pduResponse := { 
+                        resRef := ?, 
+                        iicpRes := ? 
+                    }, // End of field 'pduResponse'
+                    errorStatus := ?,
+                    secRs := {
+                        secRsRef := 0,
+                        secRs := ?
+                    } // End of field 'secRs'
+                } // End of template mw_iicResponseTx_any
+                
+                group miCommandsRecv {
+                    
+                    /**
+                     * @desc    Receive template for IICrequestTX/remote command message
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The other ITS-SCU-ID
+                     * @param   p_mi_rcmd               The MI-COMMAND.request message
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICrequestTX mdw_iicRequestTx_miCommandRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Command_request p_miReqCmd 
+                    ) modifies mw_iicRequestTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduRequest := { 
+                            reqRef := 5, 
+                            iicpReq := { MI_Command_request := p_miReqCmd } 
+                        } // End of 'pduRequest' field 
+                    } // End of template mdw_iicRequestTx_miCommandRequest 
+                    
+                    /**
+                     * @desc    Receive template for IICresponseTX message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_mi_rcmd               The MI-COMMAND.confirm message
+                     * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                     */
+                    template IICresponseTX mdw_iicResponseTx_miCommandConfirm( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Command_confirm p_miReqCmd 
+                    ) modifies mw_iicResponseTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 5, 
+                            iicpRes := { MI_Command_confirm := p_miReqCmd } 
+                        }, // End of 'pduRequest' field
+                        errorStatus := c_errStatus_success 
+                    } // End of template mdw_iicResponseTx_miCommandConfirm 
+                    
+                    /**
+                     * @desc    Receive template for IICrequestTX/remote command message
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The other ITS-SCU-ID
+                     * @param   p_mi_rreq               The MI-Request.request message
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICrequestTX mdw_iicRequestTx_miRequestRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Request_request p_miReqReq 
+                    ) modifies mw_iicRequestTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduRequest := { 
+                            reqRef := 6, 
+                            iicpReq := { MI_Request_request := p_miReqReq } 
+                        } // End of 'pduRequest' field 
+                    } // End of template mdw_iicRequestTx_miRequestRequest 
+                    
+                    /**
+                     * @desc    Receive template for IICresponseTX message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_mi_rcmd               The MI-COMMAND.confirm message
+                     * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                     */
+                    template IICresponseTX mdw_iicResponseTx_miRequestRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Request_confirm p_miReqReq
+                    ) modifies mw_iicResponseTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 6, 
+                            iicpRes := { MI_Request_confirm := p_miReqReq } 
+                        }, // End of 'pduResponse' field
+                        errorStatus := c_errStatus_success 
+                    } // End of template mdw_iicResponseTx_miRequestRequest 
+                    
+                } // End of group miCommands
+                
+                group miGetSet {
+                    
+                    /**
+                     * @desc    Receive template for IICrequestTX/remote command message
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The other ITS-SCU-ID
+                     * @param   p_miReqGet             The MI-GET.request message
+                     * @see ISO 24102-3 Clause 6.3.1 MI-GET.request
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICrequestTX mdw_iicRequestTx_miGetRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Get_request p_miReqGet 
+                    ) modifies mw_iicRequestTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduRequest := { 
+                            reqRef := 7, 
+                            iicpReq := { MI_Get_request := p_miReqGet } 
+                        } // End of 'pduRequest' field 
+                    } // End of template mdw_iicRequestTx_miGetRequest 
+                    
+                    /**
+                     * @desc    Receive template for IICresponseTX message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_miReqGet             The MI-GET.confirm message
+                     * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                     */
+                    template IICresponseTX mdw_iicResponseTx_miGetRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Get_confirm p_miReqGet 
+                    ) modifies mw_iicResponseTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 7, 
+                            iicpRes := { MI_Get_confirm := p_miReqGet } 
+                        }, // End of 'pduResponse' field
+                        errorStatus := c_errStatus_success 
+                    } // End of template mdw_iicResponseTx_miGetRequest 
+                    
+                    /**
+                     * @desc    Receive template for IICrequestTX/remote command message
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The other ITS-SCU-ID
+                     * @param   p_miReqSet             The MI-SET.request message
+                     * @see ISO 24102-3 Clause 6.2.1 MI-SET.request
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICrequestTX mdw_iicRequestTx_miSetRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Set_request p_miReqSet 
+                    ) modifies mw_iicRequestTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduRequest := { 
+                            reqRef := 8, 
+                            iicpReq := { MI_Set_request := p_miReqSet } 
+                        } // End of 'pduRequest' field 
+                    } // End of template mdw_iicRequestTx_miSetRequest 
+                    
+                    /**
+                     * @desc    Receive template for IICresponseTX message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_miReqSet             The MI-GET.confirm message
+                     * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                     */
+                    template IICresponseTX mdw_iicResponseTx_miSetRequest( 
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Set_confirm p_miReqSet 
+                    ) modifies mw_iicResponseTx_any := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 8, 
+                            iicpRes := { MI_Set_confirm := p_miReqSet } 
+                        }, // End of 'pduResponse' field
+                        errorStatus := c_errStatus_success 
+                    } // End of template mdw_iicResponseTx_miSetRequest 
+                    
+                    /**
+                     * @desc    Receive template for IICresponse message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_miCommandConfirm     The MI_Command_confirm expected template
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICresponseTX mdw_iicpResponseTx_miCommandConfirm(
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Command_confirm p_miCommandConfirm 
+                    ) modifies mdw_iicpResponseTx_success := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 5, 
+                            iicpRes := { MI_Command_confirm := p_miCommandConfirm } 
+                        } // End of 'pduResponse' field 
+                    } // End of template mdw_iicpResponseTx_miCommandConfirm 
+                    
+                    /**
+                     * @desc    Receive template for IICresponse message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_miGetConfirm     The MI_Get_confirm expected template
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICresponseTX mdw_iicpResponseTx_miGetConfirm(
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Get_confirm p_miGetConfirm 
+                    ) modifies mdw_iicpResponseTx_success := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 7, 
+                            iicpRes := { MI_Get_confirm := p_miGetConfirm } 
+                        } // End of 'pduResponse' field 
+                    } // End of template mdw_iicpResponseTx_miGetConfirm 
+                    
+                    /**
+                     * @desc    Receive template for IICresponse message with success status
+                     * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                     * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                     * @param   p_miSetConfirm     The MI_Set_confirm expected template
+                     * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                     */
+                    template IICresponseTX mdw_iicpResponseTx_miSetConfirm(
+                        in template (present) ITS_scuId p_sourceItsScuId, 
+                        in template (present) ITS_scuId p_destinationItsScuId, 
+                        in template (present) MI_Set_confirm p_miSetConfirm 
+                    ) modifies mdw_iicpResponseTx_success := {
+                        sourceITS_scuId := p_sourceItsScuId, 
+                        destinationITS_scuId := p_destinationItsScuId, 
+                        pduResponse := { 
+                            resRef := 8, 
+                            iicpRes := { MI_Set_confirm := p_miSetConfirm } 
+                        } // End of 'pduResponse' field 
+                    } // End of template mdw_iicpResponseTx_miSetConfirm 
+                    
+                } // End of group miCommandsRecv
+                
+                group mnCommands {
+                    
+                    group mnCommandsSend { 
+                        
+                        /**
+                         * @desc TODO
+                         */
+                        template (value) IICrequestTX m_iicRequestTx_mnRequestRequest( 
+                            in template (value) ITS_scuId p_sourceItsScuId, 
+                            in template (value) ITS_scuId p_destinationItsScuId, 
+                            in template (value) PduCounter p_pduCounter, 
+                            in template (value) MN_Request_request p_mnReqReq 
+                        ) := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduCounter := p_pduCounter,
+                            requestID := 0,
+                            pduRequest := { 
+                                reqRef := 4, 
+                                iicpReq := { MN_Request_request := p_mnReqReq } 
+                            }, // End of 'pduRequest' field
+                            secRq := {
+                                secRqRef := 0,
+                                secRq := { NullType := NULL } // No security
+                            }
+                        } // End of template m_iicRequestTx_mnRequestRequest 
+                        
+                    } // End of group mnCommandsSend 
+                    
+                    group mnCommandsRecv { 
+                        
+                        /**
+                         * @desc    Receive template for IICrequestTX/remote command message
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The other ITS-SCU-ID
+                         * @param   p_mnCmdReq             The MN-COMMAND.request message
+                         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                         */
+                        template IICrequestTX mdw_iicRequestTx_mnCommandRequest( 
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MN_Command_request p_mnCmdReq 
+                        ) modifies mw_iicRequestTx_any := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduRequest := { 
+                                reqRef := 3, 
+                                iicpReq := { MN_Command_request := p_mnCmdReq } 
+                            } // End of 'pduRequest' field 
+                        } // End of template mdw_iicRequestTx_mnCommandRequest 
+                        
+                        /**
+                         * @desc    Receive template for IICrequestTX/remote command message
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The other ITS-SCU-ID
+                         * @param   p_mn_rreq               The MN-Request.request message
+                         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                         */
+                        template IICrequestTX mdw_iicRequestTx_mnRequestRequest( 
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MN_Request_request p_mnReqReq 
+                        ) modifies mw_iicRequestTx_any := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduRequest := { 
+                                reqRef := 4, 
+                                iicpReq := { MN_Request_request := p_mnReqReq } 
+                            } // End of 'PduRequest' field 
+                        } // End of template mdw_iicRequestTx_mnRequestRequest 
+                        
+                        /**
+                         * @desc    Receive template for IICresponseTX message with success status
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                         * @param   p_mnReqConf            The MN_Request_confirm expected template
+                         * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                         */
+                        template IICresponseTX mdw_iicResponseTx_mnRequestRequest( 
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MN_Request_confirm p_mnReqConf 
+                        ) modifies mw_iicResponseTx_any := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduResponse := { 
+                                resRef := 4, 
+                                iicpRes := { MN_Request_confirm := p_mnReqConf } 
+                            }, // End of 'pduResponse' field
+                            errorStatus := c_errStatus_success 
+                        } // End of template mdw_iicResponseTx_mnRequestRequest 
+                        
+                        /**
+                         * @desc    Receive template for IICresponse message with success status
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                         * @param   p_vCI_info              The VCI-info request
+                         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                         */
+                        template IICresponseTX mdw_iicpResponseTx_mnCommandConfirm(
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MN_Command_confirm p_mnCommandConfirm 
+                        ) modifies mdw_iicpResponseTx_success := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduResponse := { 
+                                resRef := 3, 
+                                iicpRes := { MN_Command_confirm := p_mnCommandConfirm } 
+                            } // End of 'pduResponse' field 
+                        } // End of template mdw_iicpResponseTx_mnCommandConfirm 
+                        
+                    } // End of group mnCommandsrecv 
+                    
+                } // End of group mnCommands
+                
+                group mfCommands {
+                    
+                    group mfCommandsSend {
+                        
+                        /**
+                         * @desc    Send template for IICrequestRX/remote message
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                         * @param   p_pduCounter            Even number generated from a cyclic counter at the ITS-SCU, which produces the request  
+                         * @param   p_mf_rcmd               The MF-COMMAND.request message
+                         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                         */
+                        template (value) IICrequestRX m_iicRequestRx_mfCommandRequest( 
+                            in template (value) ITS_scuId p_sourceItsScuId, 
+                            in template (value) ITS_scuId p_destinationItsScuId, 
+                            in template (value) PduCounter p_pduCounter, 
+                            in template (value) MF_Command_request p_mfCmdReq 
+                        ) := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduCounter := p_pduCounter,
+                            requestID := 0,
+                            pduRequest := { 
+                                reqRef := 1, 
+                                iicpReq := { MF_Command_request := p_mfCmdReq } 
+                            }, // End of 'pduRequest' field
+                            secRq := {
+                                secRqRef := 0,
+                                secRq := { NullType := NULL } // No security
+                            }
+                        } // End of template m_iicRequestRx_mfCommandRequest 
+                        
+                        /**
+                         * @desc TODO
+                         */
+                        template (value) IICrequestRX m_iicRequestRx_mfRequestRequest( 
+                            in template (value) ITS_scuId p_sourceItsScuId, 
+                            in template (value) ITS_scuId p_destinationItsScuId, 
+                            in template (value) PduCounter p_pduCounter, 
+                            in template (value) MF_Request_request p_mfReqReq 
+                        ) := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduCounter := p_pduCounter,
+                            requestID := 0,
+                            pduRequest := { 
+                                reqRef := 0, 
+                                iicpReq := { 
+                                    PduRequest := {
+                                        reqRef := 2, 
+                                        iicpReq := { MF_Request_request := p_mfReqReq } 
+                                    } // End of 'PduRequest' field 
+                                } // End of 'iicpReq' field 
+                            }, // End of 'pduRequest' field
+                            secRq := {
+                                secRqRef := 0,
+                                secRq := { NullType := NULL } // No security
+                            }
+                        } // End of template m_iicRequestRx_mfRequestRequest 
+                        
+                    } // End of group mfCommandsSend
+                    
+                    group mfCommandsRecv {
+                        
+                        /**
+                         * @desc    Receive template for IICrequestTX/remote message
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                         * @param   p_mf_rcmd               The MF-COMMAND.request message
+                         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                         */
+                        template (present) IICrequestTX mdw_iicRequestTx_mfCommandRequest( 
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MF_Command_request p_mfCmdReq 
+                        ) modifies mw_iicRequestTx_any := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduRequest := { 
+                                reqRef := 0, 
+                                iicpReq := { 
+                                    PduRequest := {
+                                        reqRef := 1, 
+                                        iicpReq := { MF_Command_request := p_mfCmdReq } 
+                                    } // End of 'PduRequest' field 
+                                } // End of 'iicpReq' field 
+                            } // End of 'pduRequest' field 
+                        } // End of template mdw_iicRequestTx_mfCommandRequest 
+                        
+                        /**
+                         * @desc    Receive template for IICresponseTX message with success status
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                         * @param   p_mf_rcmd               The MF-COMMAND.confirm message
+                         * @see ISO 24102-4 Clause 8.2.2 IIC-Response PDU 
+                         */
+                        template IICresponseTX mdw_iicResponseTx_mfCommandRequest( // FIXME Rename into mdw_iicResponseTx_mfCommandConfirm
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MF_Command_confirm p_mnCmdConf 
+                        ) modifies mw_iicResponseTx_any := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduResponse := { 
+                                resRef := 1, 
+                                iicpRes := { MF_Command_confirm := p_mnCmdConf } 
+                            }, // End of 'pduRequest' field
+                            errorStatus := c_errStatus_success 
+                        } // End of template mdw_iicResponseTx_mfCommandRequest 
+                        
+                        /**
+                         * @desc    Receive template for IICresponse/VCI-info message
+                         * @param   p_sourceItsScuId       The source ITS-SCU-ID
+                         * @param   p_destinationItsScuId  The destination ITS-SCU-ID
+                         * @param   p_vCI_info              The VCI-info request
+                         * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU 
+                         */
+                        template IICresponseTX mdw_iicpResponse_mfCommandConfirm(
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MF_Command_confirm p_mfCommandConfirm 
+                        ) modifies mdw_iicpResponseTx_success := {
+                            sourceITS_scuId := p_sourceItsScuId, 
+                            destinationITS_scuId := p_destinationItsScuId, 
+                            pduResponse := { 
+                                resRef := 1, 
+                                iicpRes := { MF_Command_confirm := p_mfCommandConfirm } 
+                            } // End of 'pduResponse' field 
+                        } // End of template mdw_iicpResponse_mfCommandConfirm 
+                        
+                    } // End of group mfCommandsRecv
+                    
+                } // End of group mfCommands
+                
+                group mfRequest {
+                    
+                    group mfRequestRecv {
+                        
+                        /**
+                         * @desc    Send template for IICrequest/MF_Request_Request
+                         * @param p_sourceItsScuId         ITS-SCU-ID of source ITS-SCU, which produces the request
+                         * @param p_destinationItsScuId    ITS-SCU-ID of destination ITSSCU, which shall evaluate the request.
+                         * @param p_pduCounter              Even number generated from a cyclic counter at the ITS-SCU, which produces the request
+                         * @param pduRequest                Information description
+                         * @see ISO 24102-4 Clause 7 Protocol data units
+                         */
+                        template (present) IICrequestTX mdw_iicRequestTx_mfRequestRequest( 
+                            in template (present) ITS_scuId p_sourceItsScuId, 
+                            in template (present) ITS_scuId p_destinationItsScuId, 
+                            in template (present) MF_Request_request p_mfRequestRequest 
+                        ) modifies mw_iicRequestTx_any := { 
+                            sourceITS_scuId := p_sourceItsScuId,
+                            destinationITS_scuId := p_destinationItsScuId,
+                            pduRequest := {
+                                reqRef := 2,
+                                iicpReq := {
+                                    MF_Request_request := p_mfRequestRequest
+                                }
+                            }
+                        } // End of template mdw_iicRequestTx_mfRequestRequest 
+                        
+                    } // End of group mfRequestRecv
+                    
+                } // End of group mfRequest 
+                
+            } // End of group remoteCommands
+            
+        } // End of group iicpTemplates
+        
+        /**
+         * @desc Templates used to 
+         * <li>trigger message on Upper Tester</li>
+         * <li>capture indication message sent by the IUT</li>
+         */
+        group utPrimitives {
+        
+            /**
+             * @desc Initializes the FNTP IUT including support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) UtInitialize m_utIicpInitialize_with_management := { 
+                utIicpInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_SET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_USED,
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utIicpInitialize' 
+            } // End of template m_utIicpInitialize_with_management 
+            
+            /**
+             * @desc Initializes the FNTP IUT without support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) UtInitialize m_utIicpInitialize_without_management := { 
+                utIicpInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_UNUSED, 
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utIicpInitialize' 
+            } // End of template m_utIicpInitialize_without_management 
+            
+            /**
+             * @desc    Send template for UtIicpEvent
+             * @param   p_mcmdRs McmdRs message
+             */
+            template (value) UtIicpEvent m_utIicpEvent_McmdRs( 
+                in template (value) McmdRs p_mcmdRs 
+            ) := { 
+                mcmdRs := p_mcmdRs
+            } // End of template m_utIicpEvent_McmdRs 
+            
+            /**
+             * @desc    Send template for UtIicpEvent
+             * @param   p_mf_Command_confirm MF_Command_confirm message
+             */
+            template (value) UtIicpEvent m_utIicpEvent_MfCommandConfirm( 
+                in template (value) MF_Command_confirm p_mf_Command_confirm 
+            ) := { 
+                mf_Command_confirm := p_mf_Command_confirm
+            } // End of template m_utIicpEvent_MfCommandConfirm 
+            
+            /**
+             * @desc    Send template for UtIicpEvent
+             * @param   p_mn_Command_confirm  MN_Command_confirm message
+             */
+            template (value) UtIicpEvent m_utIicpEvent_MnCommandConfirm( 
+                in template (value) MN_Command_confirm p_mn_Command_confirm 
+            ) := { 
+                mn_Command_confirm := p_mn_Command_confirm
+            } // End of template m_utIicpEvent_MnCommandConfirm 
+            
+            /**
+             * @desc    Send template for UtIicpEvent
+             * @param   p_mi_Command_confirm MI_Command_confirm message
+             */
+            template (value) UtIicpEvent m_utIicpEvent_MiCommandConfirm( 
+                in template (value) MI_Command_confirm p_mi_Command_confirm 
+            ) := { 
+                mi_Command_confirm := p_mi_Command_confirm
+            } // End of template m_utIicpEvent_MiCommandConfirm 
+            
+            /**
+             * @desc    Send template for UtIicpEvent
+             * @param   p_mi_Get_confirm MI_Get_confirm message
+             */
+            template (value) UtIicpEvent m_utIicpEvent_MiGetConfirm( 
+                in template (value) MI_Get_confirm p_mi_Get_confirm 
+            ) := { 
+                mi_Get_confirm := p_mi_Get_confirm
+            } // End of template m_utIicpEvent_MiGetConfirm 
+            
+            /**
+             * @desc    Send template for UtIicpEvent
+             * @param   p_mi_Set_confirm MI_Set_confirm message
+             */
+            template (value) UtIicpEvent m_utIicpEvent_MiSetConfirm( 
+                in template (value) MI_Set_confirm p_mi_Set_confirm 
+            ) := { 
+                mi_Set_confirm := p_mi_Set_confirm
+            } // End of template m_utIicpEvent_MiSetConfirm 
+            
+            /**
+             * @desc    Receive template for UtIicpEventInd
+             */
+            template (present) UtIicpEventInd mw_utIicpEventInd_McmdRq( 
+                in template (present) McmdRq p_mcmdRq 
+            ) := { 
+                mcmdRq := p_mcmdRq
+            } // End of template mw_utIicpEventInd_McmdRq 
+            
+            /**
+             * @desc    Receive template for UtIicpEventInd
+             */
+            template (present) UtIicpEventInd mw_utIicpEventInd_MfCommandRequest( 
+                in template (present) MF_Command_request p_mf_Command_request 
+            ) := { 
+                mf_Command_request := p_mf_Command_request
+            } // End of template mw_utIicpEventInd_MfCommandRequest 
+            
+            /**
+             * @desc    Receive template for UtIicpEventInd
+             */
+            template (present) UtIicpEventInd mw_utIicpEventInd_MnCommandRequest( 
+                in template (present) MN_Command_request p_mn_Command_request 
+            ) := { 
+                mn_Command_request := p_mn_Command_request
+            } // End of template mw_utIicpEventInd_MnCommandRequest 
+            
+            /**
+             * @desc    Receive template for UtIicpEventInd
+             */
+            template (present) UtIicpEventInd mw_utIicpEventInd_MiCommandRequest( 
+                in template (present) MI_Command_request p_mi_Command_request 
+            ) := { 
+                mi_Command_request := p_mi_Command_request
+            } // End of template mw_utIicpEventInd_MiCommandRequest 
+            
+            /**
+             * @desc    Receive template for UtIicpEventInd
+             */
+            template (present) UtIicpEventInd mw_utIicpEventInd_MiGetRequest( 
+                in template (present) MI_Get_request p_mi_Get_request 
+            ) := { 
+                mi_Get_request := p_mi_Get_request
+            } // End of template mw_utIicpEventInd_MiGetRequest 
+            
+            /**
+             * @desc    Receive template for UtIicpEventInd
+             */
+            template (present) UtIicpEventInd mw_utIicpEventInd_MiSetRequest( 
+                in template (present) MI_Set_request p_mi_Set_request 
+            ) := { 
+                mi_Set_request := p_mi_Set_request
+            } // End of template mw_utIicpEventInd_MiSetRequest 
+            
+            group simUtInPrimitives { // TODO To be removed
+                
+                template (value) PduRequest m_iicpSimUtReq( 
+                    in template (value) SimUt p_simUtIn 
+                ) := { 
+                } // End of template m_iicpSimUtReqt
+                
+                /**
+                 * @desc    Send template for IIC-Request SimUtIn message
+                 * @param   p_simUtIn SimUtIn message
+                 */
+                template (value) SimUt m_simUtIn_vciInfo( 
+                    in template (value) VCI_info_req p_vciInfo 
+                ) := {
+                    fill := '000'B, 
+                    action_ := { 
+                        mcmdTrigger := { 
+                            mCmdRef := 1, 
+                            mcmd := { VCI_info_req := p_vciInfo } 
+                        } // End of field 'mcmdTrigger'
+                    } // End of field 'action' 
+                } // End of template m_simUtIn_vciInfo
+                
+            } // End of group simUtInPrimitives
+            
+            group simUtOutPrimitives {
+                /**
+                 * @desc    Send template for IIC-Request SimUtOut message
+                 * @param   p_simUtOut SimUtOut message
+                 */
+                template (present) PduRequest m_pduRequest_simUtOut( 
+                    in template (present) SimUt p_simUtOut 
+                ) := {
+                    reqRef := 241, 
+                    iicpReq := { 
+                        SimUt := p_simUtOut
+                    } 
+                } // End of template m_pduRequest_simUtOut
+                
+            
+            } // End of group simUtInPrimitives
+            
+        } // End of group utPrimitives
+        
+    } // End of group iicpPrimitives
+    
+} // End of module LibItsIicp_Templates

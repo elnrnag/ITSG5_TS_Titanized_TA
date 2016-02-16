@@ -1,0 +1,43 @@
+{
+    "attributes": {
+        "PICS_USE_POLYGONAL_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_POLYGONAL_REGION",
+            "origin": "eda56708-128a-44e0-8d6b-abf9727642b2",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "e2057955-7a09-484a-ae5a-e7f034f29ec8",
+            "type": "STRING",
+            "value": "\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "eda56708-128a-44e0-8d6b-abf9727642b2",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/f727674f-3a77-4e61-877b-e5d2d9f5dc55",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a7eb2f2c-4f29-4ac4-a390-68308a532c8e"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "eda56708-128a-44e0-8d6b-abf9727642b2",
+            "type": "STRING",
+            "value": "08. Check polygonal region of subordinate certificate"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e2057955-7a09-484a-ae5a-e7f034f29ec8",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "eda56708-128a-44e0-8d6b-abf9727642b2"
+}

@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT is able to receive a secured GN Beacon if the signer_info header field is not encoded first.\r\n"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "TODO"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "7af569bc-c4fb-48c0-9fb4-564ba9afaa20"
+}

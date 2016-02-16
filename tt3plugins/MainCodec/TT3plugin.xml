@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE plugin PUBLIC "-//TESTING TECH//DTD TT3plugin//2.0" "TT3plugin.dtd"> 
+<plugin id="org.etsi.ttcn.codec.MainCodec" name="Main Codec" provider-name="STF462" version="1.0.0.0">
+  <runtime>
+    <library name="MainCodec.jar"/>
+    <library name="../build"/>
+  </runtime>
+  <dependency>
+    <reference id="org.etsi.ttcn.codec"/>
+    <reference id="org.etsi.its.tool"/>
+  </dependency>
+</plugin>

@@ -1,0 +1,1005 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FSAP/LibItsFsap_Functions.ttcn3 $
+ *              $Id: LibItsFsap_Functions.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Fast service advertisement protocol (ISO 24102-5) functions
+ */
+module LibItsFsap_Functions {
+    
+    // Libcommon
+    import from LibCommon_Sync all;
+    import from LibCommon_Time {
+        function f_sleep, f_sleepIgnoreDef
+    };
+    
+    // LibIts
+    import from CITSapplMgmtApplReg language "ASN.1:1997" {
+        type ITSaid 
+    };
+    import from CALMllsap language "ASN.1:1997" { 
+        type EUI64 
+    }; 
+    import from CALMmanagement language "ASN.1:1997" {
+        type
+            ITS_scuId, StationID, 
+            ApplicationID 
+    };
+    import from CALMiitsscu language "ASN.1:1997" {
+        type 
+            ITS_SCUtype 
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type CommandRef
+    };
+    import from CALMfsap language "ASN.1:1997" {
+        type
+            SAM, 
+            CTX, CTXrxNot, 
+            GCregClient, 
+            GCschedule, ServiceDataReg, ServiceList, 
+            ContextData 
+    };
+    import from CALMfntp language "ASN.1:1997" {
+        type
+            PortNumber  
+    };
+    import from LibItsMgt_Templates all; // FIXME Remove 'all' 
+    import from LibItsMgt_Functions all; // FIXME Remove 'all' 
+    import from LibItsFsap_TypesAndValues all;
+    import from LibItsFsap_Templates all;
+    import from LibItsFsap_Pixits all;
+    import from LibItsFsap_Pics all;
+    import from LibItsIicp_Functions {
+        altstep a_iicpDefault
+    };
+    import from LibItsFntp_Templates { 
+        template 
+            m_llServiceAddr, m_linkId 
+    };
+    import from LibItsFntp_Functions { 
+        function 
+            f_getIutRemoteDestCiidBc, f_getIutRemoteDestCiidUc, f_getIutWlLocalCiid 
+    };
+    import from LibItsCalm_Interface all; // FIXME Remove 'all' 
+    
+    /**
+     * @desc Upper tester functions
+     */
+    group utFunctions {
+        
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_utInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utFsapInitializeIut(template (value) UtInitialize p_utInitialize) runs on ItsCalm {
+        
+            utPort.send(p_utInitialize);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                    log("*** f_utFsapInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utFsapInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utFsapInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+        
+        } // End of function f_utFsapInitializeIut 
+        
+        /**
+         * @desc    Send a FAsapPrimitivesDown primitive and wait for the NFsapPrimitivesUp confirm response
+         * @param   p_utFsapEvent    The FAsapPrimitivesDown request
+         * @param   p_utFsapEventInd The FAsapPrimitivesDown response
+         * @param   p_discard        Set to true if responses shall be discard, otherwise the function failed 
+         * @param   p_result         The response value
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utFsapEventResponse( 
+            in template (value) UtFsapEvent p_utFsapEvent, 
+            in template (present) UtFsapEventInd p_utFsapEventInd, 
+            in boolean p_discard, 
+            out UtFsapEventInd p_result) 
+        runs on ItsCalm {
+            
+//            log("*** f_utFsapEventResponse: INFO: Send message: ", p_commandReq, " ***");
+            utPort.send(p_utFsapEvent);
+//            log("*** f_utFsapEventResponse: INFO: Expected UtCommandConfirm: ", p_commandConf, " ***");
+            tc_wait.start;
+            alt {
+                [] utPort.receive(p_utFsapEventInd) -> value p_result {
+//                    log("*** f_utFsapEventResponse: INFO: Receive expected confirm: message ***");
+                    tc_wait.stop;
+                }
+                [] utPort.receive(UtFsapEventInd:? ) -> value p_result {
+                    if (p_discard == false) { 
+                        tc_wait.stop; 
+                        log("*** f_utFsapEventResponse: ERROR: Event not correctly indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("fail", e_error);
+                    }
+                    else {
+                        log("*** f_utFsapEventResponse: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    }
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) {
+                        log("*** f_utFsapEventResponse: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                    else {
+                        log("*** f_utFsapEventResponse: INFO: Event not indicated at application layer ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                }
+            } // End of 'alt' statement
+            
+        } // End of function f_utFsapEventResponse
+        
+        /**
+         * @desc    Send a FAsapPrimitivesDown primitive and do not wait for the NFsapPrimitivesDown confirm response
+         * @param   p_utFsapEvent    The FAsapPrimitivesDown primitive
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_utFsapEvent( 
+            in template (value) UtFsapEvent p_utFsapEvent 
+        ) runs on ItsCalm { 
+            var UtFsapEventInd v_utFsapEventInd;
+            
+            utPort.send(p_utFsapEvent);
+            tc_noac.start;
+            alt {
+                [] utPort.receive(UtFsapEventInd:?) -> value v_utFsapEventInd { // FIXME Use altstep for UtPort
+                    tc_noac.stop;
+                    log("*** f_utFsapEvent: INFO: Unexpected message was received ***", v_utFsapEventInd);
+                }
+                [] tc_noac.timeout {
+                    log("*** f_utFsapEvent: INFO: FAsapPrimitivesUp succeed ***");
+                }
+            } // End of 'alt' statement 
+
+        } // End of function f_utFsapEvent
+        
+    } // End of group utFunctions
+
+    /**
+     * @desc Config tester functions
+     */
+    group cfFunctions { 
+        
+        /**
+         * @desc    Requests to initialize the configuration tester 
+         * @param   p_cfInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_cfFsapInitialize(template (value) CfInitialize p_cfInitialize) runs on ItsCalm {
+        
+            cfPort.send(p_cfInitialize);
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(CfResult:true) {
+                    tc_wait.stop;
+                    log("*** f_cfFsapInitialize: INFO: Configuration tester initialized ***");
+                }
+                [] cfPort.receive {
+                    tc_wait.stop;
+                    log("*** f_cfFsapInitialize: INFO: Configuration tester could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_cfFsapInitialize: INFO: Configuration tester could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+    
+        } // End of function f_cfFsapInitialize 
+
+        /**
+         * @desc    Await for notification on MF-SAP 
+         * @param   p_cfFsapEventInd    The MF_Request_request notification message.
+         * @param   p_discard           Set to true if responses shall be discard, otherwise the function failed 
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_cfFsapAwaitNotificationToManagement( 
+            in template CfFsapEventInd p_cfFsapEventInd, 
+            in boolean p_discard 
+        ) runs on ItsCalm {
+            var CfFsapEventInd p_result;
+            
+            log("*** f_cfFsapAwaitNotificationToManagement: INFO: Expected event: ", p_cfFsapEventInd, " ***");
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(p_cfFsapEventInd) {
+                    tc_wait.stop;
+                    log("*** f_cfFsapAwaitNotificationToManagement: INFO: Notification event received ***");
+                }
+                [] cfPort.receive(CfFsapEventInd: ?) -> value p_result { 
+                    if (p_discard == false) { 
+                        tc_wait.stop;
+                        log("*** f_cfFsapAwaitNotificationToManagement: ERROR: Another event indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfFsapAwaitNotificationToManagement: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    } 
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) { 
+                        log("*** f_cfFsapAwaitNotificationToManagement: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfFsapAwaitNotificationToManagement: INFO: Event not indicated at application layer ***");
+                    }
+                }
+            } // End of 'alt' statement
+        
+        } // End of function f_cfFsapAwaitNotificationToManagement
+        
+    } // End of group cfFunctions
+    
+    group fsapConfigurationFunctions {
+        
+        /**
+         * @desc This configuration features:
+         * <li>Host and Router are combined (see ISO/WD 29281-2 - Figure 1 - Implementation architecture I)</li>
+         * <li>MGT1 IISC Port (IISC/LAN) is not used</li>
+         */
+        function f_cf01Up() runs on ItsCalm {
+            
+            // Sanity check
+            if (PICS_ITS_S_INW) {
+                log("*** f_cf01Up: ERROR: PICS_ITS_S_INW shall not be required for executing the TC ***");
+                stop;
+            }
+            
+            // Map
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            map(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            map(self:fsapPort, system:fsapPort);
+            
+            // Connect
+            f_connect4SelfOrClientSync(); 
+            
+            // Set processing on shutdown
+            activate(a_cf01Down());
+            
+            // Initialize the component
+            f_initialiseComponent("cf01Up");
+
+            // Initialze the IUT
+            f_initialState();
+            
+        } // End of function f_cf01Up
+        
+        /**
+         * @desc This configuration features:
+         * <li>Host and Router are separated (see ISO/WD 29281-2 - Figure 3 - Implementation architecture II & III)</li>
+         * <li>MGT1 IISC Port (IISC/LAN) is used if specified</li>
+         */
+        function f_cf02Up() runs on ItsCalm {
+            
+            // Sanity check
+            if (not(PICS_ITS_S_INW)) {
+                log("*** f_cf02Up: ERROR: PICS_ITS_S_INW required for executing the TC ***");
+                stop;
+            }
+            
+            vc_commandRef := 0;
+            vc_pduCounter := 0;
+            
+            // Map
+            map(self:utPort, system:utPort);
+            map(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            map(self:fsapPort, system:fsapPort);
+            
+            // Connect
+            f_connect4SelfOrClientSync();
+            
+            // Set processing on shutdown
+            activate(a_cf02Down());
+            
+            // Initialize the component
+            f_initialiseComponent("cf02Up");
+
+            // Initialze the IUT
+            f_initialState();
+            
+        } // End of function f_cf02Up
+        
+        /**
+         * @desc    Deletes configuration cf01
+         */
+        function f_cf01Down() runs on ItsCalm {
+            
+            deactivate;
+            
+            // Unmap
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            unmap(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            unmap(self:fsapPort, system:fsapPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // End of f_cf01Down
+        
+        /**
+         * @desc Deletes configuration cf02
+         */
+        function f_cf02Down() runs on ItsCalm {
+            
+            deactivate;
+            
+            // Unmap
+            unmap(self:utPort, system:utPort);
+            unmap(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            unmap(self:fsapPort, system:fsapPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // End of f_cf02Down
+        
+        /**
+         * @desc    Behavior function for initializing component's variables and tables
+         * @param   p_componentName Name of the component
+         * @param   p_iicpMGM Set to true if IISC port shall be used
+         */
+        function f_initialiseComponent(in charstring p_componentName) runs on ItsMgt {
+            
+            // Initialize variables
+            
+            // Set defaults
+            activate(a_fsapDefault()); 
+            if (p_componentName == "cf02Up") {
+                activate(a_iicpDefault());
+            }
+        } // end f_initialiseComponent
+        
+    } // End of group fsapConfigurationFunctions
+    
+    group preambles {
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         */
+        function f_initialState() runs on ItsCalm {
+            if (PICS_ITS_MGT_NOT == true) {
+                f_utFsapInitializeIut(m_utFsapInitialize_with_management);
+            } else { 
+                f_utFsapInitializeIut(m_utFsapInitialize_without_management);
+            } // FIXME Add suport of PICS_FSAP_FNTP
+            f_cfFsapInitialize(m_cfFsapInitialize);
+            f_sleepIgnoreDef(PX_WAIT_FOR_IUT_READY); // Wait until the IUT is in a stable situation (beaconing...)
+            cfPort.clear; // Because TestConfigIICP should trigger management port deletion message 
+        } // End of function f_initialState
+        
+        /**
+         * @desc    Generte FAsapPrimitivesDown primitive  
+         * @param   p_utFsapEvent The FAsapPrimitivesDown primitive
+         * @verdict Unchanged
+         */
+        function f_fsapGenerateFaPrimitiveWithConfirm( 
+            in template (value) UtFsapEvent p_generateFaSapRequest, 
+            in template (present) UtFsapEventInd p_faSapRequestConfirm, 
+            in boolean p_discard, 
+            out UtFsapEventInd p_result 
+        )  runs on ItsCalm { 
+            
+            f_utFsapEventResponse(
+                p_generateFaSapRequest, 
+                p_faSapRequestConfirm, 
+                p_discard,
+                p_result
+            );
+            
+        } // End of function f_fsapGenerateFaPrimitiveWithConfirm 
+        
+        /**
+         * @desc    Generte FAsapPrimitivesDown primitive  
+         * @param   p_utFsapEvent The FAsapPrimitivesDown primitive
+         * @verdict Unchanged
+         */
+        function f_fsapGenerateFaPrimitiveWithoutConfirm( 
+            in template (value) UtFsapEvent p_utFsapEvent
+        )  runs on ItsCalm { 
+            
+            f_utFsapEvent(p_utFsapEvent);
+            
+        } // End of function f_fsapGenerateFaPrimitiveWithoutConfirm 
+        
+        /**
+         * @desc    Wait for MF_Request_request/CTXrxNot message sent by ITS management entity 
+         * @param   p_ctxRxNot CTXrxNot value
+         * @verdict Unchanged
+         */
+        function f_fsapAwaitCtxRxNot( 
+            in template (present) CTXrxNot p_ctxRxNot
+        )  runs on ItsCalm { 
+        
+            f_cfFsapAwaitNotificationToManagement( 
+                mw_cfFsapEventInd( 
+                    mw_mfRequestRequest_ctx( 
+                        p_ctxRxNot
+                    ) 
+                ), 
+                false 
+            ); 
+            
+        } // End of function f_fsapAwaitCtxRxNot 
+        
+        /**
+         * @desc    Makes the simulated ITS Service Provider for IUT 
+         */
+        function f_startServiceProvider( 
+            in template (value) ServiceList p_serviceList,  
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort 
+        ) runs on ItsCalm {
+            f_acFsapTriggerEvent(
+                AcFsapPrimitive: {
+                    inSapPrimitivesUp := m_generateSamMessagePdu( 
+                        m_llServiceAddr(m_linkId(f_getIutRemoteDestCiidBc(), f_getIutWlLocalCiid())), 
+                        m_llServiceAddr(m_linkId(f_getIutRemoteDestCiidBc(), f_getIutWlLocalCiid())), 
+                            bit2oct( 
+                                encvalue( 
+                                    m_fsapBasicFntpNpdu( 
+                                        p_sourcePort, 
+                                        p_destinationPort, 
+                                        bit2oct( 
+                                            encvalue( 
+                                                m_sam( 
+                                                    f_getIutClientId(), 
+                                                    f_getIutServiceId(), 
+                                                    p_serviceList 
+                                                )
+                                            )
+                                        )
+                                    ) 
+                                )
+                            )
+                        ) // End of field 'm_generateSamMessagePdu'
+                }
+            );
+            f_sleepIgnoreDef(PX_SP_DISCOVERY_DELAY);
+        } // End of function f_startServiceProvider
+
+        /**
+         * @desc    Makes the simulated ITS Service Provider for IUT 
+         */
+        function f_stopServiceProvider() runs on ItsCalm {
+            f_acFsapTriggerEvent(AcFsapPrimitive: { stopTransmission := true });
+            f_sleepIgnoreDef(PX_SP_DISCOVERY_DELAY); 
+        } // End of function f_stopServiceProvider
+        
+    } // End of group preambles
+    
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsCalm {
+            // Nothing to do
+        } // End of function f_poDefault
+        
+    } // End of group postambles
+    
+    group adapterControl {
+        
+        /**
+         * @desc    Triggers event in the test system adaptation.
+         * @param   p_event The event to trigger
+         */
+        function f_acFsapTriggerEvent(
+            in template (value) AcFsapPrimitive p_event 
+        ) runs on ItsCalm {
+//            log("*** f_acFsapTriggerEvent: send: ", p_event, "***");
+            acPort.send(p_event);
+        }
+        
+        /**
+         * @desc    Triggers event in the test system adaptation via NF-SAP interface.
+         * @param   p_event The event to trigger
+         */
+        function f_sendCtx( 
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            template (value) CTX p_ctx
+        ) runs on ItsCalm {
+            if (PICS_FSAP_FNTP == true) {
+                log(
+                    "*** f_sendCtx: Send CTX: ",
+                      p_ctx,
+                    "***");
+                fsapPort.send(
+                    m_fsapReq_inSap( 
+                        m_inSapPrimitivesUp( 
+                            m_llServiceAddr(m_linkId(f_getIutRemoteDestCiidUc(), f_getIutWlLocalCiid())), 
+                            m_llServiceAddr(m_linkId(f_getIutWlLocalCiid(), f_getIutWlLocalCiid())), 
+                            bit2oct( 
+                                encvalue( 
+                                    m_fsapBasicFntpNpdu( 
+                                        p_sourcePort, 
+                                        p_destinationPort, 
+                                        bit2oct( 
+                                            encvalue( 
+                                                p_ctx 
+                                            )
+                                        )
+                                    ) 
+                                )
+                            )
+                        )
+                    )
+                ); 
+            } else {
+                fsapPort.send(
+                    m_fsapReq_nfSap( 
+                        m_nfSapPrimitivesUp( 
+                            p_sourcePort, // FIXME Wrong value I guess 
+                            p_destinationPort, // FIXME Wrong value I guess 
+                            m_linkId(f_getIutWlLocalCiid(), f_getIutWlLocalCiid()), 
+                            bit2oct( 
+                                encvalue( 
+                                    p_ctx 
+                                )
+                            )
+                        )
+                    )
+                ); 
+            }
+        } // End of function f_sendCtx 
+        
+    } // End of group adapterControl
+    
+    group testerFunctions {
+        
+    } // End of group testerFunctions
+    
+    group internalFunctions { // TODO Use parametrized function (ETSI ES 202 784) insetad of the three oct2xxx functions
+        
+        group serviceProvider { 
+            
+            function f_regServer( 
+                in template (value) GCschedule p_gcSchedule, 
+                in template (value) ServiceDataReg p_serviceDataReg
+            ) runs on ItsCalm {
+                f_fsapGenerateFaPrimitiveWithConfirm( 
+                    m_generateFaSapPrimitivesDown( 
+                        m_faSapPrimitivesDown_gcRegServer( 
+                            m_gcRegServer( 
+                                f_getIutApplicationId(), 
+                                p_gcSchedule, 
+                                p_serviceDataReg 
+                            ) 
+                        ) 
+                    ), 
+                    mw_fsapGcRegServerConf(f_getIutApplicationId()), 
+                    true,
+                    vc_utEventInd.utFsapEventInd
+                ); 
+            } // End of function f_regServer 
+            
+            function f_deregServer() runs on ItsCalm {
+                f_fsapGenerateFaPrimitiveWithConfirm(               
+                    m_generateFaSapPrimitivesDown( 
+                        m_faSapPrimitivesDown_gcDeregServer( 
+                            m_gcDeregServer( 
+                                f_getIutApplicationId() 
+                            ) 
+                        ) 
+                    ),
+                    mw_fsapGcDeregServerConf(f_getIutApplicationId()), // Expected GCDeregServerConf 
+                    true, 
+                    vc_utEventInd.utFsapEventInd 
+                ); 
+            } // End of function f_deregServer 
+            
+            /**
+             * @desc  This function convert the specified octetstring into a template (SAM)
+             * This SHALL be done due to the ASN.1 description of IN-SAP service primitives DL_Unitdata_request/DL_Unitdata_indication
+             * @param p_data        An octetstring to decode
+             * @param p_syncPoint   Current synchronisation point, required to set verdict according to the LibCommon rules
+             * @param p_decoded     The decoded message
+             * @verdict Unchanged on success, set to fail otherwise
+             * @see ISO/CD 21218 - Clause 8.2.2
+             */
+            function f_oct2sam( 
+                in octetstring p_data, 
+                in charstring p_syncPoint, 
+                out SAM p_decoded
+            ) runs on ItsCalm {
+                var bitstring v_data;
+                var integer v_result;
+                
+//                log("*** f_oct2sam: INFO: pdu: " & oct2str(p_data) & " ***");
+                v_data := oct2bit(p_data);
+                v_result := decvalue(v_data, p_decoded);
+                if (v_result == 1) {
+                    log("*** f_oct2sam: FAIL: 'decvalue' operation failed ***");
+                    f_selfOrClientSyncAndVerdictTestBody(p_syncPoint, e_error); 
+                } else if (v_result == 2) {
+                    log("*** f_oct2sam: FAIL: 'decvalue' operation failed, not enougth bits ***");
+                    f_selfOrClientSyncAndVerdictTestBody(p_syncPoint, e_error); 
+                }
+//                log("*** f_oct2sam: INFO: Decoded message done ***");
+            } // End of function f_oct2sam
+            
+            /**
+             * @desc  This function convert the specified octetstring into a template (CTX)
+             * This SHALL be done due to the ASN.1 description of IN-SAP service primitives DL_Unitdata_request/DL_Unitdata_indication
+             * @param p_data        An octetstring to decode
+             * @param p_syncPoint   Current synchronisation point, required to set verdict according to the LibCommon rules
+             * @param p_decoded     The decoded message
+             * @verdict Unchanged on success, set to fail otherwise
+             * @see ISO/CD 21218 - Clause 8.2.2
+             */
+            function f_oct2ctx( 
+                in octetstring p_data, 
+                in charstring p_syncPoint, 
+                out CTX p_decoded
+            ) runs on ItsCalm {
+                var bitstring v_data;
+                var integer v_result;
+                
+                log("*** f_oct2ctx: INFO: pdu: " & oct2str(p_data) & " ***");
+                v_data := oct2bit(p_data);
+                v_result := decvalue(v_data, p_decoded);
+                if (v_result == 1) {
+                    log("*** f_oct2ctx: FAIL: 'decvalue' operation failed ***");
+                    f_selfOrClientSyncAndVerdictTestBody(p_syncPoint, e_error); 
+                } else if (v_result == 2) {
+                    log("*** f_oct2ctx: FAIL: 'decvalue' operation failed, not enougth bits ***");
+                    f_selfOrClientSyncAndVerdictTestBody(p_syncPoint, e_error); 
+                }
+                log("*** f_oct2ctx: INFO: Decoded message done ***");
+            } // End of function f_oct2ctx
+            
+        } // End of group serviceProvider
+        
+        group serviceUser { 
+            
+            function f_regClient(
+                in template (value) ApplicationID p_applicationId,
+                in template (value) ITSaid p_serviceId, 
+                in template (value) GCregClient p_gcRegClient
+            ) runs on ItsCalm {
+                
+                f_fsapGenerateFaPrimitiveWithConfirm(               
+                    m_generateFaSapPrimitivesDown( 
+                        m_faSapPrimitivesDown_gcRegClient( 
+                            p_gcRegClient 
+                        ) 
+                    ), 
+                    mw_fsapGcRegClientConf(p_applicationId), 
+                    true, 
+                    vc_utEventInd.utFsapEventInd 
+                ); 
+            } // End of function f_regClient
+            
+            function f_deregClient(
+                in template (value) ApplicationID p_applicationId 
+            ) runs on ItsCalm {
+                
+                f_fsapGenerateFaPrimitiveWithConfirm( 
+                    m_generateFaSapPrimitivesDown( 
+                        m_faSapPrimitivesDown_gcDeregClient( 
+                            p_applicationId 
+                        ) 
+                    ), 
+                    mw_fsapGcDeregClientConf(p_applicationId), // Expected GCDeregClientConf 
+                    true, 
+                    vc_utEventInd.utFsapEventInd  
+                ); 
+            } // End of function f_deregClient
+            
+        } // End of group serviceUser 
+        
+    } // End of group internalFunctions
+    
+    group iutFunctions {
+        
+        /**
+         * @desc    Get the local identifier of the VCI for broadcast on ITS-S host
+         * @return  The local identifier of the VCI for broadcast on ITS-S host
+         * @see     PX_WL_REMOTE_CIID_BC
+         * @verdict Unchanged
+         */
+        function f_getIutSrcRemoteCiId() return EUI64 {
+            return PX_SRC_REMOTE_CIID;
+        }
+        
+        /**
+         * @desc    Get the identifier of a VCI on ITS-S host/router only 
+         * @return  The identifier of a different VCI on ITS-S host/router only 
+         * @see     PX_WL_LOCAL_CIID
+         * @verdict Unchanged
+         */
+        function f_getIutSrcLocalCiId() return EUI64 {
+            return PX_WL_LOCAL_CIID;
+        }
+        
+        function f_getIutMedTypeIso21215LocalCiid() return EUI64 {
+            return PX_IUT_MEDTYPE_ISO21215_LOCAL_CIID;
+        }
+        
+        function f_getIutMedTypeIso21215RemoteCiid() return EUI64 {
+            return PX_IUT_MEDTYPE_ISO21215_REMOTE_CIID;
+        }
+        
+        function f_getIutMedTypeOtherLocalCiid() return EUI64 {
+            return PX_IUT_MEDTYPE_OTHER_LOCAL_CIID;
+        }
+        
+        function f_getIutMedTypeOtherRemoteCiid() return EUI64 {
+            return PX_IUT_MEDTYPE_OTHER_REMOTE_CIID;
+        }
+        
+        /**
+         * @desc    Gets the SAM retransmit timer.
+         * @return  SAM retransmit timer 
+         * @see     PICS_SAM_RETRANSMIT_TIMER
+         */
+        function f_getIutSamRetransmitTimer() return float {
+            return 0.9 * PICS_SAM_RETRANSMIT_TIMER / 100.0; // 90%
+        }
+        
+        /**
+         * @desc    Gets the maximum SAM jitter.
+         * @return  Maximum SAM jitter
+         * @see     PICS_SAM_RETRANSMIT_TIMER
+         */
+        function f_getIutSamMaxJitter() return float {
+           return 1.1 * PICS_SAM_RETRANSMIT_TIMER / 100.0; // 110%
+        }
+        
+        /**
+         * @desc    Get the ITS application object ID (ITS-AID) for GCregServer MF-REQUEST 
+         * @return  The ITS application object ID (ITS-AID)
+         * @see     PX_APPLICATION_ID
+         */
+        function f_getIutApplicationId() return ApplicationID {
+            return PX_APPLICATION_ID;
+        }
+        
+        /**
+         * @desc    Get the ITS application object ID (ITS-AID) for GCregClient MF-REQUEST 
+         * @return  The ITS application object ID (ITS-AID)
+         * @see     PX_CLIENT_APPLICATION_ID
+         */
+        function f_getIutClientApplicationId() return ApplicationID {
+            return PX_CLIENT_APPLICATION_ID;
+        }
+        
+        /**
+         * @desc    Get the globally unique ITS-AID of the ITS-S application 
+         * @return  The globally unique ITS-AID of the ITS-S application
+         * @see     PX_ITS_AID
+         */
+        function f_getIutServiceId() return ITSaid {
+            return PX_ITS_AID;
+        }
+        
+        /**
+         * @desc    Get the server identifier value
+         * @return  The client identifier value
+         * @see     PX_SERVER_ID
+         */
+        function f_getIutServerId() return StationID {
+            return PX_SERVER_ID;
+        }
+         
+        function f_getLocalClientId() return StationID {
+            return PX_LOCAL_ID;
+        }
+        /**
+         * @desc    Get the service client ITS station value
+         * @return  The service client ITS station value
+         * @see     PX_CLIENT_ID
+         */
+        function f_getIutClientId() return StationID {
+            return PX_IUT_ID;
+        }
+        
+        /**
+         * @desc    Get the scheduling information with a specific access technology
+         * @return  The scheduling information
+         * @see     PX_GSCHED_ACCESS_TECH_NONIP
+         */
+        function f_getIutGcScheduleWithAccessTechAndNonIp() return GCschedule {
+            return { PX_GSCHED_ACCESS_TECH_NONIP };
+        }
+        
+        /**
+         * @desc    Get the scheduling information with a specific access technology using a long period time
+         * @return  The scheduling information
+         * @see     PX_GSCHED_ACCESS_TECH_NONIP
+         */
+        function f_getIutGcScheduleLongTPeriodTimeWithAccessTechAndNonIp() return GCschedule {
+            return { PX_GSCHED_LOG_PERIOD_TIME_ACCESS_TECH_NONIP };
+        }
+        
+        /**
+         * @desc    Get the scheduling information with an unknown access technology
+         * @return  The scheduling information
+         * @see     PX_GSCHED_ACCESS_UNKNOWN_TECH_NONIP
+         */
+        function f_getIutGCscheduleWithUnknownAccessTechAndNonIp() return GCschedule {
+            return { PX_GSCHED_ACCESS_UNKNOWN_TECH_NONIP };
+        }
+        
+                
+        /**
+         * @desc    Get the scheduling information with no access technology
+         * @return  The scheduling information
+         * @see     PX_GSCHED_NONIP
+         */
+        function f_getIutGCscheduleWithNonIp() return GCschedule {
+            return { PX_GSCHED_NONIP };
+        }
+        
+        /**
+         * @desc    Get advertisement details with no session phase
+         * @return  The advertisement details
+         * @see     PX_SERVICE_DATA_REG_WITH_NO_SESSION_PHASE
+         */
+        function f_getIutServiceDataRegWithNoSession() return ServiceDataReg {
+            return PX_SERVICE_DATA_REG_WITH_NO_SESSION_PHASE;
+        }
+        
+        /**
+         * @desc    Get advertisement details with a specific access technology and with request to change communication channel for session phase
+         * @return  The advertisement details
+         * @see     PX_SERVICE_DATA_REG_WITH_SESSION_PHASE_AND_CHANNEL_CHANGE
+         */
+        function f_getIutServiceDataRegWithNoSessionAndChannelChange() return ServiceDataReg {
+            return PX_SERVICE_DATA_REG_WITH_SESSION_PHASE_AND_CHANNEL_CHANGE;
+        }
+        
+        /**
+         * @desc    Get advertisement details without request to change communication channel for session phase and without request to change communication channel for session phase
+         * @return  The advertisement details
+         * @see     PX_SERVICE_DATA_REG_WITH_SESSION_PHASE
+         */
+        function f_getIutServiceDataRegWithSession() return ServiceDataReg {
+            return PX_SERVICE_DATA_REG_WITH_SESSION_PHASE;
+        }
+        
+        /**
+         * @desc    Get non-IP information on services offered, with no session phase and no channel change requested
+         * @return  The non-IP information on services offered
+         * @see     PX_NO_IP_SERVICE_WITH_NO_SESSION_AND_NO_CHANGE_CHANNEL
+         */
+        function f_getIutServicelistWithNoSessionAndNoChannelChange() return ServiceList { 
+            return { PX_NO_IP_SERVICE_WITH_NO_SESSION_AND_NO_CHANGE_CHANNEL };
+        }
+        
+        /**
+         * @desc    Get non-IP information on services offered, with session phase and no channel change requested
+         * @return  The non-IP information on services offered
+         * @see     PX_NO_IP_SERVICE_WITH_SESSION_AND_NO_CHANGE_CHANNEL
+         */
+        function f_getIutServicelistWithSessionAndNoChangeChannel() return ServiceList { 
+            return { PX_NO_IP_SERVICE_WITH_SESSION_AND_NO_CHANGE_CHANNEL };
+        }
+        
+        /**
+         * @desc    Get non-IP information on services offered, with no session phase and channel change requested
+         * @return  The non-IP information on services offered
+         * @see     PX_NO_IP_SERVICE_WITH_SESSION_AND_CHANNEL_CHANGE
+         */
+        function f_getIutServicelistWithSessionAndChangeChannel() return ServiceList { 
+            return { PX_NO_IP_SERVICE_WITH_SESSION_AND_CHANNEL_CHANGE };
+        }
+        
+        /**
+         * @desc    Get non-IP information on an unknown services offered, with session phase and no channel change requested
+         * @return  The non-IP information on services offered
+         * @see     PX_NO_IP_SERVICE_WITH_UNKNOWN_SERVICE_ID
+         */
+        function f_getIutServicelistWithUnknownServiceId() return ServiceList { 
+            return { PX_NO_IP_SERVICE_WITH_UNKNOWN_SERVICE_ID };
+        }
+        
+        /**
+         * @desc    Get non-IP information on services offered, with session phase and channel change requested on an unknown channel
+         * @return  The non-IP information on services offered
+         * @see     PX_NO_IP_SERVICE_WITH_UNKNOWN_CHANNEL
+         */
+        function f_getIutServicelistWithUnknownChannel() return ServiceList { 
+            return { PX_NO_IP_SERVICE_WITH_UNKNOWN_CHANNEL };
+        }
+        
+        /**
+         * @desc    Get the session port as acknowledgement of GCsamctx offered byt the ITS application 
+         * @return  The session port 
+         * @see     PX_SESSION_PORT
+         */
+        function f_getIutSessionPort() return PortNumber { 
+            return PX_SESSION_PORT;
+        } 
+        
+        /**
+         * @desc    Get the context data value 
+         * @return  The context data value 
+         * @see     PX_CONTEXT_DATA
+         */
+        function f_getContextData() return ContextData { 
+            return PX_CONTEXT_DATA;
+        } 
+        
+    } // End of group iutFunctions
+    
+    group fsapAltsteps {
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_fsapDefault() runs on ItsMgt {
+            [] tc_wait.timeout {
+                log("*** a_fsapDefault: ERROR: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout {
+                log("*** a_fsapDefault: ERROR: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] any timer.timeout {
+                log("*** a_fsapDefault: INCONC: An unknown timer has expired in default ***"); 
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                log("*** a_fsapDefault: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                if(self == mtc) {
+                    f_cf01Down();
+                }
+                stop;
+            }
+        } // End of altstep a_fsapDefault()
+        
+        /**
+         * @desc Default handling cf01 de-initialisation.
+         */
+        altstep a_cf01Down() runs on ItsMgt {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf01Down();
+                log("*** a_cf01Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        } // End of altstep a_cf01Down()
+        
+        /**
+         * @desc Default handling cf02 de-initialisation.
+         */
+        altstep a_cf02Down() runs on ItsMgt {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf02Down();
+                log("*** a_cf02Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        } // End of altstep a_cf02Down()
+        
+    } // End of group fsapAltsteps
+    
+} // End of module LibItsFsap_Functions

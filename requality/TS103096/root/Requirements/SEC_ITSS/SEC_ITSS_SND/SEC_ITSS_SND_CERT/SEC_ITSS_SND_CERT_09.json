@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "df89a517-b410-46f7-90da-77b24372193c",
+            "type": "STRING",
+            "value": "Check that the certificate signature is valid"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "df89a517-b410-46f7-90da-77b24372193c",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/4ee1b61f-a484-4fc4-b43d-aa191370d877"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "df89a517-b410-46f7-90da-77b24372193c",
+            "type": "STRING",
+            "value": "09. Check the certificate signature"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "df89a517-b410-46f7-90da-77b24372193c",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "df89a517-b410-46f7-90da-77b24372193c"
+}

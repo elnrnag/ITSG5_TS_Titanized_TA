@@ -1,0 +1,95 @@
+/**
+ *  @author     ETSI / STF421
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DCC/LibItsDcc_Templates.ttcn $
+ *              $Id: LibItsDcc_Templates.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc       DCC (TS 102 724) Templates
+ *  @see        ETSI TS 102 917-3
+ */
+module LibItsDcc_Templates {
+    
+    // LibCommon
+    
+    // LibIts
+    import from LibItsDcc_TypesAndValues all;
+    import from LibItsDcc_TestSystem all;
+    /**
+     * @desc Templates used to trigger actions at the Upper Tester
+     * and to capture indication message sent by the IUT on the radio interface
+     */
+    group utPrimitives {
+        /**
+         * @desc Ut Initialize Primitive template
+         */
+        template (value) UtInitialize m_utInitialize(template (value) UtRadioInitialize p_utRadioInitialize) :=
+           {
+               utRadioInitialize := p_utRadioInitialize
+           }// End m_utRadioInitialize
+        
+        /**
+         * @desc UtRadioInitialize Primitive template
+         */
+        template (value) UtRadioInitialize m_utRadioInitialize :=
+           {
+           }// End m_utRadioInitialize
+        
+        /**
+         * @desc UtRadioEvent Primitive template
+         */
+        template (value) UtTrigger m_utRadioEvent(template (omit) ChannelState p_cch := omit,
+                                                  template (omit) ChannelState p_sch1 := omit,
+                                                  template (omit) ChannelState p_sch2 := omit,
+                                                  template (omit) ChannelState p_sch3 := omit, 
+                                                  template (omit) ChannelState p_sch4 := omit) := 
+           {utRadioEvent:= {cchChannelState  := p_cch,
+                            sch1ChannelState := p_sch1,
+                            sch2ChannelState := p_sch2,
+                            sch3ChannelState := p_sch3,
+                            sch4ChannelState := p_sch4
+           }}// End m_utRadioEvent
+    } // End of group utPrimitives
+
+       group rrxPrimitives { 
+        /**
+         * @desc  RRX Indication Primitive template
+         */
+        template (present) RrxInd m_rrxInd(template (present) Channel p_channel,
+                                           template (present) integer p_measuredPower) :=
+           {
+               channel                 := p_channel,
+               measuredPower           := p_measuredPower
+           } // End m_utRadioCommandIndication
+           
+    } // End of group rrxPrimitives
+    
+    /**
+     * @desc    Primitive on IN-SAP interface
+     */
+    group inSapPrimitives {
+        /**
+         * @desc IN Request Primitive template
+         */
+        template InReq m_In_Request(integer     p_commandReference,
+                                    octetstring p_referenceBurst,
+                                    integer     p_requestedTxPower,
+                                    integer     p_dCCProfileIdentifier) :=
+           {commandReference     := p_commandReference,
+            referenceBurst       := p_referenceBurst,
+            requestedSendPower   := p_requestedTxPower,
+            dCCProfileIdentifier := p_dCCProfileIdentifier
+            } // End m_In_Request
+        
+        /**
+         * @desc IN Status Primitive template
+         */
+        template (present) InSta mw_In_Status(template (present) integer p_commandReference,
+                                              template (present) Channel p_channel,
+                                              template (present) boolean p_transmissionSuccessStatus) :=
+           {commandReference          := p_commandReference,
+            channel                   := p_channel,
+            transmissionSuccessStatus := p_transmissionSuccessStatus,
+            achievedSendPower         := ?
+           } // End mw_In_Status
+        
+    } // End of group inSapPrimitives
+    
+} // End of module LibItsDcc_Templates

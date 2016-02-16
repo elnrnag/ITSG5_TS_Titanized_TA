@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "2043f4ae-1aca-4084-a10a-057ed0bfa620",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2192ce7e-f93c-4f63-a974-13e73c7917f0"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "2043f4ae-1aca-4084-a10a-057ed0bfa620",
+            "type": "STRING",
+            "value": "08. Check that AT certificate is signed by AA cert."
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "2043f4ae-1aca-4084-a10a-057ed0bfa620",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "2043f4ae-1aca-4084-a10a-057ed0bfa620",
+            "type": "STRING",
+            "value": "complete"
+        }
+    },
+    "uuid": "2043f4ae-1aca-4084-a10a-057ed0bfa620"
+}

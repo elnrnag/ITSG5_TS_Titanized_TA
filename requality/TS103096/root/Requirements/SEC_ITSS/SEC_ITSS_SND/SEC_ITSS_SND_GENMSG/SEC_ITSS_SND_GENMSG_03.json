@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "fccb79f8-1904-4670-a775-ab3020c60a08",
+            "type": "STRING",
+            "value": "If ITS-S sends a signed message with general security profile check that the sent SecuredMessage contains exactly one signer_info field of type certificate"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "fccb79f8-1904-4670-a775-ab3020c60a08",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/8919f8cf-0b31-445c-b659-b5c9af67975c"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "fccb79f8-1904-4670-a775-ab3020c60a08",
+            "type": "STRING",
+            "value": "03. Check that signer info is a certificate"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "fccb79f8-1904-4670-a775-ab3020c60a08",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "fccb79f8-1904-4670-a775-ab3020c60a08"
+}

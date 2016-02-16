@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S accepts a valid enrolment response even if the permissions in the issued certificate are a subset of requested permissions"
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/6ed18035-70c8-48c7-93ac-a23c1dfaadd8"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9ad61804-09b6-4f86-b6be-997b90f6a095"
+}

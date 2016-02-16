@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "216c0016-6530-4224-8517-83c1195239b8",
+            "type": "STRING",
+            "value": "If ITS-S sends a secured CAM check that the sent SecuredMessage contains non-empty payload of type signed."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "216c0016-6530-4224-8517-83c1195239b8",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/9c739ca7-141b-4d74-9a6e-54db6606bde3",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a61181d9-1ca0-444d-8723-5bc368222afc"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "216c0016-6530-4224-8517-83c1195239b8",
+            "type": "STRING",
+            "value": "14. Check Payload"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "216c0016-6530-4224-8517-83c1195239b8",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "216c0016-6530-4224-8517-83c1195239b8"
+}

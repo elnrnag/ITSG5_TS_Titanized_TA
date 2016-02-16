@@ -1,0 +1,126 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FSAP/LibItsFsap_TypesAndValues.ttcn3 $
+ *              $Id: LibItsFsap_TypesAndValues.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Types and constants definitions for Fast Service Advertisement Protocol (ISO 24102-4)
+ */
+module LibItsFsap_TypesAndValues {
+    
+    // LibCommon
+    
+    // LibIts
+    
+    // LibItsCalm
+    import from CALMiitsscu language "ASN.1:1997" {
+        type 
+            McmdRq 
+    };
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+            INsapPrimitivesUp 
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type
+            FAsapPrimitivesUp, FAsapPrimitivesDown, 
+            MF_Command_request, MF_Request_request 
+    };
+    import from CALMfntp language "ASN.1:1997" {
+        type
+            NFsapPrimitivesDown, NFsapPrimitivesUp  
+    };
+    import from CALMfsap language "ASN.1:1997" {
+        type
+            SAM   
+    };
+
+	/**
+	 * @desc UpperTester primitives
+	 */
+    group utPrimitives {
+        
+        /**
+         * @desc Trigger to initialize the IUT.
+         */
+        type record UtFsapInitialize {
+            McmdRq    mcmdRq 
+        }  with {
+            encode (mcmdRq) "LibItsIicp_asn1"  
+        }
+        
+        /**
+         * @desc Events at the application layer of the IUT.
+         */
+        type union UtFsapEvent { 
+            FAsapPrimitivesDown faSapPrimitivesDown 
+        }
+        with {
+            encode (faSapPrimitivesDown) "LibItsCALMmsap_asn1"  
+        }
+        
+        /**
+         * @desc Send a MF-SAP primitive from Facility layer through a SAP.
+         * @member faSapPrimitivesUp MF-SAP up primitive 
+         */
+        type union UtFsapEventInd { 
+            FAsapPrimitivesUp faSapPrimitivesUp 
+        }
+        with {
+            encode (faSapPrimitivesUp) "LibItsCALMmsap_asn1"  
+        }
+        
+    } with {
+        encode "UpperTester"
+    } // End of group utPrimitives
+    
+	/**
+	 * @desc ConfigTester primitives
+	 */
+    group cfPrimitives { 
+        
+        /**
+         * @desc Trigger to initialize the IUT.
+         * @member McmdRq MN-COMMAND-Request message to initialize the upper tester
+         */
+        type record CfFsapInitialize {  
+        }
+        
+        /**
+         * @desc Send a MA-SAP.request primitive to the Management layer through a SAP.
+         * @member mnRequestRequest MN_REQUEST_Request primitive 
+         */
+        type union CfFsapEventInd { 
+            MF_Request_request    mfRequestRequest 
+        }
+        with {
+            encode (mfRequestRequest) "LibItsCALMmsap_asn1"  
+        }
+    
+    } with {
+        encode "ConfigTester"
+    } // End of group cfPrimitives  
+    
+	/**
+	 * @desc Test Adapter control primitives
+	 */
+    group acPrimitives {
+        
+        /**
+         * @desc    TA primitives for FSAP
+         */
+        type union AcFsapPrimitive { 
+            INsapPrimitivesUp inSapPrimitivesUp, 
+            boolean stopTransmission 
+        } 
+        with {
+            encode (inSapPrimitivesUp) "LibItsCALMllsap_asn1"  
+			encode "AdapterControl"
+        }
+        
+    } with {
+		encode "AdapterControl"
+	}// End of group acPrimitives
+    
+}
+with {
+    encode "LibItsFsap"
+} //End of module LibItsFsap_TypesAndValues

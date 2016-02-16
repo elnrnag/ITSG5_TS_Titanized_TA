@@ -1,0 +1,994 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Security/LibItsSecurity_TypesAndValues.ttcn3 $
+ *            $Id: LibItsSecurity_TypesAndValues.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Module containing types and values for Security Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *  @see Draft ETSI TS 103 097 V1.1.14
+ */
+module LibItsSecurity_TypesAndValues {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    /** 
+     * @desc Specification of basic format elements
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2
+     */
+    group basicFormatElements {
+        
+        /**
+         * @desc An integer of variable length
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.1   IntX
+         */
+        type integer IntX with { variant "" }; //TODO with { variant "IntX" };
+        
+        /**
+         * @desc List of supported algorithms based on public key cryptography
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.2   PublicKeyAlgorithm
+         */
+        type enumerated PublicKeyAlgorithm {
+            e_ecdsa_nistp256_with_sha256    (0),
+            e_ecies_nistp256                (1)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc List of supported algorithms based on symmetric key cryptography
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.3   SymmetricAlgorithm
+         */
+        type enumerated SymmetricAlgorithm {
+            e_aes_128_ccm   (0)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc Wrapper for public keys by specifying the used algorithm
+         * @member algorithm    Specifying the used algorithm 
+         * @member public_key   The public key structure
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4   PublicKey
+         */
+        type record PublicKey {
+            PublicKeyAlgorithm  algorithm,
+            PublicKeyContainer  public_key
+        } with { variant "" }; // End of type PublicKey
+        
+        /**
+         * @desc Information regarding ECC contained in an EccPoint structure
+         * @member eccPoint         Specific details regarding ECC contained in an EccPoint structure
+         * @member ecies_nistp256   Specific details regarding ECC contained in an EccPoint structure
+         * @member other_key        Out of scope
+         */
+        type union PublicKeyContainer { 
+            EccPoint        eccPoint,
+            AesCcm          aesCcm,
+            octetstring     other_key
+        } with { variant "" }; // End of type PublicKeyContainer
+        
+        /**
+         * @desc Information regarding AES CCM encryption
+         * @member supported_symm_alg   The symmetric key algorithm
+         * @member eccPoint             The EccPoint used in the PublicKey
+         */
+        type record AesCcm {
+            SymmetricAlgorithm  supported_symm_alg,
+            EccPoint            eccPoint
+        } with { variant "" }; // End of type AesCcmsc
+        
+        /**
+         * @desc Defines public key based on elliptic curve cryptography
+         * @member type_        The ECC key types
+         * @member x            The x coordinate 
+         * @member y            The y coordinate
+         * @remark In case of e_x_coordinate_only, e_compressed_lsb_y_0 and e_compressed_lsb_y_1, the field y shall not be present
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+         * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+         */
+        type record EccPoint {
+            EccPointType        type_,
+            octetstring         x,
+            EccPointContainer   y optional
+        } with { variant "" }; // End of type EccPoint
+        
+        /**
+         * @desc Defines a public key based on elliptic curve cryptography
+         * @member y    The y coordinate
+         * @member data Out of scope
+         */
+        type union EccPointContainer {
+            octetstring y,
+            octetstring data
+        } with { variant "" };// End of type EccPointContainer
+        
+        /**
+         * @desc List of supported ECC key types
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.6   EccPointType
+         */
+        type enumerated EccPointType { 
+            e_x_coordinate_only     (0),
+            e_compressed_lsb_y_0    (2),
+            e_compressed_lsb_y_1    (3),
+            e_uncompressed          (4)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc Parameters and additional data required for encryption and decryption of data using different symmetric encryption algorithms
+         * @member symm_algorithm   The symmetric algorithm that shall be used with a public key for encryption 
+         * @member public_key       The public key for encryption 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.7   EncryptionParameters
+         */
+        type record EncryptionParameters {
+            SymmetricAlgorithm              symm_algorithm,
+            EncryptionParametersContainer   public_key
+        } with { variant "" }; // End of type EncryptionParameters
+        
+        /**
+         * @desc 
+         * @member nonce    Data encryption with the Advanced Encryption Standard (AES) using a 128-bit key in Counter with cipher block chaining message authentication code (CCM) mode
+         * @member params   Out of scope
+         */
+        type union EncryptionParametersContainer {
+            Oct12       nonce,
+            octetstring params
+        } with { variant "" }; // End of type EncryptionParametersContainer
+        
+        /**
+         * @desc Signatures based on public key cryptography
+         * @member algorithm    Algorithm type
+         * @member signature_   The signature
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.8   Signature
+         */
+        type record Signature {
+            PublicKeyAlgorithm  algorithm,
+            SignatureContainer  signature_
+        } with { variant "" }; // End of type Signature
+        
+        /**
+         * @desc 
+         * @member algorithm    The ECDSA based signature
+         * @member signature_   Out of scope
+         */
+        type union SignatureContainer {
+            EcdsaSignature  ecdsa_signature,
+            octetstring     signature_
+        } with { variant "" }; // End of type SignatureContainer
+        
+        /**
+         * @desc Description an ECDSA based signature
+         * @member r            Coordinate of the elliptic curve point resulting from multiplying the generator element by the ephemeral private key
+         * @member s            TODO
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.9  EcdsaSignature
+         */
+        type record EcdsaSignature {
+            EccPoint            r,
+            octetstring         s
+        } with { variant "" }; // End of type EcdsaSignature
+        
+        
+        /**
+         * @desc Information about the signer of a message
+         * @member type_        Signature algorithm type
+         * @member signerInfo   Signature algorithm information. In case of self-signed, this field is not required because of no additional data shall be given
+         * @remark In case of e_self, the field signerInfo shall not be present
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.10  SignerInfo
+         */
+        type record SignerInfo {
+            SignerInfoType type_,
+            SignerInfoContainer signerInfo optional 
+        } with { variant "" }; // End of type SignerInfo
+        
+        /**
+         * @desc 
+         * @member digest               The digest value
+         * @member certificate          A certificate
+         * @member certificates         A complete certificate chain
+         * @member certificateWithAlgo  A certificate with a specific algorithm
+         * @member info                 To be used in all other cases
+         */
+        type union SignerInfoContainer {
+            HashedId8           digest,
+            Certificate         certificate,
+            CertificateChain    certificates,
+            CertificateWithAlgo certificateWithAlgo,
+            octetstring         info
+        } with { variant "" }; // End of type SignerInfoContainer
+        
+        /**
+         * @desc 
+         * @member algorithm    The public key algorithm 
+         * @member digest       The digest value
+         */
+        type record CertificateWithAlgo {
+            PublicKeyAlgorithm  algorithm,
+            HashedId8           digest
+        } with { variant "" }; // End of type CertificateWithAlgo
+        
+        /**
+         * @desc The list of the methods to describe a message's signer
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.11  SignerInfoType
+         */
+        type enumerated SignerInfoType {
+            e_self                                      (0),
+            e_certificate_digest_with_sha256            (1),
+            e_certificate                               (2),
+            e_certificate_chain                         (3),
+            e_certificate_digest_with_other_algorithm   (4)
+        } with { variant "" }; // End of type SignerInfoContainer
+        
+        /**
+         * @desc Identifies data such as a certificate
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.12  HashedId8
+         * @see RFC2246 Clause 4.2. Miscellaneous
+         */
+        type Oct8 HashedId8 with { variant "" };
+        
+        /**
+         * @desc Indication on an identifier, where real identification is not required
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.13  HashedId3
+         * @see RFC2246 Clause 4.2. Miscellaneous
+         */
+        type Oct3 HashedId3 with { variant "" };
+        
+        /**
+         * @desc The unsigned 32 bits number of International Atomic Time (TAI) microseconds since 00:00:00 UTC, 01 January 2004
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.14  Time64
+         */
+        type UInt32 Time32 with { variant "" };
+        
+        /**
+         * @desc The unsigned 64 bits number of International Atomic Time (TAI) microseconds since 00:00:00 UTC, 01 January 2004
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.15  Time64
+         */
+        type UInt64 Time64 with { variant "" };
+        
+        /**
+         * @desc The time along with the standard deviation of time values
+         * @member time         The time being encoded
+         * @member log_std_dev  The rounded up value of the log to the base 1,134666 of the implementation's estimate of the standard deviation in units of nanoseconds
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.16  Time64WithStandardDeviation
+         */
+        type record Time64WithStandardDeviation {
+            Time64  time,
+            UInt8   log_std_dev
+        } with { variant "" }; // End of type Time64WithStandardDeviation
+        
+        /**
+         * @desc Defines the duration of a time span (e.g. a certificate's validity)
+         * @member unit     Units of the duration
+         * @member duration The duration of a time span
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.17  Duration
+         */
+        type record Duration {
+            DurationUnitType    unit,
+            Int13               duration
+        } with { variant "" }; // End of type Duration
+        
+        /**
+         * @desc List of supported duration unit
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.17  Duration
+         * @see Draft ETSI TS 103 097 V1.1.14 Table 3: Interpretation of duration unit bits
+         */
+        type enumerated DurationUnitType {
+            e_seconds       (0), // seconds
+            e_minutes       (1), // minutes (60 seconds)
+            e_hours         (2), // hours (3 600 seconds)
+            e_hoursBlock    (3), // 60 hour blocks (216 000 seconds)
+            e_year          (4)  // years (31 556 925 seconds)
+        } with { variant "FIELDLENGTH(3)" }; //with { variant "3 bit" }
+        
+        /**
+         * @desc Define latitude range
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.18/19  Two/ThreeDLocation/permitted values
+         */
+        type integer WGSLatitude  (-900000000 .. 900000001) with { variant "FIELDLENGTH(32)" }; //with { variant "32 bit"};
+        
+        /**
+         * @desc Define longitude range
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.18/19  Two/hreeDLocation/permitted values
+         */
+        type integer WGSLongitude (-1800000000 .. 1800000001) with { variant "FIELDLENGTH(32)" }; //with { variant "32 bit"};
+        
+        /**
+         * @desc Specify a two dimensional location
+         * @member latitude     Latitude in tenths of micro degrees relative to the World Geodetic System (WGS)-84 datum 
+         * @member longitude    Longitude in tenths of micro degrees relative to the World Geodetic System (WGS)-84 datum 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.18  TwoDLocation
+         */
+        type record TwoDLocation {
+            WGSLatitude     latitude,
+            WGSLongitude    longitude
+        } with { variant "" }; // End of type TwoDLocation
+        
+        /**
+         * @desc Specify a three dimensional location
+         * @member latitude     Latitude in tenths of micro degrees relative to the World Geodetic System (WGS)-84 datum 
+         * @member longitude    Longitude in tenths of micro degrees relative to the World Geodetic System (WGS)-84 datum 
+         * @member elevation    Elevation relative to the WGS-84 ellipsoid in decimetres
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.19  ThreeDLocation
+         */
+        type record ThreeDLocation {
+            WGSLatitude     latitude,
+            WGSLongitude    longitude,
+            Oct2            elevation
+        } with { variant "" }; // End of type ThreeDLocation
+        
+        /**
+         * @desc Defines an ordered list of ThreeDLocation
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of ThreeDLocation ThreeDLocations with { variant "" };
+        
+        /**
+         * @desc Defines geographic regions used to limit the validity of certificates
+         * @member region_type  Region type 
+         * @member region       Region description
+         * @remark In case of e_none, the field region shall not be present
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.20  GeographicRegion
+         */
+        type record GeographicRegion {
+            RegionType                  region_type,
+            GeographicRegionContainer   region optional 
+        } with { variant "" }; // End of type GeographicRegion
+        
+        type union GeographicRegionContainer {
+            CircularRegion      circular_region,
+            RectangularRegions  rectangular_region,
+            PolygonalRegion     polygonal_region,
+            IdentifiedRegion    id_region,
+            octetstring         other_region
+        } with { variant "" }; // End of type GeographicRegionContainer
+        
+        /**
+         * @desc The list of the possible region types
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  RegionType
+         */
+        type enumerated RegionType {
+            e_none      (0),
+            e_circle    (1),
+            e_rectangle (2),
+            e_polygon   (3),
+            e_id        (4)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc Defines a circular region
+         * @member center   Circular center
+         * @member radius   Radius given in metres
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.22  CircularRegion
+         */
+        type record CircularRegion {
+            TwoDLocation    center,
+            UInt16          radius 
+        } with { variant "" }; // End of type CircularRegion
+        
+        /**
+         * @desc Defines a rectangular region by connecting the four points in the order (northwest.latitude, northwest.longitude), (northwest.longitude, southeast.longitude), (southeast.longitude, southeast.longitude), and (southeast.longitude, northwest.longitude)
+         * @member northwest   Upper left corner
+         * @member southeast   Lower rigth corner
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.23  RectangularRegion
+         */
+        type record RectangularRegion {
+            TwoDLocation    northwest,
+            TwoDLocation    southeast
+        } with { variant "" }; // End of type RectangularRegion
+        
+        /**
+         * @desc Defines an ordered list of RectangularRegion
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of RectangularRegion RectangularRegions with { variant "" };
+        
+        /**
+         * @desc Defines an ordered list of PolygonalRegion
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of TwoDLocation PolygonalRegion with { variant "" };
+        
+        /**
+         * @desc Defines a predefined geographic region determined by the region dictionary and the region identifier
+         * @member region_dictionary   The region dictionary
+         * @member region_identifier   The region identifier
+         * @member local_region        The whole region. 0 if the whole region is meant
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.25  IdentifiedRegion
+         */
+        type record IdentifiedRegion {
+            RegionDictionary    region_dictionary,
+            UInt16              region_identifier,
+            IntX                local_region
+        } with { variant "" }; // End of type IdentifiedRegion
+        
+        /**
+         * @desc The list of dictionaries containing two-octet records of globally defined regions
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.26  RegionDictionary
+         */
+        type enumerated RegionDictionary {
+            e_iso_3166_1  (0),
+            e_un_stats    (1)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" } // End of type RegionDictionary
+        
+        /**
+         * @desc Defines an ordered list of RegionIdentifiers
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of UInt16 RegionIdentifiers with { variant "" };
+        
+    } // End of group basicFormatElements
+    
+    /** 
+     * @desc Specification of security header
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 5
+     */
+    group SecurityMessages {
+        
+        /**
+         * @desc Secured message description, part to be signed
+         * @member protocol_version The applied protocol version
+         * @member header_fields    Multiple information fields of interest to the security layer
+         * @member payload_field   The message's payload
+         * @member trailer_fields   Security information after the payload
+         * 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.1 SecuredMessage
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7 Security profiles
+         */
+        type record ToBeSignedSecuredMessage {
+            UInt8               protocol_version,
+            HeaderFields        header_fields,
+            SecPayload          payload_field,          // Used by the codec to fill it with the secured packet in case of 'omit' value
+            UInt8               trailer_fieldsLength,   // Draft ETSI TS 103 097 V1.1.14 Clauses 7.1/2/3 
+            TrailerFieldType    trailerFieldType
+        } with { variant "" }; // End of type ToBeSignedSecuredMessage
+        
+        /**
+         * @desc Secured message description
+         * @member protocol_version The applied protocol version
+         * @member header_fields    Multiple information fields of interest to the security layer
+         * @member payload_fields   The message's payload
+         * @member trailer_fields   Security information after the payload
+         * 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.1 SecuredMessage
+         */
+        type record SecuredMessage {
+            UInt8           protocol_version,
+            HeaderFields    header_fields,
+            SecPayload      payload_field,  // Used by the codec to fill it with the secured packet in case of 'omit' value
+            TrailerFields   trailer_fields
+        } with { variant "" }; // End of type SecuredMessage
+        
+        /**
+         * @desc Defines an ordered list of HeaderField
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of HeaderField HeaderFields with { variant "" };
+        
+        /**
+         * @desc Payload structure
+         * @member type_    Payload type
+         * @member payload  Payload data
+         * 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+         */
+        type record SecPayload {
+            SecPayloadType  type_,
+            octetstring     data optional
+        } with { variant "" }; // End of type Payload
+        
+        /**
+         * @desc Supported types of payloads
+         * 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.3 PayloadType
+         */
+        type enumerated SecPayloadType {
+            e_unsecured             (0),
+            e_signed                (1),
+            e_encrypted             (2),
+            e_signed_external       (3),
+            e_signed_and_encrypted  (4)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc Defines an ordered list of TrailerField
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of TrailerField TrailerFields with { variant "" };
+        
+        /**
+         * @desc Information of interest to the security layer
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+         */
+        type record HeaderField {
+            HeaderFieldType         type_,
+            HeaderFieldContainer    headerField
+        } with { variant "" }; // End of type HeaderField
+        
+        /**
+         * @desc Supported types of header fields
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.5    HeaderFieldType
+         */
+        type enumerated HeaderFieldType {
+            e_generation_time                       (0),
+            e_generation_time_standard_deviation    (1),
+            e_expiration                            (2),
+            e_generation_location                   (3),
+            e_request_unrecognized_certificate      (4),
+            e_its_aid                               (5),
+            e_signer_info                           (128),
+            e_encryption_parameters                 (129),
+            e_recipient_info                        (130)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        type union HeaderFieldContainer {
+            Time64                          generation_time,
+            Time64WithStandardDeviation     generation_time_with_standard_deviation,
+            Time32                          expiry_time,
+            ThreeDLocation                  generation_location,
+            HashedId3s                      digests,
+            IntX                            its_aid,
+            SignerInfo                      signer,
+            EncryptionParameters            enc_params,
+            RecipientInfos                  recipients,
+            octetstring                     other_header
+        } with { variant "" }; // End of type HeaderFieldContainer
+        
+        /**
+         * @desc Defines an ordered list of HashedId3
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of HashedId3 HashedId3s with { variant "" };
+        
+        /**
+         * @desc Defines an ordered list of RecipientInfo
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of RecipientInfo RecipientInfos with { variant "" };
+        
+        /**
+         * @desc Information used by the security layer after processing the payload
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.6 TrailerField
+         */
+        type record TrailerField {
+            TrailerFieldType        type_,
+            TrailerFieldContainer   trailerField
+        } with { variant "" }; // End of type TrailerField 
+        
+        /**
+         * @desc 
+         * @member signature_       The signature of the payload
+         * @member security_field   Out of scope
+         */
+        type union TrailerFieldContainer {
+            Signature   signature_,
+            octetstring security_field
+        } with { variant "" }; // End of type TrailerFieldContainer
+        
+        /**
+         * @desc Supported types of trailer fields
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.7 TrailerFieldType
+         */
+        type enumerated TrailerFieldType {
+            e_signature     (1)
+        } with { variant "FIELDLENGTH(1)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc Information for a message's recipient
+         * @member cert_id          Identifier for the recipient's certificate
+         * @member pk_encryption    Type of the recipient's certificate
+         * @member enc_key          The recipient's certificate
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.8 RecipientInfo
+         */
+        type record RecipientInfo {
+            HashedId8               cert_id,
+            PublicKeyAlgorithm      pk_encryption,
+            RecipientInfoContainer  enc_key
+        } with { variant "" }; // End of type RecipientInfo
+        
+        /**
+         * @desc The recipient's certificate
+         * @member enc_key          Identifier for the recipient's certificate
+         * @member enc_key_other    Type of the recipient's certificate
+         */
+        type union RecipientInfoContainer {
+            EciesEncryptedKey   enc_key,
+            octetstring         enc_key_other
+        } with { variant "" }; // End of type RecipientInfoContainer
+        
+        /**
+         * @desc Defines an ECIES-encrypted symmetric key as defined in IEEE Std 1363a 2004 
+         * @member v            The sender's ECC ephemeral key used for the Elliptic Curve Encryption Scheme
+         * @member c            The encrypted (AES) key 
+         * @member t            The authentication tag vector
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.9 EciesEncryptedKey
+         */
+         type record EciesEncryptedKey {
+            EccPoint             v,
+            octetstring          c,
+            Oct16                t
+        } with { variant "" }; // End of type EciesEncryptedKey
+        
+    } // End of group SecurityMessages
+    
+    group certificateSpecification {
+        
+        /**
+         * @desc Certificate description
+         * @member version                  The certificate's version. Shall be set to 2
+         * @member signer_info              The certificate's signer information
+         * @member subject_info             Information on the certificate's subject
+         * @member subject_attributes       The certificate's subject
+         * @member validity_restrictions    Restrictions regarding the certificate's validity
+         * @member signature_               The signature of this certificate signed by the responsible CA
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.1 Certificate
+         */
+        type record Certificate {
+            UInt8                   version,
+            SignerInfo              signer_info,
+            SubjectInfo             subject_info,
+            SubjectAttributes       subject_attributes,
+            ValidityRestrictions    validity_restrictions,
+            Signature               signature_
+        } with { variant "" }; // End of type Certificate
+        
+         /**
+         * @desc Defines an ordered list of Certificate
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of Certificate CertificateChain with { variant "" };
+        
+        /**
+         * @desc Certificate description
+         * @member subject_type The type subjet
+         * @member subject_name The subject itself
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.2 SubjectInfo
+         * @remark The subject_name variable-length vector shall have a maximum length of 32 bytes
+         */
+        type record SubjectInfo {
+            SubjectType subject_type,
+            Oct0to31    subject_name // The subject_name variable-length vector shall have a maximum length of 32 bytes 
+        } with { variant "" }; // End of type SubjectInfo
+        
+        /**
+         * @desc The list of the possible types of subjects
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.3 SubjectInfoType
+         */
+        type enumerated SubjectType {
+            e_enrollment_credential     (0),
+            e_authorization_ticket      (1),
+            e_authorization_authority   (2),
+            e_enrollment_authority      (3),
+            e_root_ca                   (4),
+            e_crl_signer                (5)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc Subject attribute description
+         * @member type_        The type of attribute
+         * @member attribute    The attribute itself
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.4 SubjectAttribute
+         */
+        type record SubjectAttribute {
+            SubjectAttributeType        type_,
+            SubjectAttributeContainer   attribute
+        } with { variant "" }; // End of type SubjectAttribute
+        
+        /**
+         * @desc The attributes description
+         * @member key              
+         * @member rv               
+         * @member assurance_level  
+         * @member its_aid_list     
+         * @member its_aid_ssp_list 
+         * @member other_attribute  
+         */
+        type union SubjectAttributeContainer {
+            PublicKey           key,
+            EccPoint            rv,
+            SubjectAssurance    assurance_level,
+            IntXs               its_aid_list,
+            ItsAidSsps          its_aid_ssp_list,
+            octetstring         other_attribute
+        } with { variant "" }; // End of type SubjectAttributeContainer
+        
+         /**
+         * @desc Defines an ordered list of SubjectAttribute
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of SubjectAttribute SubjectAttributes with { variant "" };
+        
+         /**
+         * @desc Defines an ordered list of IntX
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of IntX IntXs with { variant "" };
+        
+         /**
+         * @desc Defines an ordered list of ItsAidSsp
+         * @remark TTCN-3 language does not provide feature suach as superset for the. In consequence, the is replaced here by a set of
+         */
+        type set of ItsAidSsp ItsAidSsps with { variant "" };
+        
+        /**
+         * @desc The list of the possible types of attributes
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.5 SubjectAttributeType
+         */
+        type enumerated SubjectAttributeType {
+            e_verification_key      (0),
+            e_encryption_key        (1),
+            e_assurance_level       (2),
+            e_reconstruction_value  (3),
+            e_its_aid_list          (32),
+            e_its_aid_ssp_list      (33)
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        /**
+         * @desc The ITS S's assurance
+         * @member levels   The assurance levels
+         * @member reserved Out of scope
+         * @member confidence The confidence
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.6 SubjectAssurance
+         * @see Draft ETSI TS 103 097 V1.1.14 Table 5: Bitwise encoding of subject assurance
+         */
+        type record SubjectAssurance {
+            Bit3    levels,
+            Bit3    reserved,
+            Bit2    confidence
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" } // End of type SubjectAssurance
+        
+        /**
+         * @desc Defines ways to restrict the validity restriction of the certificate
+         * @member type_    The type of validity restriction of the certificate
+         * @member validity The validity restriction of the certificate
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.6 SubjectAssurance
+         */
+        type record ValidityRestriction {
+            ValidityRestrictionType         type_,
+            ValidityRestrictionContainer    validity
+        } with { variant "" }; // End of type ValidityRestriction
+        
+        /**
+         * @desc Defines the validity restriction of the certificate
+         * @member end_validity             Validity restriction till the end date
+         * @member time_start_and_end       Validity restriction between into a range
+         * @member time_start_and_duration  Validity restriction between into a range from a start date and inside a geographical aera
+         * @member region                   Validity restriction into a geographical area
+         * @member region                   Validity restriction into a geographical area
+         * @member data                     TODO
+         */
+        type union ValidityRestrictionContainer {
+            Time32              end_validity,
+            TimeStartEnd        time_start_and_end,
+            TimeDuration        time_start_and_duration,
+            GeographicRegion    region,
+            octetstring         data
+        } with { variant "" }; // End of type ValidityRestrictionContainer
+        
+        /**
+         * @desc Defines the validity restriction between into a range
+         * @member start_validity   Start date
+         * @member end_validity     End date
+         */
+        type record TimeStartEnd {
+            Time32  start_validity,
+            Time32  end_validity
+        } with { variant "" }; // End of type TimeStartEnd
+        
+        /**
+         * @desc Defines the validity restriction between into a range from a start date and inside a geographical aera
+         * @member start_validity   Start date
+         * @member duration         Duration of the validity restriction from the start date
+         */
+        type record TimeDuration {
+            Time32              start_validity,
+            Duration            duration
+        } with { variant "" }; // End of type TimeDuration
+        
+        /**
+         * @desc Type of validity restriction of a certificate
+         * @see Draft ETSI TS 103 097 V1.1.14 6.8    ValidityRestrictionType
+         */
+        type enumerated ValidityRestrictionType {
+            e_time_end                  (0),
+            e_time_start_and_end        (1),
+            e_time_start_and_duration   (2),
+            e_region                    (3),
+            e_unknown
+        } with { variant "FIELDLENGTH(8)" }; //with { variant "8 bit" }
+        
+        type set of ValidityRestriction ValidityRestrictions with { variant "" };
+        
+        /**
+         * @desc ITS-AID  description
+         * @member its_aid                      The ITS_AID identifier
+         * @member service_specific_permissions The associated Service Specific Permissions 
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.9 ItsAidSsp
+         */
+        type record ItsAidSsp {
+            IntX                        its_aid,
+            ServiceSpecificPermissions  service_specific_permissions
+        } with { variant "" }; // End of type ItsAidSsp
+        
+        /**
+         * @desc Service specific permissions definition
+         * @member version      SSP version control
+         * @member sspConatiner Service specific permissions definition
+         */
+        type record ServiceSpecificPermissions {
+            Oct1                                version,
+            ServiceSpecificPermissionsContainer sspContainer optional
+        } with { variant "" }; // End of type ServiceSpecificPermissions
+        
+        /**
+         * @desc Service specific permissions definition
+         * @member sspCAM  Service specific permissions definition for DENM
+         * @member sspDENM  Service specific permissions definition for DENM
+         * @member opaque   Service specific permissions definition for others
+         * 
+         * @see ETSI EN 302 637-2 V1.3.2 (2014-11) Clause 6.2.2.2  Service Specific Permissions (SSP)
+         * @see ETSI EN 302 637-3 V1.2.2 (2014-11) Clause 6.2.2.2   Service Specific Permissions (SSP)
+         */
+        type union ServiceSpecificPermissionsContainer {
+            SspCAM          sspCAM,
+            SspDENM         sspDENM,
+            Oct0to30        opaque
+        } with { variant "" }; // End of type ServiceSpecificPermissions
+        
+        /**
+         * @desc Service specific permissions definition for CAM
+         * @see ETSI EN 302 637-2 V1.3.2 (2014-11) Clause 6.2.2.2  Service Specific Permissions (SSP)
+         */
+        type record SspCAM {
+            Bit1        cenDsrcTollingZone,
+            Bit1        publicTransport,
+            Bit1        specialTransport,
+            Bit1        dangerousGoods,
+            Bit1        roadwork,
+            Bit1        rescue,
+            Bit1        emergency,
+            Bit1        safetyCar,
+            Bit1        closedLanes,
+            Bit1        requestForRightOfWay,
+            Bit1        requestForFreeCrossingAtATrafficLight,
+            Bit1        noPassing,
+            Bit1        noPassingForTrucks,
+            Bit1        speedLimit,
+            Bit1        reserved1,
+            Bit1        reserved2
+        } with { variant "" }; // End of type SspCAM
+        
+        /**
+         * @desc Service specific permissions definition for DENM
+         * @member trafficCondition
+         * @member accident
+         * @member roadworks
+         * @member adverseWeatherCondition_Adhesion
+         * @member hazardousLocation_SurfaceCondition
+         * @member hazardousLocation_ObstacleOnTheRoad
+         * @member hazardousLocation_AnimalOnTheRoad
+         * @member humanPresenceOnTheRoad
+         * @member wrongWayDriving
+         * @member rescueAndRecoveryWorkInProgress
+         * @member adverseWeatherCondition_ExtremeWeatherCondition  
+         * @member adverseWeatherCondition_Visibility
+         * @member adverseWeatherCondition_Precipitation
+         * @member slowVehicle
+         * @member dangerousEndOfQueue
+         * @member vehicleBreakdown
+         * @member postCrash
+         * @member humanProblem
+         * @member stationaryVehicle
+         * @member emergencyVehicleApproaching
+         * @member hazardousLocation_DangerousCurve
+         * @member collisionRisk
+         * @member signalViolation
+         * @member dangerousSituation
+         * @member reserved                                             Reserved for Future Usage
+         * @see Draft ETSI EN 302 637-3 V1.2.10 Clause 6.2.2.2  Service Specific Permissions (SSP)
+         */
+        type record SspDENM {
+            Bit1        trafficCondition,
+            Bit1        accident,
+            Bit1        roadworks,
+            Bit1        adverseWeatherCondition_Adhesion,
+            Bit1        hazardousLocation_SurfaceCondition,
+            Bit1        hazardousLocation_ObstacleOnTheRoad,
+            Bit1        hazardousLocation_AnimalOnTheRoad,
+            Bit1        humanPresenceOnTheRoad,
+            Bit1        wrongWayDriving,
+            Bit1        rescueAndRecoveryWorkInProgress,
+            Bit1        adverseWeatherCondition_ExtremeWeatherCondition,
+            Bit1        adverseWeatherCondition_Visibility,
+            Bit1        adverseWeatherCondition_Precipitation,
+            Bit1        slowVehicle,
+            Bit1        dangerousEndOfQueue,
+            Bit1        vehicleBreakdown,
+            Bit1        postCrash,
+            Bit1        humanProblem,
+            Bit1        stationaryVehicle,
+            Bit1        emergencyVehicleApproaching,
+            Bit1        hazardousLocation_DangerousCurve,
+            Bit1        collisionRisk,
+            Bit1        signalViolation,
+            Bit1        dangerousSituation
+        } with { variant "" }; // End of type SspDENM
+        
+    } // End of group certificateSpecification
+    
+    /**
+     * @desc Send/receive templates for profiles for certificates
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.4    Profiles for certificate
+     */
+    group profileCertificates {
+        
+        /**
+         * @desc Certificate description, part to be signed
+         * @member version                  The certificate's version. Shall be set to 2
+         * @member signer_info              The certificate's signer 
+         * @member subject_info             Information on the certificate's subject
+         * @member subject_attributes       The certificate's subject
+         * @member validity_restrictions    Restrictions regarding the certificate's validity
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.4    Profiles for certificate
+         */
+        type record ToBeSignedCertificate {
+            UInt8                   version,
+            SignerInfo              signer_info,
+            SubjectInfo             subject_info,
+            SubjectAttributes       subject_attributes,
+            ValidityRestrictions    validity_restrictions
+        } with { variant "" }; // End of type ToBeSignedCertificate
+        
+    } // End of group profileCertificates 
+    
+    group taConfiguration {
+        
+        /**
+         * @desc Describes the Test Adapter security configuration
+         * @member signingPrivateKey    Signing private keys generated by the PKI Infrastructire tool (CertChainGenerator\src\org\etsi\stf440\pki\MainApp.java)
+         * @member encryptPrivateKey    Encryption private keys generated by the PKI Infrastructire tool (CertChainGenerator\src\org\etsi\stf440\pki\MainApp.java)
+         * @member caCertificate        Certificates Authorization certificate generated by the PKI Infrastructire tool
+         * @member aaCertificate        Enrolment Credential certificate generated by the PKI Infrastructire tool
+         * @member atCertificate        Authorization Tickate certificate generated by the PKI Infrastructire tool
+         * @member location             3D location associated to each configuration
+         */
+        type record TaConfig {
+            Oct32           signingPrivateKey,
+            Oct32           encryptPrivateKey,
+            Certificate     caCertificate,
+            Certificate     aaCertificate,
+            Certificate     atCertificate,
+            ThreeDLocation  location
+        } with { variant "" }; // End of type TaConfig
+        
+        /**
+         * @desc Describes the Test Adapter security configurations
+         */
+        type set of TaConfig TaConfigs with { variant "" };
+        
+    } // End of group taConfiguration
+    
+    group taPrimitives {
+        
+        /**
+         * @desc    Primitive used to activate security support
+         * @member  certificateId The certificate identifier to be used
+         */
+        type record AcEnableSecurity {
+            charstring certificateId
+        } with { variant "" }; // End of type AcEnableSecurity
+        
+        /**
+         * @desc    Primitive used to deactiate security support
+         */
+        type record AcDisableSecurity {
+            boolean disable
+        } with { variant "" }; // End of type AcDisableSecurity
+        
+    } // End of group taPrimitives
+    
+    group utPrimitives {
+        
+    }
+    // End of group utPrimitives
+        
+} with { encode "RAW" };
+
+// End of module LibItsSecurity_TypesAndValues
+

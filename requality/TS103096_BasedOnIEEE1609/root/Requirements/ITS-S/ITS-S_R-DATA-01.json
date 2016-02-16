@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/f557e3d6-87e8-47f3-a468-7324d5b0d176"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "07. Receiving Data NB"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "b388f0a8-bfbd-41ab-9dc1-b829b7abd0a6"
+}

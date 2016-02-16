@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "42a52204-c135-462c-9560-e5119aa20e81",
+            "type": "STRING",
+            "value": "Positive test is not needed to be tested.\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "42a52204-c135-462c-9560-e5119aa20e81",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/12e35a8b-e0f5-44e6-a5f5-4fb3e932e835"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "42a52204-c135-462c-9560-e5119aa20e81",
+            "type": "STRING",
+            "value": "09. Check that AA cert is signed by Root cert"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "42a52204-c135-462c-9560-e5119aa20e81",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "42a52204-c135-462c-9560-e5119aa20e81"
+}

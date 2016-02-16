@@ -1,0 +1,336 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2015 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     MAP_Types_Test.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2015-11-03
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module MAP_Types_Test
+{
+  import from ITS_Container language "ASN.1:1997" all;
+  import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+  import from MAP_Types all;
+
+  type component Empty_CT {
+  
+  }
+
+  const MAP_PDU map_pdu := {
+        header := {
+                protocolVersion := 3,
+                messageID := 10,
+                stationID := 99
+            },
+	mapData := {
+		msgID := 132,
+		msgSubID := 11,
+		msgIssueRevision := 111,
+		layerType := generalMapData,
+		layerID := 66,
+		intersections := {
+			{
+				name := "name name",
+				id := {
+					region := 4654,
+					id := 7894
+				},
+				revision := 40,
+				refPoint := {
+					lat := 564684,
+					long := 132443,
+					elevation := -1313,
+					regional := {{altitudeValue := 232, altitudeConfidence := alt_200_00}}
+				},
+				laneWidth := 13213,
+				speedLimits := {
+					{
+						type_ := maxSpeedInSchoolZone,
+						speed := 4641
+					},
+					{
+						type_ := vehicleMinSpeed,
+						speed := 12
+					},
+					{
+						type_ := vehiclesWithTrailersMinSpeed,
+						speed := 313
+					}
+				},
+				laneSet := {
+					{
+						laneID := 111,
+						name := "somename",
+						ingressApproach := 2,
+						egressApproach := 7,
+						laneAttributes := {
+							directionalUse := '10'B,
+							sharedWith := '0101101010'B,
+							laneType := {
+								crosswalk := '0101011100101010'B
+							},
+							regional := {}
+						},
+						maneuvers := '101001010010'B,
+						nodeList := {
+							nodes := { 
+								{
+									delta := {
+										node_XY1 := {
+											x := 11,
+											y := 46
+										}
+									},
+									attributes := {
+										localNode := {
+											roundedCapStyleA
+										},
+										disabled := {
+											doNotBlock
+										},
+										enabled := {
+											whiteLine
+										},
+										data := {
+											{laneCrownPointLeft := 68}
+										},
+										regional := {
+											{}
+										},
+										dWidth := 131,
+										dElevation := 234
+									}
+								},
+								{
+									delta := {
+										node_XY1 := {
+											x := 62,
+											y := 113
+										}
+									},
+									attributes := {
+										localNode := {
+											roundedCapStyleA
+										},
+										disabled := {
+											doNotBlock
+										},
+										enabled := {
+											whiteLine
+										},
+										data := {
+											{laneCrownPointLeft := 23}
+										},
+										regional := {
+											{}
+										},
+										dWidth := 139,
+										dElevation := 234
+									}
+								}
+							}
+						},
+						connectsTo := {
+							{
+								connectingLane := {
+									lane := 146,
+									maneuver := '111010111100'B
+								},
+								remoteIntersection := {
+									region := 1231,
+									id := 4621
+								},
+								signalGroup := 16,
+								userClass := 12,
+								connectionID := 11
+							}
+						},
+						overlays := {12, 122, 86,9},
+						regional := {}	
+						
+					}
+				},
+				preemptPriorityData := {
+						{}
+					},
+				regional := {}
+			}
+		},
+		roadSegments := {
+			{
+				name := "othername",
+				id := {
+					region := 32432,
+					id := 232
+				},
+				revision := 11,
+				refPoint := {
+					lat := 31231,
+					long := 1357,
+					elevation := -12,
+					regional := {{altitudeValue := 12, altitudeConfidence := alt_200_00}}
+				},
+				laneWidth := 2131,
+				speedLimits := {
+					{
+						type_ := maxSpeedInSchoolZone,
+						speed := 12
+					},
+					{
+						type_ := vehicleMinSpeed,
+						speed := 46
+					},
+					{
+						type_ := vehiclesWithTrailersMinSpeed,
+						speed := 4352
+					}
+				},
+				roadLaneSet := {
+					{
+						laneID := 3,
+						name := "names",
+						ingressApproach := 8,
+						egressApproach := 1,
+						laneAttributes := {
+							directionalUse := '11'B,
+							sharedWith := '0111010110'B,
+							laneType := {
+								crosswalk := '0101001110111110'B
+							},
+							regional := {}
+						},
+						maneuvers := '010110111010'B,
+						nodeList := {
+							nodes := { 
+								{
+									delta := {
+										node_XY1 := {
+											x := 135,
+											y := 11
+										}
+									},
+									attributes := {
+										localNode := {
+											roundedCapStyleA
+										},
+										disabled := {
+											doNotBlock
+										},
+										enabled := {
+											whiteLine
+										},
+										data := {
+											{laneCrownPointLeft := 12}
+										},
+										regional := {
+											{}
+										},
+										dWidth := 1,
+										dElevation := 36
+									}
+								},
+								{
+									delta := {
+										node_XY1 := {
+											x := 500,
+											y := 310
+										}
+									},
+									attributes := {
+										localNode := {
+											roundedCapStyleA
+										},
+										disabled := {
+											doNotBlock
+										},
+										enabled := {
+											whiteLine
+										},
+										data := {
+											{laneCrownPointLeft := 85}
+										},
+										regional := {
+											{}
+										},
+										dWidth := 222,
+										dElevation := 234
+									}
+								}
+							}
+						},
+						connectsTo := {
+							{
+								connectingLane := {
+									lane := 100,
+									maneuver := '111010001100'B
+								},
+								remoteIntersection := {
+									region := 46461,
+									id := 1024
+								},
+								signalGroup := 135,
+								userClass := 162,
+								connectionID := 12
+							}
+						},
+						overlays := {12, 122, 86},
+						regional := {}					
+					}
+				},
+				regional := {}
+			}
+		},
+		dataParameters := {
+			processMethod := "process",
+			processAgency := "agency",
+			lastCheckedDate := "checkeddate",
+			geoidUsed := "geoid"
+		},
+		restrictionList := {
+			{
+				id := 255,
+				users := {
+					{
+						basicType := equippedTaxis
+					}
+				}
+			}
+		},
+		regional := {
+			signalHeadLocations := {
+				{
+					node := {
+						node_XY1 := {
+							x := 135,
+							y := 11
+						}
+					},
+					elevation := 1023,
+					signalGroupID := 101
+				}
+			}
+		},
+		crc := 'B4AA'O
+	}				
+};
+
+
+  testcase tc_encdec() runs on Empty_CT {
+    if(map_pdu == dec_MAP_PDU(enc_MAP_PDU(map_pdu))){
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+
+  control{
+    execute(tc_encdec());
+  }
+}

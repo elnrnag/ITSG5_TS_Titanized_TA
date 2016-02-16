@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "42ba7080-2769-40f8-84c3-1ef627d97f0b",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2adf210a-7c7b-4225-a0ed-f5a25b1b430d"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "42ba7080-2769-40f8-84c3-1ef627d97f0b",
+            "type": "STRING",
+            "value": "CAM profile"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "42ba7080-2769-40f8-84c3-1ef627d97f0b",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "42ba7080-2769-40f8-84c3-1ef627d97f0b",
+            "type": "STRING",
+            "value": "complete"
+        }
+    },
+    "uuid": "42ba7080-2769-40f8-84c3-1ef627d97f0b"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\"><a name=\"a61181d9-1ca0-444d-8723-5bc368222afc\" id=\"id_a61181d9-1ca0-444d-8723-5bc368222afc\" class=\"requality_id\"><\/a>A <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\">Payload<\/span><\/font><span class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\"> element shall be included for all CAMs. This element shall be of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\">signed<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_a61181d9-1ca0-444d-8723-5bc368222afc\"> and contain the CAM payload.<\/span><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "a61181d9-1ca0-444d-8723-5bc368222afc"
+}

@@ -1,0 +1,1485 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FNTP/LibItsFntp_Functions.ttcn3 $
+ *              $Id: LibItsFntp_Functions.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       FAST networking & transport layer protocol (ISO 29281-2) functions
+ */
+module LibItsFntp_Functions {
+    
+    // Libcommon
+    import from LibCommon_Sync {
+        function 
+            f_connect4SelfOrClientSync, f_disconnect4SelfOrClientSync, 
+        f_selfOrClientSyncAndVerdict, f_selfOrClientSyncAndVerdictTestBody; 
+        altstep a_shutdown 
+    };
+    import from LibCommon_VerdictControl {
+      type FncRetCode
+    };
+    import from LibCommon_Time {
+      function f_sleep, f_sleepIgnoreDef
+    };
+    import from LibCommon_BasicTypesAndValues { 
+        type UInt16 
+    };
+    
+    // LibIts 
+    
+    // LibItsCalm 
+    import from CALMmanagement language "ASN.1:1997" { 
+        type StationID, ITS_scuId; 
+    }; 
+    import from CALMllsap language "ASN.1:1997" { 
+        type 
+            EUI64, IN_SAPaddress, LLserviceAddr, Link_ID, AccessParameters 
+    }; 
+    import from CALMmsap language "ASN.1:1997" { 
+        type 
+            FWTsetNot 
+    }; 
+    import from CITSapplReq language "ASN.1:1997" { 
+        type ServiceRef 
+    };
+    import from CALMfntp language "ASN.1:1997" all; 
+    import from LibItsFntp_TypesAndValues {
+        const c_portDyn, c_portNon;
+        type 
+            UtFntpEvent, UtFntpEventInd, 
+            CfFntpEventInd 
+    };
+    import from LibItsFntp_Pics { 
+        modulepar PICS_ITS_MGT_NOT
+    };
+    import from LibItsFntp_Templates all;
+    import from LibItsFntp_Pixits all;
+    import from LibItsFntp_Pics {
+        modulepar PICS_ITS_S_INW, PICS_ROLE_RH;
+    };
+    import from LibItsMgt_TypesAndValues { 
+        group constants 
+    };
+    import from LibItsMgt_Templates { 
+        template 
+            mdw_fwtSetNotRequestReq, mdw_fwtDeleteFntp, 
+            mw_mnRequestRequest_setNotFNTP 
+    };
+    import from LibItsCalm_Interface { 
+        type 
+            UtInitialize, CfInitialize, CfEventInd, 
+            UtResult, CfResult, 
+            ItsCalm 
+    }; 
+    
+    /**
+     * @desc Upper tester functions
+     */
+    group utFunctions {
+        
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_utInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utFntpInitializeIut(template (value) UtInitialize p_utInitialize) runs on ItsCalm {
+        
+            utPort.send(p_utInitialize);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                    log("*** f_utFntpInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utFntpInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utFntpInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+        
+        } // End of function f_utFntpInitializeIut 
+        
+        /**
+         * @desc    Send a NFsapPrimitivesDown primitive and wait for the NFsapPrimitivesUp confirm response
+         * @param   p_utFntpEvent    The NFsapPrimitivesDown request
+         * @param   p_utFntpEventInd The NFsapPrimitivesDown response
+         * @param   p_discard        Set to true if responses shall be discard, otherwise the function failed 
+         * @param   p_result         The response value
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utFntpEventResponse( 
+            in template (value) UtFntpEvent p_utFntpEvent, 
+            in template (present) UtFntpEventInd p_utFntpEventInd, 
+            in boolean p_discard, 
+            out UtFntpEventInd p_result) 
+        runs on ItsCalm {
+            
+//            log("*** f_utFntpEventResponse: INFO: Send message: ", p_commandReq, " ***");
+            utPort.send(p_utFntpEvent);
+//            log("*** f_utFntpEventResponse: INFO: Expected UtCommandConfirm: ", p_commandConf, " ***");
+            tc_wait.start;
+            alt {
+                [] utPort.receive(p_utFntpEventInd) -> value p_result {
+//                    log("*** f_utFntpEventResponse: INFO: Receive expected confirm: message ***");
+                    tc_wait.stop;
+                }
+                [] utPort.receive(UtFntpEventInd:? ) -> value p_result {
+                    if (p_discard == false) { 
+                        tc_wait.stop; 
+                        log("*** f_utFntpEventResponse: ERROR: Event not correctly indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("fail", e_error);
+                    }
+                    else {
+                        log("*** f_utFntpEventResponse: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    }
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) {
+                        log("*** f_utFntpEventResponse: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                    else {
+                        log("*** f_utFntpEventResponse: INFO: Event not indicated at application layer ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                }
+            } // End of 'alt' statement
+            
+        } // End of function f_utFntpEventResponse
+        
+        /**
+         * @desc    Send a NFsapPrimitivesDown primitive and do not wait for the NFsapPrimitivesDown confirm response
+         * @param   p_utFntpEvent    The NFsapPrimitivesDown primitive
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_utFntpEvent( 
+            in template (value) UtFntpEvent p_utFntpEvent 
+        ) runs on ItsCalm { 
+            var UtFntpEventInd v_utFntpEventInd;
+            
+            utPort.send(p_utFntpEvent);
+            tc_noac.start;
+            alt {
+                [] utPort.receive(mdw_fntpCommConfirm_anyError(?)) { // Failure expected 
+                    tc_noac.stop;
+                    log("*** f_utFntpEvent: ERROR: Message is confirmed on error only (see ISO/IEC WD 29281-1 Clause 7.6.2 Basic procedure) ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] utPort.receive(mw_fntpCommConfirm_success) { // FIXME Use altstep for UtPort
+                    tc_noac.stop;
+                    log("*** f_utFntpEvent: INFO: Message was confirmed successfully ***");
+                }
+                [] utPort.receive(UtFntpEventInd:?) -> value v_utFntpEventInd { // FIXME Use altstep for UtPort
+                    tc_noac.stop;
+                    log("*** f_utFntpEvent: INFO: Unexpected message was received ***", v_utFntpEventInd);
+                    // FIXME Check the content of the notification, not sure which fields should be set - repeat;
+                }
+                [] tc_noac.timeout {
+                    log("*** f_utFntpEvent: INFO: CommandRequest succeed ***");
+                }
+            } // End of 'alt' statement 
+
+        } // End of function f_utFntpEvent
+        
+    } // End of group utFunctions
+
+    /**
+     * @desc Config tester functions
+     */
+    group cfFunctions { 
+        
+        /**
+         * @desc    Requests to initialize the configuration tester 
+         * @param   p_cfInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_cfFntpInitialize(template (value) CfInitialize p_cfInitialize) runs on ItsCalm {
+        
+            cfPort.send(p_cfInitialize);
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(CfResult:true) {
+                    tc_wait.stop;
+                    log("*** f_cfFntpInitialize: INFO: Configuration tester initialized ***");
+                }
+                [] cfPort.receive {
+                    tc_wait.stop;
+                    log("*** f_cfFntpInitialize: INFO: Configuration tester could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_cfFntpInitialize: INFO: Configuration tester could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+
+        } // End of function f_cfFntpInitialize 
+        
+        /**
+         * @desc    Await for notification on MN-SAP 
+         * @param   p_cfFntpEventInd    The MN_Request_request notification message.
+         * @param   p_discard           Set to true if responses shall be discard, otherwise the function failed 
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_cfFntpAwaitNotificationToManagement( 
+            in template CfFntpEventInd p_cfFntpEventInd, 
+            in boolean p_discard 
+        ) runs on ItsCalm {
+            var CfFntpEventInd p_result;
+            
+            log("*** f_cfFntpAwaitNotificationToManagement: INFO: Expected event: ", p_cfFntpEventInd, " ***");
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(p_cfFntpEventInd) {
+                    tc_wait.stop;
+                    log("*** f_cfFntpAwaitNotificationToManagement: INFO: Notification event received ***");
+                }
+                [] cfPort.receive(CfFntpEventInd: ?) -> value p_result { 
+                    if (p_discard == false) { 
+                        tc_wait.stop;
+                        log("*** f_cfFntpAwaitNotificationToManagement: ERROR: Another event indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfFntpAwaitNotificationToManagement: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    } 
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) { 
+                        log("*** f_cfFntpAwaitNotificationToManagement: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfFntpAwaitNotificationToManagement: INFO: Event not indicated at application layer ***");
+                    }
+                }
+            } // End of 'alt' statement
+        
+        } // End of function f_cfFntpAwaitNotificationToManagement
+    
+    } // End of group cfFunctions
+    
+    /**
+     * @desc Test adapter setting functions
+     */
+    group fntpConfigurationFunctions {
+        
+        /**
+         * @desc This configuration features:
+         * <li>Host and Router are combined (see ISO/WD 29281-2 - Figure 1 - Implementation architecture I)</li>
+         * <li>MGT1 IISC Port (IISC/LAN) is not used</li>
+         */
+        function f_cf01Up() runs on ItsCalm {
+            
+            // Sanity check
+            if (PICS_ITS_S_INW or not(PICS_ROLE_RH)) {
+                log("*** f_cf01Up: ERROR: 'PICS_ITS_S_INW or not(PICS_ROLE_RH)' required for stting up CF01 ***");
+                stop;
+            }
+            
+            // Map
+            map(self:utPort, system:utPort);
+            map(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            map(self:fntpPort, system:fntpPort);
+            
+            vc_commandRef := 0;
+            vc_pduCounter := 0;
+            
+            // Connect
+            f_connect4SelfOrClientSync();
+            
+            // Set processing on shutdown
+            activate(a_cf01Down());
+            
+            // Initialize the component
+            f_initialiseComponent("cf01Up");
+            
+            // Initialze the IUT
+            f_initialState();
+            
+        } // End of function f_cf01Up
+        
+        /**
+         * @desc This configuration features:
+         * <li>Host and Router are separated (see ISO/WD 29281-2 - Figure 3 - Implementation architecture II & III)</li>
+         * <li>MGT1 IISC Port (IISC/LAN) is not used</li>
+         */
+        function f_cf02Up() runs on ItsCalm {
+            
+            // Sanity check
+            if (not(PICS_ITS_S_INW)) {
+                log("*** f_cf02Up: ERROR: PICS_ITS_S_INW required for setting uo CF02 ***");
+                stop;
+            }
+            
+            vc_commandRef := 0;
+            vc_pduCounter := 0;
+            
+            // Map
+            map(self:utPort, system:utPort);
+            map(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            map(self:fntpPort, system:fntpPort);
+            
+            // Connect
+            f_connect4SelfOrClientSync();
+            
+            // Set processing on shutdown
+            activate(a_cf02Down());
+            
+            // Initialize the component
+            f_initialiseComponent("cf02Up");
+
+            // Initialze the IUT
+            f_initialState();
+            
+        } // End of function f_cf02Up
+        
+        /**
+         * @desc Deletes configuration cf01
+         */
+        function f_cf01Down() runs on ItsCalm {
+            
+            deactivate;
+            
+            // Unmap
+            unmap(self:utPort, system:utPort);
+            unmap(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            unmap(self:fntpPort, system:fntpPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // end f_cf01Down
+        
+        /**
+         * @desc Deletes configuration cf02
+         */
+        function f_cf02Down() runs on ItsCalm {
+            
+            deactivate;
+            
+            // Unmap
+            unmap(self:utPort, system:utPort);
+            unmap(self:cfPort, system:cfPort); // FIXME Add check PICS_ITS_MGT_NOT
+            unmap(self:fntpPort, system:fntpPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // End of f_cf02Down
+        
+        /**
+         * @desc    Behavior function for initializing component's variables and tables
+         * @param   p_componentName Name of the component
+         */
+        function f_initialiseComponent(in charstring p_componentName) runs on ItsCalm {
+            
+            // Initialize variables
+            vc_componentName := p_componentName;
+            vc_portNumber := { portLong := c_portNon };
+            
+            // Set defaults
+            activate(a_fntpDefault()); // Default for Fntp module
+        } // End of f_initialiseComponent
+        
+    } // End of group fntpConfigurationFunctions
+    
+    /**
+     * @desc Preambule functions
+     */
+    group preambles {
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         */
+        function f_initialState() runs on ItsCalm {
+            
+            if (PICS_ITS_MGT_NOT == true) {
+                f_utFntpInitializeIut(m_utFntpInitialize_with_management);
+            } else { 
+                f_utFntpInitializeIut(m_utFntpInitialize_without_management);
+            } 
+            f_cfFntpInitialize(m_cfFntpInitialize);
+            f_sleepIgnoreDef(PX_WAIT_FOR_IUT_READY); // Wait until the IUT is in a stable situation (beaconing...)
+            cfPort.clear; // Because TestConfigIICP should trigger management port deletion message 
+        } // End of function f_initialState
+        
+        /**
+         * @desc Implement the following Initial conditions:
+         * <li>the IUT having set up properly the FNTP forwarding table, and the local port number of the ITS-S application</li>
+         * <li>the IUT having an entry in the FNTP forwarding table for unicast communication with remote Link Port and Service Port</li>
+         * <li>the IUT having an entry in the FNTP forwarding table for Service Port = port1, but not for Service Port = port2</li>
+         * <li>the IUT having an entry in the FNTP forwarding table for a Service Port, but no entry for the peer station</li>
+         * @param p_port Indicates the port number
+         * @verdict Unchanged on success, set to fail on error (e_timeout)
+         * @see ISO 29281-2 Clause 8.2
+         */
+        // TODO Consider case of c_portDyn, and use f_utEventResponse
+        function f_initializeFntpForwardingTable(in PortNumber p_port) runs on ItsCalm {
+            
+            f_utFntpEventResponse( 
+                m_generateNfFntpPortCreationRequest(
+                    f_getIutServiceRef(), 
+                    p_port 
+                ),
+                mw_utFntpEventInd( 
+                    mw_fntpPortConfirm( 
+                        f_getIutServiceRef(), 
+                        p_port 
+                    ) 
+                ), 
+                false, 
+                vc_utEventInd.utFntpEventInd 
+            );
+            // Store the allocated port number
+            vc_portNumber := p_port;
+            if (ischosen(vc_portNumber.portShort)) {
+                log("*** f_initializeFntpForwardingTable: INFO: portNumber value is: " & int2str(vc_portNumber.portShort) & " ***");
+            } else {
+                log("*** f_initializeFntpForwardingTable: INFO: portNumber value is: " & int2str(vc_portNumber.portLong) & " ***");
+            }
+            if (PICS_ITS_MGT_NOT) {
+                // And wait for a MN-SAP.MN-REQUEST/FWTupdate message sent to ITS management entity to update the forwarding table
+                f_fntpAwaitFwtUpdate_reference(
+                    vc_portNumber, 
+                    vc_reference 
+                );
+            }
+        } // End of function f_initializeFntpForwardingTable
+        
+        /**
+         * @desc    Wait for MN_Request_request/FWTupdate message sent by IST management entity to update the forwarding table 
+         * @param   p_portNumber Contains either the value PORT_NON in order to indicate dynamic assignment of a port number by the port number manager, or a valid value of a well-known static port PORT_REG
+         * @param   p_reference  The reference value associated to the provided port number
+         * @verdict Unchanged
+         */
+        function f_fntpAwaitFwtUpdate_reference( 
+            in template (present) PortNumber p_portNumber, 
+            out integer p_reference 
+        ) runs on ItsCalm {
+            
+            f_cfAwaitCreationPortNotificationToManagement( 
+                mw_cfFntpEventInd(
+                    mdw_fwtSetNotRequestReq(
+                        p_portNumber, 
+                        PX_USER_PRIORITY, 
+                        c_linkId_unknown,  
+                        c_unknown_portLong, 
+                        c_unknown_portLong 
+                    )
+                ),
+                false,
+                p_reference 
+            ); 
+        } // End of function f_fntpAwaitFwtUpdate_reference
+		
+        /**
+         * @desc Wait for notification from IUT to Management layer
+         * @param p_cfFntpEventInd	Receive template of the expected event
+         * @param p_discard			Set to true if command confirm responses shall be discard, otherwise the function failed 
+         * @param p_reference		The reference value associated to the provided port number
+         * @verdict Unchanged on success, set to fail on error (e_timeout)
+         */
+        function f_cfAwaitCreationPortNotificationToManagement( 
+            in template CfFntpEventInd p_cfFntpEventInd, 
+            in boolean p_discard, 
+            out integer p_reference  
+        ) runs on ItsCalm {
+            var CfFntpEventInd p_result;
+            
+            p_reference := 65535; // See noFNTPfwtEntries FIXME Create a constant
+            
+            log("*** f_cfAwaitCreationPortNotificationToManagement: INFO: Expected event: ", p_cfFntpEventInd, " ***");
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(p_cfFntpEventInd) -> value p_result {
+                    tc_wait.stop;
+                    p_reference := p_result.mnRequestRequest.request_param.FWTsetNot.fwt.SetNotFNTP.reference;
+                    log("*** f_cfAwaitCreationPortNotificationToManagement: INFO: Notification event received, reference entry=", p_reference, " ***");
+                }
+                [] cfPort.receive(CfFntpEventInd: ?) -> value p_result { 
+                    if (p_discard == false) { 
+                        tc_wait.stop;
+                        log("*** f_cfAwaitCreationPortNotificationToManagement: ERROR: Another event indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfAwaitCreationPortNotificationToManagement: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    } 
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) { 
+                        log("*** f_cfAwaitCreationPortNotificationToManagement: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfAwaitCreationPortNotificationToManagement: INFO: Event not indicated at application layer ***");
+                    }
+                }
+            } // End of 'alt' statement
+        
+        } // End of function f_cfAwaitCreationPortNotificationToManagement
+    
+        /**
+         * @desc Wait for MN_Request_request/FWT Update notification from IUT to Management layer
+         * @param p_portNumber			The provided port number value
+         * @param p_linkId				Set VCI link identifier 
+         * @param p_remotePortNumber	The remote port number value
+         * @param p_linkPortNumber		The linked port number value
+         * @verdict Unchanged on success, set to fail on error (e_timeout)
+         */
+        function f_fntpAwaitFwtUpdate( 
+            in template (present) PortNumber p_portNumber, 
+            in template (value) Link_ID p_linkId,  
+            in template (value) PortNumber p_remotePortNumber, 
+            in template (value) PortNumber p_linkPortNumber 
+        ) runs on ItsCalm {
+            
+            f_cfFntpAwaitNotificationToManagement( 
+               mw_cfFntpEventInd(
+                    mdw_fwtSetNotRequestReq(
+                        p_portNumber, 
+                        PX_USER_PRIORITY, 
+                        p_linkId,  
+                        p_remotePortNumber, 
+                        p_linkPortNumber
+                    )  
+                ),
+                false 
+            ); 
+        } // End of function f_fntpAwaitFwtUpdate
+        
+        /**
+         * @desc Wait for MN_Request_request/FWT Delete notification from IUT to Management layer
+         * @param p_reference		The reference value associated to the provided port number
+         * @verdict Unchanged on success, set to fail on error (e_timeout)
+         */
+        function f_fntpAwaitFwtDelete( 
+            in template (value) integer p_reference  
+        ) runs on ItsCalm {
+            
+            f_cfFntpAwaitNotificationToManagement( 
+                mw_cfFntpEventInd(
+                    mdw_fwtDeleteFntp(
+                        p_reference 
+                    )  
+                ),
+                false 
+            ); 
+        } // End of function f_fntpAwaitFwtDelete()
+        
+        /**
+         * @desc Generate a NF-SAP request and wait for a confirm message 
+         * @param p_generateNfSapRequest  The NF-SAP request message to send 
+         * @param p_nfSapRequestConfirm   The command confirm response
+         * @param p_discard               Set to true if command confirm responses shall be discard, otherwise the function failed 
+         * @param p_result                The command/request confirm response
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_fntpGenerateNfSApRequestWithConfirm( 
+            in template (value) UtFntpEvent p_generateNfSapRequest, 
+            in template (present) UtFntpEventInd p_nfSapRequestConfirm, 
+            in boolean p_discard, 
+            out UtFntpEventInd p_result 
+        ) runs on ItsCalm { 
+            
+            f_utFntpEventResponse(
+                p_generateNfSapRequest, 
+                p_nfSapRequestConfirm, 
+                p_discard,
+                p_result
+            );
+            
+        } // End of function f_fntpGenerateNfSApRequestWithConfirm 
+        
+        /**
+         * @desc Generate a NFsapPrimitivesDown primitive without waiting for a confirm message 
+         * @param p_utFntpEvent The NFsapPrimitivesDown primitive to send 
+         * @verdict Unchanged
+         */
+        function f_fntpGenerateNfSApRequestWithoutConfirm( 
+            in template (value) UtFntpEvent p_utFntpEvent 
+        ) runs on ItsCalm { 
+            
+            f_utFntpEvent(p_utFntpEvent);
+            
+        } // End of function f_fntpGenerateNfSApRequestWithoutConfirm 
+        
+        /**
+         * @desc Await for NFsapPrimitivesUp primitive 
+         * @param p_portNumber	The port number value 
+         * @param p_linkId	    The source link identifier
+         * @verdict Unchanged on success, fail on error and inconc otherwise 
+         */
+        function f_fntpAwaitNfSapCommConfirm( 
+            in template (present) PortNumber p_portNumber, 
+            in template (present) Link_ID p_linkId
+        ) runs on ItsCalm {
+            var UtFntpEventInd v_utFntpEventInd;
+            
+            log("*** f_fntpAwaitNfSapCommConfirm: DEBUG: Expected template: ", 
+                 mw_utFntpEventInd( 
+                    mdw_checkNfFntpCommIndication(
+                        vc_portNumber,                      // Destination port of DL-UNITDATA.request primitive
+                        p_portNumber,                        // Source port of DL-UNITDATA.request primitive
+                        p_linkId                            // Source address of DL-UNITDATA.request primitive
+            )));
+            tc_wait.start;
+            alt {
+                [] utPort.receive( 
+                    mw_utFntpEventInd( 
+                        mdw_checkNfFntpCommIndication(
+                            vc_portNumber,                      // Destination port of DL-UNITDATA.request primitive
+                            p_portNumber,                       // Source port of DL-UNITDATA.request primitive
+                            p_linkId                            // Source address of DL-UNITDATA.request primitive
+                ))) -> value v_utFntpEventInd {
+                    tc_wait.stop;
+                    log("*** f_fntpAwaitNfSapCommConfirm: INFO: NF-SAP Communication indication received:", v_utFntpEventInd, " ***");
+                }
+                [] utPort.receive( 
+                    mw_utFntpEventInd( 
+                        mw_checkNfFntpCommIndication_any
+                )) -> value v_utFntpEventInd {
+                    tc_wait.stop;
+                    log("*** f_fntpAwaitNfSapCommConfirm: INFO: Unexpected NF-SAP Communication indication received:", v_utFntpEventInd, " ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] utPort.receive(UtFntpEventInd:?) -> value v_utFntpEventInd {
+                    tc_wait.stop;
+                    log("*** f_fntpAwaitNfSapCommConfirm: INFO: Unknown NF-SAP Communication indication received:", v_utFntpEventInd, " ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_fntpAwaitNfSapCommConfirm: ERROR: Timeout while waiting for event check result ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+            } // End of 'alt' statement
+        } // End of function f_fntpAwaitNfSapCommConfirm 
+        
+        /**
+         * @desc Call this method to remove entry created by f_initializeFntpForwardingTable() in FNTP Forwarding Table
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_unInitializeFntpForwardingTable() runs on ItsCalm {
+            // check c_portDyn
+            // Send for FTN-SOCKET.request & Wait for FTN-SOCKET.confirm
+            
+            f_utFntpEventResponse( 
+                m_generateNfFntpPortDeletionRequest( 
+                    f_getIutServiceRef(), 
+                    vc_portNumber 
+                ), 
+                mw_utFntpEventInd( 
+                    mw_fntpPortConfirm( 
+                        f_getIutServiceRef(), 
+                        c_unknown_portLong  
+                    )  
+                ), 
+                false, 
+                vc_utEventInd.utFntpEventInd  
+            );
+            
+            if (PICS_ITS_MGT_NOT) {
+                // And wait for a MN-SAP.MN-REQUEST/FWTupdate message sent to ITS management entity to update the forwarding table
+                f_fntpAwaitFwtDelete(
+                    vc_reference 
+                );
+            }
+        } // End of function f_unInitializeFntpForwardingTable
+        
+        /**
+         * @desc Trigger a basic FNTPNPDU to create an entry in forwarding table for a known peer station 
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_setupKnownPeerStation() runs on ItsCalm { 
+            f_sendBasicFntpNpdu( 
+                f_getIutRemotePortNumberValue(), 
+                vc_portNumber,  
+                m_llServiceAddr(mw_linkId(f_getIutRemoteDestCiidUc(), f_getIutWlLocalCiid())), 
+                m_llServiceAddr(mw_linkId(f_getIutWlLocalCiid(), f_getIutWlLocalCiid())) 
+            );
+            if (PICS_ITS_MGT_NOT) {
+                // And wait for a MN-SAP.MN-REQUEST/FWTupdate message sent to ITS management entity to update the forwarding table
+                f_fntpAwaitFwtUpdate( 
+                    vc_portNumber, 
+                    mw_linkId(f_getIutRemoteDestCiidUc(), f_getIutWlLocalCiid()), 
+                    f_getIutRemotePortNumberValue(), 
+                    vc_portNumber 
+                );
+            }
+            // And wait for NF-SAP Comm.ind message sent by the FNTP to the ITS facilities entity 
+            f_fntpAwaitNfSapCommConfirm(
+                f_getIutRemotePortNumberValue(), 
+                m_linkId(f_getIutRemoteDestCiidUc(), f_getIutWlLocalCiid())  
+            );
+        } // End of function f_setupKnownPeerStation
+        
+    } // End of group preambles
+    
+    /**
+     * @desc Postambule functions
+     */
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsCalm {
+            // Nothing to do
+        }
+        
+    } // End of group postambles
+    
+    /**
+     * @desc Message triggreing functions
+     */
+    group messagesTriggering {
+        
+        /**
+         * @desc    Triggers test adapter to send FNTP basic NDPU
+         * @param   p_sourcePort        	Source port (c_portRtr or c_portHst)
+         * @param   p_destinationPort  		Destination port (c_portRtr or c_portHst)
+         * @param   p_inSapSourceAddress    IN-SAP source port
+         * @param   p_inSapDestAddress   	IN-SAP destination port
+         * @verdict Unchanged
+         */
+        function f_sendBasicFntpNpdu(  
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    m_generateFntpNpdu(
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                m_fntpBasicNpdu( 
+                                    p_sourcePort, 
+                                    p_destinationPort
+                                ) 
+                            ) 
+                        ) 
+                    )
+                )
+            );
+        } // End of function f_sendBasicFntpNpdu
+        
+        /**
+         * @desc    Triggers test adapter to send FNTP forwarding NDPU
+         * @param   p_sourcePort        	Source port (c_portRtr or c_portHst)
+         * @param   p_destinationPort   	Destination port (c_portRtr or c_portHst)
+         * @param   p_fromPort         	 	Forwarding source port
+         * @param   p_toPort            	Forwarding destination port
+         * @param   p_inSapSourceAddress	IN-SAP source port
+         * @param   p_inSapDestAddress   	IN-SAP destination port
+         * @param   p_counter           	Expected value of FNTP packet counter counter field
+         * @param   p_hops                  N-hops value
+         * @verdict Unchanged
+         */
+        function f_sendForwardingNpdu(
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) PortNumber p_fromPort, 
+            in template (value) PortNumber p_toPort, 
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress, 
+            in template (value) FNTPpacketCounter p_counter, 
+            in template (value) FNTPhopCount p_hops 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    m_generateFntpNpdu(
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                md_fntpForwardingNpdu( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    p_hops,
+                                    p_fromPort,
+                                    p_toPort,
+                                    p_counter 
+                                ) 
+                            ) 
+                        ) 
+                    ) 
+                ) 
+            ); 
+        } // End of function f_sendForwardingNpdu
+        
+        /**
+         * @desc    Triggers test adapter to send FNTP NDPU
+         * @param   p_sourcePort        	Source port number
+         * @param   p_destinationPort   	Destination port number
+         * @param   p_inSapSourceAddress	IN-SAP source port
+         * @param   p_inSapDestAddress   	IN-SAP destination port
+         * @param   p_hops              	N-hops value
+         * @verdict Unchanged
+         */
+        function f_sendExtendedFntpNpdu(
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress, 
+            in FNTPhopCount p_hops 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    m_generateFntpNpdu(
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                m_fntpExtendedNpdu( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    p_hops
+                                ) 
+                            ) 
+                        ) 
+                    ) 
+                ) 
+            ); 
+        } // End of function f_sendExtendedFntpNpdu
+        
+        /**
+         * @desc    Triggers lower tester to send FNTP station-internal NDPU with several hops and an invalid control field
+         * @param   p_sourcePort            Source port 
+         * @param   p_destinationPort       Destination port 
+         * @param   p_inSapSourceAddress    IN-SAP source port 
+         * @param   p_inSapDestAddress      IN-SAP destination port 
+         * @param   p_hops                  N-hops value 
+         * @verdict Unchanged
+         */
+        function f_sendFntpNpduInvalidCtrlField( 
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress, 
+            in template (value) FNTPhopCount p_hops 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    m_generateFntpNpdu(
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                md_fntpExtendedNpdu_invalidCtrlField( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    p_hops 
+                                ) 
+                            ) 
+                        ) 
+                    ) 
+                ) 
+            ); 
+        } // End of function f_sendFntpNpduInvalidCtrlField
+        
+        /**
+         * @desc    Triggers lower tester to send FNTP station-internal NDPU with bit5 set 
+         * @param   p_sourcePort            Source port 
+         * @param   p_destinationPort       Destination port 
+         * @param   p_inSapSourceAddress    IN-SAP source port 
+         * @param   p_inSapDestAddress      IN-SAP destination port 
+         * @verdict Unchanged
+         */
+        function f_sendFntpNpduInvalidBitSet( 
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    m_generateFntpNpdu(
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                md_fntpExtendedNpdu_invalidBitSet( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    omit
+                                ) 
+                            ) 
+                        ) 
+                    ) 
+                ) 
+            ); 
+        } // End of function f_sendFntpNpduInvalidBitSet
+        
+        /**
+         * @desc    Triggers test adapter to send FNTP NDPU
+         * @param   p_sourcePort        	Source port 
+         * @param   p_destinationPort   	Destination port 
+         * @param   p_inSapSourceAddress	IN-SAP source port 
+         * @param   p_inSapDestAddress      IN-SAP destination port 
+         * @param   p_hops              	N-hops value 
+         * @param   p_rxCIP             	Receive (RX) parameter settings
+         * @param   p_txCIP             	Transmit (TX) parameters of a VCI
+         * @param   p_accessParams          Access parameters 
+         * @verdict Unchanged
+         */
+        function f_sendFntpNpduCip(
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress, 
+            in template (value) FNTPhopCount p_hops, 
+            in template (value) RXcip p_rxCip, // TODO Perhaps this parameter is not required, p_accessParams would be enough
+            in template (value) TXcip p_txCip, // TODO Perhaps this parameter is not required, p_accessParams would be enough
+            in template (value) AccessParameters p_accessParams 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    md_generateFntpNpduCip( 
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                md_fntpExtendedNpdu_cip( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    p_hops, 
+                                    p_rxCip, // TODO Perhaps this parameter is not required, p_accessParams would be enough
+                                    p_txCip // TODO Perhaps this parameter is not required, p_accessParams would be enough
+                                ) 
+                            ) 
+                        ), 
+                        p_accessParams 
+                    ) 
+                ) 
+            ); 
+        } // End of function f_sendFntpNpduCip
+        
+        /**
+         * @desc    Triggers test adapter to send FNTP forwarding NDPU with an unknown ITS-SCU-ID
+         * @param   p_sourcePort        Source port (c_portRtr or c_portHst)
+         * @param   p_destinationPort   Destination port (c_portRtr or c_portHst)
+         * @param   p_fromPort          Forwarding source port
+         * @param   p_toPort            Forwarding destination port
+         * @param   p_sourcePort        IN-SAP source port
+         * @param   p_destinationPort   IN-SAP destination port
+         * @param   p_counter           Expected value of FNTP packet counter counter field
+         * @param   p_hops              N-hops value
+         * @verdict Unchanged
+         */
+        function f_sendFntpForwardingNpduWithUnknownItsSciId(
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) PortNumber p_fromPort, 
+            in template (value) PortNumber p_toPort,
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress, 
+            in template (value) FNTPpacketCounter p_counter, 
+            in template (value) FNTPhopCount p_hops 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    m_generateFntpNpdu( 
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                md_fntpForwardingNpdu_unknownItsScuId( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    p_hops,
+                                    p_fromPort,
+                                    p_toPort,
+                                    p_counter 
+                                ) // End of field 'md_fntpForwardingNpdu_UnknownITS_SCU_ID'
+                            ) // End of function encvalue
+                        ) // End of function bit2oct
+                    ) // End of field 'm_generateFntpNPDU'
+                ) 
+            ); 
+        } // End of function f_sendFntpForwardingNpduWithUnknownItsSciId
+        
+        /**
+         * @desc    Triggers test adapter to send FNTP forwarding NDPU with CIP
+         * @param   p_sourcePort        Source port (c_portRtr or c_portHst)
+         * @param   p_destinationPort   Destination port (c_portRtr or c_portHst)
+         * @param   p_fromPort          Forwarding source port
+         * @param   p_toPort            Forwarding destination port
+         * @param   p_sourcePort        IN-SAP source port
+         * @param   p_destinationPort   IN-SAP destination port
+         * @param   p_counter           Expected value of FNTP packet counter counter field
+         * @param   p_hops              N-hops value
+         * @param   p_rxCIP             Receive (RX) parameter settings
+         * @param   p_txCIP             Transmit (TX) parameters of a VCI
+         * @verdict Unchanged
+         */
+        function f_sendFntpForwardingNpduCip(
+            in template (value) PortNumber p_sourcePort, 
+            in template (value) PortNumber p_destinationPort, 
+            in template (value) PortNumber p_fromPort, 
+            in template (value) PortNumber p_toPort,
+            in template (value) LLserviceAddr p_inSapSourceAddress, 
+            in template (value) LLserviceAddr p_inSapDestAddress, 
+            in template (value) FNTPpacketCounter p_counter, 
+            in template (value) FNTPhopCount p_hops, 
+            in template (value) RXcip p_rxCip, // TODO Perhaps this parameter is not required, p_accessParams would be enough
+            in template (value) TXcip p_txCip, // TODO Perhaps this parameter is not required, p_accessParams would be enough
+            in template (value) AccessParameters p_accessParams 
+        ) runs on ItsCalm { 
+            fntpPort.send(
+                m_fntpReq( 
+                    md_generateFntpNpduCip( 
+                        p_inSapSourceAddress, 
+                        p_inSapDestAddress, 
+                        bit2oct( 
+                            encvalue( 
+                                md_fntpForwardingNpdu_cip( 
+                                    p_sourcePort, 
+                                    p_destinationPort, 
+                                    p_hops, 
+                                    p_fromPort, 
+                                    p_toPort, 
+                                    p_counter, 
+                                    p_rxCip, // TODO Perhaps this parameter is not required, p_accessParams would be enough
+                                    p_txCip // TODO Perhaps this parameter is not required, p_accessParams would be enough
+                                ) // End of field 'md_fntpForwardingNpdu_CIP'
+                            ) // End of function 'encvalue'
+                        ), // End of function 'bit2oct'
+                        p_accessParams 
+                    ) 
+                ) 
+            ); 
+        } // End of function f_sendFntpForwardingNpduCip
+        
+    } // End of group messagesTriggering
+    
+	/**
+	 * @desc Validation helpers functions
+	 */
+    group internalFunctions { // TODO Use parametrized function (ETSI ES 202 784) insetad of the three oct2xxx functions
+        
+        /**
+         * @desc  This function convert the specified octetstring into a template (FNTPNPDU or FntpExtInd or FntpFwdInd)
+         * This SHALL be done due to the ASN.1 description of IN-SAP service primitives DL_Unitdata_request/DL_Unitdata_indication
+         * @param p_data        An octetstring to decode
+         * @param p_syncPoint   Current synchronisation point, required to set verdict according to the LibCommon rules
+         * @param p_decoded     The decoded message
+         * @verdict Unchanged on success, set to fail otherwise
+         * @see ISO/CD 21218 - Clause 8.2.2
+         */
+        function f_oct2npdu(in octetstring p_data, in charstring p_syncPoint, out FNTPNPDU p_decoded) runs on ItsCalm {
+            var bitstring v_data;
+            var integer v_result;
+            
+//            log("*** f_oct2npdu: INFO: pdu: " & oct2str(p_data) & " ***");
+            v_data := oct2bit(p_data);
+            v_result := decvalue(v_data, p_decoded);
+            if (v_result == 1) {
+                log("*** f_oct2npdu: FAIL: 'decvalue' operation failed ***");
+                f_selfOrClientSyncAndVerdictTestBody(p_syncPoint, e_error); 
+            } else if (v_result == 2) {
+                log("*** f_oct2npdu: FAIL: 'decvalue' operation failed, not enougth bits ***");
+                f_selfOrClientSyncAndVerdictTestBody(p_syncPoint, e_error); 
+            }
+//            log("*** f_oct2npdu: INFO: Decoded message done ***");
+        } // End of function f_oct2npdu
+        
+    } // End of group internalFunctions
+    
+	/**
+	 * @desc PIXIT accessors
+	 */
+    group iutFunctions {
+        
+        group cf01 { 
+            
+            /**
+             * @desc    Get the local identifier of the VCI
+             * @return  The local identifier of the VCI
+             * @see     PX_WL_LOCAL_CIID
+             * @verdict Unchanged
+             * @see ISO 21218 - Clause 6.2 Link Identifier
+             */
+            function f_getIutWlLocalCiid() return EUI64 {
+                return PX_WL_LOCAL_CIID;
+            }
+            
+            function f_getIutWlRemoteCiid() return EUI64 {
+                return PX_WL_REMOTE_CIID;
+            }
+            
+            /**
+             * @desc    Get the local identifier of the VCI for broadcast on ITS-S host
+             * @return  The local identifier of the VCI for broadcast on ITS-S host
+             * @see     PX_WL_REMOTE_CIID_BC
+             * @verdict Unchanged
+             */
+            function f_getIutWlRemoteCiidBc() return EUI64 {
+                return PX_WL_REMOTE_CIID_BC;
+            }
+            
+            /**
+             * @desc    Get the remote CIID for unicast (peer to peer)
+             * @return  The remote CIID for unicast 
+             * @see     PX_WL_REMOTE_CIID_UC
+             * @verdict Unchanged
+             */
+            function f_getIutWlRemoteCiidUc() return EUI64 {
+                return PX_WL_REMOTE_CIID_UC;
+            }
+            
+            /**
+             * @desc    Get the IUT Link-ID in broadcast transmission mode
+             * @return  The IUT Link-ID in broadcast transmission mode
+             * @see     PX_WL_LINK_ID_BC
+             * @verdict Unchanged
+             * @see ISO 21218 - Clause 6.2 Link Identifier
+             */
+            function f_getIutWlLinkIdBc() return Link_ID {
+                return PX_WL_LINK_ID_BC;
+            }
+            
+            /**
+             * @desc    Get an unknown VCI to be used to transmit the packet, i.e. the peer station, for Unicast
+             * @return  An unknown VCI to be used to transmit the packet
+             * @see PX_WL_LINK_ID_UNKWNON_UC
+             * @verdict Unchanged
+             */
+            function f_getIutWlLinkIdUnknownUc() return Link_ID {
+                return PX_WL_LINK_ID_UNKWNON_UC;
+            }
+            
+            /**
+             * @desc   Get the VCI to be used to transmit the packet, i.e. the peer station, for Unicast
+             * @return The VCI to be used to transmit the packet, i.e. the peer station, for Unicast
+             * @see PX_WL_LINK_ID_UC
+             * @verdict Unchanged
+             */
+            function f_getIutWlLinkIdUc() return Link_ID {
+                return PX_WL_LINK_ID_UC;
+            }
+            
+        } // End of group cf01 
+        
+        group cf02 { 
+            
+            /**
+             * @desc    Get the local identifier of the VCI
+             * @return  The local identifier of the VCI
+             * @see     PX_LAN_LOCAL_CIID
+             * @verdict Unchanged
+             * @see ISO 21218 - Clause 6.2 Link Identifier
+             */
+            function f_getIutLanLocalCiid() return EUI64 {
+                return PX_LAN_LOCAL_CIID;
+            }
+            
+            /**
+             * @desc    Get the local identifier of the VCI for broadcast on ITS-S host
+             * @return  The local identifier of the VCI for broadcast on ITS-S host
+             * @see     PX_LAN_REMOTE_CIID_BC
+             * @verdict Unchanged
+             */
+            function f_getIutLanRemoteCiidBc() return EUI64 {
+                return PX_LAN_REMOTE_CIID_BC;
+            }
+            
+            /**
+             * @desc    Get the IUT Link-ID in broadcast transmission mode
+             * @return  The IUT Link-ID in broadcast transmission mode
+             * @see     PX_LAN_LINK_ID_BC
+             * @verdict Unchanged
+             * @see ISO 21218 - Clause 6.2 Link Identifier
+             */
+            function f_getIutLanLinkIdBc() return Link_ID {
+                return PX_LAN_LINK_ID_BC;
+            }
+            
+            /**
+             * @desc    Get the identifier of a different VCI on ITS-S host/router only 
+             * @return  The identifier of a different VCI on ITS-S host/router only 
+             * @see     PX_LAN_DIFFERENT_LOCAL_CIID
+             * @verdict Unchanged
+             */
+            function f_getIutLanDifferentLocalCiid() return EUI64 {
+                return PX_LAN_DIFFERENT_LOCAL_CIID;
+            }
+            
+        } // End of group cf02 
+        
+        group peerStation {
+            
+            /**
+             * @desc    Get the local identifier of the VCI
+             * @return  The local identifier of the VCI
+             * @see     PX_DEST_LOCAL_CIID
+             * @verdict Unchanged
+             * @see ISO 21218 - Clause 6.2 Link Identifier
+             */
+            function f_getIutDestLocalCiid() return EUI64 {
+                return PX_DEST_LOCAL_CIID;
+            }
+            
+            /**
+             * @desc    Get the remote identifier of the VCI for broadcast on ITS-S host
+             * @return  The remote identifier of the VCI for broadcast on ITS-S host
+             * @see     PX_DEST_REMOTE_CIID_BC
+             * @verdict Unchanged
+             * @see ISO 21218 - Clause 6.2 Link Identifier
+             */
+            function f_getIutRemoteDestCiidBc() return EUI64 {
+                return PX_DEST_REMOTE_CIID_BC;
+            }
+            
+            /**
+             * @desc    Get the remote identifier of a second VCI for unicast (peer to peer) on ITS-S host 
+             * @return  The remote identifier of a a second VCI for unicast (peer to peer) on ITS-S host 
+             * @see     PX_DEST_REMOTE_CIID_UC
+             * @verdict Unchanged
+             */
+            function f_getIutRemoteDestCiidUc() return EUI64 {
+                return PX_DEST_REMOTE_CIID_UC;
+            }
+            
+            /**
+             * @desc    Get the identifier of a second VCI for unicast (peer to peer) on ITS-S host 
+             * @return  The identifier of a a second VCI for unicast (peer to peer) on ITS-S host 
+             * @see     PX_WL_SECOND_REMOTE_CIID_BC
+             * @verdict Unchanged
+             */
+            function f_getIutSecondRemoteDestCiidBc() return EUI64 {
+                return PX_SECOND_REMOTE_CIID_BC;
+            }
+            
+        } // End of group peerStation
+        
+        /**
+         * @desc   Get the application port number, used instead of c_portDyn
+         * @return The application port number, used instead of c_portDyn
+         * @see PX_APP_PORT_NUMBER
+         * @verdict Unchanged
+         */
+        function f_getIutAppPortValue() return PortNumber {
+            return PX_APP_PORT_NUMBER;
+        }
+        
+        /**
+         * @desc    Get the source forwarding port
+         * @return  The source forwarding port
+         * @see     PX_FORWARDING_SRC_PORT
+         * @verdict Unchanged
+         */
+        function f_getIutForwardingSrcPort() return PortNumber {
+            return PX_FORWARDING_SRC_PORT;
+        }
+        
+        /**
+         * @desc    Get the destination forwarding port
+         * @return  The destination forwarding port
+         * @see     PX_FORWARDING_DST_PORT
+         * @verdict Unchanged
+         */
+        function f_getIutForwardingDestPort() return PortNumber {
+            return PX_FORWARDING_DST_PORT;
+        }
+        
+        /**
+         * @desc    Get the source port number, i.e. the local endpoint
+         * @return  The source port number
+         * @see     PX_LOCAL_PORT_NUMBER
+         * @verdict Unchanged
+         */
+        function f_getIutLocalPortNumberValue() return PortNumber {
+            return PX_LOCAL_PORT_NUMBER;
+        }
+        
+        /**
+         * @desc   Unknown broadcast VCI
+         * @return An unknown broadcast VCI
+         * @see PX_WL_LINK_ID_UNKWNON_BC
+         * @verdict Unchanged
+         */
+        function f_getIutWlLinkIdUnknownBc() return Link_ID {
+            return PX_WL_LINK_ID_UNKWNON_BC;
+        }
+        
+        /**
+         * @desc    Get the ITS-SP payload EPDU
+         * @return  The ITS-SP payload EPDU
+         * @see     PX_ITS_FPDU
+         * @verdict Unchanged
+         */
+        function f_getIutItsFpdu() return ITSfpdu { 
+            return PX_ITS_FPDU;
+        }
+        
+        /**
+         * @desc    Get the service reference defining a number uniquely identifying the endpoint at this host in an implementation specific way
+         * @return  The service reference
+         * @see     PX_SERVICE_REF
+         * @verdict Unchanged
+         */
+        function f_getIutServiceRef() return ServiceRef {
+            return PX_SERVICE_REF;
+        }
+        
+        /**
+         * @desc    Get the Single-hop value
+         * @return  The Single-hop value
+         * @verdict Unchanged
+         */
+        function f_getIutShopValue() return FNTPhopCount {
+            return PX_SHOP;
+        }
+        
+        /**
+         * @desc    Get the N-hops value
+         * @return  The N-hops value
+         * @verdict Unchanged
+         */
+        function f_getIutNhopsValue() return FNTPhopCount {
+            return PX_NHOPS;
+        }
+        
+        /**
+         * @desc    Get a service port number
+         * @return  The service port number
+         * @see     PX_SERVICE_PORT
+         * @verdict Unchanged
+         */
+        function f_getIutServicePortValue() return PortNumber {
+            return PX_SERVICE_PORT;
+        }
+        
+        /**
+         * @desc   Get the reception access parameter
+         * @return The reception access parameter
+         * @see PX_CIP_RX_SETTINGS
+         * @verdict Unchanged
+         */
+        function f_getIutRxCipValue() return RXcip {
+            return PX_CIP_RX_SETTINGS;
+        }
+        
+        /**
+         * @desc   Get the transmission access parameter
+         * @return The transmission access parameter
+         * @see PX_CIP_TX_SETTINGS
+         * @verdict Unchanged
+         */
+        function f_getIutTxCipValue() return TXcip {
+            return PX_CIP_TX_SETTINGS;
+        }
+        
+        function f_getIutAccessParametersValue() return AccessParameters { 
+            return PX_ACCESS_PARAMETERS_SETTINGS;
+        }
+        
+        /**
+         * @desc    Get the remote port number value
+         * @return  The remote port number value
+         * @see     PX_REMOTE_PORT_NUMBER
+         * @verdict Unchanged
+         */
+        function f_getIutRemotePortNumberValue() return PortNumber {
+            return PX_REMOTE_PORT_NUMBER;
+        } // End of function f_getIutRemotePortNumberValue
+        
+        /**
+         * @desc    Get the second remote port number value
+         * @return  The second remote port number value
+         * @see     PX_SECOND_REMOTE_PORT_NUMBER
+         * @verdict Unchanged
+         */
+        function f_getIutSecondRemotePortNumberValue() return PortNumber {
+            return PX_SECOND_REMOTE_PORT_NUMBER;
+        } // End of function f_getIutSecondRemotePortNumberValue
+        
+    } // End of group iutFunctions
+    
+	/**
+	 * @desc altstep functions
+	 */
+    group fntpAltsteps {
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_fntpDefault() runs on ItsCalm {
+            [] tc_wait.timeout {
+                log("*** a_fntpDefault: ERROR: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout { // For security because it should be done in main altsetp bloc
+                log("*** a_fntpDefault: ERROR: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] any timer.timeout {
+                log("*** a_fntpDefault: INCONC: An unknown timer has expired in default ***"); 
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                log("*** a_fntpDefault: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                if(self == mtc) {
+                    f_cf01Down();
+                }
+                stop;
+            }
+        } // End of altstep a_fntpDefault()
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_fntpUnsollictedMessages() runs on ItsCalm {
+            [] fntpPort.receive(mw_fntpInd(mw_fntpInSapPrimitiveReq(mw_inUnitDataReq_any))) {
+                log("*** a_fntpDefault: INFO: Unexpected FNTP NDPU received in default ***");
+            }
+            [] fntpPort.receive(mw_fntpInd(?)) {
+                log("*** a_fntpUnsollictedMessages: INFO: Unkown FNTP NDPU received in default ***");
+            }
+            [] fntpPort.receive {
+                log("*** a_fntpUnsollictedMessages: INFO: Unkown message received in default ***");                
+            }
+        } // End of altstep a_fntpUnsollictedMessages()
+        
+        /**
+         * @desc Default handling cf01 de-initialisation.
+         */
+        altstep a_cf01Down() runs on ItsCalm {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf01Down();
+                log("*** a_cf01Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        } // End of altstep a_cf01Down()
+        
+        /**
+         * @desc Default handling cf02 de-initialisation.
+         */
+        altstep a_cf02Down() runs on ItsCalm {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf02Down();
+                log("*** a_cf02Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        } // End of altstep a_cf02Down()
+        
+    } // End of group fntpAltsteps
+    
+} // End of module LibItsFntp_Functions

@@ -1,0 +1,423 @@
+Index: adapter/org/etsi/its/adapter/ports/ProtocolPortFactory.java
+===================================================================
+--- adapter/org/etsi/its/adapter/ports/ProtocolPortFactory.java	(revision 1471)
++++ adapter/org/etsi/its/adapter/ports/ProtocolPortFactory.java	(working copy)
+@@ -37,7 +37,6 @@
+ 		ports.put("btpPort", BtpPort.class);
+ 		ports.put("geoNetworkingPort", GnPort.class);
+ 		ports.put("ipv6OverGeoNetworkingPort", Gn6Port.class);
+-		ports.put("v2gPort", V2GPort.class);
+ 	}
+ 
+ 	/**
+Index: adapter/org/etsi/its/adapter/ports/V2GPort.java
+===================================================================
+--- adapter/org/etsi/its/adapter/ports/V2GPort.java	(revision 1471)
++++ adapter/org/etsi/its/adapter/ports/V2GPort.java	(working copy)
+@@ -75,7 +75,7 @@
+ 		role = ((CharstringValue)TERFactory.getInstance().getTaParameter("V2gTsRole")).getString();
+ 		v2gHost = ((CharstringValue)TERFactory.getInstance().getTaParameter("V2gSeccAddress")).getString();
+ 		//v2gPort = Integer.decode(((CharstringValue)TERFactory.getInstance().getTaParameter("V2gSeccPort")).getString());
+-		v2gPort = ((IntegerValue)TERFactory.getInstance().getTaParameter("V2gSeccPort")).getInt();
++		v2gPort = ((IntegerValue)TERFactory.getInstance().getTaParameter("V2gSeccPort")).getInteger();
+ 		try {
+ 			sdpPeerAddress = InetAddress.getByName("ff02::1");
+ 		} catch (UnknownHostException e1) {
+Index: adapter/org/etsi/its/adapter/TestAdapter.java
+===================================================================
+--- adapter/org/etsi/its/adapter/TestAdapter.java	(revision 1471)
++++ adapter/org/etsi/its/adapter/TestAdapter.java	(working copy)
+@@ -19,7 +19,6 @@
+ import org.etsi.its.adapter.ports.ProtocolPortFactory;
+ import org.etsi.its.adapter.ports.UpperTesterPort;
+ import org.etsi.ttcn.tci.CharstringValue;
+-import org.etsi.ttcn.tri.TriActionTemplate;
+ import org.etsi.ttcn.tri.TriAddress;
+ import org.etsi.ttcn.tri.TriAddressList;
+ import org.etsi.ttcn.tri.TriCommunicationSA;
+@@ -70,10 +69,14 @@
+ 		return required.getTriStatus(TriStatus.TRI_OK);
+ 	} 
+ 
++	@Override
++	public TriStatus triExecuteTestCase(TriTestCaseId tcId, TriPortIdList portList) {
++		return triExecuteTestcase(tcId, portList);
++	}
++
+ 	/* (non-Javadoc)
+ 	 * @see org.etsi.ttcn.tri.TriCommunicationSA#triExecuteTestcase(org.etsi.ttcn.tri.TriTestCaseId, org.etsi.ttcn.tri.TriPortIdList)
+ 	 */
+-	@Override
+     public TriStatus triExecuteTestcase(final TriTestCaseId tcId, final TriPortIdList portList) {
+ 		return required.getTriStatus(TriStatus.TRI_OK);
+ 	} 
+@@ -296,14 +299,14 @@
+ 		return required.getTriStatus(TriStatus.TRI_ERROR, "triSutActionInformal not implemented");	
+ 	}
+ 
+-	/**
+-	 * triSutActionTemplate not implemented
+-	 * @see org.etsi.ttcn.tri.TriCommunicationSA#triSutActionTemplate(org.etsi.ttcn.tri.TriActionTemplate)
+-	 */
+-	@Override
+-	public TriStatus triSutActionTemplate(TriActionTemplate templateValue) {
+-		return required.getTriStatus(TriStatus.TRI_ERROR, "triSutActionTemplate not implemented");
+-	}
++//	/**
++//	 * triSutActionTemplate not implemented
++//	 * @see org.etsi.ttcn.tri.TriCommunicationSA#triSutActionTemplate(org.etsi.ttcn.tri.TriActionTemplate)
++//	 */
++//	@Override
++//	public TriStatus triSutActionTemplate(TriActionTemplate templateValue) {
++//		return required.getTriStatus(TriStatus.TRI_ERROR, "triSutActionTemplate not implemented");
++//	}
+ 
+ 	/**
+      * triMapParam not implemented
+@@ -322,4 +325,21 @@
+     public TriStatus triUnmapParam(TriPortId compPortId, TriPortId tsiPortId, TriParameterList paramList) {
+ 		return required.getTriStatus(TriStatus.TRI_ERROR, "triUnmapParam not implemented");
+ 	}
++
++	@Override
++	public TriStatus triGetStreamValue(TriComponentId arg0, TriPortId arg1,
++			TriAddress arg2, TriMessage arg3) {
++		return required.getTriStatus(TriStatus.TRI_ERROR, "triUnmapParam not implemented");
++	}
++
++	@Override
++	public TriStatus triSetStreamValue(TriComponentId arg0, TriPortId arg1,
++			TriAddress arg2, TriMessage arg3) {
++		return required.getTriStatus(TriStatus.TRI_ERROR, "triUnmapParam not implemented");
++	}
++
++	@Override
++	public TriStatus triStaticMap(TriPortId arg0, TriPortId arg1) {
++		return required.getTriStatus(TriStatus.TRI_ERROR, "triUnmapParam not implemented");
++	}
+ } 
+Index: codec/org/etsi/codec/ITciCDWrapper.java
+===================================================================
+--- codec/org/etsi/codec/ITciCDWrapper.java	(revision 1471)
++++ codec/org/etsi/codec/ITciCDWrapper.java	(working copy)
+@@ -27,9 +27,33 @@
+ 	 * See ETSI ES 201 873-6 V4.2.1 - 7.3.2.1.2 getInteger
+ 	 * @return An instance of Type representing a TTCN-3 integer type
+ 	 */
+-	public IntegerValue getInteger();
++	public IntegerValue setInteger(final Integer value);
+ 
+ 	/** 
++	 * Constructs and returns a basic TTCN-3 big integer type
++	 * 
++	 * @see ETSI ES 201 873-6 V4.2.1 - 7.3.2.1.2 getInteger
++	 * @return An instance of Type representing a TTCN-3 integer type
++	 */
++	public IntegerValue setInteger(final BigInteger value);
++	
++	/** 
++	 * Constructs and returns a basic integer type
++	 * 
++	 * See ETSI ES 201 873-6 V4.2.1 - 7.3.2.1.2 getInteger
++	 * @return An instance of Type representing a TTCN-3 integer type
++	 */
++	public int getInteger(final IntegerValue iv);
++
++	/** 
++	 * Constructs and returns a basic big integer type
++	 * 
++	 * @see ETSI ES 201 873-6 V4.2.1 - 7.3.2.1.2 getInteger
++	 * @return An instance of Type representing a TTCN-3 integer type
++	 */
++	public long/*TODO BigInteger*/ getBigInteger(final IntegerValue iv);
++
++	/** 
+ 	 * Constructs and returns a basic TTCN-3 octet string type
+ 	 * 
+ 	 * See ETSI ES 201 873-6 V4.2.1 - 7.3.2.1.2 getOctetstring
+@@ -44,14 +68,6 @@
+ 	 * @return An instance of Type representing a TTCN-3 float type
+ 	 */
+ 	public FloatValue getFloat();
+-
+-	/** 
+-	 * Constructs and returns a basic TTCN-3 big integer type
+-	 * 
+-	 * @see ETSI ES 201 873-6 V4.2.1 - 7.3.2.1.2 getInteger
+-	 * @return An instance of Type representing a TTCN-3 integer type
+-	 */
+-	IntegerValue getBigInteger(BigInteger bigInt);
+ 	
+ 	/** 
+ 	 * Constructs and returns a basic TTCN-3 float type
+Index: codec/org/etsi/ttcn/codec/CodecFactory.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/CodecFactory.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/CodecFactory.java	(working copy)
+@@ -61,7 +61,7 @@
+             org.etsi.ttcn.codec.its.uppertester.Plugin.init();
+             org.etsi.ttcn.codec.its.geonetworking.Plugin.init();
+             org.etsi.ttcn.codec.its.btp.Plugin.init();
+-                                 
++            org.etsi.ttcn.codec.its.security.Plugin.init();
+         }        
+     }
+ 
+Index: codec/org/etsi/ttcn/codec/generic/Integer.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/generic/Integer.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/generic/Integer.java	(working copy)
+@@ -46,17 +46,17 @@
+         try {
+             Matcher matcher = UNSIGNED_VARIANT.matcher(decodingHypothesis.getTypeEncodingVariant());
+             if(matcher.find()) {
+-                // Unsigned integer                
+-                if(lengthInBits >= 32) {                 
+-                    iv.setBigInt(new BigInteger(1, value)); // /!\ ttwb specific
++                // Unsigned integer
++                if(lengthInBits >= java.lang.Integer.SIZE) { 
++                    iv = mainCodec.getTciCDRequired().setInteger(new BigInteger(1, value)); 
+                 }
+                 else {
+-                    iv.setInt(ByteHelper.byteArrayToInt(value));
++                    iv = mainCodec.getTciCDRequired().setInteger(ByteHelper.byteArrayToInt(value));
+                 }
+             }
+             else {
+                 // Signed integer 
+-                iv.setInt(ByteHelper.byteArrayToSignedInt(value, lengthInBits));
++                iv.setInteger(ByteHelper.byteArrayToSignedInt(value, lengthInBits));
+             }
+         }
+         catch(Exception e) {
+@@ -87,10 +87,10 @@
+         
+ //        System.out.println(String.format("Integer.encode: length: %d", lengthInBytes));
+         if (lengthInBits > java.lang.Integer.SIZE) {
+-            encoded = ByteHelper.longToByteArray(iv.getBigInt().longValue(), lengthInBytes);
++            encoded = ByteHelper.longToByteArray(mainCodec.getTciCDRequired().getBigInteger(iv), lengthInBytes);
+             res.setBits(encoded, lengthInBits);
+         } else {
+-            encoded = ByteHelper.intToByteArray(iv.getInt(), lengthInBytes);
++            encoded = ByteHelper.intToByteArray(mainCodec.getTciCDRequired().getInteger(iv), lengthInBytes);
+             res.setBits(encoded, lengthInBits);
+         }
+         res.setBits(encoded, lengthInBits);
+Index: codec/org/etsi/ttcn/codec/ipv6/Ipv6ExtHdr.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/ipv6/Ipv6ExtHdr.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/ipv6/Ipv6ExtHdr.java	(working copy)
+@@ -27,7 +27,7 @@
+     protected void postDecodeField(String fieldName, CodecBuffer buf, Type decodingHypothesis, RecordValue rv) {
+ 
+         if(fieldName.equals("hdrLen")) {
+-            int len = ((IntegerValue)(rv.getField(fieldName))).getInt();
++            int len = ((IntegerValue)(rv.getField(fieldName))).getInteger();
+             mainCodec.setHint("Ipv6ExtHdrLen", Integer.toString(len));
+         }
+     }
+Index: codec/org/etsi/ttcn/codec/its/geonetworking/CommonHeader.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/its/geonetworking/CommonHeader.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/its/geonetworking/CommonHeader.java	(working copy)
+@@ -39,7 +39,7 @@
+         }
+ 
+         else if(fieldName.equals("plLength")) {
+-            int pl = ((IntegerValue)(rv.getField(fieldName))).getInt();
++            int pl = ((IntegerValue)(rv.getField(fieldName))).getInteger();
+             mainCodec.setHint("payloadLength", Integer.toString(pl));
+         }
+     }
+Index: codec/org/etsi/ttcn/codec/its/security/Plugin.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/its/security/Plugin.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/its/security/Plugin.java	(working copy)
+@@ -13,7 +13,6 @@
+     public static void init() {
+ 
+         CodecFactory cf = CodecFactory.getInstance();
+-//        cf.setCodec(TciTypeClass.UNION, "LibItsSecurity", "LibItsSecurity", BtpHeader.class);
+-//        cf.setCodec(TciTypeClass.RECORD, "LibItsSecurity", "LibItsSecurity", Payload.class);
++        cf.setCodec(TciTypeClass.RECORD, "LibItsSecurity", "Payload", Payload.class);
+     }
+ }
+\ No newline at end of file
+Index: codec/org/etsi/ttcn/codec/lowpan/IphcHeader.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/lowpan/IphcHeader.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/lowpan/IphcHeader.java	(working copy)
+@@ -126,7 +126,7 @@
+         }
+ 
+         else if(fieldName.equals("inlineNextHeader")) {
+-            int nh = ((IntegerValue)(rv.getField(fieldName))).getInt();
++            int nh = ((IntegerValue)(rv.getField(fieldName))).getInteger();
+             mainCodec.setHint("Ipv6NextHeader", Integer.toString(nh));
+             if(nh == 0 || nh == 60 || nh == 43 || nh == 44) { 
+                 mainCodec.setHint("ExtensionHeaderListMore", "true");
+Index: codec/org/etsi/ttcn/codec/MainCodec.java
+===================================================================
+--- codec/org/etsi/ttcn/codec/MainCodec.java	(revision 1471)
++++ codec/org/etsi/ttcn/codec/MainCodec.java	(working copy)
+@@ -8,6 +8,7 @@
+ import java.util.Map;
+ import java.util.TreeMap;
+ 
++import org.etsi.codec.ITciCDWrapper;
+ import org.etsi.ttcn.tri.TriMessage;
+ import org.etsi.ttcn.tci.TciCDProvided;
+ import org.etsi.ttcn.tci.TciCDRequired;
+@@ -16,9 +17,9 @@
+ 
+ public class MainCodec extends ICodec {
+ 
+-    public MainCodec(TciCDRequired cdReq) {
++    public MainCodec(ITciCDWrapper _cdReq) {
+         super(null);
+-        this.cdReq = cdReq;
++        this.cdReq = _cdReq;
+     }
+ 
+     public Value triDecode(TriMessage message, Type decodingHypothesis) {
+@@ -97,11 +98,11 @@
+         presenceHints.put(key, value);
+     }
+ 
+-    public TciCDRequired getTciCDRequired() {
++    public ITciCDWrapper getTciCDRequired() {
+         return cdReq;
+     }
+ 
+     protected Map<String, String> hints = new TreeMap<String, String>();
+     protected Map<String, java.lang.Boolean> presenceHints = new TreeMap<String, java.lang.Boolean>();
+-    protected TciCDRequired cdReq;
++    protected ITciCDWrapper cdReq;
+ }
+Index: extfunc/org/etsi/its/extfunc/ItsExternalFunctionsProvider.java
+===================================================================
+--- extfunc/org/etsi/its/extfunc/ItsExternalFunctionsProvider.java	(revision 1471)
++++ extfunc/org/etsi/its/extfunc/ItsExternalFunctionsProvider.java	(working copy)
+@@ -79,24 +79,19 @@
+         
+         String datestr="01/01/2004 00:00:00";
+         DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+-        IntegerValue now = _tcicdWrapper.getInteger();
++        IntegerValue now = null;
+         try {
+-//            System.out.println(String.format("fx_getCurrentTime: now:%d, 2004:%d", System.currentTimeMillis(), ((java.util.Date)formatter.parse(datestr)).getTime()));
+-//            System.out.println("Diff: " + (int)(System.currentTimeMillis() - ((java.util.Date)formatter.parse(datestr)).getTime()));
+-            now.setBigInt(
++            now = _tcicdWrapper.setInteger(
+                 new BigInteger(
+                     1, 
+-                    ByteHelper.longToByteArray(
+-                        System.currentTimeMillis() - ((java.util.Date)formatter.parse(datestr)).getTime(),
+-                        Long.SIZE / Byte.SIZE
+-                    )
++                    ByteHelper.longToByteArray(System.currentTimeMillis() - ((java.util.Date)formatter.parse(datestr)).getTime(), Long.SIZE / Byte.SIZE)
+                 )
+             );
+         } catch (ParseException e) {
+-            now.setInt(0);
++        	now = _tcicdWrapper.setInteger(0);
+         }
+         
+-        _logger.exiting("ItsExternalFunctionsProvider", "fx_getCurrentTime", String.format("%10d", now.getInt())); 
++        _logger.exiting("ItsExternalFunctionsProvider", "fx_getCurrentTime", String.format("%10d", now.getInteger())); 
+         return now;
+     } // End of method fx_getCurrentTime
+ 
+@@ -122,17 +117,17 @@
+             final IntegerValue p_latitudeA, final IntegerValue p_longitudeA,
+             final IntegerValue p_latitudeB, final IntegerValue p_longitudeB) {
+         _logger.entering("ItsExternalFunctionsProvider", "fx_computeDistance",
+-                String.format("%d, %d, %d, %d", p_latitudeA.getInt(),
+-                        p_longitudeA.getInt(), p_latitudeB.getInt(),
+-                        p_longitudeB.getInt()));
++                String.format("%d, %d, %d, %d", p_latitudeA.getInteger(),
++                        p_longitudeA.getInteger(), p_latitudeB.getInteger(),
++                        p_longitudeB.getInteger()));
+ 
+         // Initialise the returned value
+         FloatValue dist = _tcicdWrapper.getFloat();
+ 
+-        double dlat = (new Double(p_latitudeB.getInt()) - new Double(
+-                p_latitudeA.getInt())) / 10000000;
+-        double dlong = (new Double(p_longitudeB.getInt()) - new Double(
+-                p_longitudeA.getInt())) / 10000000;
++        double dlat = (new Double(p_latitudeB.getInteger()) - new Double(
++                p_latitudeA.getInteger())) / 10000000;
++        double dlong = (new Double(p_longitudeB.getInteger()) - new Double(
++                p_longitudeA.getInteger())) / 10000000;
+ 
+         long d = Math.round(Math.sqrt(Math.pow(dlat * rbis, 2)
+                 + Math.pow(dlong * rbis * Math.cos(dlat), 2)));
+@@ -172,17 +167,17 @@
+         _logger.entering(
+                 "ItsExternalFunctionsProvider",
+                 "fx_computePositionUsingDistance",
+-                String.format("%d, %d", p_distance.getInt(),
+-                        p_orientation.getInt()));
++                String.format("%d, %d", p_distance.getInteger(),
++                        p_orientation.getInteger()));
+ 
+-        double angularD = new Double(p_distance.getInt()) / earthRadius;
+-        double radHeading = new Double(p_orientation.getInt()) * Math.PI
++        double angularD = new Double(p_distance.getInteger()) / earthRadius;
++        double radHeading = new Double(p_orientation.getInteger()) * Math.PI
+                 / 180;
+ 
+         // Convert to rad
+-        double lat1 = (new Double(p_refLatitude.getInt()) / 10000000)
++        double lat1 = (new Double(p_refLatitude.getInteger()) / 10000000)
+                 * Math.PI / 180;
+-        double long1 = (new Double(p_refLongitude.getInt()) / 10000000)
++        double long1 = (new Double(p_refLongitude.getInteger()) / 10000000)
+                 * Math.PI / 180;
+ 
+         double lat2 = Math.asin(Math.sin(lat1) * Math.cos(angularD)
+@@ -200,8 +195,8 @@
+         long rlat2 = Math.round(lat2 * 10000000 / Math.PI * 180);
+         long rlong2 = Math.round(long2 * 10000000 / Math.PI * 180);
+ 
+-        p_latitude.setInt((int) rlat2);
+-        p_longitude.setInt((int) rlong2);
++        p_latitude.setInteger((int) rlat2);
++        p_longitude.setInteger((int) rlong2);
+ 
+     } // End of method fx_computePositionUsingDistance
+ 
+@@ -226,11 +221,14 @@
+      */
+     @Override
+     public IntegerValue fx_computeGnTimestamp() {
+-
+-        IntegerValue timestamp = _tcicdWrapper.getInteger();
+         
+-        // /!\ ttwb specific
+-        timestamp.setBigInt(new BigInteger(1, ByteHelper.longToByteArray(((System.currentTimeMillis() - ITS_REF_TIME) % (long)Math.pow(2,32)), 5)));
++        IntegerValue timestamp = _tcicdWrapper.setInteger(
++                new BigInteger(
++                    1,
++                    ByteHelper.longToByteArray((System.currentTimeMillis() - ITS_REF_TIME) % (long)Math.pow(2,32), Long.SIZE / Byte.SIZE) 
++                )
++            );
++        
+         return timestamp;
+     }
+ 
+@@ -305,11 +303,11 @@
+         try {
+             // Upper-Layer Packet Length (32bits)
+             pseudoheader.write(ByteHelper.intToByteArray(
+-                    p_payloadLength.getInt(), 4));
++                    p_payloadLength.getInteger(), 4));
+             // Checksum set to 0 (24bits)
+             pseudoheader.write(ByteHelper.intToByteArray(0, 3));
+             // Next header (8bits)
+-            pseudoheader.write((byte) p_nextHdr.getInt());
++            pseudoheader.write((byte) p_nextHdr.getInteger());
+         } catch (IOException e) {
+             e.printStackTrace();
+         }

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "These <a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\">\n<font style=\"font-family: 'Courier New'; font-size: 10pt;\">HeaderField<\/font>\n<\/a>\n<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Times New Roman'; font-size: 10pt;\"> elements shall be included.<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "03383703-f2d9-4cd4-ad8f-ff96d1c1d06b"
+}

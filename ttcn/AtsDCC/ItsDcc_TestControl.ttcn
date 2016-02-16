@@ -1,0 +1,347 @@
+/**
+ *    @author     ETSI / STF421
+ *    @version    $URL: svn+ssh://vcs.etsi.org/TTCN3/ATS/Its/trunk/ttcn/AtsDCC/ItsDcc_TestControl.ttcn $
+ *                $Id: ItsDcc_TestControl.ttcn 372 2012-07-12 10:00:36Z tepelmann $
+ *    @desc       Test Control file for DCC
+ *
+ */
+module ItsDcc_TestControl {
+    
+    import from LibItsDcc_Pixits {modulepar all;}
+    import from LibItsDcc_TypesAndValues {group moduleParTables;}
+
+    // ATS DCC
+    import from ItsDcc_TestCases {testcase all;}
+    
+    // Test Execution
+    control {
+        
+        var integer i, j, k;
+        
+        //SingleTransceiverITSStation
+        //CCH_relaxed_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_7_TC_STS_REL_01_03); i:=i + 1) {
+            execute(TC_STS_REL_01(PIXIT_TABLE_7_TC_STS_REL_01_03[i]));
+            execute(TC_STS_REL_02(PIXIT_TABLE_7_TC_STS_REL_01_03[i]));
+            execute(TC_STS_REL_03(PIXIT_TABLE_7_TC_STS_REL_01_03[i]));
+        }
+        execute(TC_STS_REL_04());
+        
+        //CCH_active_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_8_TC_STS_ACT_01_03); i:=i + 1) {
+            execute(TC_STS_ACT_01(PIXIT_TABLE_8_TC_STS_ACT_01_03[i]));
+            execute(TC_STS_ACT_02(PIXIT_TABLE_8_TC_STS_ACT_01_03[i]));
+            execute(TC_STS_ACT_03(PIXIT_TABLE_8_TC_STS_ACT_01_03[i]));
+        }
+        execute(TC_STS_ACT_04());
+        
+        //CCH_restrictive_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_9_TC_STS_RES_01_03); i:=i + 1) {
+            execute(TC_STS_RES_01(PIXIT_TABLE_9_TC_STS_RES_01_03[i]));
+            execute(TC_STS_RES_02(PIXIT_TABLE_9_TC_STS_RES_01_03[i]));
+            execute(TC_STS_RES_03(PIXIT_TABLE_9_TC_STS_RES_01_03[i]));
+        }
+        execute(TC_STS_RES_04());
+        
+        //MultipleTransceiverITSStation_G5A
+        //CCH_related
+        //CCH_variable_channel_states
+        for (i:=0;i<lengthof(PIXIT_TABLE_10_TC_MTS_CCH_01); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_10_TC_MTS_CCH_01[j].aspects); j:=j + 1) {
+                for (k:=0;k<lengthof(PIXIT_TABLE_10_TC_MTS_CCH_01[i].aspects[j].aspect.sch1States); k:=k + 1) {
+                    execute(
+                        TC_MTS_CCH_01(
+                            ProfileSingleChannelTimeChannelAspect:{
+                                profile := PIXIT_TABLE_10_TC_MTS_CCH_01[i].profile, 
+                                aspect:={
+                                    cchState := PIXIT_TABLE_10_TC_MTS_CCH_01[i].aspects[j].cchState,
+                                    aspect := {
+                                        messageInterval := PIXIT_TABLE_10_TC_MTS_CCH_01[i].aspects[j].aspect.messageInterval,
+                                        tOff := PIXIT_TABLE_10_TC_MTS_CCH_01[i].aspects[j].aspect.tOff,
+                                        sch1State := PIXIT_TABLE_10_TC_MTS_CCH_01[i].aspects[j].aspect.sch1States[k]
+                                    }
+                                }
+                            }
+                        )
+                    );
+                }
+            }
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_11_TC_MTS_CCH_02); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_11_TC_MTS_CCH_02[j].aspects); j:=j + 1) {
+                for (k:=0;k<lengthof(PIXIT_TABLE_11_TC_MTS_CCH_02[i].aspects[j].states); k:=k + 1) {
+                    execute(
+                        TC_MTS_CCH_02(
+                            ProfileSingleChannelAspect:{
+                                profile := PIXIT_TABLE_11_TC_MTS_CCH_02[i].profile, 
+                                aspect:={
+                                    cchState := PIXIT_TABLE_11_TC_MTS_CCH_02[i].aspects[j].cchState,
+                                    sch1State := PIXIT_TABLE_11_TC_MTS_CCH_02[i].aspects[j].states[k].sch1State,
+                                    sch2State := PIXIT_TABLE_11_TC_MTS_CCH_02[i].aspects[j].states[k].sch2State
+                                }
+                            }
+                        )
+                    );
+                }
+            }
+        }
+        //CCH_active_channel_states
+        for (i:=0;i<lengthof(PIXIT_TABLE_12_TC_MTS_ACT_01); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_12_TC_MTS_ACT_01[i].aspect.sch1States); j:=j + 1) {
+                execute(
+                    TC_MTS_ACT_01(
+                        ProfileSingleTimeChannelAspect:{
+                            profile := PIXIT_TABLE_12_TC_MTS_ACT_01[i].profile, 
+                            aspect:={
+                                messageInterval := PIXIT_TABLE_12_TC_MTS_ACT_01[i].aspect.messageInterval,
+                                tOff := PIXIT_TABLE_12_TC_MTS_ACT_01[i].aspect.tOff,
+                                sch1State := PIXIT_TABLE_12_TC_MTS_ACT_01[i].aspect.sch1States[j]
+                            }
+                        }
+                    )
+                );
+            }
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_13_TC_MTS_ACT_02); i:=i + 1) {
+            execute(TC_MTS_ACT_02(PIXIT_TABLE_13_TC_MTS_ACT_02[i]));
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_14_TC_MTS_ACT_03); i:=i + 1) {
+            execute(TC_MTS_ACT_03(PIXIT_TABLE_14_TC_MTS_ACT_03[i]));
+        }
+        for (i:=0; i<lengthof(PIXIT_TABLE_15_TC_MTS_ACT_04); i:=i + 1) {
+            execute(TC_MTS_ACT_04(PIXIT_TABLE_15_TC_MTS_ACT_04[i]));
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_16_TC_MTS_ACT_05); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_16_TC_MTS_ACT_05[i].aspects); j:=j + 1) {
+                execute(
+                    TC_MTS_ACT_05(
+                        PIXIT_TABLE_16_TC_MTS_ACT_05[i].state,
+                        PIXIT_TABLE_16_TC_MTS_ACT_05[i].aspects[j]
+                    )
+                );
+            }
+        }
+        
+        //CCH_restrictive_channel_states
+        for (i:=0;i<lengthof(PIXIT_TABLE_17_TC_MTS_RES_01); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_17_TC_MTS_RES_01[i].aspect.sch1States); j:=j + 1) {
+                execute(
+                    TC_MTS_RES_01(
+                        ProfileSingleTimeChannelAspect:{
+                            profile := PIXIT_TABLE_17_TC_MTS_RES_01[i].profile, 
+                            aspect:={
+                                messageInterval := PIXIT_TABLE_17_TC_MTS_RES_01[i].aspect.messageInterval,
+                                tOff := PIXIT_TABLE_17_TC_MTS_RES_01[i].aspect.tOff,
+                                sch1State := PIXIT_TABLE_17_TC_MTS_RES_01[i].aspect.sch1States[j]
+                            }
+                        }
+                    )
+                );
+            }
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_18_TC_MTS_RES_02); i:=i + 1) {
+            execute(TC_MTS_RES_02(PIXIT_TABLE_18_TC_MTS_RES_02[i]));
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_19_TC_MTS_RES_03); i:=i + 1) {
+            execute(TC_MTS_RES_03(PIXIT_TABLE_19_TC_MTS_RES_03[i]));
+        }
+        for (i:=0; i<lengthof(PIXIT_TABLE_20_TC_MTS_RES_04); i:=i + 1) {
+            execute(TC_MTS_RES_04(PIXIT_TABLE_20_TC_MTS_RES_04[i]));
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_21_TC_MTS_RES_05); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_21_TC_MTS_RES_05[i].aspects); j:=j + 1) {
+                execute(
+                    TC_MTS_RES_05(
+                        PIXIT_TABLE_21_TC_MTS_RES_05[i].state,
+                        PIXIT_TABLE_21_TC_MTS_RES_05[i].aspects[j]
+                    )
+                );
+            }
+        }
+        
+        //SCH1_related
+        //SCH1_relaxed_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_22_TC_MTS_SCH1_01_03); i:=i + 1) {
+            execute(TC_MTS_SCH1_01(PIXIT_TABLE_22_TC_MTS_SCH1_01_03[i]));
+            execute(TC_MTS_SCH1_02(PIXIT_TABLE_22_TC_MTS_SCH1_01_03[i]));
+            execute(TC_MTS_SCH1_03(PIXIT_TABLE_22_TC_MTS_SCH1_01_03[i]));
+        }
+        execute(TC_MTS_SCH1_04());
+        
+        //SCH1_active_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_23_TC_MTS_SCH1_05_07); i:=i + 1) {
+            execute(TC_MTS_SCH1_05(PIXIT_TABLE_23_TC_MTS_SCH1_05_07[i]));
+            execute(TC_MTS_SCH1_06(PIXIT_TABLE_23_TC_MTS_SCH1_05_07[i]));
+            execute(TC_MTS_SCH1_07(PIXIT_TABLE_23_TC_MTS_SCH1_05_07[i]));
+        }
+        execute(TC_MTS_SCH1_08());
+        
+        //SCH1_restrictive_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_24_TC_MTS_SCH1_09_11); i:=i + 1) {
+            execute(TC_MTS_SCH1_09(PIXIT_TABLE_24_TC_MTS_SCH1_09_11[i]));
+            execute(TC_MTS_SCH1_10(PIXIT_TABLE_24_TC_MTS_SCH1_09_11[i]));
+            execute(TC_MTS_SCH1_11(PIXIT_TABLE_24_TC_MTS_SCH1_09_11[i]));
+        }
+        execute(TC_MTS_SCH1_12());
+        
+        //SCH2_related
+        //SCH2_relaxed_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_25_TC_MTS_SCH2_01_03); i:=i + 1) {
+            execute(TC_MTS_SCH2_01(PIXIT_TABLE_25_TC_MTS_SCH2_01_03[i]));
+            execute(TC_MTS_SCH2_02(PIXIT_TABLE_25_TC_MTS_SCH2_01_03[i]));
+            execute(TC_MTS_SCH2_03(PIXIT_TABLE_25_TC_MTS_SCH2_01_03[i]));
+        }
+        execute(TC_MTS_SCH2_04());
+        
+        //SCH2_active_channel_state
+        execute(TC_MTS_SCH2_05());
+        execute(TC_MTS_SCH2_06());
+        execute(TC_MTS_SCH2_07());
+        execute(TC_MTS_SCH2_08());
+        
+        //MultipleTransceiverITSStation_G5B
+        //CCH_related
+        for (i:=0; i<lengthof(PIXIT_TABLE_26_TC_G5B_CCH_01); i:=i + 1) {
+            execute(TC_G5B_CCH_01(PIXIT_TABLE_26_TC_G5B_CCH_01[i]));
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_27_TC_G5B_CCH_02); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_27_TC_G5B_CCH_02[j].aspects); j:=j + 1) {
+                for (k:=0;k<lengthof(PIXIT_TABLE_27_TC_G5B_CCH_02[i].aspects[j].sch3States); k:=k + 1) {
+                    execute(
+                        TC_G5B_CCH_02(
+                            ProfileSingleChannelAspect2:{
+                                profile := PIXIT_TABLE_27_TC_G5B_CCH_02[i].profile, 
+                                aspect:={
+                                    cchState := PIXIT_TABLE_27_TC_G5B_CCH_02[i].aspects[j].cchState,
+                                    sch3State := PIXIT_TABLE_27_TC_G5B_CCH_02[i].aspects[j].sch3States[k]
+                                }
+                            }
+                        )
+                    );
+                }
+            }
+        }
+        for (i:=0;i<lengthof(PIXIT_TABLE_28_TC_G5B_CCH_03_04); i:=i + 1) {
+            for (j:=0;j<lengthof(PIXIT_TABLE_28_TC_G5B_CCH_03_04[i].aspects); j:=j + 1) {
+                execute(
+                    TC_G5B_CCH_03(
+                        PIXIT_TABLE_28_TC_G5B_CCH_03_04[i].state,
+                        PIXIT_TABLE_28_TC_G5B_CCH_03_04[i].aspects[j]
+                    )
+                );
+                execute(
+                    TC_G5B_CCH_04(
+                        PIXIT_TABLE_28_TC_G5B_CCH_03_04[i].state,
+                        PIXIT_TABLE_28_TC_G5B_CCH_03_04[i].aspects[j]
+                    )
+                );
+            }
+        }
+        //SCH3_related
+        //SCH3_relaxed_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_29_TC_G5B_SCH3_01_03); i:=i + 1) {
+            execute(TC_G5B_SCH3_01(PIXIT_TABLE_29_TC_G5B_SCH3_01_03[i]));
+            execute(TC_G5B_SCH3_02(PIXIT_TABLE_29_TC_G5B_SCH3_01_03[i]));
+            execute(TC_G5B_SCH3_03(PIXIT_TABLE_29_TC_G5B_SCH3_01_03[i]));
+        }
+        execute(TC_G5B_SCH3_04());
+        
+        //SCH3_active_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_30_TC_G5B_SCH3_05_07); i:=i + 1) {
+            execute(TC_G5B_SCH3_05(PIXIT_TABLE_30_TC_G5B_SCH3_05_07[i]));
+            execute(TC_G5B_SCH3_06(PIXIT_TABLE_30_TC_G5B_SCH3_05_07[i]));
+            for (j:=0; j<lengthof(PIXIT_TABLE_30_TC_G5B_SCH3_05_07_SCH4); j:=j + 1) {
+                execute(TC_G5B_SCH3_07(PIXIT_TABLE_30_TC_G5B_SCH3_05_07_SCH4[j], PIXIT_TABLE_30_TC_G5B_SCH3_05_07[i]));
+            }
+        }
+        execute(TC_G5B_SCH3_08());
+        for (i:=0; i<lengthof(PIXIT_TABLE_31_TC_G5B_SCH3_09); i:=i + 1) {
+            for (j:=0; j<lengthof(PIXIT_TABLE_31_TC_G5B_SCH3_09[i].profiles); j:=j + j) {
+                execute(
+                    TC_G5B_SCH3_09(
+                        SingleChannelProfileAspect:{
+                            PIXIT_TABLE_31_TC_G5B_SCH3_09[i].state,
+                            PIXIT_TABLE_31_TC_G5B_SCH3_09[i].profiles[j]
+                        }
+                    )
+                );
+            }
+        }
+        
+        //SCH3_restrictive_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_32_TC_G5B_SCH3_10_12); i:=i + 1) {
+            execute(TC_G5B_SCH3_10(PIXIT_TABLE_32_TC_G5B_SCH3_10_12[i]));
+            execute(TC_G5B_SCH3_11(PIXIT_TABLE_32_TC_G5B_SCH3_10_12[i]));
+            for (j:=0; j<lengthof(PIXIT_TABLE_32_TC_G5B_SCH3_10_12_SCH4); j:=j + 1) {
+                execute(TC_G5B_SCH3_12(PIXIT_TABLE_32_TC_G5B_SCH3_10_12_SCH4[j], PIXIT_TABLE_32_TC_G5B_SCH3_10_12[i]));
+            }
+        }
+        execute(TC_G5B_SCH3_13());
+        for (i:=0; i<lengthof(PIXIT_TABLE_33_TC_G5B_SCH3_14); i:=i + 1) {
+            for (j:=0; j<lengthof(PIXIT_TABLE_33_TC_G5B_SCH3_14[i].profiles); j:=j + j) {
+                execute(
+                    TC_G5B_SCH3_14(
+                        SingleChannelProfileAspect:{
+                            PIXIT_TABLE_33_TC_G5B_SCH3_14[i].state,
+                            PIXIT_TABLE_33_TC_G5B_SCH3_14[i].profiles[j]
+                        }
+                    )
+                );
+            }
+        }
+        
+        //SCH4_relaxed_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_34_TC_G5B_SCH4_01_03); i:=i + 1) {
+            for (j:=0; j<lengthof(PIXIT_TABLE_34_TC_G5B_SCH4_01_03[i].profiles); j:=j + j) {
+                execute(
+                    TC_G5B_SCH4_01(
+                        SingleChannelProfileAspect:{
+                            PIXIT_TABLE_34_TC_G5B_SCH4_01_03[i].state,
+                            PIXIT_TABLE_34_TC_G5B_SCH4_01_03[i].profiles[j]
+                        }
+                    )
+                );
+                execute(
+                    TC_G5B_SCH4_02(
+                        SingleChannelProfileAspect:{
+                            PIXIT_TABLE_34_TC_G5B_SCH4_01_03[i].state,
+                            PIXIT_TABLE_34_TC_G5B_SCH4_01_03[i].profiles[j]
+                        }
+                    )
+                );
+            }
+        }
+        for (i:=0; i<lengthof(PIXIT_TABLE_34_TC_G5B_SCH4_01_03_SCH3); i:=i + 1) {
+            execute(TC_G5B_SCH4_03(PIXIT_TABLE_34_TC_G5B_SCH4_01_03_SCH3[i]));
+        }
+        
+        //SCH4_active_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_35_TC_G5B_SCH4_04_07); i:=i + 1) {
+            for (j:=0; j<lengthof(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3); j:=j + 1) {
+                execute(TC_G5B_SCH4_04(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[j], PIXIT_TABLE_35_TC_G5B_SCH4_04_07[i]));
+                execute(TC_G5B_SCH4_05(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[j], PIXIT_TABLE_35_TC_G5B_SCH4_04_07[i]));
+                execute(TC_G5B_SCH4_06(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[j], PIXIT_TABLE_35_TC_G5B_SCH4_04_07[i]));    
+            }
+        }
+        
+        for (i:=0; i<lengthof(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3); i:=i + 1) {
+            execute(TC_G5B_SCH4_07(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[i]));
+        }
+        
+        //SCH4_restrivtive_channel_state
+        for (i:=0; i<lengthof(PIXIT_TABLE_36_TC_G5B_SCH4_08_11); i:=i + 1) {
+            for (j:=0; j<lengthof(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3); j:=j + 1) {
+                execute(TC_G5B_SCH4_08(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[j], PIXIT_TABLE_36_TC_G5B_SCH4_08_11[i]));
+                execute(TC_G5B_SCH4_09(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[j], PIXIT_TABLE_36_TC_G5B_SCH4_08_11[i]));
+                execute(TC_G5B_SCH4_10(PIXIT_TABLE_35_TC_G5B_SCH4_04_07_SCH3[j], PIXIT_TABLE_36_TC_G5B_SCH4_08_11[i]));   
+            }
+        }
+        
+        for (i:=0; i<lengthof(PIXIT_TABLE_36_TC_G5B_SCH4_08_11_SCH3); i:=i + 1) {
+            execute(TC_G5B_SCH4_11(PIXIT_TABLE_36_TC_G5B_SCH4_08_11_SCH3[i]));
+        }
+        
+        
+    }
+    
+} // end ItsDcc_TestControl

@@ -1,0 +1,136 @@
+/**
+ *    @author     ETSI / STF405
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/BTP/LibItsBtp_TestSystem.ttcn $
+ *                $Id: LibItsBtp_TestSystem.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc        Test System module for ITS BTP
+ *
+ */
+module LibItsBtp_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_Time {modulepar all};
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsBtp_TypesAndValues all;
+
+	//User ports
+
+	import from General_Types all;
+	import from TTCN_EncDec all;
+    
+    group portDefinitions {
+    
+        /**
+         * @desc Upper Tester port
+         */
+        type port UpperTesterPort message {
+            out 
+                UtInitialize, UtBtpTrigger;
+            in 
+                UtInitializeResult, UtBtpTriggerResult, UtBtpEventInd;
+       // } with  {extension "internal"
+        
+        }// end UpperTesterPort 
+        
+        
+		//} // end UpperTesterPort
+        
+    } // end portDefinitions
+
+    group interfacePorts {
+
+        group networkAndTransportPorts {
+            
+            group nt1Ports {
+
+                /**
+                 * @desc NT1 BTP Port (BTP/GeoNet/G5) 
+                 */
+                type port BtpPort message {
+                    in BtpInd;
+                    out BtpReq;
+           //     } with  {extension "internal"
+                
+                } // end BtpPort
+                 /*with { extension "user LANL2asp_PT
+						out(
+							BtpReq -> ASP_LANL2: function(enc_BtpReq) 
+						)
+						in(
+							ASP_LANL2				-> BtpInd: function(dec_BtpInd);
+							ASP_LANL2_Error			-> -: discard;
+							ASP_v2_LANL2			-> BtpInd: function(dec_BtpInd_v2);
+							ASP_LANL2_open_result	-> -: discard;
+							ASP_v2_LANL2_Error		-> -: discard
+						)" */
+				//} // end BtpPort
+                                
+            } // End of group nt1Ports
+            
+        } // End of group networkAndTransportPorts
+    
+    } // End of group interfacePorts
+    
+    group componentDefinitions {
+
+        /**
+         * @desc ITS System Adapter
+         */
+        type component ItsBtpSystem {
+            
+            port UpperTesterPort utPort;
+            
+            // NT1 ports 
+            port BtpPort btpPort;
+            
+        } // end component ItsAdapter
+        
+    } // End of group componentDefinitions
+    
+    /**
+     * @desc Test component for ITS Network and Transport layer 
+     */
+    type component ItsBtp extends ItsBaseComponent {
+        
+        port UpperTesterPort utPort;
+        
+        // NT1 ports 
+        port BtpPort btpPort;
+                
+        // timers
+                
+        var UtBtpEventIndList vc_utEvents := {};
+        
+    } // End of component ItsBtp
+        
+    group networkAndTransportPrimitives { 
+            
+        group nt1Primitives {
+
+            /**
+             * @desc NT1 BTP Indication Primitive 
+             */
+            type record BtpInd {
+                BtpPacket msgIn
+            } with { variant "" };
+        
+            /**
+             * @desc NT1 BTP Request Primitive 
+             */
+            type record BtpReq {
+                BtpPacket msgOut
+            } with { variant "" };
+                        
+        } // end nt1Primitives
+        
+    } // End of group networkAndTransportPrimitives    
+    
+     
+} with { encode "RAW" };
+
+// End of module LibItsBtp_TestSystem
+
+

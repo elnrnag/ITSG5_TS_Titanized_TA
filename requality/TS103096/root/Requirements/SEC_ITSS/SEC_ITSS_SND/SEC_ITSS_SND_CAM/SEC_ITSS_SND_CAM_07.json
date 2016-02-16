@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "d89c3cec-bd65-4e0e-a38b-0dd5201c531e",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/83f9122f-3988-4955-99f7-5b08c1b7948f"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "d89c3cec-bd65-4e0e-a38b-0dd5201c531e",
+            "type": "STRING",
+            "value": "07. Check that IUT restarts the timer when the certificate has been sent"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d89c3cec-bd65-4e0e-a38b-0dd5201c531e",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d89c3cec-bd65-4e0e-a38b-0dd5201c531e"
+}

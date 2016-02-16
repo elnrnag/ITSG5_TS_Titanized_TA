@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "1609Dot2Data message received by the test system from the ITS-S under test"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "6be5d0ae-0ccd-4a26-abaa-ef46b9bc22d4"
+}

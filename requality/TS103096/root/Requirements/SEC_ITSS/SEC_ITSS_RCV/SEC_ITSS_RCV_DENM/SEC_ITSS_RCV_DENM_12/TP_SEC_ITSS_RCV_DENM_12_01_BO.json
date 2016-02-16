@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards a Secured DENM if the signer certificate of the message contains the subject type 'enrolment_credential'"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer.type\r\n\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\tcontaining signer.certificate (CERT_TS_EA_A)\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'enrolment_credentials'\r\n\t\t\t}\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_DENM'\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "55e54a0c-2daf-48c0-b64a-a23f10a455ba"
+}

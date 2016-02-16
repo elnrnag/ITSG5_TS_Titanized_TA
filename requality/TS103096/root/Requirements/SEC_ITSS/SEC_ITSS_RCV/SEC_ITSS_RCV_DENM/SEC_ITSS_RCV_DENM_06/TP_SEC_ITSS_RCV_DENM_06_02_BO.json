@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards message containing generation_time after the certificate validity period"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (DENM) {\r\n\t\t\tcontaining header_fields[0] {\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\t\tand containing signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tand containing certificate (CERT_TS_AT_A) {\r\n\t\t\t\t\t\tcontaining validity_restrictions['time_start_and_end'] {\r\n\t\t\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\t\t\tindicating TIME_CERT_TS_AT_START\r\n\t\t\t\t\t\t\tand containing end_validity\r\n\t\t\t\t\t\t\t\tindicating TIME_CERT_TS_AT_END\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tand containing header_fields [1] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_time'\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating TIME_1 > TIME_CERT_TS_AT_END\r\n\t\t\t}\r\n\t\t\tand containing header_fields [2] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_location'\r\n\t\t\t}\r\n\t\t\tand containing header_fields[3] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b2c5b3ac-20d3-44d3-92b0-0d29e21a7c05"
+}

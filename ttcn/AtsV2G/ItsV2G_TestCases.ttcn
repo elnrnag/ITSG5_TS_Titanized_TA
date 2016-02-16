@@ -1,0 +1,793 @@
+/**
+ *    @author     ETSI / STFS46
+ *    @version    $URL: svn+ssh://vcs.etsi.org/TTCN3/ATS/Its/trunk/ttcn/AtsV2G/ItsV2G_TestCases.ttcn $
+ *                $Id: ItsV2G_TestCases.ttcn 348 2012-03-13 15:23:49Z reinaortega $
+ *    @desc       V2G Testcases (TP version: 0.0.1)
+ *
+ */
+
+module ItsV2G_TestCases {
+    
+    // LibCommon
+    
+    // LibIts
+	import from LibItsV2G_TestSystem all;
+	import from LibItsV2G_Pics all;
+	import from LibItsV2G_Functions all;
+	import from LibItsV2G_Templates all;
+	import from LibItsV2G_TypesAndValues all;
+    
+	// 5.1
+	group sdp_evcc
+	{
+		/**
+         * @desc    Checks that the IUT starts the discovery process when IP address is assigned.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT having assigned an IP address	 
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *        when {
+         *           the IUT sends a valid SECC Discovery Request
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/EVCC/SDP/CLI/BV/01
+         */
+		testcase TC_EVCC_SDP_CLI_BV_01() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  			
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpRequestMessage (mw_sdpRequestHeader, mw_sdpRequestPayload_generic))) { 
+					tc_ac.stop;
+                    log("*** TC_EVCC_SDP_CLI_BV_01: PASS: SDP request message received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_EVCC_SDP_CLI_BV_01: FAIL: SDP session request message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_EVCC_SDP_CLI_BV_01
+
+		/**
+         * @desc    Checks SECC Discovery Request retransmissions interval.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT having assigned an IP address
+		 *				the IUT having sent a valid SECC Discovery Request
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *         when {
+         *            the IUT does not receive a SECC Discovery Response
+         *         }
+		 *		   then {
+		 *             the IUT retransmits a valid SECC Discovery Request
+		 *			      after 250 ms
+		 *		   }
+		 *	   }
+		 * 
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/EVCC/SDP/CLI/BV/02
+         */
+		testcase TC_EVCC_SDP_CLI_BV_02() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local variables
+            var V2Gind vc_v2gIndMessageReceived;
+			var boolean v_retransmitOk := false;
+			timer t_minRetrans :=  c_v2g_sdpRetransmissionTimeout;
+                            
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble           
+            f_prSdpRequestReceived();          
+               
+            // Test Body            
+			t_minRetrans.start;
+			tc_ac.start;
+			alt {
+				[] t_minRetrans.timeout {
+					log("*** TC_EVCC_SDP_CLI_BV_02: INFO: Ready for retransmission ***");
+					v_retransmitOk := true;  
+					repeat; 
+				}
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpRequestMessage (mw_sdpRequestHeader, mw_sdpRequestPayload_generic))) -> value vc_v2gIndMessageReceived { 
+					tc_ac.stop;
+					if(v_retransmitOk == true) {
+						if (match(vc_v2gIndMessageReceived, vc_v2gIndMessage)){
+							log("*** TC_EVCC_SDP_CLI_BV_02: PASS: SDP request message correctly retransmitted ***");
+							setverdict(pass);
+						}
+						else {
+							log("*** TC_EVCC_SDP_CLI_BV_02: FAIL: SDP session request message wrongly retransmitted ***");
+							setverdict(fail);
+						}
+					}
+					else {
+						log("*** TC_EVCC_SDP_CLI_BV_02: FAIL: SDP session request message retransmitted too early ***");
+						setverdict(fail);
+					}
+				}   
+                [] tc_ac.timeout {
+                    log("*** TC_EVCC_SDP_CLI_BV_02: FAIL: SDP session request message retransmission not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_EVCC_SDP_CLI_BV_02
+
+		/**
+         * @desc    Checks SECC Discovery Request maximum number of retransmissions.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT having assigned an IP address
+		 *				the IUT having sent a valid SECC Discovery Request
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *         when {
+         *            the IUT does not receive a SECC Discovery Response
+         *         }
+		 *		   then {
+		 *             the IUT retransmits a valid SECC Discovery Request 4 times
+		 *		   }
+		 *	   }
+		 * 
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/EVCC/SDP/CLI/BV/03
+         */
+		testcase TC_EVCC_SDP_CLI_BV_03() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local variables
+            var V2Gind vc_v2gIndMessageReceived;
+			var integer v_maxNbrRetrans := c_maxNbrSdpRequestRetrans;
+            var integer v_nbSdpRequestReceived := 0;
+                            
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble           
+            f_prSdpRequestReceived();          
+               
+            // Test Body            
+			tc_ac.start;
+			alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpRequestMessage (mw_sdpRequestHeader, mw_sdpRequestPayload_generic))) -> value vc_v2gIndMessageReceived { 
+					tc_ac.stop;
+					v_nbSdpRequestReceived := v_nbSdpRequestReceived + 1;
+					if (match(vc_v2gIndMessageReceived, vc_v2gIndMessage)){
+						if(v_nbSdpRequestReceived > v_maxNbrRetrans) {
+                            //first SDP request message is not counted as a retransmission
+							log("*** TC_EVCC_SDP_CLI_BV_03: FAIL: SDP request message retransmitted more than 4 times  ***");
+							setverdict(fail);
+						}
+						else {
+                            tc_ac.start;
+                            repeat;
+                        }
+					}
+					else {
+						log("*** TC_EVCC_SDP_CLI_BV_03: FAIL: SDP session request message wrongly retransmitted ***");
+						setverdict(fail);
+					}					
+				}   
+                [] tc_ac.timeout {
+					if(v_nbSdpRequestReceived == v_maxNbrRetrans) {
+						//first SDP Request message is not counted as a retransmission
+						log("*** TC_EVCC_SDP_CLI_BV_03: PASS: SDP Request message retransmitted 4 times ***");
+                        setverdict(pass);
+                    }
+                    else {   
+                        log("*** TC_EVCC_SDP_CLI_BV_03: FAIL: SDP Request mesage retransmitted less than 4 times ***");                     
+                        setverdict(fail);
+                    }
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_EVCC_SDP_CLI_BV_03
+
+		/**
+         * @desc    Checks SECC Discovery Request security encoding validity with TLS selected.
+         * <pre>        
+         * Pics Selection: PICS_TLS
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT having assigned an IP address
+		 *				the IUT supporting TLS and intending to use it
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *        when {
+         *           the IUT sends a valid SECC Discovery Request
+		 *			     containing Security Encoding field indicating value ï¿½0x00ï¿½
+		 *				 containing Transport Protocol field indicating value ï¿½0x00ï¿½
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/EVCC/SDP/CLI/BV/04
+         */
+		testcase TC_EVCC_SDP_CLI_BV_04() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  			
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpRequestMessage
+								  (mw_sdpRequestHeader, mw_sdpRequestPayload(c_securedwithTLS,c_transportProtocolTCP)))) { 
+					tc_ac.stop;
+                    log("*** TC_EVCC_SDP_CLI_BV_04: PASS: SDP request message with TLS selected received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_EVCC_SDP_CLI_BV_04: FAIL: SDP session request message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_EVCC_SDP_CLI_BV_04
+
+		/**
+         * @desc    Checks SECC Discovery Request security encoding validity with TLS not selected.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT having assigned an IP address
+		 *				the IUT not supporting TLS or not intending to use it
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *        when {
+         *           the IUT sends a valid SECC Discovery Request
+		 *			     containing Security Encoding field indicating value ï¿½0x10ï¿½
+		 *				 containing Transport Protocol field indicating value ï¿½0x00ï¿½
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/EVCC/SDP/CLI/BV/05
+         */
+		testcase TC_EVCC_SDP_CLI_BV_05() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  			
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpRequestMessage
+								  (mw_sdpRequestHeader, mw_sdpRequestPayload(c_noTransportLayerSecurity,c_transportProtocolTCP)))) { 
+					tc_ac.stop;
+                    log("*** TC_EVCC_SDP_CLI_BV_05: PASS: SDP request message with no TLS selected received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_EVCC_SDP_CLI_BV_05: FAIL: SDP session request message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_EVCC_SDP_CLI_BV_05
+	} // end group sd_evcc
+
+	// 6.1
+	group sdp_secc
+	{
+		/**
+         * @desc    Checks that the IUT replies to a SECC Discovery Request indicating SECC IP and Port.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT receives a valid SECC Discovery Request	 
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *        when {
+         *           the IUT sends a valid SECC Discovery Response
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/SECC/SDP/SRV/BV/01
+         */
+		testcase TC_SECC_SDP_SRV_BV_01() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prSendSdpMessage(
+				m_sdpRequestMessage(
+					mw_sdpRequestHeader,
+					mw_sdpRequestPayload(
+						c_noTransportLayerSecurity,
+						c_transportProtocolTCP
+					)
+				)				
+			);
+                
+            // Test Body  			
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpResponseMessage
+								  (mw_sdpReponseHeader, mw_sdpResponsePayload_generic))) { 
+					tc_ac.stop;
+                    log("*** TC_SECC_SDP_SRV_BV_01: PASS: SDP Response message received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_SECC_SDP_SRV_BV_01: FAIL: SDP Response message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_SECC_SDP_SRV_BV_01
+
+		/**
+         * @desc    Check that the IUT replies to N consecutive SECC Discovery Request indicating SECC IP and Port.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *				the IUT receives N consecutive valid SECC Discovery Request	 
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+         *        when {
+         *           the IUT sends N valid SECC Discovery Responses 
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/SECC/SDP/SRV/BV/02
+         */
+		testcase TC_SECC_SDP_SRV_BV_02() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			var integer v_maxNbrConsecutiveSdpRequest := c_maxNbrConsecutiveSdpRequest;
+            var integer v_nbSdpResponseReceived := 0;
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  			
+			f_sendV2Gmessage(m_sdpReq(
+								m_sdpRequestMessage(
+									m_sdpRequestHeader,
+									m_sdpRequestPayload(
+										c_noTransportLayerSecurity,
+										c_transportProtocolTCP
+									)
+								)
+							)				
+			);
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpResponseMessage
+								  (mw_sdpReponseHeader, mw_sdpResponsePayload_generic))) { 
+					tc_ac.stop;
+					v_nbSdpResponseReceived := v_nbSdpResponseReceived + 1;
+					if (v_nbSdpResponseReceived == v_maxNbrConsecutiveSdpRequest) {
+                    	log("*** TC_SECC_SDP_SRV_BV_02: PASS: 5 Consecutive SDP Response message received ***");
+                    	setverdict(pass);
+					} else {
+                         v_nbSdpResponseReceived := v_nbSdpResponseReceived + 1;
+                         f_sendV2Gmessage(m_sdpReq(
+								m_sdpRequestMessage(
+									m_sdpRequestHeader,
+									m_sdpRequestPayload(
+										c_noTransportLayerSecurity,
+										c_transportProtocolTCP
+									)
+								)
+							)				
+						 );   
+                         tc_ac.start;
+                         repeat;
+                    }
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_SECC_SDP_SRV_BV_02: INCONC: Expected message not received ***");
+                    setverdict(inconc);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_SECC_SDP_SRV_BV_02
+
+		/**
+         * @desc    Checks that if the IUT replies with TLS-security option to a SECC Discovery Request requesting TLS.
+         * <pre>        
+         * Pics Selection: PICS_TLS
+         * Initial conditions: 
+		 * 		with {
+		 *	 			the IUT having assigned an IP address and
+		 *				the IUT supporting TLS
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+		 *		  when {	 		
+		 *				the IUT receives a valid SECC Discovery Request
+		 *					containing Security Encoding field indicating value “0x00”
+		 *					containing Transport Protocol field indicating value “0x00”	 
+         *
+         *        }
+		 *		  then {
+         *           the IUT sends a valid SECC Discovery Response
+		 *					containing Security Encoding field indicating value “0x00”
+		 *					containing Transport Protocol field indicating value “0x00”
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/SECC/SDP/SRV/BV/03
+         */
+		testcase TC_SECC_SDP_SRV_BV_03() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  
+			f_sendV2Gmessage(m_sdpReq(
+								m_sdpRequestMessage(
+									m_sdpRequestHeader,
+									m_sdpRequestPayload(
+										c_securedwithTLS,
+										c_transportProtocolTCP
+									)
+								)
+							)				
+			);
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpResponseMessage
+								  (mw_sdpReponseHeader, mw_sdpResponsePayload(c_securedwithTLS,c_transportProtocolTCP)))) { 
+					tc_ac.stop;
+                    log("*** TC_SECC_SDP_SRV_BV_03: PASS: SDP Response message with TLS-security option received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_SECC_SDP_SRV_BV_03: FAIL: SDP Response message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_SECC_SDP_SRV_BV_03
+
+		/**
+         * @desc    Checks that if the IUT does not support TLS, it replies with no-security option to a SECC Discovery Request requesting TLS.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *	 			the IUT having assigned an IP address and
+		 *				the IUT not supporting TLS
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+		 *		  when {	 		
+		 *				the IUT receives a valid SECC Discovery Request
+		 *					containing Security Encoding field indicating value “0x00”
+		 *					containing Transport Protocol field indicating value “0x00”	 
+         *
+         *        }
+		 *		  then {
+         *           the IUT sends a valid SECC Discovery Response
+		 *					containing Security Encoding field indicating value “0x10”
+		 *					containing Transport Protocol field indicating value “0x00”
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/SECC/SDP/SRV/BV/04
+         */
+		testcase TC_SECC_SDP_SRV_BV_04() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  
+			f_sendV2Gmessage(m_sdpReq(
+								m_sdpRequestMessage(
+									m_sdpRequestHeader,
+									m_sdpRequestPayload(
+										c_securedwithTLS,
+										c_transportProtocolTCP
+									)
+								)
+							)				
+			);
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpResponseMessage
+								  (mw_sdpReponseHeader, mw_sdpResponsePayload(c_noTransportLayerSecurity,c_transportProtocolTCP)))) { 
+					tc_ac.stop;
+                    log("*** TC_SECC_SDP_SRV_BV_04: PASS: SDP Response message with no-security option received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_SECC_SDP_SRV_BV_04: FAIL: SDP Response message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_SECC_SDP_SRV_BV_04
+
+		/**
+         * @desc    Checks that the IUT replies with no-security option to a SECC Discovery Request requesting no TLS.
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+		 * 		with {
+		 *	 			the IUT having assigned an IP address and
+		 *				the IUT not supporting TLS
+		 *		}
+         * Expected behaviour:
+         *     ensure that {
+		 *		  when {	 		
+		 *				the IUT receives a valid SECC Discovery Request
+		 *					containing Security Encoding field indicating value “0x10”
+		 *					containing Transport Protocol field indicating value “0x00”	 
+         *
+         *        }
+		 *		  then {
+         *           the IUT sends a valid SECC Discovery Response
+		 *					containing Security Encoding field indicating value “0x10”
+		 *					containing Transport Protocol field indicating value “0x00”
+         *        }
+		 *	   }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v0.5 TP/SECC/SDP/SRV/BV/05
+         */
+		testcase TC_SECC_SDP_SRV_BV_05() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local Variables
+			
+			// Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble 
+			f_prInitialState();
+                
+            // Test Body  
+			f_sendV2Gmessage(m_sdpReq(
+								m_sdpRequestMessage(
+									m_sdpRequestHeader,
+									m_sdpRequestPayload(
+										c_noTransportLayerSecurity,
+										c_transportProtocolTCP
+									)
+								)
+							)				
+			);
+			tc_ac.start;
+            alt {
+                [] v2gPort.receive(mw_sdpInd ( mw_sdpResponseMessage
+								  (mw_sdpReponseHeader, mw_sdpResponsePayload(c_noTransportLayerSecurity,c_transportProtocolTCP)))) { 
+					tc_ac.stop;
+                    log("*** TC_SECC_SDP_SRV_BV_05: PASS: SDP Response message with no-security option received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] tc_ac.timeout {
+                    log("*** TC_SECC_SDP_SRV_BV_05: FAIL: SDP Response message not received ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_SECC_SDP_SRV_BV_05
+
+	} // end group sdp_secc
+
+    // 5.2.1
+    group sessionSetup { 
+        
+        /**
+         * @desc    Session setup Request (3) message validity test
+         * <pre>        
+         * Pics Selection: none
+         * Initial conditions: 
+         *     with {
+         *              IUT gets the address of EVSE
+         *     }
+         * Expected behaviour:
+         *     ensure that {
+         *    when {
+         *        the IUT supported application protocol response (2) received at EV containing the used schemaID, V2G_EVCC_Sequence_Timer starts
+         *    }
+         *    then {
+         *        the IUT sends a session setup Request (3) to EVSE until V2G_EVCC_Sequence_Timer is smaller than V2G_EVCC_Sequence_Performance_Time
+         *            containing a correctly formatted Header
+         *                containing SID
+         *            containing a correctly formatted Body
+         *                containing EVCCID       
+         *    }
+         * </pre>
+         * 
+         * @version    0.0.1
+         * @see        PowerUp - D6.1 - TSS&TP v1.1.1 TP/V2G/V2GR/ACV2G/BV/01
+         */
+        testcase TC_V2G_V2GR_ACV2G_BV_01() runs on ItsV2G system ItsV2Gsystem {
+            
+            // Local variables
+            timer t_evcc_sequencePerformanceTime:= PICS_EVCC_SEQUENCE_PERFORMANCE_TIME * 0.95;
+             
+            // Test control
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            
+            f_prSessionDiscoveryCompleted();
+            f_supportedApplicationCompleted();
+            
+                
+            // Test Body
+            
+			t_evcc_sequencePerformanceTime.start;
+            alt {
+                 [] v2gPort.receive(mw_v2gInd ( mw_v2gMsg_sessionRequest (vc_sId, vc_evccId))) { 
+					t_evcc_sequencePerformanceTime.stop;
+                    log("*** TC_V2G_V2GR_ACV2G_BV_01: PASS: V2G session request message received BEFORE expiry of the sequence performance timer***");
+                    setverdict(pass);
+                }   
+                [] t_evcc_sequencePerformanceTime.timeout {
+                    log("*** TC_V2G_V2GR_ACV2G_BV_01: FAIL: V2G session request message not receive ***");
+                    setverdict(fail);
+                }         
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end TC_V2G_V2GR_ACV2G_BV_01
+
+
+                   
+    } // end group sessionSetup
+
+} // end ItsV2G_TestCases

@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "2efa81e5-e91e-44f2-af46-f79f63399534",
+            "type": "STRING",
+            "value": "Check that the certificate chain is valid"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "2efa81e5-e91e-44f2-af46-f79f63399534",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/4ee1b61f-a484-4fc4-b43d-aa191370d877",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/942ec076-7557-40df-a51c-929d6be6c9d6"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "2efa81e5-e91e-44f2-af46-f79f63399534",
+            "type": "STRING",
+            "value": "02. Check the certificate chain"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "2efa81e5-e91e-44f2-af46-f79f63399534",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "2efa81e5-e91e-44f2-af46-f79f63399534"
+}

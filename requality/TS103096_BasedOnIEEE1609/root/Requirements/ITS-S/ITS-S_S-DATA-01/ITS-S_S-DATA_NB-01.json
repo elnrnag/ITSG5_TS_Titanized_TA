@@ -1,0 +1,23 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S sends a correctly signed message with payload."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": [
+                "/Documents/TS103096-02.xhtml/4b1e86c4-4e64-4c7f-a1f3-b35b3bd97cde",
+                "/Documents/TS103096-02.xhtml/6be5d0ae-0ccd-4a26-abaa-ef46b9bc22d4"
+            ]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "20914ead-e971-4d32-b8f4-cd31e8d40579"
+}

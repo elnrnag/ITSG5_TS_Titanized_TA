@@ -1,0 +1,2314 @@
+module test_LibItsSecurity_TypesAndValues {
+    
+    // LibCommon
+    import from LibItsCommon_Functions {function f_getCurrentTime;}
+    import from LibCommon_DataStrings all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Templates {template all;}
+    import from LibItsSecurity_Functions all;
+    import from LibItsSecurity_Pixits all;
+    
+    // TestUnits
+    import from test_CommonCodec all; 
+    
+    group LibItsSecurity_testCases {
+        
+        group securityAcPrimitives {
+            
+            /**
+             * @desc Validate Security AcPrimitive
+             */
+            testcase tc_acEnableSecurity() runs on TCType system TCType {
+                
+                f_loadCertificates(PX_IUT_SEC_CONFIG_NAME);
+                vc_location := {
+                    22345,
+                    54321,
+                    '0000'O
+                };
+                
+                test_PDU<AcEnableSecurity>(
+                    m_enableSecurity( 
+                        "TA_CERT_A"
+                    ),
+                    false
+                );
+            }
+            
+        } // End of group securityAcPrimitives 
+        
+        group basicFormatElements {
+            
+            /**
+             * @desc Validate PublicKey/EccPoint
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_PublicKey_eccPoint_01() runs on TCType system TCType {
+                test_PDU<PublicKey>(
+                    m_publicKey_eccPoint(
+                        m_eccPointecdsa_nistp256_with_sha256_x_coordinate_only(
+                            'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                        )
+                    )
+                );
+            } // End of testcase tc_PublicKey_eccPoint_01
+            
+            /**
+             * @desc Validate PublicKey/EccPoint
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_PublicKey_eccPoint_02() runs on TCType system TCType {
+                test_PDU<PublicKey>(
+                    m_publicKey_eccPoint(
+                        m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                            'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                            '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                        )
+                    )
+                );
+            } // End of testcase tc_PublicKey_eccPoint_02
+            
+            /**
+             * @desc Validate PublicKey/EccPoint
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_PublicKey_aesccm_01() runs on TCType system TCType {
+                test_PDU<PublicKey>(
+                    m_publicKey_aesccm(
+                        m_aesccm(
+                            m_eccPointecdsa_nistp256_with_sha256_x_coordinate_only(
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                            )
+                        )
+                    )
+                );
+            } // End of testcase tc_PublicKey_aesccm_01
+            
+            /**
+             * @desc Validate PublicKey/EccPoint
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_PublicKey_aesccm_02() runs on TCType system TCType {
+                test_PDU<PublicKey>(
+                    m_publicKey_aesccm(
+                        m_aesccm(
+                            m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                            )
+                        )
+                    )
+                );
+            } // End of testcase tc_PublicKey_aesccm_02
+            
+            /**
+             * @desc Validate EcdsaSignature
+             * @remark The EccPointType of R shall be set to x_coordinate_only
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_EcdsaSignature_01() runs on TCType system TCType {
+                test_PDU<EcdsaSignature>(
+                    m_ecdsaSignature(
+                        m_eccPointecdsa_nistp256_with_sha256_x_coordinate_only(
+                            'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                        ),
+                        '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                    )
+                );
+            } // End of testcase tc_EcdsaSignature_01
+            
+            testcase tc_Duration_01() runs on TCType system TCType {
+                test_PDU<Duration>(
+                     m_duration_in_seconds(
+                          456
+                    )
+                );
+            } // End of testcase tc_Duration_01
+            
+            /**
+             * @desc Validate Time64WithStandardDeviation
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_Time64WithStandardDeviation_01() runs on TCType system TCType {
+                test_PDU<Time64WithStandardDeviation>(
+                    m_time64WithStandardDeviation(
+                        oct2int('FACEB00C'O),
+                        128
+                    )
+                );
+            } // End of testcase tc_Time64WithStandardDeviation_01
+            
+            /**
+             * @desc Validate TwoDLocation
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_TwoDLocation_01() runs on TCType system TCType {
+                test_PDU<TwoDLocation>(
+                    m_twoDLocation(
+                        22345,
+                        54321
+                    )
+                );
+            } // End of testcase tc_TwoDLocation_01
+            
+            /**
+             * @desc Validate ThreeDLocation
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_ThreeDLocation_01() runs on TCType system TCType {
+                test_PDU<ThreeDLocation>(
+                    m_threeDLocation(
+                        12345,
+                        54321,
+                        int2oct(1024, 2)
+                    )
+                );
+            } // End of testcase tc_ThreeDLocation_01
+            
+            testcase tc_EncryptionParameters_01() runs on TCType system TCType {
+                test_PDU<EncryptionParameters>(
+                    m_encryptionParameters_aes_128_ccm(
+                        '010203040506070808080808'O
+                    )
+                );
+            } // End of testcase tc_EncryptionParameters_01
+            
+            testcase tc_GeographicRegion_01() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_circle(
+                        m_twoDLocation(
+                            22345,
+                            54321
+                        ),
+                        2550
+                    )
+                );
+            } // End of testcase tc_EncryptionParameters_01
+            
+            testcase tc_GeographicRegion_02() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_rectangle(
+                        m_twoDLocation(
+                            22345,
+                            54321
+                        ),
+                        m_twoDLocation(
+                            2*22345,
+                            2*54321
+                        )
+                    )
+                );
+            } // End of testcase tc_EncryptionParameters_02
+            
+            testcase tc_GeographicRegion_03() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_polygonial(
+                        {
+                            m_twoDLocation(
+                                22345,
+                                54321
+                            ),
+                            m_twoDLocation(
+                                2*22345,
+                                2*54321
+                            )
+                        }
+                    )
+                );
+            } // End of testcase tc_EncryptionParameters_03
+            
+            template (value) IdentifiedRegion m_identifiedRegion_01 := {
+                region_dictionary := e_un_stats,
+                region_identifier := 3,
+                local_region      := 10
+            } // End of template m_identifiedRegion_01
+            
+            template (value) IdentifiedRegion m_identifiedRegion_02 := {
+                region_dictionary := e_iso_3166_1,
+                region_identifier := 4567,
+                local_region      := 78
+            } // End of template m_identifiedRegion_01
+            
+            template (value) IdentifiedRegion m_identifiedRegion_03 := {
+                region_dictionary := e_iso_3166_1,
+                region_identifier := 2,
+                local_region      := 2184
+            } // End of template m_identifiedRegion_03
+            
+            template (value) IdentifiedRegion m_identifiedRegion_04 := {
+                region_dictionary := e_iso_3166_1,
+                region_identifier := 2,
+                local_region      := 9 * 2184
+            } // End of template m_identifiedRegion_04
+            
+            testcase tc_GeographicRegion_04() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_identifiedRegion(
+                        m_identifiedRegion_01
+                    )
+                );
+            } // End of testcase tc_GeographicRegion_04
+            
+            testcase tc_GeographicRegion_05() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_identifiedRegion(
+                        m_identifiedRegion_02
+                    )
+                );
+            } // End of testcase tc_GeographicRegion_05
+            
+            testcase tc_GeographicRegion_06() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_identifiedRegion(
+                        m_identifiedRegion_03
+                    )
+                );
+            } // End of testcase tc_GeographicRegion_06
+            
+            testcase tc_GeographicRegion_07() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_identifiedRegion(
+                        m_identifiedRegion_04
+                    )
+                );
+            } // End of testcase tc_GeographicRegion_07
+            
+            testcase tc_GeographicRegion_08() runs on TCType system TCType {
+                test_PDU<GeographicRegion>(
+                    m_geographicRegion_nonce
+                );
+            } // End of testcase tc_GeographicRegion_08
+            
+        } // End of group basicFormatElements
+            
+        group securityHeader {
+            
+            testcase tc_Payload_01() runs on TCType system TCType {
+                test_PDU<SecPayload>(
+                    m_payload_signed_external
+                );
+            } // End of testcase tc_Payload_01
+            
+            testcase tc_Payload_02() runs on TCType system TCType {
+                test_PDU<SecPayload>(
+                    m_payload_unsecured('DEEDBEEF'O)
+                );
+            } // End of testcase tc_Payload_02
+            
+            testcase tc_Payload_03() runs on TCType system TCType {
+                test_PDU<SecPayload>(
+                    m_payload_signed('DEEDBEEF'O)
+                );
+            } // End of testcase tc_Payload_03
+            
+            testcase tc_Payload_04() runs on TCType system TCType {
+                test_PDU<SecPayload>(
+                    m_payload_encrypted('DEEDBEEF'O)
+                );
+            } // End of testcase tc_Payload_04
+            
+            testcase tc_Payload_05() runs on TCType system TCType {
+                test_PDU<SecPayload>(
+                    m_payload_signed_and_encrypted('DEEDBEEF'O)
+                );
+            } // End of testcase tc_Payload_05
+            
+            testcase tc_HeaderField_01() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_generation_time(
+                        123456789
+                    )
+                );
+            } // End of testcase tc_HeaderField_01
+            
+            testcase tc_HeaderField_02() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_generation_time_with_standard_deviation(
+                        m_time64WithStandardDeviation(
+                            oct2int('FACEB00C'O),
+                            128
+                        )
+                    )
+                );
+            } // End of testcase tc_HeaderField_02
+            
+            testcase tc_HeaderField_03() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_expiry_time(
+                        3600
+                    )
+                );
+            } // End of testcase tc_HeaderField_03
+            
+            testcase tc_HeaderField_04() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_generation_location(
+                        m_threeDLocation(
+                            -12345,
+                            -54321,
+                            int2oct(1024, 2)
+                        )
+                    )
+                );
+            } // End of testcase tc_HeaderField_04
+            
+            testcase tc_HeaderField_05() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_unrecognised_certificate(
+                        '060708'O
+                    )
+                );
+            } // End of testcase tc_HeaderField_05
+            
+            testcase tc_HeaderField_06() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    mw_header_field_its_aid(36)
+                );
+            } // End of testcase tc_HeaderField_06
+            
+            testcase tc_HeaderField_07() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    mw_header_field_its_aid(37)
+                );
+            } // End of testcase tc_HeaderField_07
+            
+            testcase tc_HeaderField_08() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_its_aid(
+                        12345
+                    )
+                );
+            } // End of testcase tc_HeaderField_08
+            
+            testcase tc_HeaderField_09() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_signer_info(
+                        m_signerInfo_self
+                    )
+                );
+            } // End of testcase tc_HeaderField_09
+            
+            testcase tc_HeaderField_10() runs on TCType system TCType {
+                test_PDU<HeaderField>(
+                    m_header_field_enc_params(
+                        m_encryptionParameters_aes_128_ccm(
+                            '010203040506070808080808'O
+                        )
+                    )
+                );
+            } // End of testcase tc_HeaderField_10
+            
+            testcase tc_TrailerField_01() runs on TCType system TCType {
+                test_PDU<TrailerField>(
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                                ),
+                                '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                            )
+                        )
+                    )
+                );
+            } // End of testcase tc_TrailerField_01
+            
+            testcase tc_SecuredMessage_01() runs on TCType system TCType {
+                test_PDU<SecuredMessage>(
+                    m_secureMessage_dummy
+                );
+            } // End of testcase tc_SecuredMessage_01
+            
+            template (value) SecuredMessage m_secureMessageCAMs_01
+            modifies m_secureMessage_dummy := {
+                header_fields        := {
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('0102030405060708'O)
+                    ),
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('1020304050607080'O)
+                    )
+                },
+                payload_field := m_payload_signed('DEEDBEEF01'O),
+                trailer_fields        := { 
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                                ),
+                                '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                            )
+                        )
+                    )
+                }
+            } // End of template tc_SecuredMessage_01
+            
+            template (value) SecuredMessage m_secureMessage_02
+            modifies m_secureMessage_dummy := {
+                header_fields        := {
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('0102030405060708'O)
+                    ),
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('1020304050607080'O)
+                    )
+                },
+                payload_field := m_payload_signed('DEEDBEEF01'O),
+                trailer_fields        := { 
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                                ),
+                                '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                            )
+                        )
+                    ),
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O,
+                                    '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                                ),
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                            )
+                        )
+                    )
+                }
+            } // End of template m_secureMessage_02
+            
+            template (value) SecuredMessage m_secureMessageCAMs
+            modifies m_secureMessage_dummy := {
+                header_fields        := {
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('0102030405060708'O)
+                    ),
+                    m_header_field_generation_time(1000 * f_getCurrentTime()),
+                    m_header_field_its_aid_CAM
+                },
+                payload_field := m_payload_signed('DEEDBEEF01'O),
+                trailer_fields        := { 
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                                ),
+                                '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                            )
+                        )
+                    ),
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O,
+                                    '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                                ),
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                            )
+                        )
+                    )
+                }
+            } // End of template m_secureMessageCAMs
+            
+            template (value) SecuredMessage m_secureMessageDENMs
+            modifies m_secureMessage_dummy := {
+                header_fields        := {
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('0102030405060708'O)
+                    ),
+                    m_header_field_generation_time(1000 * f_getCurrentTime()),
+                    m_header_field_generation_location(
+                        m_threeDLocation(
+                            12345,
+                            54321,
+                            int2oct(1024, 2)
+                        )
+                    ),
+                    m_header_field_its_aid_DENM
+                },
+                payload_field := m_payload_signed('DEEDBEEF01'O),
+                trailer_fields        := { 
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                                ),
+                                '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                            )
+                        )
+                    ),
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O,
+                                    '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                                ),
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                            )
+                        )
+                    )
+                }
+            } // End of template m_secureMessageDENMs
+            
+            template (value) SecuredMessage m_secureMessageOthers
+            modifies m_secureMessage_dummy := {
+                header_fields        := {
+                    m_header_field_signer_info(
+                        m_signerInfo_digest('0102030405060708'O)
+                    ),
+                    m_header_field_generation_time(1000 * f_getCurrentTime()),
+                    m_header_field_generation_location(
+                        m_threeDLocation(
+                            12345,
+                            54321,
+                            int2oct(1024, 2)
+                        )
+                    )
+                },
+                payload_field := m_payload_signed('DEEDBEEF01'O),
+                trailer_fields        := { 
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                                ),
+                                '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                            )
+                        )
+                    ),
+                    m_trailer_field_signature(
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                    '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O,
+                                    '00008A08AE40EC69030C056E48152F7A14F72BA4F305C2E6AA31997ABE93E7FD'O
+                                ),
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O
+                            )
+                        )
+                    )
+                }
+            } // End of template m_secureMessageOthers
+            
+            testcase tc_SecuredMessage_02() runs on TCType system TCType {
+                test_PDU<SecuredMessage>(
+                    m_secureMessage_02
+                );
+            } // End of testcase tc_SecuredMessage_02
+            
+            testcase tc_SecuredMessage_03() runs on TCType system TCType {
+                test_PDU<SecuredMessage>(
+                    m_secureMessageCAMs
+                );
+                
+                if (match(valueof(m_secureMessageCAMs), mdw_securedMessage_CAMs) == true) {
+                    setverdict(pass, "Basic");
+                }
+                if (match(valueof(m_secureMessageCAMs), mdw_securedMessage_CAMs(mw_header_field_signer_info_digest)) == true) {
+                    setverdict(pass, "With digest");
+                }
+                if (match(valueof(m_secureMessageCAMs), mdw_securedMessage_CAMs(mw_header_field_signer_info_certificate)) == false) {
+                    setverdict(pass, "With certificate mismatch");
+                }
+                if (match(valueof(m_secureMessageCAMs), mdw_securedMessage_DENMs) == true) {
+                    setverdict(fail, "Shall not match with DENM template");
+                    stop;
+                }
+                if (match(valueof(m_secureMessageCAMs), mdw_securedMessage_Others) == true) {
+                    setverdict(fail, "Shall not match with Other template");
+                    stop;
+                }
+            } // End of testcase tc_SecuredMessage_03
+            
+            testcase tc_SecuredMessage_04() runs on TCType system TCType {
+                test_PDU<SecuredMessage>(
+                    m_secureMessageDENMs
+                );
+                
+                if (match(valueof(m_secureMessageDENMs), mdw_securedMessage_DENMs) == true) {
+                    setverdict(pass, "Basic");
+                }
+                if (match(valueof(m_secureMessageDENMs), mdw_securedMessage_DENMs(mw_header_field_signer_info_digest)) == true) {
+                    setverdict(pass, "With digest");
+                }
+                if (match(valueof(m_secureMessageDENMs), mdw_securedMessage_DENMs(mw_header_field_signer_info_certificate)) == false) {
+                    setverdict(pass, "With certificate mismatch");
+                }
+                if (match(valueof(m_secureMessageDENMs), mdw_securedMessage_CAMs) == true) {
+                    setverdict(fail, "Shall not match with CAM template");
+                    stop;
+                }
+                if (match(valueof(m_secureMessageDENMs), mdw_securedMessage_Others) == true) {
+                    setverdict(fail, "Shall not match with Other template");
+                    stop;
+                }
+            } // End of testcase tc_SecuredMessage_04
+            
+            testcase tc_SecuredMessage_05() runs on TCType system TCType {
+                test_PDU<SecuredMessage>(
+                m_secureMessageOthers
+                );
+                
+                if (match(valueof(m_secureMessageOthers), mdw_securedMessage_Others) == true) {
+                    setverdict(pass, "Basic");
+                }
+                if (match(valueof(m_secureMessageOthers), mdw_securedMessage_Others(mw_header_field_signer_info_digest)) == true) {
+                    setverdict(pass, "With digest");
+                }
+                if (match(valueof(m_secureMessageOthers), mdw_securedMessage_Others(mw_header_field_signer_info_certificate)) == false) {
+                    setverdict(pass, "With certificate mismatch");
+                }
+                if (match(valueof(m_secureMessageOthers), mdw_securedMessage_CAMs) == true) {
+                    setverdict(fail, "Shall not match with CAM template");
+                    stop;
+                }
+                if (match(valueof(m_secureMessageOthers), mdw_securedMessage_CAMs) == true) {
+                    setverdict(fail, "Shall not match with CAM template");
+                    stop;
+                }
+                if (match(valueof(m_secureMessageOthers), mdw_securedMessage_DENMs) == true) {
+                    setverdict(fail, "Shall not match with DENM template");
+                    stop;
+                }
+            } // End of testcase tc_SecuredMessage_05
+            
+        } // End of group securityHeader
+        
+        group certificates {
+            
+            testcase tc_SubjectInfo_01() runs on TCType system TCType {
+                test_PDU<SubjectInfo>(
+                    m_subject_info_root_ca('DEADBEEF'O)
+                );
+            } // End of testcase tc_SubjectInfo_01
+            
+            testcase tc_SubjectInfo_02() runs on TCType system TCType {
+                test_PDU<SubjectInfo>(
+                    m_subject_info_revocation('DE5EA5ED'O)
+                );
+            } // End of testcase tc_SubjectInfo_02
+            
+            testcase tc_SubjectAttribute_01() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_verification_key(
+                        m_publicKey_eccPoint(
+                            m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                            )
+                        )
+                    )
+                );
+            } // End of testcase tc_SubjectAttribute_01
+            
+            testcase tc_SubjectAttribute_02() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_encryption_key(
+                        m_publicKey_eccPoint(
+                            m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                                '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                            )
+                        )
+                    )
+                );
+            } // End of testcase tc_SubjectAttribute_02
+            
+            testcase tc_SubjectAttribute_03() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_reconstruction_value(
+                        m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                            'D89D70110B4AB76904CBD27578420F0814380A5E4183F42AE602BE903EE606F8'O,
+                            '639D5CB825989E92F0A77B31EF65DE5B3505C75FD7B12BA64DBA89897DCB4043'O
+                        )
+                    )
+                );
+            } // End of testcase tc_SubjectAttribute_03
+            
+            testcase tc_SubjectAttribute_04() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_assurance_level(
+                        m_subjectAssurance(
+                            '101'B,
+                            '11'B
+                        )
+                    )
+                );
+            } // End of testcase tc_SubjectAttribute_04
+            
+            testcase tc_SubjectAttribute_05() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_its_aid_list(
+                        {
+                            9 * 2184,
+                            7 * 2184,
+                            5 * 2184,
+                            3 * 2184,
+                            2184
+                        }
+                    )
+                );
+            } // End of testcase tc_SubjectAttribute_05
+            
+            testcase tc_SubjectAttribute_06() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_its_aid_ssp_list(
+                        {
+                            {
+                                9 * 2184,
+                                m_sspTest
+                            },
+                            {
+                                7 * 2184,
+                                m_sspTest
+                            },
+                            {
+                                5 * 2184,
+                                m_sspTest
+                            },
+                            {
+                                3 * 2184,
+                                m_sspTest
+                            },
+                            {
+                                2184,
+                                m_sspTest
+                            }
+                        }
+                    ), 
+                    true,
+                    oct2bit('2115C04CC80100BBB80100AAA801009998010088880100'O)
+                );
+            } // End of testcase tc_SubjectAttribute_06
+            
+            testcase tc_SubjectAttribute_07() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_its_aid_ssp_list(
+                        {
+                            {
+                                36,
+                                {
+                                    version := '00'O,
+                                    sspContainer := omit
+                                }
+                            },
+                            {
+                                37,
+                                {
+                                    version := '00'O,
+                                    sspContainer := omit
+                                }
+                            }
+                        }
+                    ), 
+                    true
+                );
+            } // End of testcase tc_SubjectAttribute_07
+            
+            testcase tc_SubjectAttribute_08() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_its_aid_ssp_list(
+                        {
+                            {
+                                36,
+                                m_sspCAM_vehicle
+                            },
+                            {
+                                37,
+                                m_sspDENM_vehicle
+                            }
+                        }
+                    ), 
+                    true
+                );
+            } // End of testcase tc_SubjectAttribute_08
+            
+            testcase tc_SubjectAttribute_09() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_its_aid_list(
+                        { 
+                            1631,
+                            1632
+                        }
+                    ),
+                    true
+                );
+            } // End of testcase tc_SubjectAttribute_09
+            
+            testcase tc_SubjectAttribute_10() runs on TCType system TCType {
+                test_PDU<SubjectAttribute>(
+                    m_subject_attribute_its_aid_ssp_list(
+                        {
+                            {
+                                1631,
+                                {
+                                    '00'O,
+                                    omit
+                                }
+                            },
+                            {
+                                1632,
+                                {
+                                    '00'O,
+                                    omit
+                                }
+                            }
+                        }
+                    ), 
+                    true
+                );
+            } // End of testcase tc_SubjectAttribute_10
+            
+            testcase tc_SubjectAssurance_01() runs on TCType system TCType {
+                test_PDU<SubjectAssurance>(
+                    m_subjectAssurance(
+                        '101'B,
+                        '11'B
+                    )
+                );
+            } // End of testcase tc_SubjectAssurance_01
+            
+            testcase tc_ValidityRestriction_01() runs on TCType system TCType {
+                test_PDU<ValidityRestriction>(
+                    m_validity_restriction_time_end(
+                        12345
+                    )
+                );
+            } // End of testcase tc_ValidityRestriction_01
+            
+            testcase tc_ValidityRestriction_02() runs on TCType system TCType {
+                test_PDU<ValidityRestriction>(
+                    m_validity_restriction_time_start_and_end(
+                        12345,
+                        12378
+                    )
+                );
+            } // End of testcase tc_ValidityRestriction_02
+            
+            testcase tc_ValidityRestriction_03() runs on TCType system TCType {
+                test_PDU<ValidityRestriction>(
+                    m_validity_restriction_time_start_and_duration(
+                        12345,
+                        m_duration_in_seconds(
+                             456
+                       )
+                    )
+                );
+            } // End of testcase tc_ValidityRestriction_03
+            
+            testcase tc_ValidityRestriction_04() runs on TCType system TCType {
+                test_PDU<ValidityRestriction>(
+                    m_validity_restriction_region(
+                        m_geographicRegion_identifiedRegion(
+                            m_identifiedRegion_02
+                        )
+                    )
+                );
+            } // End of testcase tc_ValidityRestriction_04
+            
+            testcase tc_ValidityRestriction_05() runs on TCType system TCType {
+                test_PDU<ValidityRestriction>(
+                    m_validity_restriction_region(
+                        m_geographicRegion_circle(
+                            {
+                                43616908,
+                                7052847
+                            },
+                            10000
+                        )
+                    )
+                );
+            } // End of testcase tc_ValidityRestriction_05
+            
+            
+            /**
+             * @desc Root certificate self signed
+             * @verdict 
+             */
+            testcase tc_Certificate_01() runs on TCType system TCType {
+                test_PDU<Certificate>(
+                    m_certificate(
+                        m_signerInfo_self, 
+                        m_subject_info_root_ca('455453495f506c7567746573745f526f6f74'O), // ETSI_Plugtest_Root
+                        {
+                            m_subject_attribute_verification_key(
+                                m_publicKey_eccPoint(
+                                    m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                        '63eb5c4ea82bc6a6b27e5857a075dce18f0e3cdc01d42896418b23f68872e41a'O,
+                                        'd04f5dfcdc2be224986e15147840ff21f709dcb6503a416207e1b8e1ce395c2a'O
+                                    )
+                                )
+                            ),
+                            m_subject_attribute_verification_key(
+                                m_publicKey_aesccm(
+                                    m_aesccm(
+                                        m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                            '4dff56b92fcf680ee694ee58473f9f7d37516c3708f108a5185c185c5f159f02'O,
+                                            'f47aa5d2514f593245dd6575613114182dc83ec67ac2a7b6726421d94c55184b'O
+                                        )
+                                    )
+                                )
+                            )
+                        }, // End of field subject_attributes
+                        {
+                        }, // End of field validity_restrictions
+                        m_signature(
+                            m_ecdsaSignature(
+                                m_eccPointecdsa_nistp256_with_sha256_x_coordinate_only(
+                                    'd06ff2baf762e9618cac21bd110f271ea2a7c91355dca14753fc9a0dded1ab34'O
+                                ),
+                                '71db2dd2ba840126e2904297f34386ccdfe86a0ebe0e585748517a5da49808b4'O
+                            )
+                        )
+                    ) // End of template m_certificate
+                );
+            } // End of testcase tc_Certificate_01
+            
+            template (value) octetstring m_rootCertificate := '02000412455453495f506c7567746573745f526f6f748091000004a0ce08d329fd7be6b5af8fde7dad64e57fa5ff54dfaf9ec42b7443193c1f9d9d48e3c03250e59f895b17ca1e68cd8f5f1e9b1b06eddd0b98dfde91e88fa1199501010004e82c1957b1da51b5a00f29e51db151b30bd6ef29bd0c2f3e8e5cf457826f8660e59e4783e9b4b2a5b455263183ea88b18ae7e2d90ec805260213978014d1b2bf02202006c04080c0408124011464b4031a5617030303181db9cf7c052616001db9566e0526872a1d53f0d0052783500000a83ef7af9f3509189db625cd2e30eaefaf4f5b604d36389ece4f06b37a3923cf13ce5734485e25e360a7cf386eee795debbe9c61586de56b4fbd46d704109956'O;
+            template (value) octetstring m_aaCertificate := '02016da94961ba3e28810210455453495f506c7567746573745f41418091000004c368a797aa7943e4176aa5004d37eec5e12b92fea6b9630a9e197a10702f0f495c775d0e12bdbb21eb18648409443072ff2a383d51b5f7a5a7dca88434b5bb8801010004b244be4855cbb05cc7302903d043fe36d5abaa1b331b8c4de3e74c212cfac113b244be4855cbb05cc7302903d043fe36d5abaa1b331b8c4de3e74c212cfac11302202006c04080c0408124011464b4031a5617030303181db9cf7c052616001db9566e0526872a1d53f0d00527835000004c004618e92921341bcded2f15c58f50aa3590e59a3a798fe1a3b2364d66d8823b855859920f3e7f96e66f85ce90cee26ac71cb2ee9fbeecb64747ce19c50804'O;
+            template (value) octetstring m_atCertificate := '0201ebdb26e96a88ea1b01008095000004ceb7c449075ce00c1e7e1f997d443194dcf904f01f6149d4287bdcdb3bad251aa882d59fe8747108e2980c663353967a152c5b27cd83e055f93bc9b9da265859010100044d1c988453d69cae826f8a14f46d672d000b777c606a05b1b622a11f356fb2facba1fa6f2fb2ba44d47765dc6062966ded39161a5222799af887508767b657ec0220210ac040800100c04081010024011464b4031a5617030303181db9cf7c052616001db9566e0526872a1d53f0d005278350000050804677f295dbd99a64aaec8d100f07efd14234a6152012fd1371c32ff1e4479543df14c2de7d744c8526ed330bca75f05e30361a25c11dd2c83bbdf495f81f'O;
+            
+            testcase tc_Certificate_02() runs on TCType system TCType {
+                test_decodePDU<Certificate>(
+                    mw_certificate_dummy,
+                    m_rootCertificate
+                );
+            } // End of testcase tc_Certificate_02
+            
+            testcase tc_Certificate_03() runs on TCType system TCType {
+                test_decodePDU<Certificate>(
+                    mw_certificate_dummy,
+                m_aaCertificate
+                );
+            } // End of testcase tc_Certificate_03
+            
+            testcase tc_Certificate_04() runs on TCType system TCType {
+                test_decodePDU<Certificate>(
+                    mw_certificate_dummy,
+                m_atCertificate
+                );
+            } // End of testcase tc_Certificate_04
+            
+            testcase tc_Certificate_05() runs on TCType system TCType {
+                var Certificate v_ca;
+                var Certificate v_aa;
+                var Certificate v_at;
+                var bitstring v_encMsg;
+                var integer v_res;
+                var HashedId8 v_hashedId8;
+                var HashedId3 v_hashedId3;
+                
+                // AT certificate
+                v_res := decvalue(oct2bit(m_atCertificate), v_at);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                // AA certificate
+                v_res := decvalue(oct2bit(m_aaCertificate), v_aa);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                // CA certificate
+                v_res := decvalue(oct2bit(m_rootCertificate), v_ca);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                
+                // AT-AA certificates
+                v_hashedId8 := f_calculateDigestFromCertificate(v_aa);
+                if (v_hashedId8 != v_at.signer_info.signerInfo.digest) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8(v_at.signer_info.signerInfo.digest)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                // AA-CA certificate
+                v_hashedId8 := f_calculateDigestFromCertificate(v_ca);
+                log("ca v_hashedId8=", v_hashedId8);
+                log("aa digest=", v_aa.signer_info.signerInfo.digest);
+                if (v_hashedId8 != v_aa.signer_info.signerInfo.digest) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8(v_aa.signer_info.signerInfo.digest)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                // CA-CA certificate
+                v_hashedId8 := f_calculateDigestFromCertificate(v_ca);
+                if (v_hashedId8 != '6DA94961BA3E2881'O) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8('6DA94961BA3E2881'O)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                setverdict(pass, "All Digests match.");
+            } // End of testcase tc_Certificate_05
+            
+            testcase tc_Certificate_06() runs on TCType system TCType {
+                const octetstring c_rootCertificate := '02000412455453495F506C7567746573745F526F6F748091000004D901D55569384486DD3304FCFD89A970011A66A5F18BC2BB1D492E2BF19B56C3EEEAE3795D67E398081AD6A7E276147F97902C87811B565E302928141AF3EF61010100043B3D45D5DB2F9540BA3EB2644F5920DCB365FDA9F572817DC1FE1EBBB54CD8B51CFF642167EB4492F953655F80007E51569369F3A95EC045CF4D4743E80E1C6602202006C04080C0408124011464B4031A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D0052783500000FEEBD0AEC2ACB4C20553000190C8874894239446A6949C5421D67C297EC8D2E1DCB4316C5E01B59D6965AE7007F6694821498215D1FB4D3A48BB56F6C21F4D85'O;
+                const octetstring c_aaCertificate := '0201BCEC64124B3681F70210455453495F506C7567746573745F41418091000004B47B1576C9752B022B81CC89319D1F60F833F5F8CBF47EC8DC1E5557E5628BAEDD779C0CBD524911A21EDD6DEAE510BBA782D0F023D4A0AC6FCC239BF8CF0A98010100046EE4A2877E59CE258EDDEEA154F9491D6894E13D491128E1BF414CBE66E43EBD6EE4A2877E59CE258EDDEEA154F9491D6894E13D491128E1BF414CBE66E43EBD02202006C04080C0408124011464B4031A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D005278350000001F386CA0B4B468A83154547AF33ED3B62B706B3A2F39AA00F00C55C13056CC5C6D037B0E51BB41DBC2B6A999CF04012FE34D3C12E32B8AACCF43F690B6613D4'O;
+                const octetstring c_atCertificate := '02016280AF8B397B202A01008095000004AD05720B46FD03AD21544B3F05924E45924F3D2D82C63259B3646309D00A40705B8A36BAA5E14172E38BDE9E1E974130D042A996B90E5BAE6765665452A17A65010100042EF8A6DD5E650B7A31A628B471380E1C2D73E1A33586D08590F667D95123F53CEE26883D1B3C066A388D43DA5A9396FB75C73309A0D50D0A6BF43C315ED42B9E0220210AC040800100C04081010024011464B4031A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D005278350000049EC38CE35F28DE07D3CC922C6DED74EF8514F422D076C0282E8BDFB95564A6C885BE5C7259AC3EAB497D6D9BB7EB4FA84005616A4E0FE4374513F1A9CFD55B7'O;
+                
+                var Certificate v_ca;
+                var Certificate v_aa;
+                var Certificate v_at;
+                var bitstring v_encMsg;
+                var integer v_res;
+                var HashedId8 v_hashedId8;
+                var HashedId3 v_hashedId3;
+                var boolean isSignatureOk;
+                
+                // AT certificate
+                v_res := decvalue(oct2bit(c_atCertificate), v_at);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                // AA certificate
+                v_res := decvalue(oct2bit(c_aaCertificate), v_aa);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                // CA certificate
+                v_res := decvalue(oct2bit(c_rootCertificate), v_ca);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                
+                // AT-AA certificates
+                v_hashedId8 := f_calculateDigestFromCertificate(v_aa);
+                if (v_hashedId8 != v_at.signer_info.signerInfo.digest) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8(v_at.signer_info.signerInfo.digest)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                isSignatureOk := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_at,
+                    v_aa
+                );
+                log("Signature AA/AT: ", isSignatureOk);
+                
+                // AA-CA certificate
+                v_hashedId8 := f_calculateDigestFromCertificate(v_ca);
+                if (v_hashedId8 != v_aa.signer_info.signerInfo.digest) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8(v_aa.signer_info.signerInfo.digest)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                // CA-CA certificate
+                v_hashedId8 := f_calculateDigestFromCertificate(v_ca);
+                if (v_hashedId8 != 'bcec64124b3681f7'O) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8('bcec64124b3681f7'O)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                setverdict(pass, "All Digests match.");
+            } // End of testcase tc_Certificate_06
+            
+            /**
+             * Test certificate from Denis tool
+             * @desc 
+             * @verdict 
+             */
+            testcase tc_Certificate_07() runs on TCType system TCType {
+                const octetstring c_rootCertificate := '020004004B000004966296BF6D47B5ED66DB32605D1074BCBAC97B5A73FE0D4413F6A1818D6D7E9A966296BF6D47B5ED66DB32605D1074BCBAC97B5A73FE0D4413F6A1818D6D7E9A02E02004865F866009014A9618814C774C0100004337D4953FCEBC99FD481A103514CE23B0E85511D2FC55B8CF98941A5436843ACA9B85949F2DF85F9D4D3E8A150EAB3D5004DF0B3DE3972216328615E5A7F816'O;
+                const octetstring c_aaCertificate := '0201e76042b201a5435502004b000004b80fbbf4b87fdc12ebd7f3dcb689ec1bd2f2ab4c76c158ae7cf5cefbd5a65bb8b80fbbf4b87fdc12ebd7f3dcb689ec1bd2f2ab4c76c158ae7cf5cefbd5a65bb802e02004865f866015014a9618814c774c01030119ff697804342dd62710000016852db5022a8799bfe0bd9b0226c87a83e3df70557e27b759119550d5273674b42a7e5586af5d61098dabc7785ac3b4189bad28a9fa7f430824fcd0f464b548'O;
+                const octetstring c_atCertificate := '02012a83ff49822ac92d01004b000004b7e7eab1eb9046831e9b0e868aefb6475b0a6ee8bcd7eadbcb80883f53ae1c51b7e7eab1eb9046831e9b0e868aefb6475b0a6ee8bcd7eadbcb80883f53ae1c5102802104865f010015014a9618814c774c01030119ff697804342dd627100000bcb445ceccdea6b38f196aaab2050d300b966a884a4ac653984b4a3104fbb97cab0d808608cafbb22753d90b0cce256f46830075b6653e973fd56daf99bc4535'O;
+                
+                var Certificate v_ca;
+                var Certificate v_aa;
+                var Certificate v_at;
+                var bitstring v_encMsg;
+                var integer v_res;
+                var HashedId8 v_hashedId8;
+                var HashedId3 v_hashedId3;
+                
+                // AT certificate
+                v_res := decvalue(oct2bit(c_atCertificate), v_at);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                v_hashedId8 := f_calculateDigestFromCertificate(v_at);
+                log("AT hashedId8=", v_hashedId8);
+                // AA certificate
+                v_res := decvalue(oct2bit(c_aaCertificate), v_aa);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                // CA certificate
+                v_res := decvalue(oct2bit(c_rootCertificate), v_ca);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                
+                // AT-AA certificates
+                v_hashedId8 := f_calculateDigestFromCertificate(v_aa);
+                if (v_hashedId8 != v_at.signer_info.signerInfo.digest) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8(v_at.signer_info.signerInfo.digest)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                // AA-CA certificate
+                v_hashedId8 := f_calculateDigestFromCertificate(v_ca);
+                if (v_hashedId8 != v_aa.signer_info.signerInfo.digest) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8(v_aa.signer_info.signerInfo.digest)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                // CA-CA certificate
+                v_hashedId8 := f_calculateDigestFromCertificate(v_ca);
+                if (v_hashedId8 != 'e76042b201a54355'O) {
+                    setverdict(fail, "Digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "Digest match.");
+                }
+                if (substr(v_hashedId8, lengthof(v_hashedId8) - 3, 3) != f_HashedId3FromHashedId8('e76042b201a54355'O)) {
+                    setverdict(fail, "HashedId3 digest does not match.");
+                    stop;
+                } else {
+                    setverdict(pass, "HashedId3 digest match.");
+                }
+                
+                setverdict(pass, "All Digests match.");
+            } // End of testcase tc_Certificate_07
+            
+            testcase tc_Certificate_V2X_Pilot_PKI_08() runs on TCType system TCType {
+                const octetstring c_f5425279310c0379_RootCA := '0200040c547275737465645f526f6f74808d000004f1817dd05116b855a853f80db171a3a470d43170ea7eefd8ef392d66ecefbe501ceba19963c9b6447574424fff1bb89485743f4d09a72b715fc73c87e5f70a110101000441279a383b80c812b72b1a5f5c3c590e5041c634a1adcc4ce58393ca046d3c619717aef634f7d80d5f6a29fa7f86ebf823ace0097a71ee0df0793034b0d3797c02e0200224250b0114b12b03154e0d83030000007d12badf99d7070bcb237ed1fa7a5d86fd47e6aba8e616b35e95a2856fc6e26a493e1215bcee8bea18b8ed52fb240716c4d4ec7d7c0167f0f032cbb87df611d9'O;
+                const octetstring c_d30e8c02c886e433_RootCA_untrusted := '0200040e556e747275737465645f526f6f74808d00000453044fe97af60b6a7eb604bd9bacb5758d37c2f29eeb9e2de2b003b669164913f018e4d881bdf8e8a097abf720725678953a943078d6cc76f2855ac745f8ad610101000410df9d1c28c9880200d697d07e05a884469dbffc4eb7a8ea047ca4435abd185654ebd4cafa0142359d953d0774f6aebb43e5904cf5a284116566f4139b3c60b202e0200224250b0114b12b03154e0d8303000000fbb987cbc9483b8efd2eb3f06389de14bdecc777085bc9cecb906521fa70613f1822c3d34b4c992edbd2cef9d4d8b0697d79a327b3c3309f5985713b09270944'O;
+                const octetstring c_5388dec640c6e19e_AA := '0201f5425279310c0379020a547275737465645f4141808d00000401418e994657434a71e034e530b1e77a8afac37561132c83d45c442499228ca78573f14be034a4958108a654cac60f15bb35907e33d0e97f8d7eaf64a1f43547010100047c5c8d8b86cf8a00a53f3cd23fccf13d078555cc8ef27dc439780eb8ef376237ff668055da476cc82956f6febfa051a6d927e70d826db0338e42819f026aebaa02e0200224250b0114b12b03154e0d83030000005145571104d52dd7094c577719c7ca430d59608d5fefd10db3e61b7c5fd3e4716224f96ed5ab4eb7f860c15347b66e23ea12e0a186a1a80b96c6e5de05416a87'O;
+                const octetstring c_a0f336b87f0794b0_AA := '0201f5425279310c0379020a547275737465645f4141808d00000432b9c37ac51d25863a7872ef405db43df37fa73411b2c0539fd39df38828f86c946cb09039c0a9694a650d9104ba62c5a7588aef8f68935f0d170373968131cd01010004e6c956fbedcc969935be832e4de599cbfd687d81495c58b3c12028f92489d4af76b64d340be2ace8d7e2a789fe09a5f3b84f5e65bf54a07faf74696131e762e302e0200224250b0114b12b03154e0d8303000000cc6255f38bc8844fac2a31de3420e65f23dbc97dc866c840516328f27850b3520fc2a812a49dd989bfb0ece408e53b375006974d1da4efd6fc5465b3f8946183'O;
+                const octetstring c_d6dfbc3d713ffa0b_AA_untrusted := '0201d30e8c02c886e433020c556e747275737465645f4141808d000004eccc0e42d736b60cfc3fc9b9179ec27f7a371e81ef32467a4a9d56140d9a3a9a50c5d1429f5bdb8ca1ee8b785f72078d2c27028031b73dea8b6871d10d249f5f010100043d76177ad277cb6e29b3a02805b5c6c9ad26c03c74fd306f9afb664f33901edf9918825007ee128bd691607c5b97726af7dab805aefedd617c77e461dc98dca202e0200224250b0114b12b03154e0d83030000007a5f8c8d97f1b0bec546247bdeb27c28eb4b494ed2a0d62b0da776d53977e3b157178a401fd694383f927abad2b5786635f28572aab6b228896ccf0148e0d53b'O;
+                
+                // TEST_certs_keys_issued_by_5388dec640c6e19e
+                const octetstring c_Test_AT1 := '02015388dec640c6e19e010052000004b27d4d442f58e065f8d500478929bc843940f3c34d46c5475803c03594e35bd7e0132fd01634e86d4f50f7f2366988e12525232d00d03e98fc21ca8e5d0af37002e0210b24030100002504010000000b0114e9db83154cbc0203000000553c8d2b8a4e53f3d84a8837beebe83d5c7f68484ac5efceefcc7b0bc5e9531754aaf58bf90790a10f2fd11796a85e13dffaac6073d2068465da733994cd0c71'O;
+                const octetstring c_Test_AT2 := '02015388dec640c6e19e010052000004512c08862ef51fb8d937d078e915d12490b2e0c7ff41511858eec565cab83ec9306d92b0c202cad663b3f90c9d94ec48d27617801610c6d131f1b8b18e67427002e0210b24030100002504010000000b0114e9db83154cbc0203000000f84f10facd1f08b1592ae23b4239456e702b4023a8298bf4a30bc0022f06f5aa56bbfd3b792b00abcaeb6b41d34f3987d5a7f217f7f9f4195c1e85c701fce8f2'O;
+                const octetstring c_Test_AT3 := '02015388dec640c6e19e010032000002eaf5a876793ef5d8d2d154ce23e777da0ae088ae43f60652f88fef5dbe31dc3302e0210b24030100002504010000000b0114e9db83154cbc0203000000ff55b10325379ed83208d800c56746a634e78e513c96f2566329407c9540a65666dc4a0af48f649a44b6cc151aa203f054d5d095fa6184bddf08bf1f14852500'O;
+                const octetstring c_Test_AT4 := '02015388dec640c6e19e0100520000046c26d3f315e24aaac677eca6c1e82a096203b66406cf04465a01cc086018139e12e400bb4f19c901bb9fcf7268f88faed2285b52707a693c74e7b992552d7dbc02e0210b24030100002504010000000f0114e9db83154cbc0203040002100000007372e270aaa5fc350b23ab78d1fa43cf4505989a13a653d93beed2d3b89a59417321a185353d86484da24e24be96b9a691f2b9ca037bce41ca95d98204dcfa6a'O;
+                const octetstring c_Test_AT5 := '02015388dec640c6e19e010052000004068490605eff205098119eb7fc21c8229bc1529486364227cf2f42b5feb60604a923c63abe701f5342cfa0aacdc1f3f079e201d4a9029903295121186b9caf4f02e0210b2403010000250401000000150114e9db83154cbc0203011eae5f88035a297427100000408c0cec5b3111c4ade6143947d2d8a810604fcd2d3f34caa3e028e30fa9e69684f24bc84ef81f3c8ac49151b6884ad3797f3b53cbb2484691c6b94e0891014f'O;
+                const octetstring c_Test_AT6 := '02015388dec640c6e19e010052000004040344c037457b086cf2c5632c36d93817c66e8bb2452afc654e01f068de0bbfacca05a311618d721a36af440f646897744e3f9970acacec918cde0fcacf9b6502e0210b24030100002504010000001c0114e9db83154cbc020302101eb1cbe6035385741ea90a6a0369c6f40000cad16afc42c06012beb7c1ccd615054a19ea004621fd097ffda2b547b1a6f303ccea2244fc68323ea6451b369ceb1303729271810673494967e6b9a329aed6b3'O;
+                const octetstring c_Test_AT7 := '02015388dec640c6e19e01005200000463e4bb1f5849006b0418a511901e43f58d73466e9e4125071f289b6b8bf0c9fdf000aa250ef97a1343d349528993398579c037cea10f3eef5c1fd191d3e5227902e0210b24030100002504010000002c0114e9db83154cbc020303201eb1cbe6035385741eb225b403687c9a1ea90a6a0369c6f41ea732ee03552aaa0000ce5d790b9f7def755bca1834791f1b365376b0487d8d1868736d8946e4da52d0d06671334ace63a162c47691ec6adb771aa21300dd702f1680bc80b46366a9be'O;
+                const octetstring c_Test_AT8 := '02015388dec640c6e19e010052000004c48438ae701f058212c71792856e82d3b6e4fb83c447d677de4689e1495a45034fa4ed9251d94ff36ee8998913d876116bfd8127b185aa3498695b1b9823d41f02e0210b24030120002504010000000b0114e9db83154cbc0203000000d531fe87847967a64addf20de995dce65d490746776b2c631267fbee6596c450902625f179bb81ec788832caa19bbd0445bae6f698110f5a99e75c725050c46f'O;
+                const octetstring c_Test_AT9 := '02015388dec640c6e19e010080960000043283ee6ea46183575f370c76aceb8f7f20783de875c5667919b58a22a56f9fa2b10b2080890bdc3c754f9c43d2bb3fe9cea67618ce146143626eca01a4d1d6bd01010004b735a6076b3846844fca761da0cc3e9fd45df819b0e2a00cbc5cd036f7bf3ff76f220e547d6d0c951b207cc2ed17fe7b2baaee184097eacc5fa9507918d15df502e0210b24030100002504010000000b0114e9db83154cbc02030000003d31e17204242b5b6fce62f0ab8cb04a908b8526fdd817ac89a56468e3ebdecfa65d298919da05c2448f06a848d8155fe3f5c3e3ac2a09197fa69165e8c2c3f3'O;
+                // TEST_certs_keys_issued_by_a0f336b87f0794b0
+                const octetstring c_Test_AT10 := '0201a0f336b87f0794b001005200000450f73a9ce15e633d252d5b72763a9fbb31c180d4a3e594c9791c30188c7d9d16ccef80fa7ddad2ce546f79670b6312d8d27cb550d00e5439642ae08fbcb3429902e0210b24030100002504010000000b0114e9db83154cbc0203000000db779353b4571c5fb27e34b06ab2ae0c4e1a63a3a5360ff3cc733a51b634234d46d224dc93166f5cd57c06632779682b9e2c97f305e5d191d2cda97e5bf64b08'O;
+                // TEST_certs_keys_issued_by_d6dfbc3d713ffa0b
+                const octetstring c_Test_AT11 := '0201d6dfbc3d713ffa0b010052000004981b5375947df6313cb896e12bfc4acae7fac74dcdf5651780c1f0a7286a068b21b88b850cf4773862e14ec4a4a83a1c919ae846438c1695fd7d4e857945a62f02e0210b24030100002504010000000b0114e9db83154cbc02030000006d5db9a286fb5449513c63a15dd46200d808157a9c0c6a08f6bc6b0dcd563a6f399ae68e5dd567dce6310dcf87979e89ae551a1a5e65db30b1f547856316190b'O;
+                // Conformance_aa_certificates
+                const octetstring c_ts_a_ea := '0201F5425279310C03790300490000041CFD0EB0134DEE22E3E28974F926C438CD6C758FAA32E8F97836C6F909C86F22F9393DE71242623B035118CBD40F702F9956AFECB6BF8273BAE95A8CF100D3A10280200224250B0114B12B03154E0D830300000069E4AC13C211A397FF07172FF01215ED4C76CE7320355BE16B63F38B61C19F336BA906CBA60C0FB6193974EE77D24588752EC720540DABF7483DF901580FB0FC'O;
+                const octetstring c_ts_a_ec := '0201B13F33BBB46A144400004D00000437381483C1BCD2C3CD052C78B3BC0AB9E0E342D1523738A37254DF1964EE63A6D2B4B4297C2A49A16161EA6AE5D7FF46BFC8CF864B6BE69F19694E980A7E62BE026021062401002501000B0114B12B03154E0D83030000006E4C06158CF66040664FE86FA55A108A55F9723385EB1C813E53BA9DA9AA1DBD6A7F321FFA54DE6868B7875CA2E843EFA4050EED73FE7D067F5EBAD26C8EDAAD'O;
+                const octetstring c_ts_b_aa := '0201F5425279310C03790200490000047265610C8D5101D7E998A2DCF7D7BCA91300E143EE4665B8709AFE62EDAF3E49645D1A8A7A90354D18FF2BC639FC212E0EBF6BCD620CED02335845C8A8DA96CE028020022425150114B12B03154E0D8303011EAE5F88035A297427100000787F14C1E8CDBA1DC7769FFD1A66BF94AB2BDEEA0BFBA89EA746DCAFADE185F592E898C0208A39633952C4A3E8822E85EFA16ABD161E34F095B2721BE3EBE5D6'O;
+                const octetstring c_ts_c_aa := '0201F5425279310C03790200490000043585280881F01B193BFA87C2B0E166DF0E6D02D3F7CE31DE6584C5595CDBA74B2ACEA72A363DC88192DBA03EB2AD9FE873B63FE8F8952B132664A7BD9C0414A40280200224251C0114B12B03154E0D830302101EB53B5A0350AD721EA782620363A1D400004511AFEC51CFE055EB1A73D098085EAD9A4D4981BB24F14FB205758A78D1BA1538A104F03464D57D3C306CC459B6D9010F1CB6F0096CFB7CE4C852E0872699C8'O;
+                const octetstring c_ts_d_aa := '0201F5425279310C0379020049000004E3B6F0C104B8821636AF9D196DFD8141C91D38D5F15F1A9D05A354786E6AC878CBB16E09D9B394CF867A408803562F6C23965C9C8DA0E03103CEEE3C26D82D700280200224252C0114B12B03154E0D830303201EBC15E203472DCE1EBC15E2036D169C1EA0A3F2036D169C1EA0A3F203472DCE00002C829FF62D0423816237AF47FE5D83E70113D50F08A083772EE6C25AE1C6D367F09D76D9AE55CC70558EADE1E62826BF0DECAF9570FB5225014A7E13AA5DB0A6'O;
+                const octetstring c_ts_e_aa := '0201F5425279310C03790200490000042642D6E413BE9621193FA99395931CF2684F4F4C4B9A289E63053F337C324D514BE57B30888232405406147CB55604CA88453DF3EE8EE8A25384D5F701D4B3990280200224250F0114B12B03154E0D830304000210000000EA54BA28008335DFB9F0237488F2CC3DDE57D59C7858FDA4317B9F373060B302D6E1C7D8AFF00910735F772E6A297F241DA8BF34754A075195C644F4D2DC53BE'O;
+                
+                var Certificate v_f5425279310c0379_RootCA;
+                var Certificate v_5388dec640c6e19e_AA, v_a0f336b87f0794b0_AA, v_d6dfbc3d713ffa0b_AA_untrusted;
+                var Certificate v_atCertificate;
+                var Certificate v_decMsg;
+                var HashedId8 v_hashedId8;
+                var integer v_res;
+                var boolean v_result;
+                
+                // f5425279310c0379_RootCA
+                v_res := decvalue(oct2bit(c_f5425279310c0379_RootCA), v_f5425279310c0379_RootCA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("f5425279310c0379_RootCA: ", v_f5425279310c0379_RootCA);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_f5425279310c0379_RootCA);
+                log("f5425279310c0379_RootCA: v_hashedId8", v_hashedId8);
+                
+                // d30e8c02c886e433_RootCA_untrusted
+                v_res := decvalue(oct2bit(c_d30e8c02c886e433_RootCA_untrusted), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("d30e8c02c886e433_RootCA_untrusted: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("d30e8c02c886e433_RootCA_untrusted: v_hashedId8", v_hashedId8);
+                
+                // 5388dec640c6e19e_AA
+                v_res := decvalue(oct2bit(c_5388dec640c6e19e_AA), v_5388dec640c6e19e_AA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("5388dec640c6e19e_AA: ", v_5388dec640c6e19e_AA);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_5388dec640c6e19e_AA);
+                log("5388dec640c6e19e_AA: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_5388dec640c6e19e_AA,
+                    v_f5425279310c0379_RootCA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "5388dec640c6e19e_AA: Certificate verification match");
+                } else {
+                    setverdict(fail, "5388dec640c6e19e_AA: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // a0f336b87f0794b0_AA
+                v_res := decvalue(oct2bit(c_a0f336b87f0794b0_AA), v_a0f336b87f0794b0_AA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("a0f336b87f0794b0_AA: ", v_a0f336b87f0794b0_AA);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_a0f336b87f0794b0_AA);
+                log("a0f336b87f0794b0_AA: v_hashedId8", v_hashedId8);
+                
+                // c_d6dfbc3d713ffa0b_AA_untrusted
+                v_res := decvalue(oct2bit(c_d6dfbc3d713ffa0b_AA_untrusted), v_d6dfbc3d713ffa0b_AA_untrusted);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("d6dfbc3d713ffa0b_AA_untrusted: ", v_d6dfbc3d713ffa0b_AA_untrusted);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_d6dfbc3d713ffa0b_AA_untrusted);
+                log("d6dfbc3d713ffa0b_AA_untrusted: v_hashedId8", v_hashedId8);
+                
+                // _Test_AT1
+                v_res := decvalue(oct2bit(c_Test_AT1), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT1: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT1: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT1: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT1: Certificate verification mismatch");
+                }
+                
+                // _Test_AT2
+                v_res := decvalue(oct2bit(c_Test_AT2), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT2: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT2: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT2: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT2: Certificate verification mismatch");
+                }
+                
+                // _Test_AT3
+                v_res := decvalue(oct2bit(c_Test_AT3), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT3: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT3: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT3: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT3: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT4
+                v_res := decvalue(oct2bit(c_Test_AT4), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT4: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT4: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT4: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT4: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT5
+                v_res := decvalue(oct2bit(c_Test_AT5), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT5: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT5: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT5: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT5: Certificate verification mismatch");
+                }
+                
+                // _Test_AT6
+                v_res := decvalue(oct2bit(c_Test_AT6), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT6: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT6: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT6: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT6: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT7
+                v_res := decvalue(oct2bit(c_Test_AT7), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT7: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT7: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT7: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT7: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT8
+                v_res := decvalue(oct2bit(c_Test_AT8), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT8: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT8: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT8: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT8: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT9
+                v_res := decvalue(oct2bit(c_Test_AT9), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT9: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT9: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT9: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT9: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT10
+                v_res := decvalue(oct2bit(c_Test_AT10), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT10: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT10: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_a0f336b87f0794b0_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT10: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT10: Certificate verification mismatch");
+//                    stop;
+                }
+                
+                // _Test_AT11
+                v_res := decvalue(oct2bit(c_Test_AT11), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT11: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT11: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_d6dfbc3d713ffa0b_AA_untrusted
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT11: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT11: Certificate verification mismatch");
+//                    stop;
+                }
+                
+                v_res := decvalue(oct2bit(c_ts_a_ea), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("c_ts_a_ea: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("c_ts_a_ea: v_hashedId8", v_hashedId8);
+                
+                v_res := decvalue(oct2bit(c_ts_a_ec), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("c_ts_a_ec: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("c_ts_a_ec: v_hashedId8", v_hashedId8);
+                
+                v_res := decvalue(oct2bit(c_ts_b_aa), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("c_ts_b_aa: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("c_ts_b_aa: v_hashedId8", v_hashedId8);
+                
+                v_res := decvalue(oct2bit(c_ts_c_aa), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("c_ts_c_aa: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("c_ts_c_aa: v_hashedId8", v_hashedId8);
+                
+                v_res := decvalue(oct2bit(c_ts_d_aa), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("c_ts_d_aa: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("c_ts_d_aa: v_hashedId8", v_hashedId8);
+                
+                v_res := decvalue(oct2bit(c_ts_e_aa), v_decMsg);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("c_ts_e_aa: ", v_decMsg);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_decMsg);
+                log("c_ts_e_aa: v_hashedId8", v_hashedId8);
+                
+                setverdict(pass, "All Digests match.");
+            } // End of testcase tc_Certificate_V2X_Pilot_PKI_08
+            
+            testcase tc_Certificate_V2X_Pilot_PKI_Autotalk() runs on TCType system TCType {
+                const octetstring c_f5425279310c0379_RootCA := '0200040c547275737465645f526f6f74808d000004f1817dd05116b855a853f80db171a3a470d43170ea7eefd8ef392d66ecefbe501ceba19963c9b6447574424fff1bb89485743f4d09a72b715fc73c87e5f70a110101000441279a383b80c812b72b1a5f5c3c590e5041c634a1adcc4ce58393ca046d3c619717aef634f7d80d5f6a29fa7f86ebf823ace0097a71ee0df0793034b0d3797c02e0200224250b0114b12b03154e0d83030000007d12badf99d7070bcb237ed1fa7a5d86fd47e6aba8e616b35e95a2856fc6e26a493e1215bcee8bea18b8ed52fb240716c4d4ec7d7c0167f0f032cbb87df611d9'O;
+                const octetstring c_5388dec640c6e19e_AA := '0201f5425279310c0379020a547275737465645f4141808d00000401418e994657434a71e034e530b1e77a8afac37561132c83d45c442499228ca78573f14be034a4958108a654cac60f15bb35907e33d0e97f8d7eaf64a1f43547010100047c5c8d8b86cf8a00a53f3cd23fccf13d078555cc8ef27dc439780eb8ef376237ff668055da476cc82956f6febfa051a6d927e70d826db0338e42819f026aebaa02e0200224250b0114b12b03154e0d83030000005145571104d52dd7094c577719c7ca430d59608d5fefd10db3e61b7c5fd3e4716224f96ed5ab4eb7f860c15347b66e23ea12e0a186a1a80b96c6e5de05416a87'O;
+                
+                // TEST_certs_keys_issued_by_5388dec640c6e19e
+                const octetstring c_Test_AT1 := '02015388dec640c6e19e0100520000049ceb985b5d9e40c8506f4891400ac1c88d8e350f6c3eed737c02595029cf544733dc30bf30f8f5a0177f360ac1d87cbfb3ee50727eaa032791506501ee6111b702e0210b24030100002504010000000b0115043983154cbc02030000005cadfba649c7e105918cbe8004c686d2ac28f5bc4db32163743fda77d700317fb30d5cc7b8e57a2b476f040520f9da8e27b719cfce0c92d5cc2a95e556eb79ae'O;
+                const octetstring c_Test_AT2 := '02015388dec640c6e19e01005200000410c9704df6d02a3de0b148dfd47a607fc278639226af09252e4e99190e03324b5fa29f1dd0fdf2a5d4c689239ed194348e0bd2051a7172c8026ce93b391113c702e0210b24030100002504010000000b0115043983154cbc02030000009c37b90d8c764aeb5a2038fcca8b8c43dda5dbeda85d72ce74aac8e3ff4648d4466f00b60929a1cc04b89925e213e625df0d4018a8c989c0e38b8f9ae97545be'O;
+                const octetstring c_Test_AT3 := '02015388dec640c6e19e01003200000364efcf95f7bc2408f414d9bca06954bc86b065fedfc5e0cb5b0e9f854783ae3c02e0210b24030100002504010000000b0115043983154cbc020300000066a2dcf601185240f364c2f7a1266b2b460b007cf52866a2a8924c054cccaac2e41b13877dc9e2fc7a544a9b8a3f41542033dce1a8099d6126efc04bb4792c5e'O;
+                const octetstring c_Test_AT4 := '02015388dec640c6e19e01005200000402dfac49839b39032017b8b5df766f99dc8ed1cebd1b65e43df968ebccfdb45ba32a3e5b468e58c563c771fde1757029685cff58e0be21230371c1cce764ba0d02e0210b24030100002504010000000f0115043983154cbc020304000210000000486075c14c41708b05b95d81659bbdbbe6a2f939815a79008ef40151e1d664005b1e9b8ca5ca9a648df22a937a8120690a80299b84c2320dd2701505a46a043c'O;
+                const octetstring c_Test_AT5 := '02015388dec640c6e19e0100520000046690617a8b4e6cc41231965ef0cb0b582db25ef11c9472461090e7f4bbff2252ba04c51c67835b2a3357624de4455bf0d7964baa504f3dc68f11707d4daab20d02e0210b2403010000250401000000150115043983154cbc0203011eae5f88035a29742710000064874c507a81e3f1ccb50598f96d28303c45af506378d6e724f403e31ff91ea55eba8d25897f74c9fe64334cc45c2bb9ac774ae487bc215cddf83284f925ab0a'O;
+                const octetstring c_Test_AT6 := '02015388dec640c6e19e010052000004418f700b20735974dd32dc8c7ec2100533d690123d01ce41f4615f3ca7aba2052c4fb0ba6e037633da959ec411a20f90d5225984acd772fec023f03ae543315e02e0210b24030100002504010000001c0115043983154cbc020302101eb1cbe6035385741ea90a6a0369c6f40000e1e3ca55265fbada6881698dde7edc214b371c4eb23dd24f6a3d20db8b19b67a7fb55ecd8f88ca92cfd43631956169aba9632160ee200c18ea6a398fa3f777d0'O;
+                const octetstring c_Test_AT7 := '02015388dec640c6e19e010052000004c247717ec8739b7596d2a6d167b7e94ff8ee18386fbfd516797665a32b01c0b37a48ac61da79c4928f790fbfc757c1778f1025b4f7e255e2d6fd3fbe03859e3002e0210b24030100002504010000002c0115043983154cbc020303201eb1cbe6035385741eb225b403687c9a1ea90a6a0369c6f41ea732ee03552aaa000027460af713afb7f5e3c1836ea86339f29d41f99d766c9d541981d43691bdd3531cba2556d37b901ae8bb304b86809da7cd7c40cd49d118460f4377b73d580095'O;
+                const octetstring c_Test_AT8 := '02015388dec640c6e19e01005200000444af4337a1186ef2064cfc7d3850a2567a1df97bc83e26f653310dbb5a16fe3943ec559d5a9342f866f52ec3f8c401c4219760ee742dbb83082ebb99a1ed9c2802e0210b24030120002504010000000b0115043983154cbc02030000006aae2969ee1f8896eeccd66297e12b4c0ad5c698f57700158fc58de300c7916bbed39a72d56f92a713d3584c041ac9fa5506915035f0373506023ccf035e7fce'O;
+                const octetstring c_Test_AT9 := '02015388dec640c6e19e0100809600000496100b5a64a9a61fc9c3468beb8838c306fc6136685e554a3ce6bc38da49a3e6dae9301ff9c95aff201228dc8e642a0cb043221172b1893bb3bd170c3a02b722010100049495a964aa15ad706ce6019e1c130d064dc93aec4e55f8fe62bb97b647a97d34f885012363567fce3450a285e2f3953bdaadfd500f1683c5741182a57693a06f02e0210b24030100002504010000000b0115043983154cbc0203000000a824369ce301d083818e2c3dd596c865cd03ad2ad6c10a3974e1add10d42c193993a2b417331c249d8281356feb8e3b5878c153c4f15e725b92a68ef9e4173f7'O;
+                
+                var template (value) Certificate v_f5425279310c0379_RootCA;
+                var template (value) Certificate v_5388dec640c6e19e_AA;
+                var template (value) Certificate v_atCertificate;
+                var template (value) Certificate v_decMsg;
+                var template (value) HashedId8 v_hashedId8;
+                var integer v_res;
+                var boolean v_result;
+                
+                // f5425279310c0379_RootCA
+                v_res := decvalue(oct2bit(c_f5425279310c0379_RootCA), v_f5425279310c0379_RootCA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("f5425279310c0379_RootCA: ", v_f5425279310c0379_RootCA);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_f5425279310c0379_RootCA));
+                log("f5425279310c0379_RootCA: v_hashedId8", v_hashedId8);
+                
+                // 5388dec640c6e19e_AA
+                v_res := decvalue(oct2bit(c_5388dec640c6e19e_AA), v_5388dec640c6e19e_AA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("5388dec640c6e19e_AA: ", v_5388dec640c6e19e_AA);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_5388dec640c6e19e_AA));
+                log("5388dec640c6e19e_AA: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_5388dec640c6e19e_AA),
+                   v_f5425279310c0379_RootCA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "5388dec640c6e19e_AA: Certificate verification match");
+                } else {
+                    setverdict(fail, "5388dec640c6e19e_AA: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT1
+                v_res := decvalue(oct2bit(c_Test_AT1), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT1: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT1: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT1: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT1: Certificate verification mismatch");
+                }
+                
+                // _Test_AT2
+                v_res := decvalue(oct2bit(c_Test_AT2), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT2: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT2: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT2: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT2: Certificate verification mismatch");
+                }
+                
+                // _Test_AT3
+                v_res := decvalue(oct2bit(c_Test_AT3), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT3: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT3: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT3: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT3: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT4
+                v_res := decvalue(oct2bit(c_Test_AT4), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT4: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT4: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT4: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT4: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT5
+                v_res := decvalue(oct2bit(c_Test_AT5), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT5: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT5: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT5: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT5: Certificate verification mismatch");
+                }
+                
+                // _Test_AT6
+                v_res := decvalue(oct2bit(c_Test_AT6), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT6: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT6: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT6: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT6: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT7
+                v_res := decvalue(oct2bit(c_Test_AT7), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT7: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT7: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT7: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT7: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT8
+                v_res := decvalue(oct2bit(c_Test_AT8), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT8: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT8: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT8: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT8: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT9
+                v_res := decvalue(oct2bit(c_Test_AT9), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT9: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(valueof(v_atCertificate));
+                log("Test_AT9: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    valueof(v_atCertificate),
+                    valueof(v_5388dec640c6e19e_AA)
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT9: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT9: Certificate verification mismatch");
+                    stop;
+                }
+                
+                setverdict(pass, "All Digests match.");
+            } // End of testcase tc_Certificate_V2X_Pilot_PKI_Autotalk
+            
+            testcase tc_Certificate_V2X_Pilot_PKI_CodhaNxp() runs on TCType system TCType {
+                const octetstring c_f5425279310c0379_RootCA := '0200040c547275737465645f526f6f74808d000004f1817dd05116b855a853f80db171a3a470d43170ea7eefd8ef392d66ecefbe501ceba19963c9b6447574424fff1bb89485743f4d09a72b715fc73c87e5f70a110101000441279a383b80c812b72b1a5f5c3c590e5041c634a1adcc4ce58393ca046d3c619717aef634f7d80d5f6a29fa7f86ebf823ace0097a71ee0df0793034b0d3797c02e0200224250b0114b12b03154e0d83030000007d12badf99d7070bcb237ed1fa7a5d86fd47e6aba8e616b35e95a2856fc6e26a493e1215bcee8bea18b8ed52fb240716c4d4ec7d7c0167f0f032cbb87df611d9'O;
+                const octetstring c_5388dec640c6e19e_AA := '0201f5425279310c0379020a547275737465645f4141808d00000401418e994657434a71e034e530b1e77a8afac37561132c83d45c442499228ca78573f14be034a4958108a654cac60f15bb35907e33d0e97f8d7eaf64a1f43547010100047c5c8d8b86cf8a00a53f3cd23fccf13d078555cc8ef27dc439780eb8ef376237ff668055da476cc82956f6febfa051a6d927e70d826db0338e42819f026aebaa02e0200224250b0114b12b03154e0d83030000005145571104d52dd7094c577719c7ca430d59608d5fefd10db3e61b7c5fd3e4716224f96ed5ab4eb7f860c15347b66e23ea12e0a186a1a80b96c6e5de05416a87'O;
+                
+                // TEST_certs_keys_issued_by_5388dec640c6e19e
+                const octetstring c_Test_AT1 := '02015388dec640c6e19e010052000004a5fa37ceb045d79684fd208bdc9a732b6aa654fdab0746aaba67df9f2c454379ab67e27ed4fe009a39728102c29818c10df6a7593d0ad4198781e28d0ad25d6302e0210b24030100002504010000000b0115043983154cbc0203000000e7cd4f77924e2e738e459e6a8b531ca2b985c42ef1ea68c1d0bc153e6d57280379250d2bffad840e41156771d6925528f809b015cc16cf30ccef1a7af243b604'O;
+                const octetstring c_Test_AT2 := '02015388dec640c6e19e0100520000046e8a1bf50cab6961e221651b28750d1cb899290464d7ce0f388d1fb0e33dadd42945c898e4e6f56a79b55808fd9a9484e36cb77a77dcdae566162c428f0d7e8f02e0210b24030100002504010000000b0115043983154cbc0203000000d18c35fc29714f653e93c196945a89904ae3a22d68ca2a32d51af0f33deee13b5f8bf459d9a81776a81b0a74b1ff8a90196bc9858aa4f0e6d88a280e9cadeaa3'O;
+                const octetstring c_Test_AT3 := '02015388dec640c6e19e010032000002651f51eceeb1093c5c2fe37f157d9eaf3ef5519b7bb4c7c92741f36898438a2a02e0210b24030100002504010000000b0115043983154cbc0203000000c8a58fb443e34b73ebb732664f390cf1ff05e0b3c214b2a5aacf2186258f7fd2665af7b1eb818cf08c43057bce3632900a4b12d5c443b2ef658ce125eb4e023e'O;
+                const octetstring c_Test_AT4 := '02015388dec640c6e19e010052000004d356a47c706724b823aa37ca59e73248dca916c82a11ff5dac13a836579f5a0eb2b7785f0d43d774b37c7927745e1363c8d22aa69add8d8499dffa1f1d44fdef02e0210b24030100002504010000000f0115043983154cbc02030400021000000065117017b8522db92bca1894795dd762a67dbf033c02b9075760a6eac521b385b81661a8b67d5e951321dbb1d6665f506d3f60387dca694993003a1233f0a302'O;
+                const octetstring c_Test_AT5 := '02015388dec640c6e19e010052000004a7a5d2ae982c5ec151041ebafb04bcf5d0f3509888ae526d376f4b887a05ea02c2e03f4bdfd2e6ec198d454535ca0ab02e7ab4f4cb2e2d535c500dc074a963d202e0210b2403010000250401000000150115043983154cbc0203011eae5f88035a2974271000001b318989b6cf27abb78cfd0a8cb6586304a63bfa5616f977249d94e0aa482ec7082cbef1771cdf619c570f078cbec2cc67438eded05ee3776fff0addd85bb41c'O;
+                const octetstring c_Test_AT6 := '02015388dec640c6e19e0100520000046d9ad7e794c0478f23125e05110ff6f53e476919ffb76c98c6eabf2fa8db92dd799100b6477c100447e6c92d1bbb9607d68391e6e1345589e0fa6b0307787f2102e0210b24030100002504010000001c0115043983154cbc020302101eb1cbe6035385741ea90a6a0369c6f40000e2d6310882f89d539a0ffc12c0f916611195bdfab6e2f8fe0f365d16b9c0709ab8e5f134559625010e4e25d6cd52130c612164fe3aa3aec771e4a68972566887'O;
+                const octetstring c_Test_AT7 := '02015388dec640c6e19e01005200000489a96105c0625020182d976358068905db695230cc9b771c6bb2f24c78407f3a68f74381cb8bd9fb7814366be28befe039c0ac0168ca475801c0ea689900432802e0210b24030100002504010000002c0115043983154cbc020303201eb1cbe6035385741eb225b403687c9a1ea90a6a0369c6f41ea732ee03552aaa00003f4b7fa14ceae615fea9205e7b14be87d035cb318f2fcd90140ac0afef5475fa906a49205d1d8a834aead6be96be9109a7645c7c684eda9bf8adb7c5d2010015'O;
+                const octetstring c_Test_AT8 := '02015388dec640c6e19e01005200000492ea7e96c50a5437fc32236c49ec058d57d77ca87889924d7f40aca523c7d530291d61d13962913285147f0ed0c763eb2712dca0b243d64c390e6035410e0ef402e0210b24030120002504010000000b0115043983154cbc020300000024035223e7f21618b1860e6705252fb63f9c9a9b4a54aba3916595d755af7f9d9c4f93aec8dba81f8fa556023c674e81e4cc3635e3cb1073771ecedb5c3c2cda'O;
+                const octetstring c_Test_AT9 := '02015388dec640c6e19e0100809600000421a490928f83d41e0370e0f06a803d3eab14d24f981c70e6738a2c0113445040011c50639644177ee00ee9c3b266a42a8ee09d21a0aaa82928e3d34ca3ab84b301010004de427c47dde79e5bbba99f2e0f6000550b59e37571ff4940f515bfdbc06a7143208fb67ca12e63d9a17248f1dc8d3a740bed5b74989b12ac085458a6feb15fd902e0210b24030100002504010000000b0115043983154cbc0203000000f043bca53ddb6f83889f8903772cab43f175d188c0a5ce44da74ad8bac543e3c7403a994811947bcc4f1333d4bbc5fb2225998c1c4bfd7bf4debd790bcb4f245'O;
+                
+                var Certificate v_f5425279310c0379_RootCA;
+                var Certificate v_5388dec640c6e19e_AA;
+                var Certificate v_atCertificate;
+                var Certificate v_decMsg;
+                var HashedId8 v_hashedId8;
+                var integer v_res;
+                var boolean v_result;
+                
+                // f5425279310c0379_RootCA
+                v_res := decvalue(oct2bit(c_f5425279310c0379_RootCA), v_f5425279310c0379_RootCA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("f5425279310c0379_RootCA: ", v_f5425279310c0379_RootCA);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_f5425279310c0379_RootCA);
+                log("f5425279310c0379_RootCA: v_hashedId8", v_hashedId8);
+                
+                // 5388dec640c6e19e_AA
+                v_res := decvalue(oct2bit(c_5388dec640c6e19e_AA), v_5388dec640c6e19e_AA);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("5388dec640c6e19e_AA: ", v_5388dec640c6e19e_AA);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_5388dec640c6e19e_AA);
+                log("5388dec640c6e19e_AA: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_5388dec640c6e19e_AA,
+                    v_f5425279310c0379_RootCA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "5388dec640c6e19e_AA: Certificate verification match");
+                } else {
+                    setverdict(fail, "5388dec640c6e19e_AA: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT1
+                v_res := decvalue(oct2bit(c_Test_AT1), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT1: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT1: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT1: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT1: Certificate verification mismatch");
+                }
+                
+                // _Test_AT2
+                v_res := decvalue(oct2bit(c_Test_AT2), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT2: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT2: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT2: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT2: Certificate verification mismatch");
+                }
+                
+                // _Test_AT3
+                v_res := decvalue(oct2bit(c_Test_AT3), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT3: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT3: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT3: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT3: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT4
+                v_res := decvalue(oct2bit(c_Test_AT4), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT4: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT4: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT4: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT4: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT5
+                v_res := decvalue(oct2bit(c_Test_AT5), v_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT5: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT5: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT5: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT5: Certificate verification mismatch");
+                }
+                
+                // _Test_AT6
+                v_res := decvalue(oct2bit(c_Test_AT6), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT6: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT6: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT6: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT6: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT7
+                v_res := decvalue(oct2bit(c_Test_AT7), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT7: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT7: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT7: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT7: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT8
+                v_res := decvalue(oct2bit(c_Test_AT8), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT8: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT8: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT8: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT8: Certificate verification mismatch");
+                    stop;
+                }
+                
+                // _Test_AT9
+                v_res := decvalue(oct2bit(c_Test_AT9), vc_atCertificate);
+                if (v_res != 0) {
+                    setverdict(fail, "Decoding failed.");
+                    stop;
+                }
+                log("Test_AT9: ", v_atCertificate);
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("Test_AT9: v_hashedId8", v_hashedId8);
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    v_atCertificate,
+                    v_5388dec640c6e19e_AA
+                );
+                if (v_result == true) {
+                    setverdict(pass, "Test_AT9: Certificate verification match");
+                } else {
+                    setverdict(fail, "Test_AT9: Certificate verification mismatch");
+                    stop;
+                }
+                
+                setverdict(pass, "All Digests match.");
+            } // End of testcase tc_Certificate_V2X_Pilot_PKI_CodhaNxp
+            
+        } // End of group certificates
+        
+        group profileCertificates {
+            
+            /**
+             * @desc Verify AT certificate signature
+             */
+            testcase tc_profileCertificates_01() runs on TCType system TCType {
+                var boolean v_result;
+                
+                f_loadCertificates(PX_IUT_SEC_CONFIG_NAME);
+                
+                log (vc_aaCertificate);
+                log (vc_atCertificate);
+                
+                v_result := f_verifyCertificateSignatureWithIssuingCertificate(
+                    vc_atCertificate,
+                    vc_aaCertificate
+                );
+                
+                if (v_result == true) {
+                    setverdict(pass, "Certificate verification match");
+                } else {
+                    setverdict(fail, "Certificate verification mismatch");
+                    stop;
+                }
+                
+            } // End of testcase tc_profileCertificates_01
+            
+            /**
+             * @desc IUT certificates details
+             */
+            testcase tc_profileCertificates_02() runs on TCType system TCType {
+                var Certificate  v_aaCertificate;
+                var Certificate  v_atCertificate;
+                var SignerInfo   v_si;
+                var HashedId8    v_hashedId8;
+                var boolean      v_result;
+                
+                f_loadCertificates(PX_IUT_SEC_CONFIG_NAME);
+                
+                if(f_readCertificate(cc_iutCert_A, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_iutCert_A=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_iutCert_A digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_iutCert_A.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_B, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_iutCert_B=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_iutCert_B digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_iutCert_B.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_C, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_iutCert_C=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_iutCert_C digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_iutCert_C.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_D, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_iutCert_D=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_iutCert_D digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_iutCert_D.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_E, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_iutCert_E=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_iutCert_E digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_iutCert_E.v_hashedId8=", v_hashedId8);
+                
+                setverdict(pass);
+                
+            } // End of testcase tc_profileCertificates_02
+            
+            /**
+             * @desc TS certificates details
+             */
+            testcase tc_profileCertificates_03() runs on TCType system TCType {
+                var Certificate  v_aaCertificate;
+                var Certificate  v_atCertificate;
+                var SignerInfo   v_si;
+                var charstring   v_certId;
+                var HashedId8    v_hashedId8;
+                var boolean      v_result;
+                
+                f_loadCertificates(PX_IUT_SEC_CONFIG_NAME);
+                
+                if(f_readCertificate(cc_iutCert_A, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_taCert_A=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_taCert_A digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_taCert_A.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_B, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_taCert_B=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_taCert_B digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_taCert_B.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_C, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_taCert_C=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_taCert_C digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_taCert_C.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_D, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_taCert_D=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_taCert_D digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_taCert_D.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_iutCert_E, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("cc_taCert_E=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_taCert_E digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_taCert_E.v_hashedId8=", v_hashedId8);
+                
+                if(f_readCertificate(cc_taCert_EC, v_atCertificate)){
+                    f_readCertificate(oct2str(v_atCertificate.signer_info.signerInfo.digest), v_aaCertificate);
+                }
+                log("CERT_TS_A_EC=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log("cc_taCert_EC digest=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log("cc_taCert_EC.v_hashedId8=", v_hashedId8);
+                
+                v_certId := "CERT_TS_01_01_BO_AT";
+                f_readCertificate(v_certId, v_atCertificate);
+                log(v_certId & "=", v_atCertificate);
+                f_getCertificateSignerInfo(v_atCertificate, v_si);
+                log(v_certId & "=", v_si.signerInfo.digest, " / ", f_calculateDigestFromCertificate(v_aaCertificate));
+                v_hashedId8 := f_calculateDigestFromCertificate(v_atCertificate);
+                log(v_certId & ".v_hashedId8=", v_hashedId8);
+                
+                setverdict(pass);
+                
+            } // End of testcase tc_profileCertificates_03
+            
+            /**
+             * @desc Verify AT certificate signature
+             */
+            testcase tc_profileCertificates_04() runs on TCType system TCType {
+                var boolean v_result;
+                                
+                v_result := f_verifyWithEcdsaNistp256WithSha256(
+                    '0280BA800202015388DEC640C6E19E0100520000045A995005A9944930BD758D4B1BAF754E12B70081F438D3AB740C2B93E887665F31CA714E2F589297D3E8E7F09302B9414FAC85A67CF37D3903FF732E4F6B18AA02E0210B24030100002504010000000B0115043983154CBC02030000002424F87A06F258A90C0B3A095E3D64176CD630C2C5E0266ACCDC0C9E6CFD91D236B8B79029B50F668CDEC5715A482F0FEEF2765567F68A657DAB092CCA9FF5BF0000014120C45084F305240155205002800031010014002E090A008F3835724C640000000000000000FFFFFFFF0000000007D100000102000000024C644056B49D200D693A401FFFFFFC2230D41E40000FDFFF7E0276EA8733A9D74FFFD0841400004301'O,
+                    '000005B37667C87C0129C8CB5789652E9296E817D17A59DBBE56793D0940F3330C68294714DBE7E4A53EBA2DC53490D58F1A8B057A7EDA675C6DD9C403B2797DC580'O,
+                    '5A995005A9944930BD758D4B1BAF754E12B70081F438D3AB740C2B93E887665F'O,
+                    '31CA714E2F589297D3E8E7F09302B9414FAC85A67CF37D3903FF732E4F6B18AA'O
+                );
+                
+                if (v_result == true) {
+                    setverdict(pass, "Certificate verification match");
+                } else {
+                    setverdict(fail, "Certificate verification mismatch");
+                    stop;
+                }
+                
+            } // End of testcase tc_profileCertificates_04
+            
+            /**
+             * @desc Verify AT certificate signature
+             */
+            testcase tc_profileCertificates_05() runs on TCType system TCType {
+                var boolean v_result;
+                
+                
+                v_result := f_verifyWithEcdsaNistp256WithSha256(
+                    '0280BE800202015388DEC640C6E19E01004D000004847C5479B98FAAD120BBC337673DC27B44A44DAF376F4E786976A3BE74B1D7407DD1DDA838CCCA21D3FA9EF65CDAA40E39DC565EC30EF889329E2B8FF5BBB080026021062401002501000B0114B12B03154E0D8303000000A435553144A806302B48C84F0AF873992FBA7C9309E4B8255DA0BA76307A50808A9D975FC146A3B1262E56C2153DAEAAF8A171B036B7382E1041D07BFD6BB753000001415B49C0726803000004D20000162E002F01200010800000000100BC21A4FEDECABEEF0001E240000012F8000002A3803726944301000290E6711F880CD216CD405052B7C8C1577E1C6E4EED1CD7F2939E584B40A111459E230D2494B6A5B992BB61975D3D9C2D42314E84A3057EFFD965E7A7D44CE605'O,
+                    '000090E6711F880CD216CD405052B7C8C1577E1C6E4EED1CD7F2939E584B40A111459E230D2494B6A5B992BB61975D3D9C2D42314E84A3057EFFD965E7A7D44CE605'O,
+                    '847C5479B98FAAD120BBC337673DC27B44A44DAF376F4E786976A3BE74B1D740'O,
+                    '7DD1DDA838CCCA21D3FA9EF65CDAA40E39DC565EC30EF889329E2B8FF5BBB080'O
+                );
+                
+                if (v_result == true) {
+                    setverdict(pass, "Certificate verification match");
+                } else {
+                    setverdict(fail, "Certificate verification mismatch");
+                    stop;
+                }
+                
+            } // End of testcase tc_profileCertificates_05
+            
+        } // End of group profileCertificates
+        
+    } // End of group test_LibItsSecurity_TypesAndValues 
+    
+} // End of module test_LibItsSecurity_TypesAndValues

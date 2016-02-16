@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_35 b1+\"><li class=\"class_36\"><font style=\"font-family: Courier New; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\"><a name=\"6c666f70-ff2e-4d9b-b25e-45bdd0b88099\" id=\"id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\" class=\"requality_id\"><\/a>verification_key<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">: this field shall contain the public key of the key pair that is used to sign and verify message or certificate signatures.<\/span><\/font><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">\n<\/span><\/font><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">\n<\/span><\/li><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">\n<\/span><\/p><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">\n<\/span><p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_35 b1+\"><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">\t<\/span><li class=\"class_36\"><span class=\"requality_text id_6c666f70-ff2e-4d9b-b25e-45bdd0b88099\">\n<\/span><font style=\"font-family: Courier New; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><\/font><\/li><\/p>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "81c359c5-0626-459a-b0a3-4030fece7751"
+}

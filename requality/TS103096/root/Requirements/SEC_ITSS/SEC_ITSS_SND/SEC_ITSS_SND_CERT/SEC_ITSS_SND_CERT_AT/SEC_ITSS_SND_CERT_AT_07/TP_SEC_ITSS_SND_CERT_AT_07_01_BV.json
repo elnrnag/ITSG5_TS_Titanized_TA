@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that all AIDs containing in the in the its_aid_ssp_list in AT certificate are unique and exists in the  its_aid_list in the AA certificate\r\nCheck that the length of SSP of each AID is 31 octet maximum\r\n"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating certificate_chain\r\n\t\t\t\tcontaining certificates[last-1] {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_authority' (2)\r\n\t\t\t\t\tcontaining subject_attributes['its_aid_list']\r\n\t\t\t\t\t\tcontaining its_aid_list[0..N]\r\n\t\t\t\t\t\t\tindicating ITS_AID_LIST_AA\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tcontaining certificates[last] {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_ticket' (1)\r\n\t\t\t\t\tcontaining subject_attributes['its_aid_ssp_list']\r\n\t\t\t\t\t\tcontaining its_aid_ssp_list[0..N] {\r\n\t\t\t\t\t\t\tcontaining its_aid_ssp_list[n]{\r\n\t\t\t\t\t\t\t\tcontaining its_aid\r\n\t\t\t\t\t\t\t\t\tindicating unique value containing in the  ITS_AID_LIST_AA\r\n\t\t\t\t\t\t\t\tcontaining service_specific_permissions\r\n\t\t\t\t\t\t\t\t\tindicating length <= 31 octet\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}\r\n"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "9927d09f-0ec3-4122-a856-db5e7bf477a8"
+}

@@ -1,0 +1,38 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "4357caf6-c1c0-4f02-9f1b-16b34900d813",
+            "type": "STRING",
+            "value": "If ITS-S sends a signed message with general security profile check that the sent SecuredMessage contains exactly one element of the header fields: signer_info, generation_time, generation_location\r\nCheck that the header fields are in the ascending order according to the numbering of the enumeration except of the signer_info, which is encoded first."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "4357caf6-c1c0-4f02-9f1b-16b34900d813",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/655df553-f2cc-481a-b3f1-8954c2a2f19b",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/209c0b2b-c07a-4023-aadc-c80c5d0c8774",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/88ac51be-1b12-4ec0-be8a-8a064ef12c6a",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/ffd67c7f-db67-406e-83ce-f1140efe0f63"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "4357caf6-c1c0-4f02-9f1b-16b34900d813",
+            "type": "STRING",
+            "value": "02. Check header field"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "4357caf6-c1c0-4f02-9f1b-16b34900d813",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "4357caf6-c1c0-4f02-9f1b-16b34900d813"
+}

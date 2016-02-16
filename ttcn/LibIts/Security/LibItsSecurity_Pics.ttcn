@@ -1,0 +1,54 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Security/LibItsSecurity_Pics.ttcn3 $
+ *            $Id: LibItsSecurity_Pics.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Module containing Pics for Security Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsSecurity_Pics {
+    
+    /**
+     * Is the IUT support certificates pushing
+     */
+    modulepar boolean PICS_CERTIFICATE_SELECTION := true;
+    
+    /**
+     * Is the IUT support circular region geographical restriction
+     */
+    modulepar boolean PICS_USE_CIRCULAR_REGION := true;
+    
+    /**
+     * Is the IUT support rectangular region geographical restriction
+     */
+    modulepar boolean PICS_USE_RECTANGULAR_REGION := true;
+    
+    /**
+     * Is the IUT support polygonal region geographical restriction
+     */
+    modulepar boolean PICS_USE_POLYGONAL_REGION := true;
+    
+    /**
+     * Is the IUT support identified region geographical restriction
+     */
+    modulepar boolean PICS_USE_IDENTIFIED_REGION := true;
+    
+    /**
+     * Is the IUT support identified region/UN geographical restriction
+     */
+    modulepar boolean PICS_USE_UN_STATS_REGION_DICTIONARY := true;
+    
+    /**
+     * Is the IUT support identified region/ISO31661 geographical restriction
+     */
+    modulepar boolean PICS_USE_ISO31661_REGION_DICTIONARY := true;
+    
+    /**
+     * Does the IUT support ITS-AID for Generic profile?
+     */
+    modulepar boolean PICS_ITS_AID_OTHER_PROFILE := true;
+    
+} // End of module LibItsSecurity_Pics
+

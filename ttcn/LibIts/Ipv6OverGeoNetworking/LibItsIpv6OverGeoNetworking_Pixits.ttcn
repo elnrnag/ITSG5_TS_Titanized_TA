@@ -1,0 +1,66 @@
+/**
+ *  @author   ETSI / STF405 /STF449
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Ipv6OverGeoNetworking/LibItsIpv6OverGeoNetworking_Pixits.ttcn $
+ *            $Id: LibItsIpv6OverGeoNetworking_Pixits.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     Module parameters for IPv6 over GeoNetworking Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsIpv6OverGeoNetworking_Pixits {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    /**
+     * @desc GVL will be configured manually?
+     */
+    modulepar boolean PX_CONFIG_MANUAL_GVL := false;
+    
+    /**
+     * @desc Time for building the configuration and virtual interfaces dynamically.
+     */
+    modulepar float PX_T_BUILD_CONFIG := 5.0;
+    
+    /**
+     * @desc IPv6 prefix 1 to be used for defining GVL
+     */
+    modulepar Oct16 PX_GN6_PREFIX_1 := '3FFE0000000000010000000000000000'O;
+    
+    /**
+     * @desc IPv6 prefix 2 to be used for defining GVL
+     */
+    modulepar Oct16 PX_GN6_PREFIX_2 := '3FFE0000000000020000000000000000'O;
+    
+    /**
+     * @desc IPv6 prefix 3 to be used for defining GVL
+     */
+    modulepar Oct16 PX_GN6_PREFIX_3 := '3FFE0000000000030000000000000000'O;
+    
+    /**
+     * @desc Length of IPv6 prefix 1
+     * @see  PX_GN6_PREFIX_1
+     */
+    modulepar UInt8 PX_GN6_PREFIX_LENGTH_1 := 64;
+    
+    /**
+     * @desc Length of IPv6 prefix 2
+     * @see  PX_GN6_PREFIX_2
+     */
+    modulepar UInt8 PX_GN6_PREFIX_LENGTH_2 := 64;
+    
+    /**
+     * @desc Length of IPv6 prefix 3
+     * @see  PX_GN6_PREFIX_3
+     */
+    modulepar UInt8 PX_GN6_PREFIX_LENGTH_3 := 64;
+    
+    /**
+     * @desc Name of IUT's virtual interface associated with TVL
+     */
+    modulepar charstring PX_GN6_TVL_INTERFACE_NAME := "tvl0";
+    
+}
+

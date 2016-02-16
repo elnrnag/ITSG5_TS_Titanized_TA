@@ -1,0 +1,54 @@
+/**
+ *  @author   ETSI / STF405 /STF449
+ *  @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsIPv6OverGeoNetworking/ItsIpv6OverGeoNetworking_TestControl.ttcn $
+ *            $Id: ItsIpv6OverGeoNetworking_TestControl.ttcn 1423 2014-05-22 13:59:50Z filatov $
+ *  @desc     Test Control file for IPv6 over GeoNetworking Protocol
+ *
+ */
+module ItsIpv6OverGeoNetworking_TestControl {
+    
+    // ATS IPv6OverGeoNw
+    import from ItsIpv6OverGeoNetworking_TestCases {testcase all};
+    
+    // Test Execution
+    control {
+        
+        //message generation
+        //GVL
+        execute(TC_IPV6GEO_MG_GVL_BV_01());
+        execute(TC_IPV6GEO_MG_GVL_BV_02());
+        execute(TC_IPV6GEO_MG_GVL_BV_03());
+        execute(TC_IPV6GEO_MG_GVL_BV_04());
+        execute(TC_IPV6GEO_MG_GVL_BV_05());
+        
+        //TVL
+        execute(TC_IPV6GEO_MG_TVL_BV_01());
+        execute(TC_IPV6GEO_MG_TVL_BV_02());
+        execute(TC_IPV6GEO_MG_TVL_BV_03());
+        
+        //message reception
+        //GVL
+        execute(TC_IPV6GEO_MR_GVL_BV_01());
+        execute(TC_IPV6GEO_MR_GVL_BV_02());
+        execute(TC_IPV6GEO_MR_GVL_BV_03());
+        execute(TC_IPV6GEO_MR_GVL_BV_04());
+        execute(TC_IPV6GEO_MR_GVL_BV_05());
+        execute(TC_IPV6GEO_MR_GVL_BV_06());
+        execute(TC_IPV6GEO_MR_GVL_BV_07());
+        execute(TC_IPV6GEO_MR_GVL_BV_08());
+        execute(TC_IPV6GEO_MR_GVL_BV_09());
+        execute(TC_IPV6GEO_MR_GVL_BV_10());
+        
+        //TVL
+        execute(TC_IPV6GEO_MR_TVL_BV_01());
+        
+        //virtualInterfaceManagement
+        //newVirtualInterfaces
+        execute(TC_IPV6GEO_VM_NVI_BV_01());
+        
+        //expiredVirtualInterfaces
+        execute(TC_IPV6GEO_VM_EVI_BV_01());
+    }
+    
+} // end ItsIpv6OverGeoNetworking_TestControl
+

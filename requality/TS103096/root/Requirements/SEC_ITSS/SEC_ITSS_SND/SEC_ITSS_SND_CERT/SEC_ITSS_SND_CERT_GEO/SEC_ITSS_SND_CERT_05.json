@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "PICS_USE_POLYGONAL_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_POLYGONAL_REGION",
+            "origin": "d8b517b2-50f3-4b59-b2af-88fcb0dbe0de",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d8b517b2-50f3-4b59-b2af-88fcb0dbe0de",
+            "type": "STRING",
+            "value": "Check Polygonal Region:\r\nMust contain at least 3 and no more than 12 points\r\nShould not contain intersections\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "d8b517b2-50f3-4b59-b2af-88fcb0dbe0de",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/5000e046-01fa-468e-ad37-711e8685205b"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "d8b517b2-50f3-4b59-b2af-88fcb0dbe0de",
+            "type": "STRING",
+            "value": "05. Check Polygonal Region."
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d8b517b2-50f3-4b59-b2af-88fcb0dbe0de",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d8b517b2-50f3-4b59-b2af-88fcb0dbe0de"
+}

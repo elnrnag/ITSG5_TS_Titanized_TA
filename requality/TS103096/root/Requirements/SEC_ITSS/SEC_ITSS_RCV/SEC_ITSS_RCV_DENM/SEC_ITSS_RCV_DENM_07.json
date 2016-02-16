@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "4350edd1-8e33-4f1c-a1f2-ace2f64354d1",
+            "type": "STRING",
+            "value": "Check the acceptance of message type"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "4350edd1-8e33-4f1c-a1f2-ace2f64354d1",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/79b1e74c-cf2f-4d76-bcac-07d24883a293"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "4350edd1-8e33-4f1c-a1f2-ace2f64354d1",
+            "type": "STRING",
+            "value": "07. Check its_aid"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "4350edd1-8e33-4f1c-a1f2-ace2f64354d1",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "4350edd1-8e33-4f1c-a1f2-ace2f64354d1"
+}

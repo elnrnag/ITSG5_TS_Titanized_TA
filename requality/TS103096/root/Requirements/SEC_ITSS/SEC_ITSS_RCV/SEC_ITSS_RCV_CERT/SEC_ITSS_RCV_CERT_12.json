@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "f0b6f241-7910-470f-9f38-b98a4413c564",
+            "type": "STRING",
+            "value": "\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "39408838-7f8d-467f-a38b-2f6de227952f",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/6ff77750-4e3f-47e3-8261-73ad6d944a77"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "39408838-7f8d-467f-a38b-2f6de227952f",
+            "type": "STRING",
+            "value": "12. Check AID subject attribute presence"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "f0b6f241-7910-470f-9f38-b98a4413c564",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "39408838-7f8d-467f-a38b-2f6de227952f"
+}

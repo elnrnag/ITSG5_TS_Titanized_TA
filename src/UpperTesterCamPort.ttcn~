@@ -1,0 +1,12 @@
+module UpperTesterCamPort {
+
+  import from LibCommon_TypesAndValues all;
+
+
+type port UpperTesterCAMPort message {
+            out 
+                UtInitialize, UtCamTrigger, UtChangePosition;
+            in 
+                UtInitializeResult, UtCamTriggerResult, UtChangePositionResult, UtCamEventInd;
+        }
+}

@@ -1,0 +1,25 @@
+<!-- The AT certificate not containing subject attribute 'its_aid_ssp_list'
+-->
+<certificate name="CERT_TS_12_01_BO_AT">
+	<version>2</version>
+	<signer type="digest" name="CERT_TS_A_AA"/>
+	<subject type="AT" name="">
+		<!-- verification_key -->
+		<attribute type="verification_key">
+			<public_key algorythm="ecdsa_nistp256_with_sha256">
+				<ecc_point type="uncompressed"/>
+			</public_key>
+		</attribute>
+		<!-- assurance_level -->
+		<attribute type="assurance_level">
+			<assurance level="3"/>
+		</attribute>
+	</subject>
+	<validity>
+		<restriction type="time" start="2015-01-01" end="2015-04-30"/>
+		<restriction type="region">
+			<none/>
+		</restriction>
+	</validity>
+	<signature algorithm="0"/>
+</certificate>

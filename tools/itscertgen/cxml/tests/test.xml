@@ -1,0 +1,11 @@
+<?xml?>
+<tag>
+   <tag/>
+</tag>
+<!-- COMMENT -->
+text text
+text text &#x22;quoted&quot;
+<tag attr=value attr="value value" attr>
+<tag attr = value attr = "value &amp;value&#38;" attr />
+</tag>
+<tag attr=value attr="value value" attr/>

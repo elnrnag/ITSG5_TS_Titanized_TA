@@ -1,0 +1,35 @@
+{
+    "attributes": {
+        "PICS_C2C": {
+            "key": "PICS_C2C",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards Secured DENM if the generation_time is more than 10 minute in the past (C2C only)"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'signer_info'\r\n\t\t\tand containing header_fields [1] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_time'\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating TIME_1 (TIME_1 < CURRENT_TIME - 10min)\r\n\t\t\t}\r\n\t\t\tand containing header_fields ['its_aid']\r\n\t\t\t\tindicating 'AID_DENM'\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}\r\nwith {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining security_profile\r\n\t\t\t\tindicating '2'\r\n\t\t\tand containing header_fields ['generation_time']\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating TIME_1 (TIME_1 < CUR_TIME - 10min)\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "693c1179-2a22-419a-8df8-717bab22c489"
+}

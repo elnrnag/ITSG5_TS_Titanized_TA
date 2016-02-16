@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\"><a name=\"db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\" id=\"id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\" class=\"requality_id\"><\/a>If the ITS-S finds a <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">HashedId3<\/span><\/font><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\"> of its own, currently used authorization authority in that list, it shall include a <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">signer_info<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\"> field of type <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">certificate_chain<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\"> containing the currently used authorization ticket and authorization authority certificate immediately in its next CAM, instead of including a <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">signer_info<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\"> field of type <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">certificate_digest_with_sha256<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe\">.<\/span><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "db2bb1d3-c4dd-4c62-bc4a-16ed5cfd9bbe"
+}

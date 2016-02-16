@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_C2C": {
+            "isGenerated": false,
+            "key": "PICS_C2C",
+            "origin": "73fbb432-ae92-45ac-b0c3-3a558234d62d",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "73fbb432-ae92-45ac-b0c3-3a558234d62d",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "73fbb432-ae92-45ac-b0c3-3a558234d62d",
+            "type": "STRING",
+            "value": "Check that IUT accepts Secured GN Message if the distance between the current position of IUT and the value of optional HeaderField generation_location is 29.9 km"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "73fbb432-ae92-45ac-b0c3-3a558234d62d",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields ['generation_location']\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating position in 29.9 km from the current position of IUT\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "73fbb432-ae92-45ac-b0c3-3a558234d62d",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "73fbb432-ae92-45ac-b0c3-3a558234d62d",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "73fbb432-ae92-45ac-b0c3-3a558234d62d"
+}

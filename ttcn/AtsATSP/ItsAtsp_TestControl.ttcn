@@ -1,0 +1,187 @@
+/**
+ *  @author   ETSI / STF455
+ *  @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsATSP/ItsAtsp_TestControl.ttcn $
+ *            $Id: ItsAtsp_TestControl.ttcn 1426 2014-06-02 13:41:12Z garciay $
+ *  @desc     Test Control file for Access Technology Support ISO 21218 (TP version: 0.0.1)
+ *
+ */
+module ItsAtsp_TestControl {
+
+
+	// ItsAtsp
+	import from ItsAtsp_TestCases {testcase all};
+
+    // LibIts
+    import from LibItsAtsp_Pics all;
+    
+    
+    // Test Execution
+    control {
+        
+//      State Event Transistions (SE)
+//      SE - Valid Behaviour
+        if (PICS_DYNREG and PICS_MAC48) {
+            execute(TC_ATSP_SE_BV_01());
+        }
+
+        if (PICS_DYNREG and not(PICS_MAC48)) {
+            execute(TC_ATSP_SE_BV_02());
+        }
+        
+        if (PICS_DYNREG) {
+            execute(TC_ATSP_SE_BV_03());
+			execute(TC_ATSP_SE_BV_10());
+        }
+		
+        if (PICS_CIC_l2) {
+            execute(TC_ATSP_SE_BV_04());
+			execute(TC_ATSP_SE_BV_16());
+        }
+		
+        if (PICS_CIC_l3) {
+            execute(TC_ATSP_SE_BV_05());
+        }
+		
+        if (PICS_CIC_l4) {
+            execute(TC_ATSP_SE_BV_06());
+        }
+		
+        if (PICS_CIC_l1) {
+            execute(TC_ATSP_SE_BV_07());
+        }
+		
+        if (PICS_CIC_l3 and PICS_MCVCI) {
+            execute(TC_ATSP_SE_BV_08());
+        }
+
+        if ((PICS_CIC_l1 or PICS_CIC_il1) and PICS_MCVCI) {
+            execute(TC_ATSP_SE_BV_09());
+        }
+
+        if (PICS_INACT) {
+            execute(TC_ATSP_SE_BV_11());
+        }
+
+        if (PICS_ACT) {
+            execute(TC_ATSP_SE_BV_12());
+        }
+
+        if (PICS_SUSP) {
+            execute(TC_ATSP_SE_BV_13());
+        }
+
+		if (PICS_RES) {
+            execute(TC_ATSP_SE_BV_14());
+        }
+
+        if (PICS_CIC_l2 and PICS_CIAC2) {
+            execute(TC_ATSP_SE_BV_15());
+        }
+
+        if ((PICS_CIAC2 or PICS_CIAC3) and PICS_DISCONN) {
+            execute(TC_ATSP_SE_BV_17());
+        }
+
+		//      SE - Invalid Valid Behaviour
+        if (PICS_DYNREG or PICS_INACT or PICS_ACT or PICS_SUSP or PICS_RES or PICS_CONN or PICS_DISCONN) {
+            execute(TC_ATSP_SE_BI_01());
+        }
+        
+        if ((PICS_CIAC2 or PICS_CIAC3) and PICS_CONN) {
+            execute(TC_ATSP_SE_BI_02());
+        }
+        
+//      MIB I-Parameters (MB)
+//      MB - Valid Behaviour
+        if (PICS_IPRW or PICS_IPRO) {
+            execute(TC_ATSP_MB_BV_01());
+        }
+        
+        if (PICS_IPRW or PICS_IPWO) {
+            execute(TC_ATSP_MB_BV_02());
+        }
+        
+        if (PICS_IPRW or PICS_IPRO or PICS_IPNO) {
+            execute(TC_ATSP_MB_BV_03());
+        }
+        
+//      MB - Invalid Valid Behaviour
+		
+        execute (TC_ATSP_MB_BI_01());
+        execute (TC_ATSP_MB_BI_02());
+		
+        if (PICS_IPRO or PICS_IPNO) {
+            execute(TC_ATSP_MB_BI_03());
+        }
+
+//      Handling of CIs (HC)
+//      HC - Valid Behaviour
+
+        execute (TC_ATSP_HC_BV_03());
+		execute (TC_ATSP_HC_BV_05());
+		
+		if (PICS_WAKEUP) {
+            execute(TC_ATSP_HC_BV_01());
+        }
+        
+        if (PICS_RIM) {
+            execute(TC_ATSP_HC_BV_02());
+        }
+        
+        if (PICS_DELET) {
+            execute(TC_ATSP_HC_BV_04());
+        }
+        
+//      HC - Invalid Valid Behaviour
+
+		execute(TC_ATSP_HC_BI_01());
+
+//      Handling of data plane (DP)
+//      DP - Valid Behaviour
+        if ((PICS_MAC48 and PICS_BCVCI) and not(PICS_CIC_l4) and not(PICS_CIC_l5)) {
+            execute(TC_ATSP_DP_BV_01());
+        }
+        
+        if ((PICS_MAC48 and PICS_MCVCI) and not(PICS_CIC_l4) and not(PICS_CIC_l5)) {
+            execute(TC_ATSP_DP_BV_02());
+        }
+        
+        if ((PICS_MAC48 and PICS_UCVCI) and not(PICS_CIC_l4) and not(PICS_CIC_l5)) {
+            execute(TC_ATSP_DP_BV_03());
+        }
+        
+        if (PICS_MAC48 and not(PICS_CIC_l5)) {
+            execute(TC_ATSP_DP_BV_04());
+			execute(TC_ATSP_DP_BV_05());
+			execute(TC_ATSP_DP_BV_06());
+        }
+        
+        if (PICS_MAC48 and not(PICS_CIC_l4) and PICS_SUSP and PICS_RES) {
+            execute(TC_ATSP_DP_BV_07());
+        }
+        
+        if (PICS_CRCIP_V) {
+            execute(TC_ATSP_DP_BV_08());
+			execute(TC_ATSP_DP_BV_09());
+			execute(TC_ATSP_DP_BV_10());
+			execute(TC_ATSP_DP_BV_11());
+			execute(TC_ATSP_DP_BV_12());
+        }
+        
+        if (PICS_CRCIP_I) {
+            execute(TC_ATSP_DP_BV_13());
+			execute(TC_ATSP_DP_BV_14());
+        }
+        
+//      DP - Invalid Valid Behaviour
+        if (PICS_INUDS and not(PICS_CIC_l4)) {
+            execute(TC_ATSP_DP_BI_01());
+        }
+        
+        if (not(PICS_INUDS) and not(PICS_CIC_l4)) {
+            execute(TC_ATSP_DP_BI_02());
+        }
+        
+    } // End of control
+    
+} // End of module ItsAtsp_TestControl

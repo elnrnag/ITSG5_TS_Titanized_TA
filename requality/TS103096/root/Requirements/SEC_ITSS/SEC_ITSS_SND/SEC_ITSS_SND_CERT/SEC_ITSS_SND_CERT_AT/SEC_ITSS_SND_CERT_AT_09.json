@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "71ac2e1b-73ac-4293-8562-5c7371d8b04d",
+            "type": "STRING",
+            "value": "Check that the assurance level of the subordinate certificate is equal to or lower than the assurance level of the issuing certificate"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "71ac2e1b-73ac-4293-8562-5c7371d8b04d",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2973afd2-d5de-4ae7-84cc-f796bd6a57ce",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/93bc77ce-bfd3-4227-8d7f-0756a76199cd"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "71ac2e1b-73ac-4293-8562-5c7371d8b04d",
+            "type": "STRING",
+            "value": "09. Check assurance level"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "71ac2e1b-73ac-4293-8562-5c7371d8b04d",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "71ac2e1b-73ac-4293-8562-5c7371d8b04d"
+}

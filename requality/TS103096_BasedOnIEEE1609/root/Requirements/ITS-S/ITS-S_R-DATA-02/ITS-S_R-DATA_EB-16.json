@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards valid signed data when the signer is a certificate chain in which the operational permissions of a subordinate certificate are not a subset of the permissions of its issuing certificate."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/096c986d-cbd4-45ec-a89c-84c82fda2280"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "bf6a7b2c-9eee-4b7f-9f88-b83b6457eeba"
+}

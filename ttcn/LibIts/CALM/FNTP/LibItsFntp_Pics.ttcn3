@@ -1,0 +1,88 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FNTP/LibItsFntp_Pics.ttcn3 $
+ *              $Id: LibItsFntp_Pics.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       FAST networking & transport layer protocol (ISO 29281) PICS
+ */
+module LibItsFntp_Pics {
+
+    /**
+	 * @desc FNTP PICS
+	 */
+    group fntpPics {
+        
+        /**
+         * @desc Does the architecture implement ITS station-internal network?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.1/1
+         */
+        modulepar boolean PICS_ITS_S_INW := false;
+        
+        /**
+         * @desc Is IUT an host only?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.2/1
+         */
+        modulepar boolean PICS_ROLE_RONLY := false;
+        
+        /**
+         * @desc Is IUT a router only?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.2/2
+         */
+        modulepar boolean PICS_ROLE_HONLY := false;
+        
+        /**
+         * @desc Is IUT both host and router?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.2/3
+         */
+        modulepar boolean PICS_ROLE_RH := true;
+        
+        /**
+         * @desc Is IUT support basic architecture?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.3/1
+         */
+        modulepar boolean PICS_BASIC := true;
+        
+        /**
+         * @desc Is IUT support extended architecture?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.3/2
+         */
+        modulepar boolean PICS_EXT := false;
+        
+        /**
+         * @desc Is IUT support ITS station-internal forwarding?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.4/1
+         */
+        modulepar boolean PICS_IFWD := false;
+        
+        /**
+         * @desc Is IUT support secure communication?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.4/2
+         */
+        modulepar boolean PICS_SEC := false;
+        
+        /**
+         * @desc Is IUT support N-hop broadcast?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.4/3
+         */
+        modulepar boolean PICS_NHOPBC := false;
+        
+        /**
+         * @desc Is access parameters settings supported?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.4/5
+         */
+        modulepar boolean PICS_CIP := false;
+        
+        /**
+         * @desc Is IUT support 15628 Kernel Emulation?
+         * @see  ETSI TS 102 985-1 v1.1.2 A.5/1
+         */
+        modulepar boolean PICS_15628 := false;
+		
+		/**
+		 * @desc Is IUT support notification to the ITS Management layer
+         * @see  ETSI TS 102 985-1 v1.1.2 A.6/3
+		 */
+		modulepar boolean PICS_ITS_MGT_NOT := false;
+        
+    } // End of group fntpPics
+
+} // End of module LibItsFntp_Pics

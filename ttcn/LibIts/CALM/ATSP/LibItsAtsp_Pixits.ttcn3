@@ -1,0 +1,200 @@
+/**
+ *  @author     ETSI / STF455
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/ATSP/LibItsAtsp_Pixits.ttcn3 $
+ *              $Id: LibItsAtsp_Pixits.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Access Technology Layer (ISO 21218) Pixits
+ */
+module LibItsAtsp_Pixits {
+	
+	import from CALMllsap language "ASN.1:1997" {
+        type 
+			EUI64, MedID, VCIserialNumber, IN_SAPaddress, I_ParamNo, I_Param, MedID
+    };
+
+	import from CALMmanagement language "ASN.1:1997" {
+        type 
+			ITS_scuId
+    };
+
+	import from CALMmsap language "ASN.1:1997" {
+        type 
+			DataUnitData, ParameterUnitData
+    };
+	
+	import from LibItsAtsp_TypesAndValues all;
+	
+	import from LibCommon_BasicTypesAndValues {
+        type
+			UInt8, UInt6
+    };
+	
+	group Iparameter {
+		/**
+	     * @desc Expected ITS-SCU-ID of the IUT CI
+	     * @see ISO 21218 - Clause 6.2 Link Identifier 
+		 * I-Parameter No c_ciIParamNoITS_scuId
+	     */
+		modulepar ITS_scuId PX_ITS_SCU_ID := 0;
+
+		/**
+	     * @desc Expected MedID of the IUT CI
+	     * @see ISO 21218 - Clause 6.2 Link Identifier 
+		 * I-Parameter No c_ciIParamNoMedID
+	     */
+		modulepar MedID PX_Med_ID := 0;
+
+		/**
+	     * @desc Expected MedType of the IUT CI
+	     * @see ISO 21218 - Clause 6.3 Link Identifier 
+		 * I-Parameter No c_ciIParamNoMedID
+	     */
+	    modulepar MedID PX_CI_MED_TYPE := 5;
+
+		/**
+	     * @desc MedType of potential interferer
+	     * @see ISO 21218 - Clause 6.3 Link Identifier 
+		 * used in PrioReg
+	     */
+	    modulepar MedID PX_CI_INTERFERER_MED_TYPE := 5;
+
+		/**
+	     * @desc Unknown I-Parameter No
+	     * @see ISO 21218 - Clause 6.3 Link Identifier 
+	     */
+	    modulepar I_ParamNo PX_CI_UNKNOWN_PARAM_NO := 255;
+
+		/**
+	     * @desc Not supported I-Parameter
+	     * @see ISO 21218 - Clause 6.3 Link Identifier 
+	     */
+	    modulepar I_Param PX_CI_NO_SUPPORT_PARAM := {paramNo := PX_CI_NO_SUPPORT_PARAM_NO, parameter := {UserPriority := 0} };
+		modulepar I_ParamNo PX_CI_NO_SUPPORT_PARAM_NO := 125;
+	
+		/**
+	     * @desc Supported I-Parameter with write or read/write access
+	     * @see ISO 21218 - Clause 6.3 Link Identifier 
+	     */
+	    modulepar I_Param PX_CI_SUPPORT_PARAM_WR := {paramNo := PX_CI_SUPPORT_PARAM_WR_NO, parameter := {DataRate := 125} };
+		modulepar I_ParamNo PX_CI_SUPPORT_PARAM_WR_NO := 39;
+
+		/**
+	     * @desc Supported Read-Only or Notify-Only I-Parameter
+	     * @see ISO 21218 - Clause 6.3 Link Identifier 
+	     */
+		modulepar I_ParamNo PX_CI_SUPPORT_NO_WRITE_ACCESS_PARAM_NO := c_ciIParamNoCiStatus;
+	    modulepar I_Param PX_CI_SUPPORT_NO_WRITE_ACCESS_PARAM := {paramNo := PX_CI_SUPPORT_NO_WRITE_ACCESS_PARAM_NO, parameter := {CIstatus := 0} };
+
+	} // End of group Iparameter
+	
+	/**
+     * @desc T_DummyAckReq timer for prioritization procedure
+     * @see ISO 21218 - Clause 6.4.11.3 
+     */
+	modulepar float PX_TIMER_DUMMYAckReq := 0.1; // in seconds In reality the value has to be smaller
+
+	/**
+     * @desc Expected IN-SAP address
+     * @see ISO 21218 - Clause 8.2 Addressing
+	 * FNTP: 186
+	 * IPv6: 182
+     */
+	modulepar IN_SAPaddress PX_IN_SAP_ADDRESS := 186;
+
+	/**
+     * @desc Expected VCIserialNumber of the IUT UC-VCI
+     * @see ISO 21218 - Clause 6.3 Link Identifier 
+     */
+	modulepar VCIserialNumber PX_VCI_SERIAL_NUMBER := 0;
+	
+	/**
+     * @desc Expected VCIserialNumber of the IUT MC-VCI
+     * @see ISO 21218 - Clause 6.3 Link Identifier 
+     */
+	modulepar VCIserialNumber PX_VCI_SERIAL_NUMBER_MC := 0;
+
+	/**
+     * @desc MultiCast group ID of the IUT legacy CI
+     * @see ISO 21218 - Clause 6.3 Link Identifier
+	 * Range from 1 through 62
+     */
+	modulepar UInt6 PX_LEGACY_VCI_MC_GROUP_ID := 1;
+
+	/**
+     * Wait until the IUT is in a stable situation
+     */
+    modulepar float PX_WAIT_FOR_IUT_READY := 1.0;
+
+	/**
+     * Data in UnitData
+     */
+    modulepar DataUnitData PX_DATA_UNITDATA := 'ABCDEF'O;
+
+	/**
+     * Parameter in UnitData
+     */
+    modulepar ParameterUnitData PX_PARAMETER_UNITDATA := '012345'O;
+	
+    /**
+    * @desc Identifies RemoteLocalCIID group
+	* Values of RemoteCIID and LocalCIID 
+    * @see ISO 21218 - Clause 6.3 Link Identifier and 8.2.2 Tables 6 and 7
+    */
+	group RemoteLocalCIID {
+        /**
+         * @desc Identifies RemoteCIID of local VCI
+         */
+//        modulepar EUI64 PX_REMOTE_CIID_LOCAL := 'FFFFFFFFFEFFFFFF'O; // DNI
+		modulepar EUI64 PX_REMOTE_CIID_LOCAL_CI := PX_LOCAL_CIID;
+		
+        /**
+         * @desc Identifies the VCI localCIID on ITS-S router (e.g. It coud be the G5 radio MAC address of the IUT)
+		 * NOTE 0A0B0CFFFE0D0E0F is MAC address 0A:0B:0C:0D:0E:0F
+         */
+//        modulepar EUI64 PX_LOCAL_CIID := 'FFFFFFFFFEFFFFFF'O    ; // DNI
+        modulepar EUI64 PX_LOCAL_CIID :=     '0A0B0CFFFE0D0E0F'O; // Commsignia FNTP setting (laptop)
+//        modulepar EUI64 PX_LOCAL_CIID :=     'FFFFFFFFFEFFFFFF'O ; // Commsignia FSAP setting
+//        modulepar EUI64 PX_LOCAL_CIID :=     'D4CA6DFFFF55A72C'O ; // Commsignia FNTP setting (ITS-S box)
+//        modulepar EUI64 PX_LOCAL_CIID :=     '000C42FFFF6A9E2C'O; // Peek setting (@home)
+//        modulepar EUI64 PX_LOCAL_CIID :=     '000C42FFFF974497'O; // Peek setting (@office)
+        
+        /**
+         * @desc Identifies RemoteCIID of VCI on ITS test system
+         */
+//        modulepar EUI64 PX_TESTER_REMOTE_CIID_LOCAL := 'FFFFFFFFFEFFFFFF'O; // DNI
+		modulepar EUI64 PX_TESTER_REMOTE_CIID_LOCAL_CI := PX_TESTER_LOCAL_CIID;
+
+		/**
+         * @desc Identifies the VCI localCIID on ITS test system (e.g. It coud be the G5 radio MAC address of the IUT)
+		 * NOTE 0A0B0CFFFE0D0E0F is MAC address 0A:0B:0C:0D:0E:0F
+         */
+        modulepar EUI64 PX_TESTER_LOCAL_CIID := 'FFFFFFFFFEFFFFFF'O    ; // DNI
+//        modulepar EUI64 PX_TESTER_LOCAL_CIID :=     '0A0B0CFFFE0D0E0F'O; // tbd
+
+		/**
+         * @desc Identifies the VCI for broadcast on ITS-S router 
+		 * Note that U/L bit is set to 1 for broadcast 
+         */
+        modulepar EUI64 PX_REMOTE_CIID_BC := 'FFFFFFFFFEFFFFFF'O; 
+        
+        /**
+         * @desc Identifies the VCI for multicast on ITS-S router 
+         */
+        modulepar EUI64 PX_REMOTE_CIID_MC := 'EF0008FFFE011234'O;
+        
+        /**
+         * @desc Identifies the VCI for unicast on ITS-S router (peer station) (
+		 * this is the MAC address of the ITS test system
+         */
+        modulepar EUI64 PX_REMOTE_CIID_UC := '030008FFFE010001'O; // Commsignia setting
+//        modulepar EUI64 PX_REMOTE_CIID_UC := '030008FFFF010001'O; // Peek setting
+
+        /**
+         * @desc Identifies the VCI for unicast transmission to the IUT) (
+		 * this is the MAC address of the IUT
+         */
+        modulepar EUI64 PX_TESTER_REMOTE_CIID_UC := '030008FFFE010001'O; // tbd
+
+    } // End of group RemoteLocalCIID
+
+
+} // End of module LibItsAtsp_Pixits

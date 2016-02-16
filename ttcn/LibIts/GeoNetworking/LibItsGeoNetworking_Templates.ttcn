@@ -1,0 +1,2420 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/GeoNetworking/LibItsGeoNetworking_Templates.ttcn $
+ *              $Id: LibItsGeoNetworking_Templates.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       GeoNetworking Templates
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsGeoNetworking_Templates {
+    
+    // Libcommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsExternal_TypesAndValues all;
+    
+    // LibItsBtp
+    import from LibItsBtp_Templates all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Pixits all;
+    
+    // LibItsIpv6OverGeoNetworking
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+    import from LibItsIpv6OverGeoNetworking_Templates all;
+    
+    // AtsGeoNetworking
+    import from LibItsGeoNetworking_TestSystem all;
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsGeoNetworking_Pixits all;
+    
+    group geoNwPrimitivesTemplates {
+        
+        /**
+         * @desc    Send template for GeoNetworking packet (GeonetworkingPort Primitive)
+         * @param   p_geoNwMsg GeoNetworking packet to be sent
+         */
+        template (value) GeoNetworkingReq m_geoNwReq_linkLayerBroadcast(
+            template (value) GeoNetworkingPdu p_geoNwMsg
+        ) := {
+            msgOut := p_geoNwMsg,
+            macDestinationAddress := c_llBroadcast
+        }
+        
+        /**
+         * @desc    Send template for GeoNetworking packet (GeonetworkingPort Primitive)
+         * @param   p_geoNwMsg              GeoNetworking packet to be sent
+         * @param   p_llDestinationAdress   Link-layer destination address
+         */
+        template (value) GeoNetworkingReq m_geoNwReq_withLinkLayerDestination(
+            template (value) GeoNetworkingPdu p_geoNwMsg,
+            template (value) MacAddress p_llDestinationAdress
+        ) modifies m_geoNwReq_linkLayerBroadcast := {
+            macDestinationAddress := p_llDestinationAdress
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking packet (GeonetworkingPort Primitive)
+         * @param   p_geoNwMsg GeoNetworking packet to be received
+         */
+        template GeoNetworkingInd mw_geoNwInd(
+            template (present) GeoNetworkingPdu p_geoNwMsg
+        ) := {
+            msgIn := p_geoNwMsg,
+            macDestinationAddress := ?
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking packet (GeonetworkingPort Primitive)
+         * @param   p_geoNwMsg              GeoNetworking packet to be received
+         * @param   p_llDestinationAdress   Link-layer destination address
+         */
+        template GeoNetworkingInd mw_geoNwInd_withLinkLayerDestination(
+            template (present) GeoNetworkingPdu p_geoNwMsg,
+            template (present) MacAddress p_llDestinationAdress
+        ) modifies mw_geoNwInd := {
+            macDestinationAddress := p_llDestinationAdress
+        }
+        
+        group utPrimitives {
+            
+            /**
+             * @desc Initializes the GN IUT.
+             */
+            template (value) UtInitialize m_gnInitialize := {
+                hashedId8 := '0000000000000000'O
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoUnicast message to a specific destination
+             * @param   p_destinationGnAddr Destination of the GeoUnicast message
+             */
+            template (value) UtGnTrigger m_generateGeoUnicastMessage(GN_Address p_destinationGnAddr) := {
+                geoUnicast := {
+                    gnAddress := p_destinationGnAddr,
+                    lifetime := c_lifetime,
+                    trafficClass := m_trafficClass,
+                    payload := { decodedPayload := omit, rawPayload := ''O} // do not use f_adaptPayload_m here
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoUnicast message to a specific destination with specific lifetime
+             * @param   p_destinationGnAddr Destination of the GeoUnicast message
+             * @param   p_trafficClass      TrafficClass of the GeoUnicast message
+             * @see     m_generateGeoUnicastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoUnicastMessageWithTrafficClass(
+                GN_Address p_destinationGnAddr,
+                TrafficClass p_trafficClass
+            ) modifies m_generateGeoUnicastMessage := {
+                geoUnicast := {
+                    trafficClass := p_trafficClass
+                }
+            }
+                        
+            /**
+             * @desc    Request IUT to send a GeoUnicast message to a specific destination with specific lifetime
+             * @param   p_destinationGnAddr Destination of the GeoUnicast message
+             * @param   p_lifetime          Lifetime of the GeoUnicast message
+             * @see     m_generateGeoUnicastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoUnicastMessageWithLifetime(
+                GN_Address p_destinationGnAddr,
+                UInt16 p_lifetime
+            ) modifies m_generateGeoUnicastMessage := {
+                geoUnicast := {
+                    lifetime := p_lifetime
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoUnicast message to a specific destination with a payload
+             * @param   p_destinationGnAddr Destination of the GeoUnicast message
+             * @param   p_payload           Payload of the GeoUnicast message
+             * @see     m_generateGeoUnicastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoUnicastMessageWithPayload(
+                GN_Address p_destinationGnAddr,
+                octetstring p_payload
+            ) modifies m_generateGeoUnicastMessage := {
+                geoUnicast := {
+                    payload := { decodedPayload := omit, rawPayload := p_payload} // do not use f_adaptPayload_m here
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoUnicast message to a specific destination with specific lifetime with specific payload
+             * @param   p_destinationGnAddr Destination of the GeoUnicast message
+             * @param   p_lifetime          Lifetime of the GeoUnicast message
+             * @param   p_payload           Payload of the GeoUnicast message
+             * @see     m_generateGeoUnicastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoUnicastMessageWithLifetimeWithPayload(
+                GN_Address p_destinationGnAddr,
+                UInt16 p_lifetime,
+                octetstring p_payload
+            ) modifies m_generateGeoUnicastMessageWithLifetime := {
+                geoUnicast := {
+                    payload := { decodedPayload := omit, rawPayload := p_payload} // do not use f_adaptPayload_m here
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoBroadcast message to a specific area
+             * @param   p_geoArea  Destination area of the message
+             */
+            template (value) UtGnTrigger m_generateGeoBroadcastMessage(
+                GeoArea p_geoArea
+            ) := {
+                geoBroadcast := {
+                    shape := p_geoArea.shape,
+                    lifetime := c_lifetime,
+                    trafficClass := m_trafficClass,
+                    reserved := c_uInt24Zero,
+                    area := p_geoArea.area,
+                    payload := { decodedPayload := omit, rawPayload := ''O} // do not use f_adaptPayload_m here
+                }
+            }
+
+            /**
+             * @desc    Request IUT to send a GeoBroadcast message to a specific area
+             * @param   p_geoArea           Destination area of the message
+             * @param   p_trafficClass      TrafficClass of the GeoUnicast message
+             */
+            template (value) UtGnTrigger m_generateGeoBroadcastMessageWithTrafficClass(
+                GeoArea p_geoArea,
+                TrafficClass p_trafficClass
+            ) modifies m_generateGeoBroadcastMessage := {
+                geoBroadcast := {
+                    trafficClass := p_trafficClass
+                }
+            }
+                        
+            /**
+             * @desc    Request IUT to send a GeoBroadcast message to a specific area
+             * @param   p_geoArea   Destination area of the message
+             * @param   p_lifetime  Packet's lifetime
+             */
+            template (value) UtGnTrigger m_generateGeoBroadcastMessageWithLifetime(
+                GeoArea p_geoArea,
+                UInt16 p_lifetime
+            ) modifies m_generateGeoBroadcastMessage := {
+                geoBroadcast := {
+                    lifetime := p_lifetime
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoBroadcast message to a specific area with a payload
+             * @param   p_geoArea   Destination area of the message
+             * @param   p_payload   Payload of the GeoBroadcast message
+             * @see     m_generateGeoBroadcastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoBroadcastMessageWithPayload(
+                GeoArea p_geoArea,
+                octetstring p_payload
+            ) modifies m_generateGeoBroadcastMessage := {
+                geoBroadcast := {
+                    payload := { decodedPayload := omit, rawPayload := p_payload} // do not use f_adaptPayload_m here
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a GeoAnycast message to a specific area
+             * @param   p_geoArea  Destination area of the message
+             */
+            template (value) UtGnTrigger m_generateGeoAnycastMessage(
+                GeoArea p_geoArea
+            ) := {
+                geoAnycast := {
+                    shape := p_geoArea.shape,
+                    lifetime := c_lifetime,
+                    trafficClass := m_trafficClass,
+                    reserved := c_uInt24Zero,
+                    area := p_geoArea.area,
+                    payload := { decodedPayload := omit, rawPayload := ''O} // do not use f_adaptPayload_m here
+                }
+            }
+
+            /**
+             * @desc    Request IUT to send a GeoAnycast message to a specific area with a payload
+             * @param   p_geoArea           Destination area of the message
+             * @param   p_trafficClass      TrafficClass of the GeoUnicast message
+             * @see     m_generateGeoAnycastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoAnycastMessageWithTrafficClass(
+                GeoArea p_geoArea,
+                TrafficClass p_trafficClass
+            ) modifies m_generateGeoAnycastMessage := {
+                geoAnycast := {
+                    trafficClass := p_trafficClass
+                }
+            }
+                        
+            /**
+             * @desc    Request IUT to send a GeoAnycast message to a specific area with a payload
+             * @param   p_geoArea   Destination area of the message
+             * @param   p_payload   Payload of the GeoAnycast message
+             * @see     m_generateGeoAnycastMessage
+             */
+            template (value) UtGnTrigger m_generateGeoAnycastMessageWithPayload(
+                GeoArea p_geoArea,
+                octetstring p_payload
+            ) modifies m_generateGeoAnycastMessage := {
+                geoAnycast := {
+                    payload := { decodedPayload := omit, rawPayload := p_payload} // do not use f_adaptPayload_m here
+                }
+            }
+
+
+			/**
+             * @desc    Default send template for traffic class
+             */
+            template (value) TrafficClass m_trafficClass ( in SCF p_scf := e_scfEnable, in ChannelOffload p_ChOff := e_choffDisabled ) := {
+                scf             := p_scf,
+                channelOffload  := p_ChOff,
+                tcId            := 0
+            }
+            
+            /**
+             * @desc    Request IUT to send a SHB message
+             */
+            template (value) UtGnTrigger m_generateShbMessage := {
+                shb := {
+                    trafficClass := m_trafficClass,
+                    payload := { decodedPayload := omit, rawPayload := ''O} // do not use f_adaptPayload_m here
+                }
+            }
+ 
+            /**
+             * @desc    Request IUT to send a SHB message with a payload
+             * @param   p_trafficClass      TrafficClass of the GeoUnicast message
+             * @see     m_generateShbMessage
+             */
+            template (value) UtGnTrigger m_generateShbMessageWithTrafficClass(
+                TrafficClass p_trafficClass
+            ) modifies m_generateShbMessage := {
+                shb := {
+                    trafficClass := p_trafficClass
+                }
+            }
+                        
+            /**
+             * @desc    Request IUT to send a SHB message with a payload
+             * @param   p_payload   Payload of the SHB message
+             * @see     m_generateShbMessage
+             */
+            template (value) UtGnTrigger m_generateShbMessageWithPayload(
+                octetstring p_payload
+            ) modifies m_generateShbMessage := {
+                shb := {
+                    payload := { decodedPayload := omit, rawPayload := p_payload} // do not use f_adaptPayload_m here
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a TSB message
+             */
+            template (value) UtGnTrigger m_generateTsbMessage := {
+                tsb := {
+                    nbHops := 10,
+                    lifetime := c_lifetime,
+                    trafficClass := m_trafficClass,
+                    payload := { decodedPayload := omit, rawPayload := ''O} // do not use f_adaptPayload_m here
+                }
+            }
+
+            /**
+             * @desc    Request IUT to send a TSB message
+             * @param   p_lifetime  Packet's lifetime
+             */
+            template (value) UtGnTrigger m_generateTsbMessageWithLifetime(
+                UInt16 p_lifetime
+            ) modifies m_generateTsbMessage := {
+                tsb := {
+                    lifetime := p_lifetime
+                }
+            }
+            
+            /**
+             * @desc    Request IUT to send a TSB message
+             * @param   p_trafficClass      TrafficClass of the GeoUnicast message
+             */
+            template (value) UtGnTrigger m_generateTsbMessageWithTrafficClass(
+                TrafficClass p_trafficClass
+            ) modifies m_generateTsbMessage := {
+                tsb := {
+                    trafficClass := p_trafficClass
+                }
+            }
+                        
+            /**
+             * @desc    Request IUT to change its position
+             */
+            template (value) UtChangePosition m_changePosition := {
+                latitude := 1000,
+                longitude := 0,
+                elevation := 0
+            }
+            
+        } // end utPrimitives
+        
+        group taPrimitives {
+            
+            /**
+             * @desc Testsystem will start beaconing for the given neighbor
+             * @param p_beaconHeader The neighbor information
+             */
+            template (value) AcGnPrimitive m_startBeaconing(
+                template (value) BeaconHeader p_beaconHeader
+            ) := {
+                startBeaconing := {
+                    beaconPacket := m_geoNwPdu(m_geoNwBeaconPacket(p_beaconHeader.srcPosVector), -, c_hopLimit1)
+                }
+            }
+            
+            /**
+             * @desc Testsystem will stop beaconing for the given neighbor
+             * @param p_compName The neighbor
+             */
+            template AcGnPrimitive m_stopBeaconing := {
+                stopBeaconing:= {
+                }
+            }
+            
+            /**
+             * @desc Testsystem will pass received to the TTCN-3
+             * @param p_beaconHeader The neighbor information
+             */
+            template AcGnPrimitive m_startPassBeaconing(
+                template (value) BeaconHeader p_beaconHeader
+            ) := {
+                startPassBeaconing := {
+                    beaconHeader := p_beaconHeader
+                }
+            }
+            
+            /**
+             * @desc Testsystem will stop passing beacon information to the TTCN-3
+             */
+            template AcGnPrimitive m_stopPassBeaconing := {
+                stopPassBeaconing := {
+                }
+            }
+            
+            /**
+             * @desc Testsystem will start beaconing for multiple neighbors
+             * @param p_beaconHeader The neighbor information
+             * @param p_numberOfNeighbour The number of ITS stations for which TS will send beacons
+             */
+            template (value) AcGnPrimitive m_startBeaconingMultipleNeighbour(
+                template (value) BeaconHeader p_beaconHeader,
+                integer p_numberOfNeighbour
+            ) := {
+                startBeaconingMultipleNeighbour := {
+                    beaconPacket := m_geoNwPdu(m_geoNwBeaconPacket(p_beaconHeader.srcPosVector), -, c_hopLimit1),
+                    numberOfNeighbour := p_numberOfNeighbour
+                }
+            }
+            
+            /**
+             * @desc Testsystem will stop beaconing for multiple neighbors
+             * @param p_compName The neighbor
+             */
+            template AcGnPrimitive m_stopBeaconingMultipleNeighbour := {
+                stopBeaconingMultipleNeighbour:= {
+                }
+            }
+            
+            /**
+             * @desc Testsystem will reply the LongPosVector including the requested GN address
+             *       found in received beacon information to the TTCN-3
+             * @param p_gnAddress The GN address included in the LongPosVector
+             */
+            template AcGnPrimitive m_getLongPosVector(GN_Address p_gnAddress) := {
+                getLongPosVector := {
+                    gnAddress := p_gnAddress
+                }
+            }
+            
+            /**
+             * @desc    Receive template adapter control result for long position vector with specific GN_Address
+             * @param   p_gnAddress GN_Address to be contained in the long position vector
+             */
+            template AcGnResponse mw_getLongPosVectorAny(template (present) GN_Address p_gnAddress) := {
+                getLongPosVector := mw_longPosVectorAny(p_gnAddress)
+            }
+            
+        } // end taPrimitives
+        
+    } // geoNwPrimitivesTemplates
+    
+    group geoNwPduTemplates {
+        
+        /**
+         * @desc    Send template for GeoNetworking PDU
+         * @param   p_packet    GnNonSecuredPacket of GeoNetworking message
+         * @param   p_lifeTime  Lifetime of GeoNetworking message (Default: m_defaultLifetime)
+         * @param   p_hopLimit  Router Hop limit of GeoNetworking message (Default: c_defaultHopLimit)
+         */
+        template (value) GeoNetworkingPdu m_geoNwPdu(
+            in template (value) GnNonSecuredPacket p_packet,
+            in template (value) Lifetime p_lifeTime := m_defaultLifetime,
+            in template (value) UInt8 p_hopLimit := c_defaultHopLimit
+        ) := {
+            basicHeader := m_basicHeader(p_lifeTime, p_hopLimit),
+            gnPacket := {
+                packet := p_packet,
+                securedMsg := omit
+            }
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking PDU
+         * @param   p_packet    GnNonSecuredPacket of GeoNetworking message
+         * @param   p_lifeTime  Lifetime of GeoNetworking message (Default: ?)
+         * @param   p_hopLimit  Router Hop limit of GeoNetworking message (Default: ?)
+         */
+        template (present) GeoNetworkingPdu mw_geoNwPdu(
+            in template (present) GnNonSecuredPacket p_packet,
+            in template (present) Lifetime p_lifeTime := ?,
+            in template (present) UInt8 p_hopLimit := ?
+        ) := {
+            basicHeader := mw_basicHeader(p_lifeTime, p_hopLimit),
+            gnPacket := {
+                packet := p_packet,
+                securedMsg := *
+            }
+        }
+
+        /**
+         * @desc    Receive template for secured GeoNetworking PDU
+         * @param   p_secMsg    Secured message
+         * @param   p_packet    Clear-text version of the packet
+         */
+        template (present) GeoNetworkingPdu mw_geoNwSecPdu(
+            in template (present) SecuredMessage p_secMsg,
+            in template (present) GnNonSecuredPacket p_packet := ?
+        ) := {
+            basicHeader := mw_securedBasicHeader(),
+            gnPacket := {
+                packet := p_packet,
+                securedMsg := p_secMsg
+            }
+        }
+        
+        /**
+         * @desc    Send template for secured GeoNetworking PDU
+         * @param   p_packet    Clear-text version of the packet
+         * @param   p_secMsg    Secured message
+         */
+        template (value) GeoNetworkingPdu m_geoNwSecPdu(
+            in template (value) GnNonSecuredPacket p_packet,
+            in template (value) SecuredMessage p_secMsg
+        ) := {
+            basicHeader := m_securedBasicHeader(),
+            gnPacket := {
+                packet := p_packet,
+                securedMsg := p_secMsg
+            }
+        }
+                
+    } // end geoNwPduTemplates
+    
+    group geoNwPacketTemplates {
+        
+        /**
+         * @desc    Send template for GeoNetworking Packet
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         */
+        template (value) GeoNetworkingPacket m_geoNwPacket(
+            in template (value) CommonHeader p_commonHeader,
+            in template (value) ExtendedHeader p_extHeader
+        ) := {
+            packet := {
+                commonHeader := p_commonHeader,
+                extendedHeader := p_extHeader,
+                payload := f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
+            },
+            securedMsg := omit
+        }
+        
+        /**
+         * @desc    Send template for GeoNetworking Packet with no payload
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         *
+         * @see m_geoNwPacket
+         */
+        template (value) GeoNetworkingPacket m_geoNwPacketNoPayload(
+            in template (value) CommonHeader p_commonHeader,
+            in template (value) ExtendedHeader p_extHeader
+        ) modifies m_geoNwPacket := {
+            packet := {
+                payload := omit
+            }
+        }
+        
+        /**
+         * @desc    Send template for GeoNetworking Packet with octetstring payload
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         * @param   p_payload       Octetstring payload
+         *
+         * @see m_geoNwPacket
+         */
+        template (value) GeoNetworkingPacket m_geoNwPacketWithOctetstringPayload(
+            in template (value) CommonHeader p_commonHeader,
+            in template (value) ExtendedHeader p_extHeader,
+            in template (value) octetstring p_payload
+        ) modifies m_geoNwPacket := {
+            packet := {
+                payload := f_adaptPayload_m(p_payload)
+            }
+        }
+        
+        /**
+         * @desc    Send template for GeoNetworking Packet with payload
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         * @param   p_payload       Payload
+         *
+         * @see m_geoNwPacket
+         */
+        template (value) GeoNetworkingPacket m_geoNwPacketWithPayload(
+            in template (value) CommonHeader p_commonHeader,
+            in template (value) ExtendedHeader p_extHeader,
+            in template (value) Payload p_payload
+        ) modifies m_geoNwPacket := {
+            packet := {
+                payload := p_payload
+            }
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking Packet
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         */
+        template (present) GeoNetworkingPacket mw_geoNwPacket(
+            in template (present) CommonHeader p_commonHeader,
+            in template (present) ExtendedHeader p_extHeader
+        ) := {
+            packet := {
+                commonHeader := p_commonHeader,
+                extendedHeader := p_extHeader,
+                payload := *
+            },
+            securedMsg := *
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking Packet with any payload
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         *
+         * @see     mw_geoNwPacket
+         */
+        template (present) GeoNetworkingPacket mw_geoNwPduAnyPayload(
+            in template (present) CommonHeader p_commonHeader,
+            in template (present) ExtendedHeader p_extHeader
+        ) modifies mw_geoNwPacket := {
+            packet := {
+                payload := ?
+            }
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking PDU with octetstring payload
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         * @param   p_payload       Octetstring payload
+         *
+         * @see     mw_geoNwPacket
+         */
+        template (present) GeoNetworkingPacket mw_geoNwPduWithOctetstringPayload(
+            in template (present) CommonHeader p_commonHeader,
+            in template (present) ExtendedHeader p_extHeader,
+            in template (present) octetstring p_payload
+        ) modifies mw_geoNwPacket := {
+            packet := {
+                payload := f_adaptPayload_mw(p_payload)
+            }
+        }
+        
+        /**
+         * @desc    Receive template for GeoNetworking PDU with payload
+         * @param   p_basicHeader   Common header of GeoNetworking packet
+         * @param   p_extHeader     Extended header of GeoNetworking packet
+         * @param   p_payload       Payload
+         *
+         * @see     mw_geoNwPacket
+         */
+        template (present) GeoNetworkingPacket mw_geoNwPduWithPayload(
+            in template (present) CommonHeader p_commonHeader,
+            in template (present) ExtendedHeader p_extHeader,
+            in template (present) Payload p_payload
+        ) modifies mw_geoNwPacket := {
+            packet := {
+                payload := p_payload
+            }
+        }
+        
+        group geoNwPacketTemplates_ {
+            
+            /**
+             * @desc    Receive template for any GeoNetworking Packet
+             */
+            template (present) GnNonSecuredPacket mw_geoNwAnyPacket := {
+                commonHeader := mw_commonHeader(
+                    ?,
+                    ?
+                ),
+                extendedHeader := *,
+                payload := *
+            }
+            
+            /**
+             * @desc    Receive template for any GeoNetworking Packet with Payload
+             * @param   payload  Expected GN payload 
+             */
+            template (present) GnNonSecuredPacket mw_geoNwAnyPacket_withPayload(
+                template (present) Payload p_payload
+            ) := {
+                commonHeader := mw_commonHeader(
+                    ?,
+                    ?
+                ),
+                extendedHeader := *,
+                payload := p_payload
+            }
+                        
+        } // end group geoNwPacketTemplates_
+        
+        group geoNwPacketUnicastTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking Unicast Packet
+             * @param   p_sourceLongPosVec          Long position vector of source
+             * @param   p_destinationShortPosVec    Short position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             * @param   p_hopLimit                  Maximum number of hops (Default: c_defaultHopLimit)
+             * @param   p_trafficClass              Traffic Class 
+             */
+            template (value) GnNonSecuredPacket m_geoNwUnicastPacket(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) ShortPosVector p_destinationShortPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) UInt8 p_hopLimit := c_defaultHopLimit,
+                in template (value) TrafficClass p_trafficClass := m_trafficClass
+            ) := {
+                commonHeader := m_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    m_geoUnicastHeaderType,
+                    p_trafficClass,
+                    p_hopLimit
+                ),
+                extendedHeader := m_geoUnicastHeader(
+                    p_sourceLongPosVec,
+                    p_destinationShortPosVec,
+                    p_seqNumber
+                ),
+                payload := f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Unicast Packet
+             * @param   p_destinationShortPosVec    Short position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             */
+            template (present) GnNonSecuredPacket mw_geoNwUnicastPacket(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) := {
+                commonHeader := mw_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoUnicastHeaderType
+                ),
+                extendedHeader := mw_geoUnicastHeader(
+                    p_destinationShortPosVec,
+                    p_seqNumber
+                ),
+                payload := ?
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Unicast Packet
+             * @param   p_destinationShortPosVec    Short position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             * @param   p_hopLimit                  Maximum number of hops (Default: ?)
+             * @see mw_geoNwUnicastPacket
+             */
+            template (present) GnNonSecuredPacket mw_geoNwUnicastPacketWithHl(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) UInt8 p_hopLimit := ?
+            ) modifies mw_geoNwUnicastPacket := {
+                commonHeader := mw_commonHeaderWithHopLimit(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoUnicastHeaderType,
+                    p_hopLimit
+                ),
+                extendedHeader := mw_geoUnicastHeader(
+                    p_destinationShortPosVec,
+                    p_seqNumber
+                ),
+                payload := ?
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Unicast Packet
+             * @param   p_destinationShortPosVec    Short position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             * @param   p_srcLongPosVec             Long position vector of source
+             */
+            template (present) GnNonSecuredPacket mw_geoNwUnicastPacketWithSourcePv(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) LongPosVector p_srcLongPosVec
+            ) modifies mw_geoNwUnicastPacket := {
+                extendedHeader := mw_geoUnicastHeaderWithSourcePv(
+                    p_destinationShortPosVec,
+                    p_seqNumber,
+                    p_srcLongPosVec
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Unicast Packet
+             * @param   p_destinationShortPosVec    Short position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             * @param   p_nextHeader                Id of next header
+             */
+            template (present) GnNonSecuredPacket mw_geoNwUnicastPacketWithNextHeader(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) NextHeader p_nextHeader
+            ) modifies mw_geoNwUnicastPacket := {
+                commonHeader := {
+                    nextHeader := p_nextHeader
+                }
+            }
+            
+        } // end group geoNwPacketUnicastTemplates
+        
+        group geoNwPacketAnycastTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking Anycast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoAnycast packet
+             * @param   p_anycastArea           Destination GeoArea
+             * @param   p_hopLimit              Maximum number of hops (Default: c_defaultHopLimit)
+             * @param   p_trafficClass          Traffic Class 
+             */
+            template (value) GnNonSecuredPacket m_geoNwAnycastPacket(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) GeoAnycastArea p_anycastArea,
+                in template (value) UInt8 p_hopLimit := c_defaultHopLimit,
+                in template (value) TrafficClass p_trafficClass := m_trafficClass
+            ) := {
+                commonHeader := m_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    m_geoAnycastHeaderType(p_anycastArea.geoAnycastSubType),
+                    p_trafficClass,
+                    p_hopLimit
+                ),
+                extendedHeader := m_geoAnycastHeader(
+                    p_sourceLongPosVec,
+                    p_seqNumber,
+                    p_anycastArea
+                ),
+                payload := f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Anycast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoAnycast packet
+             */
+            template (present) GnNonSecuredPacket mw_geoNwAnycastPacket(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) := {
+                commonHeader := mw_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoAnycastHeaderType
+                ),
+                extendedHeader := mw_geoAnycastHeader(
+                    p_sourceLongPosVec,
+                    p_seqNumber
+                ),
+                payload := ?
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Anycast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoAnycast packet
+             * @param   p_anycastArea           Destination GeoArea
+             */
+            template (present) GnNonSecuredPacket mw_geoNwAnycastPacketWithArea(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoAnycastArea p_anycastArea
+            ) := {
+                commonHeader := mw_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoAnycastHeaderTypeWithSubType(p_anycastArea.geoAnycastSubType)
+                ),
+                extendedHeader := mw_geoAnycastHeaderWithArea(
+                    p_sourceLongPosVec,
+                    p_seqNumber,
+                    p_anycastArea
+                ),
+                payload := ?
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Anycast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoAnycast packet
+             * @param   p_anycastArea           Destination GeoArea
+             * @param   p_maxHopLimit           Maximum number of hops (Default := ?)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwAnycastPacketWithAreaAndHl(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoAnycastArea p_anycastArea,
+                in template (present) UInt8 p_maxHopLimit := ?
+            ) modifies mw_geoNwAnycastPacketWithArea := {
+                commonHeader := mw_commonHeaderWithHopLimit(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoAnycastHeaderTypeWithSubType(p_anycastArea.geoAnycastSubType),
+                    p_maxHopLimit
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Anycast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoAnycast packet
+             * @param   p_anycastArea           Destination GeoArea
+             * @param   p_nextHeader            Id of next header
+             */
+            template (present) GnNonSecuredPacket mw_geoNwAnycastPacketWithAreaWithNextHeader(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoAnycastArea p_anycastArea,
+                in template (present) NextHeader p_nextHeader
+            ) modifies mw_geoNwAnycastPacketWithArea := {
+                commonHeader := {
+                    nextHeader := p_nextHeader
+                }
+            }
+            
+        } // end group geoNwPacketAnycastTemplates
+        
+        group geoNwPacketBroadcastTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             * @param   p_broadcastArea         Destination GeoArea
+             * @param   p_hopLimit              Maximum number of hops (Default: c_defaultHopLimit)
+             * @param   p_trafficClass          Traffic Class 
+             */
+            template (value) GnNonSecuredPacket m_geoNwBroadcastPacket(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) GeoBroadcastArea p_broadcastArea,
+                in template (value) UInt8 p_hopLimit := c_defaultHopLimit,
+                in template (value) TrafficClass p_trafficClass := m_trafficClass
+            ) := {
+                commonHeader := m_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    m_geoBroadcastHeaderType(p_broadcastArea.geoBroadcastSubType),
+                    p_trafficClass,
+                    p_hopLimit
+                ),
+                extendedHeader := m_geoBroadcastHeader(
+                    p_sourceLongPosVec,
+                    p_seqNumber,
+                    p_broadcastArea
+                ),
+                payload := f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacket(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) := {
+                commonHeader := mw_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoBroadcastHeaderType
+                ),
+                extendedHeader := mw_geoBroadcastHeader(
+                    p_sourceLongPosVec,
+                    p_seqNumber
+                ),
+                payload := ?
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             * @param   p_nextHeader            Id of next header
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacketWithNextHeader(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) NextHeader p_nextHeader
+            ) modifies mw_geoNwBroadcastPacket := {
+                commonHeader := mw_commonHeader(
+                    p_nextHeader,
+                    mw_geoBroadcastHeaderType
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             * @param   p_nextHeader            Id of next header
+             * @param   p_payload               payload
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacketWithNextHeaderAndPayload(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) NextHeader p_nextHeader,
+                in template (present) Payload p_payload
+            ) modifies mw_geoNwBroadcastPacketWithNextHeader := {
+                payload := p_payload
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             * @param   p_broadcastArea         Destination GeoArea
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacketWithArea(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoBroadcastArea p_broadcastArea
+            ) modifies mw_geoNwBroadcastPacket := {
+                commonHeader := mw_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoBroadcastHeaderTypeWithSubType(p_broadcastArea.geoBroadcastSubType)
+                ),
+                extendedHeader := mw_geoBroadcastHeaderWithArea(
+                    p_sourceLongPosVec,
+                    p_seqNumber,
+                    p_broadcastArea
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             * @param   p_broadcastArea         Destination GeoArea
+             * @param   p_maxHopLimit           Maximum number of hops (Default := ?)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacketWithAreaAndHl(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoBroadcastArea p_broadcastArea,
+                in template (present) UInt8 p_maxHopLimit := ?
+            ) modifies mw_geoNwBroadcastPacketWithArea := {
+                commonHeader := mw_commonHeaderWithHopLimit(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoBroadcastHeaderTypeWithSubType(p_broadcastArea.geoBroadcastSubType),
+                    p_maxHopLimit
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet (Default: ?)
+             * @param   p_hopLimit              Maximum number of hops (Default: ?)
+             * @param   p_flags                 Flags in the common header (Default: ?)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacketWithHlAndFlags(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber := ?,
+                in template (present) UInt8 p_hopLimit := ?,
+                in template (present) Bit8 p_flags := ?
+            ) modifies mw_geoNwBroadcastPacket := {
+                commonHeader := mw_commonHeaderWithHopLimitAndFlags(
+                    PX_GN_UPPER_LAYER,
+                    mw_geoBroadcastHeaderType,
+                    p_hopLimit,
+                    p_flags
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Broadcast Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_seqNumber             Sequence number of GeoBroadcast packet
+             * @param   p_broadcastArea         Destination GeoArea
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBroadcastPacketWithAreaWithNextHeader(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoBroadcastArea p_broadcastArea,
+                in template (present) NextHeader p_nextHeader
+            ) modifies mw_geoNwBroadcastPacketWithArea := {
+                commonHeader := {
+                    nextHeader := p_nextHeader
+                }
+            }
+            
+        } // end group geoNwPacketBroadcastTemplates
+        
+        group geoNwPacketLsTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking LS Request Packet
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_seqNumber         Sequence number of LS Request packet
+             * @param   p_gnAddress         Searched GN_Address
+             */
+            template (value) GnNonSecuredPacket m_geoNwLsRequestPacket(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) GN_Address p_gnAddress
+            ) := {
+                commonHeader := m_commonHeader(
+                    e_any,
+                    m_lsRequestHeaderType,
+                    m_trafficClass,
+                    c_defaultHopLimit
+                ),
+                extendedHeader := m_lsRequestHeader(
+                    p_sourceLongPosVec, p_seqNumber, p_gnAddress
+                ),
+                payload := omit
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking LS Request Packet
+             * @param   p_seqNumber     Sequence number of LS Request packet
+             * @param   p_mid           Searched GN_Address MID
+             */
+            template (present) GnNonSecuredPacket mw_geoNwLsRequestPacket(
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GN_Address.mid p_mid
+            ) := {
+                commonHeader := mw_commonHeader(
+                    e_any,
+                    m_lsRequestHeaderType
+                ),
+                extendedHeader := mw_lsRequestHeader(
+                    p_seqNumber,
+                    p_mid
+                ),
+                payload := {
+                    decodedPayload := omit,
+                    rawPayload := ''O
+                }
+            }
+            
+            /**
+             * @desc    Send template for GeoNetworking LS Reply Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_destinationLongPosVec Long position vector of destination
+             * @param   p_seqNumber             Sequence number of LS Reply packet
+             */
+            template (value) GnNonSecuredPacket m_geoNwLsReplyPacket(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) ShortPosVector p_destinationLongPosVec,
+                in template (value) UInt16 p_seqNumber
+            ) := {
+                commonHeader := m_commonHeader(
+                    e_any,
+                    m_lsReplyHeaderType,
+                    m_trafficClass,
+                    c_defaultHopLimit
+                ),
+                extendedHeader := m_lsReplyHeader(
+                    p_sourceLongPosVec, p_destinationLongPosVec, p_seqNumber
+                ),
+                payload := omit
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking LS Reply Packet
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_destinationLongPosVec Short position vector of destination
+             */
+            template (present) GnNonSecuredPacket mw_geoNwLsReplyPacket(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) ShortPosVector p_destinationLongPosVec
+            ) := {
+                commonHeader := mw_commonHeader(
+                    e_any,
+                    m_lsReplyHeaderType
+                ),
+                extendedHeader := mw_lsReplyHeader(
+                    p_sourceLongPosVec, p_destinationLongPosVec
+                ),
+                payload := {
+                    decodedPayload := omit,
+                    rawPayload := ''O
+                }
+            }
+            
+        } // end group geoNwPacketLsTemplates
+        
+        group geoNwPacketBeaconTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking Beacon Packet
+             * @param   p_sourceLongPosVec  Long position vector of source
+             */
+            template (value) GnNonSecuredPacket m_geoNwBeaconPacket(
+                in template (value) LongPosVector p_sourceLongPosVec
+            ) := {
+                commonHeader := m_commonHeader(
+                    e_any,
+                    m_beaconHeaderType,
+                    m_trafficClass,
+                    c_hopLimit1
+                ),
+                extendedHeader := m_beaconHeader(
+                    p_sourceLongPosVec
+                ),
+                payload := omit
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking Beacon Packet
+             *
+             * @param   p_sourceLongPosVec  Long position vector of source (Default: ?)
+             * @param   p_nextHeader        Next header (Default: e_any)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwBeaconPacket(
+                in template (present) LongPosVector p_sourceLongPosVec := ?,
+                in template (present) NextHeader p_nextHeader := e_any
+            ) := {
+                commonHeader := mw_commonHeader_noPayload(
+                    p_nextHeader,
+                    m_beaconHeaderType
+                ),
+                extendedHeader := mw_beaconHeader(p_sourceLongPosVec),
+                payload := (
+                    {
+                        decodedPayload := omit,
+                        rawPayload := ''O
+                    },
+                    { // Ethernet testing requires minimum packet size of 60 bytes
+                        decodedPayload := *,
+                        rawPayload := '00000000000000000000'O
+                    }
+                )
+            }
+            
+        } // end group geoNwPacketBeaconTemplates
+        
+        group geoNwPacketShbTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking SHB Packet
+             * @param   p_sourceLongPosVec  Long position vector of source
+             */
+            template (value) GnNonSecuredPacket m_geoNwShbPacket(
+                in template (value) LongPosVector p_sourceLongPosVec
+            ) := {
+                commonHeader := m_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    m_shbHeaderType,
+                    m_trafficClass,
+                    c_defaultHopLimit
+                ),
+                extendedHeader := m_shbHeader(
+                    p_sourceLongPosVec
+                ),
+                payload :=  f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking SHB Packet
+             * @param   p_sourceLongPosVec  Long position vector of source (Default: ?)
+             * @param   p_hopLimit          Maximum number of hops (Default: ?)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwShbPacket(
+                in template (present) LongPosVector p_sourceLongPosVec := ?,
+                in template (present) UInt8 p_hopLimit := ?
+            ) := {
+                commonHeader := mw_commonHeaderWithHopLimit(
+                    PX_GN_UPPER_LAYER,
+                    m_shbHeaderType,
+                    p_hopLimit
+                ),
+                extendedHeader := mw_shbHeader(p_sourceLongPosVec),
+                payload := ?
+            }
+            
+        } // end group geoNwPacketShbTemplates
+        
+        group geoNwPacketTsbTemplates {
+            
+            /**
+             * @desc    Send template for GeoNetworking TSB Packet
+             * @param   p_seqNumber         Sequence number of TSB packet
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_hopLimit          The maximum number of hops (Default: c_defaultHopLimit)
+             */
+            template (value) GnNonSecuredPacket m_geoNwTsbPacket(
+                in template (value) UInt16 p_seqNumber,
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt8 p_hopLimit := c_defaultHopLimit,
+                in template (value) TrafficClass p_trafficClass := m_trafficClass
+            ) := {
+                commonHeader := m_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    m_tsbHeaderType,
+                    p_trafficClass,
+                    p_hopLimit
+                ),
+                extendedHeader := m_tsbHeader(
+                    p_seqNumber,
+                    p_sourceLongPosVec
+                ),
+                payload :=  f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking TSB Packet
+             * @param   p_seqNumber         Sequence number of TSB packet (Default: ?)
+             * @param   p_sourceLongPosVec  Long position vector of source (Default: ?)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwTsbPacket(
+                in template (present) UInt16 p_seqNumber := ?,
+                in template (present) LongPosVector p_sourceLongPosVec := ?
+            ) := {
+                commonHeader := mw_commonHeader(
+                    PX_GN_UPPER_LAYER,
+                    m_tsbHeaderType
+                ),
+                extendedHeader := mw_tsbHeader(p_seqNumber, p_sourceLongPosVec),
+                payload := ?
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking TSB Packet
+             * @param   p_seqNumber         Sequence number of TSB packet (Default: ?)
+             * @param   p_sourceLongPosVec  Long position vector of source (Default: ?)
+             * @param   p_hopLimit          The maximum number of hops (Default: ?)
+             */
+            template (present) GnNonSecuredPacket mw_geoNwTsbPacketWithHl(
+                in template (present) UInt16 p_seqNumber := ?,
+                in template (present) LongPosVector p_sourceLongPosVec := ?,
+                in template (present) UInt8 p_hopLimit := ?
+            ) modifies mw_geoNwTsbPacket := {
+                commonHeader := mw_commonHeaderWithHopLimit(
+                    PX_GN_UPPER_LAYER,
+                    m_tsbHeaderType,
+                    p_hopLimit
+                )
+            }
+            
+            /**
+             * @desc    Receive template for GeoNetworking TSB Packet
+             * @param   p_seqNumber         Sequence number of TSB packet (Default: ?)
+             * @param   p_sourceLongPosVec  Long position vector of source (Default: ?)
+             * @param   p_nextHeader        Id of next header
+             */
+            template (present) GnNonSecuredPacket mw_geoNwTsbPacketWithNextHeader(
+                in template (present) UInt16 p_seqNumber := ?,
+                in template (present) LongPosVector p_sourceLongPosVec := ?,
+                in template (value) NextHeader p_nextHeader
+            ) modifies mw_geoNwTsbPacket := {
+                commonHeader := {
+                    nextHeader := p_nextHeader
+                }
+            }
+            
+        } // end group geoNwPacketTsbTemplates
+        
+    } // end group geoNwPacketTemplates
+    
+    group geoNwHeadersTemplates {
+        
+        group geoNwBasicHeaderTemplates {
+            
+            /**
+             * @desc    Send template for Basic header
+             *
+             * @param p_lifeTime    Lifetime of GeoNetworking message
+             * @param p_hopLimit    Router Hop limit of GeoNetworking message
+             */
+            template (value) BasicHeader m_basicHeader(
+                in template (value) Lifetime p_lifeTime := m_defaultLifetime,
+                in template (value) UInt8 p_hopLimit := c_defaultHopLimit
+            ) := {
+                version := c_geoNwProtocolVersion,
+                nextHeader := e_commonHeader,
+                reserved := 0,
+                lifeTime := p_lifeTime,
+                routerHopLimit := p_hopLimit
+            }
+            
+            /**
+             * @desc    Receive template for Basic header
+             *
+             * @param p_lifeTime    Lifetime of GeoNetworking message
+             * @param p_hopLimit    Router Hop limit of GeoNetworking message
+             */
+            template (present) BasicHeader mw_basicHeader(
+                in template (present) Lifetime p_lifeTime := ?,
+                in template (present) UInt8 p_hopLimit := ?
+            ) := {
+                version := c_geoNwProtocolVersion,
+                nextHeader := ?,
+                reserved := ?,
+                lifeTime := p_lifeTime,
+                routerHopLimit := p_hopLimit
+            }
+            
+            /**
+             * @desc    Send template for Secured Basic header
+             *
+             * @param p_lifeTime    Lifetime of GeoNetworking message
+             * @param p_hopLimit    Router Hop limit of GeoNetworking message
+             */
+            template (value) BasicHeader m_securedBasicHeader(
+                in template (value) Lifetime p_lifeTime := m_defaultLifetime,
+                in template (value) UInt8 p_hopLimit := c_defaultHopLimit
+            ) := {
+                version := c_geoNwProtocolVersion,
+                nextHeader := e_securedPacket,
+                reserved := 0,
+                lifeTime := p_lifeTime,
+                routerHopLimit := p_hopLimit
+            } // End of template m_securedBasicHeader
+            
+            /**
+             * @desc    Receive template for Secured Basic header
+             *
+             * @param p_lifeTime    Lifetime of GeoNetworking message
+             * @param p_hopLimit    Router Hop limit of GeoNetworking message
+             */
+            template (present) BasicHeader mw_securedBasicHeader(
+                in template (present) Lifetime p_lifeTime := ?,
+                in template (present) UInt8 p_hopLimit := ?
+            ) := {
+                version := c_geoNwProtocolVersion,
+                nextHeader := e_securedPacket,
+                reserved := ?,
+                lifeTime := p_lifeTime,
+                routerHopLimit := p_hopLimit
+            } // End of template mw_securedBasicHeader
+            
+            /**
+             * @desc    Default send template for Lifetime field
+             */
+            template (value) Lifetime m_defaultLifetime := {
+                multiplier := c_defaultLifetime,
+                ltBase := e_100s
+            }
+            
+            /**
+             * @desc    Send template for Lifetime field (Base = 1s)
+             */
+            template (value) Lifetime m_lifetimeBase1s(
+                in template (value) UInt6 p_multiplier
+            ) := {
+                multiplier := p_multiplier,
+                ltBase := e_1s
+            }
+            
+            /**
+             * @desc    Receive template for lifetime 0
+             */
+            template (present) Lifetime mw_lifetime0 := {
+                multiplier := 0,
+                ltBase := ?
+            }
+            
+        } //end group geoNwBasicHeaderTemplates
+        
+        group geoNwCommonHeaderTemplates {
+            
+            /**
+             * @desc    Send template for Common header
+             * @param   p_nextHeader    Id of next header
+             * @param   p_trafficClass  Packet's traffic class
+             * @param   p_headerTypeSubType     Header's type and sub-type
+             * @param   p_hopLimit      Maximum number of hops
+             * @remark  plLength field is set to 0 and has to be computed by codec
+             */
+            template (value) CommonHeader m_commonHeader (
+                in template (value) NextHeader p_nextHeader,
+                in template (value) HeaderTST p_headerTypeSubType,
+                in template (value) TrafficClass p_trafficClass,
+                in template (value) UInt8 p_hopLimit
+            ) := {
+                nextHeader := p_nextHeader,
+                reserved := c_uInt8Zero,
+                headerTST := p_headerTypeSubType,
+                trafficClass := p_trafficClass,
+                flags := c_8ZeroBits,
+                plLength := 0, // will be computed by Codec
+                maxHopLimit := p_hopLimit,
+                reserved2 := 0
+            }
+            
+            /**
+             * @desc    Receive template for Common header
+             * @param   p_nextHeader        Id of next header
+             * @param   p_headerTypeSubType         Header's type and sub-type
+             */
+            template CommonHeader mw_commonHeader (
+                in template (present) NextHeader p_nextHeader,
+                in template (present) HeaderTST p_headerTypeSubType
+            ) := {
+                nextHeader := p_nextHeader,
+                reserved := ?,
+                headerTST := p_headerTypeSubType,
+                trafficClass := ?,
+                flags := ?,
+                plLength := ?,
+                maxHopLimit := ?,
+                reserved2 := ?
+            }
+            
+            /**
+             * @desc    Receive template for Common header with no payload
+             * @param   p_nextHeader        Id of next header
+             * @param   p_headerTypeSubType         Header's type and sub-type
+             */
+            template CommonHeader mw_commonHeader_noPayload (
+                in template (present) NextHeader p_nextHeader,
+                in template (present) HeaderTST p_headerTypeSubType
+            ) modifies mw_commonHeader := {
+                plLength := 0
+            }
+            
+            /**
+             * @desc    Receive template for Common header with specific Hop limit
+             * @param   p_nextHeader        Id of next header
+             * @param   p_headerTypeSubType Header's type and sub-type
+             * @param   p_hopLimit          Maximum number of hops
+             * @see     mw_commonHeader
+             */
+            template CommonHeader mw_commonHeaderWithHopLimit (
+                in template (present) NextHeader p_nextHeader,
+                in template (present) HeaderTST p_headerTypeSubType,
+                in template (present) UInt8 p_hopLimit
+            ) modifies mw_commonHeader := {
+                maxHopLimit := p_hopLimit
+            }
+            
+            /**
+             * @desc    Receive template for Common header with specific Hop limit
+             * @param   p_senderLongPosVec  Long position vector of sender
+             * @param   p_nextHeader        Id of next header
+             * @param   p_headerTypeSubType Header's type and sub-type
+             * @param   p_hopLimit          Maximum number of hops
+             * @param   p_flags             Flags in the common header
+             * @see     mw_commonHeaderWithHopLimit
+             */
+            template CommonHeader mw_commonHeaderWithHopLimitAndFlags (
+                in template (present) NextHeader p_nextHeader,
+                in template (present) HeaderTST p_headerTypeSubType,
+                in template (present) UInt8 p_hopLimit,
+                in template (present) Bit8 p_flags
+            ) modifies mw_commonHeaderWithHopLimit := {
+                flags := p_flags
+            }
+            
+            /**
+             * @desc    Receive template for Common header with specific Traffic Class
+             * @param   p_senderLongPosVec  Long position vector of sender
+             * @param   p_nextHeader        Id of next header
+             * @param   p_headerTypeSubType         Header's type and sub-type
+             * @param   p_trafficClass      Packet's traffic class
+             */
+            template CommonHeader mw_commonHeaderWithTrafficClass (
+                in template (present) NextHeader p_nextHeader,
+                in template (present) HeaderTST p_headerTypeSubType,
+                in template (present) TrafficClass p_trafficClass
+            ) modifies mw_commonHeader := {
+                trafficClass := p_trafficClass
+            }
+            
+           
+            /**
+             * @desc    Receive template for traffic class
+             */
+            template TrafficClass mw_trafficClass ( in template SCF p_scf := ?, in template ChannelOffload p_ChOff := ? ) := {
+                scf             := p_scf,
+                channelOffload  := p_ChOff,
+                tcId            := ?
+            }
+            
+            /**
+             * @desc    Receive template for any GN_Address
+             */
+            template GN_Address mw_gnAddressAny := {
+                typeOfAddress := ?,
+                stationType := ?,
+                stationCountryCode := ?,
+                mid := ?
+            }
+            
+            /**
+             * @desc    Receive template for GN_Address
+             * @param   p_stationType           Station's type
+             * @param   p_stationCountryCode    Station's country code
+             */
+            template GN_Address mw_gnAddress(
+                in template (present) StationType p_stationType,
+                in template (present) UInt10 p_stationCountryCode
+            ) := {
+                typeOfAddress := ?,
+                stationType := p_stationType,
+                stationCountryCode := p_stationCountryCode,
+                mid := ?
+            }
+            
+            /**
+             * @desc    Receive template for long position vector with specific GN_Address
+             * @param   p_gnAddress GN_Address to be contained in the long position vector
+             */
+            template LongPosVector mw_longPosVectorAny(
+                in template (present) GN_Address p_gnAddress
+            ) := {
+                gnAddr := p_gnAddress,
+                timestamp := ?,
+                latitude := ?,
+                longitude := ?,
+                pai := ?,
+                speed := ?,
+                heading := ?
+            }
+            
+            /**
+             * @desc    Receive template for long position vector with strict position check
+             * @param   p_longPosVector The base long position vector
+             */
+            template LongPosVector mw_longPosVectorPosition(
+                in template (value) LongPosVector p_longPosVector
+            ) := {
+                gnAddr := p_longPosVector.gnAddr,
+                timestamp := ?,
+                latitude := p_longPosVector.latitude,
+                longitude := p_longPosVector.longitude,
+                pai := ?,
+                speed := p_longPosVector.speed,
+                heading := p_longPosVector.heading
+            }
+            
+            /**
+             * @desc    Receive template for long position vector with position check with delta
+             * @param   p_longPosVector The base long position vector
+             */
+            template LongPosVector mw_longPosVectorPosition_withDelta(
+                in template (value) LongPosVector p_longPosVector
+            ) modifies mw_longPosVectorPosition := {
+                    latitude := f_getDelta32(valueof(p_longPosVector.latitude), PX_POS_DELTA),
+                    longitude := f_getDelta32(valueof(p_longPosVector.longitude), PX_POS_DELTA),
+                    speed := ? 
+            }
+            
+            /**
+             * @desc    Receive template for short position vector with strict position check
+             * @param   p_shortPosVector The base short position vector
+             */
+            template ShortPosVector mw_shortPosVectorPosition(
+                in template (value) ShortPosVector p_shortPosVector
+            ) := {
+                    gnAddr := p_shortPosVector.gnAddr,
+                    timestamp := ?,
+                    latitude := p_shortPosVector.latitude,
+                    longitude := p_shortPosVector.longitude
+            }
+            
+            /**
+             * @desc    Receive template for short position vector with position check with delta
+             * @param   p_shortPosVector The base short position vector
+             */
+            template ShortPosVector mw_shortPosVectorPosition_withDelta(
+                in template (value) ShortPosVector p_shortPosVector
+            ) modifies mw_shortPosVectorPosition := {
+                    latitude := f_getDelta32(valueof(p_shortPosVector.latitude), PX_POS_DELTA),
+                    longitude := f_getDelta32(valueof(p_shortPosVector.longitude), PX_POS_DELTA)
+            }
+            
+            /**
+             * @desc    Receive template for short position vector without position check
+             * @param   p_shortPosVector The base short position vector
+             */
+            template ShortPosVector mw_shortPosVectorPosition_anyPos(
+                in template (value) ShortPosVector p_shortPosVector
+            ) modifies mw_shortPosVectorPosition := {
+                    latitude := ?,
+                    longitude := ?
+            }
+            
+            function f_getDelta32(Int32 p_value, integer p_delta) return template (present) Int32 {
+                if (p_value == c_int32Min) {
+                    return (p_value .. p_value+p_delta);
+                }
+                if (p_value == c_int32Max) {
+                    return (p_value-p_delta .. p_value);
+                }
+                return (p_value-p_delta .. p_value+p_delta);
+            }
+            
+            function f_getDelta15(Int32 p_value, integer p_delta) return template (present) Int15 {
+                if (p_value == c_int15Min) {
+                    return (p_value .. p_value+p_delta);
+                }
+                if (p_value == c_int15Max) {
+                    return (p_value-p_delta .. p_value);
+                }
+                return (p_value-p_delta .. p_value+p_delta);
+            }
+            
+        } // end geoNwCommonHeaderTemplates
+        
+        group geoUnicastHeaderTemplates {
+            
+            /**
+             * @desc    Send template for GeoUnicast header
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_destinationLongPosVec Long position vector of destination
+             * @param   p_seqNumber             Sequence number of GeoUnicast packet
+             */
+            template (value) ExtendedHeader m_geoUnicastHeader(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) ShortPosVector p_destinationLongPosVec,
+                in template (value) UInt16 p_seqNumber
+            ) := {
+                geoUnicastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := c_uInt8Zero,
+                    srcPosVector := p_sourceLongPosVec,
+                    dstPosVector := p_destinationLongPosVec
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoUnicast header
+             * @param   p_senderLongPosVec          Long position vector of sender
+             * @param   p_destinationShortPosVec    Long position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             */
+            template ExtendedHeader mw_geoUnicastHeader(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) := {
+                geoUnicastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := ?,
+                    srcPosVector := ?,
+                    dstPosVector := p_destinationShortPosVec
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoUnicast header with source long position vector
+             * @param   p_destinationShortPosVec    Long position vector of destination
+             * @param   p_seqNumber                 Sequence number of GeoUnicast packet
+             * @param   p_srcLongPosVec             Long position vector of source
+             * @see     mw_geoUnicastHeader
+             */
+            template ExtendedHeader mw_geoUnicastHeaderWithSourcePv(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) LongPosVector p_srcLongPosVec
+            ) modifies mw_geoUnicastHeader := {
+                geoUnicastHeader := {
+                    srcPosVector := p_srcLongPosVec
+                }
+            }
+            
+            /**
+             * @desc    Send template for GeoUnicast header type
+             */
+            template (value) HeaderTST m_geoUnicastHeaderType := {
+                geoUnicastHdr := {
+                    headerType := e_geoUnicast,
+                    headerSubType := c_uInt4Zero
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoUnicast header type
+             */
+            template HeaderTST mw_geoUnicastHeaderType := {
+                geoUnicastHdr := {
+                    headerType := e_geoUnicast,
+                    headerSubType := c_uInt4Zero
+                }
+            }
+            
+        } // end geoUnicastHeaderTemplates
+        
+        group geoBroadcastHeaderTemplates {
+            
+            /**
+             * @desc    Send template for GeoBroadcast header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_seqNumber         Sequence number of GeoBroadcast packet
+             * @param   p_broadcastArea     Destination GeoArea
+             */
+            template (value) ExtendedHeader m_geoBroadcastHeader(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) GeoBroadcastArea p_broadcastArea
+            ) := {
+                geoBroadcastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := c_uInt8Zero,
+                    srcPosVector := p_sourceLongPosVec,
+                    geoAreaPosLatitude := p_broadcastArea.geoBroadcastArea.geoAreaPosLatitude,
+                    geoAreaPosLongitude := p_broadcastArea.geoBroadcastArea.geoAreaPosLongitude,
+                    distanceA := p_broadcastArea.geoBroadcastArea.distanceA,
+                    distanceB := p_broadcastArea.geoBroadcastArea.distanceB,
+                    angle := p_broadcastArea.geoBroadcastArea.angle,
+                    reserved2 := c_uInt24Zero
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoBroadcast header for any GeoArea
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_senderLongPosVec  Long position vector of sender
+             * @param   p_seqNumber         Sequence number of GeoBroadcast packet
+             */
+            template ExtendedHeader mw_geoBroadcastHeader(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) := {
+                geoBroadcastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := ?,
+                    srcPosVector := p_sourceLongPosVec,
+                    geoAreaPosLatitude := ?,
+                    geoAreaPosLongitude := ?,
+                    distanceA := ?,
+                    distanceB := ?,
+                    angle := ?,
+                    reserved2 := ?
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoBroadcast header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_senderLongPosVec  Long position vector of sender
+             * @param   p_seqNumber         Sequence number of GeoBroadcast packet
+             * @param   p_broadcastArea     Destination GeoArea
+             * @see     mw_geoBroadcastHeader
+             */
+            template ExtendedHeader mw_geoBroadcastHeaderWithArea (
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoBroadcastArea p_broadcastArea
+            ) modifies mw_geoBroadcastHeader := {
+                geoBroadcastHeader := {
+                    geoAreaPosLatitude := p_broadcastArea.geoBroadcastArea.geoAreaPosLatitude,
+                    geoAreaPosLongitude := p_broadcastArea.geoBroadcastArea.geoAreaPosLongitude,
+                    distanceA := p_broadcastArea.geoBroadcastArea.distanceA,
+                    distanceB := p_broadcastArea.geoBroadcastArea.distanceB,
+                    angle := p_broadcastArea.geoBroadcastArea.angle
+                }
+            }
+            
+            /**
+             * @desc    Send template for GeoBroadcast header type
+             * @param   p_headerSubType Packet's subtype
+             */
+            template (value) HeaderTST m_geoBroadcastHeaderType(
+                in template (value) HeaderSubTypeGeoBroadcast p_headerSubType
+            ) := {
+                geoBroadcastHdr := {
+                    headerType := e_geoBroadcast,
+                    headerSubType := p_headerSubType
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoBroadcast header type
+             */
+            template HeaderTST mw_geoBroadcastHeaderType := {
+                geoBroadcastHdr := {
+                    headerType := e_geoBroadcast,
+                    headerSubType := ?
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoBroadcast header type with sub-type
+             * @param   p_headerSubType Packet's subtype
+             * @see     mw_geoBroadcastHeaderType
+             */
+            template HeaderTST mw_geoBroadcastHeaderTypeWithSubType(
+                in template (present) HeaderSubTypeGeoBroadcast p_headerSubType
+            ) modifies mw_geoBroadcastHeaderType := {
+                geoBroadcastHdr := {
+                    headerSubType := p_headerSubType
+                }
+            }
+            
+        } // end geoBroadcastHeaderTemplates
+        
+        group geoAnycastHeaderTemplates {
+            
+           /**
+             * @desc    Send template for GeoAnycast header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_seqNumber         Sequence number of GeoAnycast packet
+             * @param   p_anycastArea       Destination GeoArea
+             */
+            template (value) ExtendedHeader m_geoAnycastHeader(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) GeoAnycastArea p_anycastArea
+            ) := {
+                geoAnycastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := c_uInt8Zero,
+                    srcPosVector := p_sourceLongPosVec,
+                    geoAreaPosLatitude := p_anycastArea.geoAnycastArea.geoAreaPosLatitude,
+                    geoAreaPosLongitude := p_anycastArea.geoAnycastArea.geoAreaPosLongitude,
+                    distanceA := p_anycastArea.geoAnycastArea.distanceA,
+                    distanceB := p_anycastArea.geoAnycastArea.distanceB,
+                    angle := p_anycastArea.geoAnycastArea.angle,
+                    reserved2 := c_uInt24Zero
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoAnycast header for any GeoArea
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_senderLongPosVec  Long position vector of sender
+             * @param   p_seqNumber         Sequence number of GeoAnycast packet
+             */
+            template ExtendedHeader mw_geoAnycastHeader(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) := {
+                geoAnycastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := ?,
+                    srcPosVector := p_sourceLongPosVec,
+                    geoAreaPosLatitude := ?,
+                    geoAreaPosLongitude := ?,
+                    distanceA := ?,
+                    distanceB := ?,
+                    angle := ?,
+                    reserved2 := ?
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoAnycast header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_senderLongPosVec  Long position vector of sender
+             * @param   p_seqNumber         Sequence number of GeoAnycast packet
+             * @param   p_anycastArea       Destination GeoArea
+             * @see     mw_geoAnycastHeader
+             */
+            template ExtendedHeader mw_geoAnycastHeaderWithArea (
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoAnycastArea p_anycastArea
+            ) modifies mw_geoAnycastHeader := {
+                geoAnycastHeader := {
+                    geoAreaPosLatitude := p_anycastArea.geoAnycastArea.geoAreaPosLatitude,
+                    geoAreaPosLongitude := p_anycastArea.geoAnycastArea.geoAreaPosLongitude,
+                    distanceA := p_anycastArea.geoAnycastArea.distanceA,
+                    distanceB := p_anycastArea.geoAnycastArea.distanceB,
+                    angle := p_anycastArea.geoAnycastArea.angle
+                }
+            }
+            
+            /**
+             * @desc    Send template for GeoBroadcast header type with sub-type
+             * @param   p_headerSubType Packet's subtype
+             */
+            template (value) HeaderTST m_geoAnycastHeaderType(
+                in template (value) HeaderSubTypeGeoAnycast p_headerSubType
+            ) := {
+                geoAnycastHdr := {
+                    headerType := e_geoAnycast,
+                    headerSubType := p_headerSubType
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoAnycast header type with any sub-type
+             */
+            template HeaderTST mw_geoAnycastHeaderType := {
+                geoAnycastHdr := {
+                    headerType := e_geoAnycast,
+                    headerSubType := ?
+                }
+            }
+            
+            /**
+             * @desc    Receive template for GeoAnycast header type with sub-type
+             * @param   p_headerSubType Packet's subtype
+             * @see     mw_geoAnycastHeaderType
+             */
+            template HeaderTST mw_geoAnycastHeaderTypeWithSubType(
+                in template (present) HeaderSubTypeGeoAnycast p_headerSubType
+            ) modifies mw_geoAnycastHeaderType := {
+                geoAnycastHdr := {
+                    headerSubType := p_headerSubType
+                }
+            }
+            
+        } // end geoAnycastHeaderTemplates
+        
+        group lsRequestHeaderTemplates {
+            
+            /**
+             * @desc    Send template for LS Request header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             * @param   p_seqNumber         Sequence number of LS Request packet
+             * @param   p_gnAddress         Searched GN_Address
+             */
+            template (value) ExtendedHeader m_lsRequestHeader(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) UInt16 p_seqNumber,
+                in template (value) GN_Address p_gnAddress
+            ) := {
+                lsRequestHeader := {
+                    seqNumber       := p_seqNumber,
+                    reserved        := c_uInt8Zero,
+                    srcPosVector    := p_sourceLongPosVec,
+                    gnAddress       := p_gnAddress
+                }
+            }
+            
+            /**
+             * @desc    Receive template for LS Request header
+             * @param   p_seqNumber     Sequence number of LS Request packet
+             * @param   p_mid           Searched GN_Address MID
+             */
+            template ExtendedHeader mw_lsRequestHeader(
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GN_Address.mid p_mid
+            ) := {
+                lsRequestHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := ?,
+                    srcPosVector := ?,
+                    gnAddress := mw_gnAddressMid(p_mid)
+                }
+            }
+            
+            /**
+             * @desc    Send template for LS Request header type
+             */
+            template (value) HeaderTST m_lsRequestHeaderType := {
+                lsHdr := {
+                    headerType := e_locationService,
+                    headerSubType := e_lsRequest
+                }
+            }
+            
+            /**
+             * @desc    Receive template for LS Request header type
+             */
+            template HeaderTST mw_lsRequestHeaderType := {
+                lsHdr := {
+                    headerType := e_locationService,
+                    headerSubType := e_lsRequest
+                }
+            }
+            
+        } // end lsRequestHeaderTemplates
+                    
+        group lsReplyHeaderTemplates {
+            
+            /**
+             * @desc    Send template for LS Reply header
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_destinationLongPosVec Long position vector of destination
+             * @param   p_seqNumber             Sequence number of LS Reply packet
+             */
+            template (value) ExtendedHeader m_lsReplyHeader(
+              in template (value) LongPosVector p_sourceLongPosVec,
+              in template (value) ShortPosVector p_destinationLongPosVec,
+              in template (value) UInt16 p_seqNumber
+            ) := {
+                lsReplyHeader := {
+                  seqNumber := p_seqNumber,
+                  reserved := c_uInt8Zero,
+                  srcPosVector := p_sourceLongPosVec,
+                  dstPosVector := p_destinationLongPosVec
+                }
+            }
+            
+            /**
+             * @desc    Receive template for any LS Reply header
+             */
+            template ExtendedHeader mw_lsReplyHeaderAny := {
+                lsReplyHeader := {
+                seqNumber := ?,
+                reserved := ?,
+                srcPosVector := ?,
+                dstPosVector := ?
+                }
+            }
+            
+            /**
+             * @desc    Receive template for LS Reply header
+             * @param   p_sourceLongPosVec      Long position vector of source
+             * @param   p_destinationLongPosVec Short position vector of destination
+             * @see     mw_lsReplyHeaderAny
+             */
+            template ExtendedHeader mw_lsReplyHeader(
+                in template (present) LongPosVector p_sourceLongPosVec,
+                in template (present) ShortPosVector p_destinationLongPosVec)
+            modifies mw_lsReplyHeaderAny := {
+                lsReplyHeader := {
+                    srcPosVector := p_sourceLongPosVec,
+                    dstPosVector := p_destinationLongPosVec
+                }
+            }
+            
+            
+            /**
+             * @desc    Send template for LS Reply header type
+             */
+            template (value) HeaderTST m_lsReplyHeaderType := {
+                lsHdr := {
+                  headerType := e_locationService,
+                  headerSubType := e_lsReply
+                }
+            }
+            
+        } // end lsRequestHeaderTemplates
+        
+        group beaconHeaderTemplates {
+            
+            /**
+             * @desc    Send template for Beacon header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             */
+            template (value) ExtendedHeader m_beaconHeader(
+                in template (value) LongPosVector p_sourceLongPosVec
+            ) := {
+                beaconHeader := {
+                    srcPosVector := p_sourceLongPosVec
+                }
+            }
+            
+            /**
+             * @desc    Receive template for Beacon header
+             * @param   p_sourceLongPosVec  Long position vector of source
+             */
+            template ExtendedHeader mw_beaconHeader(
+                in template (present) LongPosVector p_sourceLongPosVec
+            ) := {
+                beaconHeader := {
+                    srcPosVector := p_sourceLongPosVec
+                }
+            }
+            
+            /**
+             * @desc    Send template for Beacon header type
+             */
+            template (value) HeaderTST m_beaconHeaderType := {
+                beaconHdr := {
+                    headerType := e_beacon,
+                    headerSubType := c_uInt4Zero
+                }
+            }
+            
+            /**
+             * @desc    Receive template for Beacon header type
+             */
+            template HeaderTST mw_beaconHeaderType := {
+                beaconHdr := {
+                    headerType := e_beacon,
+                    headerSubType := ?
+                }
+            }
+            
+        } // end beaconHeaderTemplates
+        
+        group shbHeaderTemplates {
+            
+            /**
+             * @desc    Send template for SHB header
+             * @param   p_sourceLongPosVec  Long position vector of sender
+             */
+            template (value) ExtendedHeader m_shbHeader(
+                in template (value) LongPosVector p_sourceLongPosVec
+            ) := {
+                shbHeader := {
+                    srcPosVector := p_sourceLongPosVec,
+                    reserved := 0
+                }
+            }
+            
+            /**
+             * @desc    Receive template for SHB header
+             * @param   p_sourceLongPosVec  Long position vector of sender
+             */
+            template (present) ExtendedHeader mw_shbHeader(
+                in template (present) LongPosVector p_sourceLongPosVec
+            ) := {
+                shbHeader := {
+                    srcPosVector:= p_sourceLongPosVec,
+                    reserved := ?
+                }
+            }
+            
+            /**
+             * @desc    Send template for SHB header type
+             */
+            template (value) HeaderTST m_shbHeaderType := {
+                tsbHdr := {
+                  headerType := e_topologicallyScopedBroadcast,
+                  headerSubType := e_singleHop
+                }
+            }
+            
+        } // end shbHeaderTemplates
+        
+        group tsbHeaderTemplates {
+            
+            /**
+             * @desc    Send template for TSB header
+             * @param   p_seqNumber         Sequence number of TSB packet
+             * @param   p_srcPosVector      Long position vector of source
+             */
+            template ExtendedHeader m_tsbHeader(
+                in template (value) UInt16 p_seqNumber,
+                in template (value) LongPosVector p_srcPosVector
+            ) := {
+                tsbHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := c_uInt8Zero,
+                    srcPosVector := p_srcPosVector
+                }
+            }
+            
+            /**
+             * @desc    Receive template for TSB header
+             * @param   p_seqNumber         Sequence number of TSB packet
+             * @param   p_sourceLongPosVec  Long position vector of source
+             */
+            template (present) ExtendedHeader mw_tsbHeader(
+                in template (present) UInt16 p_seqNumber,
+                in template (present) LongPosVector p_sourceLongPosVec
+            ) := {
+                tsbHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := ?,
+                    srcPosVector := p_sourceLongPosVec
+                }
+            }
+            
+            /**
+             * @desc    Send template for TSB header type
+             */
+            template (value) HeaderTST m_tsbHeaderType := {
+                tsbHdr := {
+                  headerType := e_topologicallyScopedBroadcast,
+                  headerSubType := e_multiHop
+                }
+            }
+            
+            /**
+             * @desc    Receive template for TSB header type
+             */
+            template (present) HeaderTST mw_tsbHeaderType := {
+                tsbHdr := {
+                  headerType := e_topologicallyScopedBroadcast,
+                  headerSubType := e_multiHop
+                }
+            }
+            
+        } // end tsbHeaderTemplates
+        
+    } // end geoNwHeadersTemplates
+    
+    group geoMiscTemplates {
+        
+        /**
+         * @desc    Receive template for GN_Address. Only M_ID field is discriminent
+         * @param   p_mid Expected GN Address MID
+         */
+        template GN_Address mw_gnAddressMid(in template (present) GN_Address.mid p_mid) := {
+            typeOfAddress := ?,
+            stationType := ?,
+            stationCountryCode := ?,
+            mid := p_mid
+        }
+        
+        group geoDummyTemplates {
+            
+            /**
+             * @desc    Dummy template for GN_Address
+             */
+            template (value) GN_Address m_dummyGnAddr := {
+                typeOfAddress := e_manual,
+                stationType := e_passengerCar,
+                stationCountryCode := c_uInt10Zero,
+                mid := c_6ZeroBytes
+            }
+            
+            /**
+             * @desc    Dummy template for long position vector
+             */
+            template (value) LongPosVector m_dummyLongPosVector := {
+                gnAddr := m_dummyGnAddr,
+                timestamp := c_uInt32Zero,
+                latitude := c_uInt32Zero,
+                longitude := c_uInt32Zero,
+                pai := int2bit(1,1),
+                speed := c_uInt16Zero,
+                heading := c_uInt16Zero
+            }
+            
+            /**
+             * @desc    Dummy template for Area
+             */
+            template (value) Area m_dummyArea := {
+                geoAreaPosLatitude := c_uInt32Zero,
+                geoAreaPosLongitude := c_uInt32Zero,
+                distanceA := c_uInt16Zero,
+                distanceB := c_uInt16Zero,
+                angle := c_uInt16Zero
+            }
+            
+            /**
+             * @desc    Dummy template for GeoBroadcastArea
+             */
+            template (value) GeoBroadcastArea m_dummyGeoBroadcastArea := {
+                geoBroadcastSubType := e_geoBroadcastRect,
+                geoBroadcastArea := m_dummyArea
+            }
+            
+        } // end geoDummyTemplates
+        
+    } // end geoMiscTemplates
+    
+    group geoTemplateFunctions {
+        
+        function f_adaptPayloadForUtInd_m(in template (value) Payload p_gnPayload) return octetstring {
+            
+            if(PX_BTP_IN_UT_IND == false) {
+            	if(PX_GN_UPPER_LAYER == e_btpA or PX_GN_UPPER_LAYER == e_btpB) {
+            		if( ispresent(p_gnPayload.decodedPayload) ){
+				        return bit2oct(encvalue(p_gnPayload.decodedPayload.btpPacket.payload));
+            		}
+            		
+            		return valueof(p_gnPayload.rawPayload);
+            	}
+            }
+            
+			return bit2oct(encvalue(p_gnPayload));
+        }
+
+        function f_adaptPayload_m(in template (value) octetstring p_finalPayload) return template (value) Payload {
+            var template (value) Payload v_payload;
+            
+            if(PX_GN_UPPER_LAYER == e_any) {
+	    	//ELNRNAG
+                v_payload := { decodedPayload := omit, rawPayload := p_finalPayload};
+                //v_payload := { rawPayload := p_finalPayload};
+                return v_payload;
+            }
+            
+            if(PX_GN_UPPER_LAYER == e_ipv6) {
+	    	//v_payload := { rawPayload := ''O};
+                v_payload := { decodedPayload := { ipv6Packet := m_ipv6Packet(c_unspecified, c_allNodesMca, c_noNextHdr, m_octetstringPayload(p_finalPayload))}, rawPayload := ''O};
+                
+                return v_payload;
+            }
+            
+            if(PX_GN_UPPER_LAYER == e_btpA) {
+                v_payload := { 
+		  decodedPayload := { 
+		    btpPacket := m_btpA({ 
+			       	   decodedPayload := omit, 
+				   rawPayload := p_finalPayload })}, 
+		rawPayload := ''O};
+                //v_payload := { rawPayload := ''O};
+                return v_payload;
+            }
+            
+            if(PX_GN_UPPER_LAYER == e_btpB) {
+                v_payload := { 
+		  decodedPayload := { 
+		    btpPacket := m_btpB({ 
+		                   decodedPayload := omit, 
+				   rawPayload := p_finalPayload })}, 
+		  rawPayload := ''O};
+                //v_payload := { rawPayload := ''O};
+                return v_payload;
+            }
+            
+            return v_payload;
+        }
+        
+        function f_adaptPayload_mw(in template (present) octetstring p_finalPayload) return template (present) Payload {
+            var template (present) Payload v_payload;
+            
+            if(PX_GN_UPPER_LAYER == e_any) {
+               //v_payload := { decodedPayload := *, rawPayload := p_finalPayload};
+               v_payload := { rawPayload := p_finalPayload};
+               return v_payload;
+            }
+            
+            if(PX_GN_UPPER_LAYER == e_ipv6) {
+               //v_payload := { decodedPayload := { ipv6Packet := mw_ipv6Packet(?, ?, ?, mw_octetstringPayload(p_finalPayload))}, rawPayload := ?};
+               v_payload := { rawPayload := ?};
+               return v_payload;
+            }
+            
+            if(PX_GN_UPPER_LAYER == e_btpA) {
+               //v_payload := { decodedPayload := { btpPacket := mw_btpA(?, ?, { decodedPayload := *, rawPayload := p_finalPayload } )}, rawPayload := ?};
+               v_payload := { rawPayload := ?};
+               return v_payload;
+            }
+            
+            if(PX_GN_UPPER_LAYER == e_btpB) {
+               //v_payload := { decodedPayload := { btpPacket := mw_btpB(?, ?, { decodedPayload := *, rawPayload := p_finalPayload })}, rawPayload := ?};
+               v_payload := { rawPayload := ?};
+               
+               return v_payload;
+            }
+            
+            return v_payload;
+        }
+        
+    } // end geoTemplateFunctions
+    
+} // end ItsGeoNetworking_Templates
+

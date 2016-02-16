@@ -1,0 +1,192 @@
+module LibItsCalm_Pixits { 
+
+    // LibCommon 
+    import from LibCommon_DataStrings { 
+        type Bit1, Bit6  
+    };
+
+	/**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for ATSP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_ATSP_ACCESS_SETTINGS_MX_SAP_SET := 
+        PX_IUT_AL_xT_AT_IN_SAP_SET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_UNSET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_UNSET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_SET & 
+        '00'B;
+
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for FNTP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs not supported</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_ATSP_ACCESS_SETTINGS_MX_SAP_UNSET := 
+        PX_IUT_AL_xT_AT_IN_SAP_SET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_UNSET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_UNSET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_UNSET & 
+        '00'B;
+	
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for FNTP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_FNTP_ACCESS_SETTINGS_MX_SAP_SET := 
+        PX_IUT_AL_xT_AT_IN_SAP_UNSET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_SET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_UNSET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_SET & 
+        '00'B;
+
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for FNTP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs not supported</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_FNTP_ACCESS_SETTINGS_MX_SAP_UNSET := 
+        PX_IUT_AL_xT_AT_IN_SAP_UNSET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_SET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_UNSET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_UNSET & 
+        '00'B;
+
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for FSAP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_FSAP_ACCESS_SETTINGS_MX_SAP_SET := 
+        PX_IUT_AL_xT_AT_IN_SAP_UNSET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_SET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_SET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_SET & 
+        '00'B;
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for FSAP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs not supported</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_FSAP_ACCESS_SETTINGS_MX_SAP_UNSET := 
+        PX_IUT_AL_xT_AT_IN_SAP_UNSET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_SET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_SET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_UNSET & 
+        '00'B;
+    
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for IICP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs not supported</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_SET := 
+        PX_IUT_AL_xT_AT_IN_SAP_UNSET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_SET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_SET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_SET & 
+        '00'B;
+	
+    /**
+     * @desc Location of the IUT, which defines the interface(s) of the IUT for upper (/ lower) tester access.
+     * Used for IICP ATS
+     * <li>ITS-S access layer: Upper tester access is via IN-SAP</li>
+     * <li>ITS-S networking & transport layer: Upper / lower tester access is via NF-SAP</li>
+     * <li>ITS-S facilities layer: Upper / lower tester access is via FA-SAP</li>
+     * <li>ITS-S management entity: Upper / lower tester access is via MX-SAPs not supported</li>
+     * <li>ITS-S security entity (not supported in the present document)</li>
+     * <li>ITS-S application entity (not supported in the present document)</li>
+     */
+    modulepar Bit6 PX_LOC_ITS_IICP_ACCESS_SETTINGS_MX_SAP_UNSET := 
+        PX_IUT_AL_xT_AT_IN_SAP_UNSET & 
+        PX_IUT_FNTP_xT_AT_NF_SAP_UNSET & 
+        PX_IUT_FAC_xT_AT_FA_SAP_UNSET & 
+        PX_IUT_MGT_xT_AT_Mx_SAP_UNSET & 
+        '00'B;
+	
+    /**
+     * @desc Indicates that IN-SAP interface is not used 
+     */
+    modulepar Bit1 PX_IUT_AL_xT_AT_IN_SAP_UNSET := '0'B;
+    /**
+     * @desc Indicates that IN-SAP interface is used 
+     */
+    modulepar Bit1 PX_IUT_AL_xT_AT_IN_SAP_SET := '1'B;
+    
+    /**
+     * @desc Indicates that NF-SAP interface is not used 
+     */
+    modulepar Bit1 PX_IUT_FNTP_xT_AT_NF_SAP_UNSET := '0'B;
+    /**
+     * @desc Indicates that NF-SAP interface is used 
+     */
+    modulepar Bit1 PX_IUT_FNTP_xT_AT_NF_SAP_SET := '1'B;
+    
+    /**
+     * @desc Indicates that FA-SAP interface is not used 
+     */
+    modulepar Bit1 PX_IUT_FAC_xT_AT_FA_SAP_UNSET := '0'B;
+    /**
+     * @desc Indicates that FA-SAP interface is not used 
+     */
+    modulepar Bit1 PX_IUT_FAC_xT_AT_FA_SAP_SET := '1'B;
+    
+    /**
+     * @desc Indicates that management SAP (Mx-SAP) interfaces are not used 
+     */
+    modulepar Bit1 PX_IUT_MGT_xT_AT_Mx_SAP_UNSET := '0'B;
+    /**
+     * @desc Indicates that management SAP (Mx-SAP) interfaces are used 
+     */
+    modulepar Bit1 PX_IUT_MGT_xT_AT_Mx_SAP_SET := '1'B;
+
+    /**
+     * @desc Lower layers 
+     * This means that Teat Adapter should set fnt port setting to Fntp/ETH
+     */
+    modulepar Bit1 PX_IUT_LOWER_LAYER_USED := '1'B;
+    modulepar Bit1 PX_IUT_LOWER_LAYER_UNUSED := '0'B;
+
+    /**
+     * @desc Test mode
+     */
+    modulepar Bit1 PX_IUT_TEST_MODE_OFF := '0'B;
+    modulepar Bit1 PX_IUT_TEST_MODE_ON := '1'B;
+
+} // End of module module LibItsCalm_Pixits 

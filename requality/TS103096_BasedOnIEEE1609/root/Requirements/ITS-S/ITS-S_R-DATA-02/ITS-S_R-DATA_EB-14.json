@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards valid signed data when the signer is a certificate chain in which the region of validity of a subordinate certificate overlaps but is not wholly contained by the region of validity of its issuing certificate."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/6551654e-b308-43a9-a40f-74347a30e410"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "324025cd-4b3b-43ec-952f-9f39167dfeeb"
+}

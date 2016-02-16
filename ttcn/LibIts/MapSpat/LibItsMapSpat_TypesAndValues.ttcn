@@ -1,0 +1,74 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/MapSpat/LibItsMapSpat_TypesAndValues.ttcn $
+ *              $Id: LibItsMapSpat_TypesAndValues.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     Module containing types and values for MAP SPAT
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsMapSpat_TypesAndValues {
+
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DSRC language "ASN.1:1997" all;
+    import from REG_D language "ASN.1:1997" all;
+    import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+    import from LibItsCommon_TypesAndValues {
+        type UtChangePosition
+    };
+    
+    group mapSpatConstants {
+        
+    } // end group mapSpatConstants
+    
+    group utPrimitives {
+        
+        /**
+         * @desc Upper Tester message to request triggering of an event at IUT 
+         */
+        type record UtMapSpatTrigger {
+            Event    event
+        }
+        type enumerated Event {
+            spatMsg            (0),
+            mapNewContent    (1),
+            mapRepL10s        (2),
+            mapRepG10s        (3)
+        }
+        /**
+         * @desc Upper Tester result message of request of triggering of an event at IUT 
+         */
+        type record UtMapSpatTriggerResult {
+            boolean result,
+            MsgCount msgCount
+        }
+        
+        /**
+         * @desc Upper Tester message to check event/status at IUT 
+         */
+        type record UtMapEventInd {
+            MAP_PDU mapMsg
+        } with { variant "" };
+//            encode (mapMsg) "LibItsMapSpat_asn1" }
+
+        type record UtSpatEventInd {
+            SPAT_PDU spatMsg
+        } with { variant "" };
+//            encode (spatMsg) "LibItsMapSpat_asn1" }
+        
+        /**
+         * @desc List of Upper Tester messages to check event/status on MAP SPAT IUT 
+         */
+        type record of UtMapEventInd UtMapEventIndList;
+        type record of UtSpatEventInd UtSpatEventIndList;
+    } with {
+        encode "UpperTester"
+    }
+
+} // end LibItsMapSpat_TypesAndValues

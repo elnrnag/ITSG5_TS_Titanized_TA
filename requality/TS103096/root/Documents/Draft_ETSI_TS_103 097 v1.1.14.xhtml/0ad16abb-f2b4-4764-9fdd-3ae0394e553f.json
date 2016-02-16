@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_0ad16abb-f2b4-4764-9fdd-3ae0394e553f\"><a name=\"0ad16abb-f2b4-4764-9fdd-3ae0394e553f\" id=\"id_0ad16abb-f2b4-4764-9fdd-3ae0394e553f\" class=\"requality_id\"><\/a> Each ITS-AID shall be unique in the <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">its_aid_list<font style=\"font-family: Times New Roman;\">.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "fe0c67b6-148d-4775-9e77-d09300029e66"
+}

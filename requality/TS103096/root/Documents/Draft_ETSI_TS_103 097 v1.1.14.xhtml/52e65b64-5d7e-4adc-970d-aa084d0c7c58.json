@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\"><a name=\"52e65b64-5d7e-4adc-970d-aa084d0c7c58\" id=\"id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\" class=\"requality_id\"><\/a>The <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\">EccPoint<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\"> used in a <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\">PublicKey<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\"> shall not have <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\">EccPointType<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\"> <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\">x_coordinate_only<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_52e65b64-5d7e-4adc-970d-aa084d0c7c58\">.<\/span><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "52e65b64-5d7e-4adc-970d-aa084d0c7c58"
+}

@@ -1,0 +1,29 @@
+<!-- AT cert with the same circular region like issuing AA certificate -->
+<certificate name="CERT_TS_06_01_BV_AT">
+	<version>2</version>
+	<signer type="digest" name="CERT_TS_B_AA"/>
+	<subject type="AT" name="">
+		<!-- verification_key -->
+		<attribute type="verification_key">
+			<public_key algorythm="ecdsa_nistp256_with_sha256">
+				<ecc_point type="uncompressed"/>
+			</public_key>
+		</attribute>
+		<!-- assurance_level -->
+		<attribute type="assurance_level">
+			<assurance level="3"/>
+		</attribute>
+		<!-- its_aid_ssp_list -->
+		<attribute type="its_aid_ssp_list">
+			<ssp aid="36">&#01;&#xFF;&#xFF;</ssp>  <!-- CAM -->
+			<ssp aid="37">&#01;&#xFF;&#xFF;&#xFF;</ssp>  <!-- DENM -->
+		</attribute>
+	</subject>
+	<validity>
+		<restriction type="time" start="2015-01-01" end="2015-04-30"/>
+		<restriction type="region">
+			<circle latitude="0.0" longitude="0.0" radius="10000"/>
+		</restriction>
+	</validity>
+	<signature algorithm="0"/>
+</certificate>

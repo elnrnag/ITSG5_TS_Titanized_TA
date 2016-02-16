@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "c00b6297-8b7a-487b-a79e-802be7b9bddc",
+            "type": "STRING",
+            "value": "Check the acceptance of SecuredMessage containing HeaderField generation_time"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "c00b6297-8b7a-487b-a79e-802be7b9bddc",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/e1c8b3e0-5da0-4e8d-8355-563039c7cdc7",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/48e8cd0f-df1a-4fd5-a36b-6d47370cb9c5"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "c00b6297-8b7a-487b-a79e-802be7b9bddc",
+            "type": "STRING",
+            "value": "06. Check generation time"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "c00b6297-8b7a-487b-a79e-802be7b9bddc",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "c00b6297-8b7a-487b-a79e-802be7b9bddc"
+}

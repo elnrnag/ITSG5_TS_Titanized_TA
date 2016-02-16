@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "795ce224-604e-4598-89be-96d0b650984e",
+            "type": "STRING",
+            "value": "Check that the IUT discards certificate with wrong version"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "795ce224-604e-4598-89be-96d0b650984e",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/c4cd2dea-c087-49fa-9d20-b08451557a51",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/0df98c72-fcf5-46bd-ac32-c67617caeadc"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "795ce224-604e-4598-89be-96d0b650984e",
+            "type": "STRING",
+            "value": "01. Check that certificate version is 2"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "795ce224-604e-4598-89be-96d0b650984e",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "795ce224-604e-4598-89be-96d0b650984e"
+}

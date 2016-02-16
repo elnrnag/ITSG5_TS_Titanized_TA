@@ -1,0 +1,223 @@
+/**
+ *  @author   ETSI / STFS46
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/V2G/LibItsV2G_TypesAndValues.ttcn $
+ *            $Id: LibItsV2G_TypesAndValues.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     Module containing types and values for V2G application layer protocols
+ *
+ */
+module LibItsV2G_TypesAndValues {
+
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    // LibIts
+	//import from iso_15118_2_2010_MsgBody all; //language "XSD" all with {extension "File:V2G_CI_MsgBody.xsd" };
+	import from iso_15118_2_2010_AppProtocol all;//language "XSD" all with {extension "File:XSD/V2G_CI_AppProtocol.xsd" };
+	//import from iso_15118_2_2010_MsgDataTypes all;//language "XSD" all with {extension "File:XSD/V2G_CI_MsgDataTypes.xsd" };
+	import from iso_15118_2_2010_MsgDef all;//language "XSD" all with {extension "File:XSD/V2G_CI_MsgDef.xsd" };
+	//import from iso_15118_2_2010_MsgHeader all;//language "XSD" all with {extension "File:XSD/V2G_CI_MsgHeader.xsd" };
+	//import from org_w3_www__2000_09_xmldsig all;//language "XSD" all with {extension "File:XSD/xmldsig-core-schema.xsd" };
+    
+    group v2gPdus {
+     
+        group SDPMessages {
+
+			/**
+	         * @desc SDP (Session Discovery Protocol) message description
+	         */
+	        type record Sdp_Message {
+	            Sdp_Header sdpHeader,
+				Sdp_Payload	sdpPayload
+	        }
+		}
+    } // end v2gPdus
+    
+    group v2gHeaders {
+        
+		 group SDPMessages {
+
+			 /**
+	         * @desc SDP (Session Discovery Protocol) Header description 
+	         */
+	        type record Sdp_Header {
+				Oct1 protocolVersion,
+				Oct1 inverseProtocolVersion,
+				Oct2 payloadType,
+				UInt16 payloadLength
+	        }
+		 }
+             
+    } // end v2gHeaders
+
+    group v2gPayload {
+
+		group SDPMessages {
+
+			 /**
+	         * @desc SDP (Session Discovery Protocol) Payload description 
+	         */
+	         type union Sdp_Payload {
+				 Sdp_Request sdpRequest,
+				 Sdp_Response sdpResponse
+			 }
+
+			 /**
+	         * @desc SDP (Session Discovery Protocol) Request message description 
+	         */
+			 type record Sdp_Request
+			 {
+				Oct1 security,
+				Oct1 transportProtocol
+			 } 
+			 
+			 /**
+	         * @desc SDP (Session Discovery Protocol) Response message description 
+	         */
+			 type record Sdp_Response
+			 {
+				Ipv6Address seccIPAddress, // IPv6
+				UInt16 seccPort,
+				Oct1 security,
+				Oct1 transportProtocol
+	         }
+		 }
+       
+    } //end v2gPayload
+
+	group IPAddress
+	{
+		/**
+         * @desc IPv6 Address
+         */
+        type Oct16 Ipv6Address;
+	} // end IPAddress
+	
+	group acPrimitives {
+        
+		   /**
+			* @desc    TA primitives for V2G
+			* @member  AcRetrieveUdpPort                      -
+			* @member  Primitive2                      -
+			*/
+		   type union AcV2Gprimitive {
+			   AcRetrieveUdpPort acRetrieveUdpPort
+			   //Primitive2 primitive2,
+		   }
+        
+		   /**
+			* @desc    Primitive for receiveing response from TA
+			* @member  getLongPosVector
+			*/
+		   type union AcV2Gresponse {
+			   //UdpPort udpPort,
+			   AcV2GresponseFailure failure
+		   }
+        
+		   /**
+			* @desc    Primitive for TA to retrive UDP port 
+			* @member  beaconHeader        Beacon template
+			*/
+		   type record AcRetrieveUdpPort {
+		   //anything you need to retrieve the correct udp port
+		   }
+		   
+		   type record AcV2GresponseFailure {
+				boolean     failure
+			}
+            
+        
+	   } // end acPrimitives
+
+    group utPrimitives {
+    	
+    	group utCommonPrimitives {
+    		
+	        /**
+	         * @desc Upper Tester message to initialize IUT 
+	         */
+	        type union UtInitialize {
+	            UtV2Ginitialize utV2Ginitialize
+	        }
+	
+	        /**
+	         * @desc Upper Tester message describing an action/event 
+	         */
+	        type union UtEvent {
+	            UtV2Gevent utV2Gevent
+	        }
+	                
+	        /**
+	         * @desc Upper Tester message to trigger an action on IUT 
+	         */
+	        type record UtTrigger {
+	            UtEvent utEvent
+	        }
+	        
+	        /**
+	         * @desc Upper Tester message to check event/status on IUT 
+	         */    
+	        type record UtCheck {
+	            UtEvent utEvent
+	        }
+	        
+	        /**
+	         * @desc Upper Tester response message  
+	         */    
+	        type boolean UtResult;
+        }
+        with {
+            encode "UpperTester"
+        }
+                
+        /**
+         * @desc Upper Tester message to initialize V2G IUT 
+         */
+        type record UtV2Ginitialize {
+        }
+        
+        /**
+         * @desc Upper Tester message generating V2G message
+         */
+        type union UtV2Gevent {
+			V2G_Message.Header   v2gHeader,
+			V2G_Message.Body     v2gBody
+        }
+        
+    } // end utPrimitives
+    
+	group sdpValues {
+
+		const Oct1 c_protocolVersion1 := '01'O;
+		const Oct1 c_inverseProtocolVersion1 := 'FE'O;
+
+		const Oct2 c_sdpRequestMessagePayloadType := '9000'O;
+		const Oct2 c_sdpResponseMessagePayloadType := '9001'O;
+
+		const UInt16 c_sdpRequestPayloadLength := 2;
+		const UInt16 c_sdpResponsePayloadLength := 18;
+
+		const Oct1 c_securedwithTLS := '00'O;
+		const Oct1 c_noTransportLayerSecurity := '10'O;
+
+		const Oct1 c_transportProtocolTCP := '00'O;
+		const Oct1 c_transportProtocolUDP := '10'O;
+
+		const UInt16 c_V2G_UDP_SDP_SERVER := 15118;
+
+		const integer c_maxNbrSdpRequestRetrans := 4;
+		const integer c_maxNbrConsecutiveSdpRequest := 5;
+
+	} // end sdpValues
+
+	group timerTimeouts
+	{
+		const float c_v2g_seccSequenceTimeout  := 60.0;
+		const float c_v2g_evccSequenceTimeout  := 40.0;
+
+		const float c_v2g_sdpRetransmissionTimeout := 0.25;
+	}
+}
+with {
+    encode "LibItsV2G"
+}

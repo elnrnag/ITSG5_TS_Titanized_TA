@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards the Secured DENM containing exactly one non-empty payload of type 'signed_and_encrypted'."
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_DENM'\r\n\t\t\tand containing payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed_and_encrypted'\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "9182cb14-4b7e-444b-8d71-c918cfeba097"
+}

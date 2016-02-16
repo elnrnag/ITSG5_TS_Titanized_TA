@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "e764bb01-436d-4e46-a5c1-4c4af7eaf928",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/4d1be56a-6392-4bb5-aee0-608ca40f1dd5"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "e764bb01-436d-4e46-a5c1-4c4af7eaf928",
+            "type": "STRING",
+            "value": "10. Check validity restriction presence and order"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e764bb01-436d-4e46-a5c1-4c4af7eaf928",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "e764bb01-436d-4e46-a5c1-4c4af7eaf928"
+}

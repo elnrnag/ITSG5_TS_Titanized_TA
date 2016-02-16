@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "d7dba395-7b45-4419-9623-b7858088be3e",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "feb8dd32-d942-42dd-b5f6-6baa90a44f9f",
+            "type": "STRING",
+            "value": "Check that the IUT discards a message when its signing certificate contains 'time_start_and_duration' validity restriction\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "feb8dd32-d942-42dd-b5f6-6baa90a44f9f",
+            "type": "STRING",
+            "value": "radiuswith {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_10_03_BO_AT) {\r\n\t\t\t\t\t\tcontaining validity_restrictions['time_start_and_duration']\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "d7dba395-7b45-4419-9623-b7858088be3e",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d7dba395-7b45-4419-9623-b7858088be3e",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "feb8dd32-d942-42dd-b5f6-6baa90a44f9f"
+}

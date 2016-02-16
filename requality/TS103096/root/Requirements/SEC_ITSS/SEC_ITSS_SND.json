@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "a077a073-02b8-4035-b5eb-386fb33545b6",
+            "type": "STRING",
+            "value": "1. Sending behavior"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a077a073-02b8-4035-b5eb-386fb33545b6",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "a077a073-02b8-4035-b5eb-386fb33545b6",
+            "type": "STRING",
+            "value": "complete"
+        }
+    },
+    "uuid": "a077a073-02b8-4035-b5eb-386fb33545b6"
+}

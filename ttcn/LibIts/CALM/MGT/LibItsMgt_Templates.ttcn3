@@ -1,0 +1,749 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/MGT/LibItsMgt_Templates.ttcn3 $
+ *              $Id: LibItsMgt_Templates.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Templates definitions for ITS station management (ISO 24102-3)
+ */
+module LibItsMgt_Templates {
+    
+    // LibCommon 
+    import from LibCommon_BasicTypesAndValues { 
+        type 
+            UInt8, UInt16; 
+    }; 
+    
+    // LibIts
+    import from CALMmanagement language "ASN.1:1997" { 
+        type ITS_scuId 
+    }; 
+    // FIXME Check why TTWB raises an error on ErrStatus (not found)?
+    import from CALMllsap language "ASN.1:1997" all;/*{ 
+        type 
+            ErrStatus, 
+            MedType , CIaClass, CIclass 
+    };*/
+    import from CALMmsap language "ASN.1:1997" all; 
+    import from CALMfntp language "ASN.1:1997" { 
+        type 
+            PortNumber, 
+            SetFNTP, UpdateFNTP, SetNotFNTP, DeleteFNTP 
+    }; 
+    import from CALMfsap language "ASN.1:1997" { 
+        type 
+            GCregServer, 
+            GCregClient, 
+            SAMrxNot, 
+            CTXrxNot, 
+            GCsamctxConf 
+    }; 
+    import from LibItsMgt_TypesAndValues { 
+        group constants; 
+        type IParamNoList, IParamList  
+    }; 
+    import from LibItsMgt_Pixits { 
+        modulepar PX_PDU_REQUEST_FILL_FIELD_VALUE 
+    }; 
+    
+    group mgtSapTemplates { 
+        
+        /**
+         * @desc MF-SAP service primitives templates
+         * @see ISO 24102-3 Clause 8
+         */
+        group mgtMfSapTemplates {
+            
+            /**
+             * @desc Templates for MF-SAP
+             * @see ISO 24102-3 Clause 8.2
+             */
+            group mfCommand {
+                
+                group mfCommandSend { 
+                    
+                    /**
+                     * @desc Generic send template for MF-COMMAND.request service primitive
+                     * @param   p_commandRef    Unique cyclic reference number of command. 
+                     * @param   p_mfCmd         MF-Command message description 
+                     */
+                    template (value) MF_Command_request m_mfCommandRequest_stateCInotify( 
+                        in template (value) CommandRef p_commandRef, 
+                        in template (value) StateCInotify p_stateCInotify 
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 7, 
+                        command_param := { StateCInotify := p_stateCInotify }
+                    } // End of template m_mfCommandRequest_stateCInotify
+                    
+	                /**
+	                 * @desc    Send template for PduRequest/MF-COMMAND.confirm
+	                 * @param   p_mfCommandReq MF-COMMAND.confirm description 
+	                 * @see ISO 24102-4 Clause 8.2.1 IIC-Request PDU
+	                 */
+	                template (value) MF_Command_confirm m_mfCommand_confirm_stateCInotify( 
+                        in template (value) CommandRef p_commandRef 
+	                ) := {
+						commandRef := p_commandRef,
+						ref := 7,
+						cmdConfirm_param := { NullType := NULL },
+						errStatus:= 0
+	                } // End of template m_mfCommand_confirm_stateCInotify
+					
+                } // End of group mfCommandSend
+                
+                group mfCommandRecv { 
+                    
+                    /**
+                     * @desc Unspecified receive template for MF-COMMAND.request service primitive
+                     * Used for:
+                     * <li>modifying restrictif template</li>
+                     * <li>default altstep</li>
+                     * @see  a_mgtMfSapPortDefault altstep statement
+                     */
+                    template MF_Command_request mw_mfCommandRequest_any := {
+                        commandRef := ?,
+                        ref := ?, 
+                        command_param := ? 
+                    } // End of template mw_mfCommandRequest_any
+                    
+                    /**
+                     * @desc Unspecified receive template for MF-COMMAND.confirm service primitive
+                     * @see a_mgtMfSapPortDefault altstep statement
+                     * @see ISO 24102-3 Clause 8.3.3
+                     */
+                    template MF_Command_confirm mw_mfCommandConfirm_any := {
+                        commandRef := ?,
+                        ref := ?, 
+                        cmdConfirm_param := ?, 
+                        errStatus := ?
+                    } // End of template mw_mfCommandConfirm_any
+                    
+                    /**
+                     * @desc    Receive template for MF-Request.confirm service primitive
+                     * @param   p_errorStatus Error status
+                     */
+                    template MF_Command_confirm mdw_mfCommandConfirm(
+                        in template (present) ErrStatus p_errorStatus
+                    ) modifies mw_mfCommandConfirm_any:= {
+                        errStatus := p_errorStatus
+                    } // End of template mw_mfCommandConfirm
+                    
+                    template MF_Command_confirm mdw_mfCommandConfirm_gCsamctxConf(
+                        in template (value) ErrStatus p_errorStatus
+                    ) modifies mdw_mfCommandConfirm := {
+                        ref := 2/*, 
+                        cmdConfirm_param := { GCsamctxConf := ? }*/ 
+                    } // End of template mdw_mfCommandConfirm_gCsamctxConf
+                    
+                } // End of group mfCommandRecv
+                
+            } // End of group mfCommand
+            
+            group mfRequestRequest { 
+                
+                group mfRequestRequestSend { 
+                    
+                    /**
+                     * @desc Generic receive template for MF-REQUEST.request service primitive 
+                     * @param   p_commandRef    Unique cyclic reference number of command. 
+                     * @param   p_request_param MF-Request message description 
+                     */
+                    template (value) MF_Request_request m_mfRequestRequest_ldmRegister( 
+                        in template (value) CommandRef p_commandRef, 
+                        in template (value) LDMregister p_ldmRegister
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 9, 
+                        request_param := { LDMregister := p_ldmRegister } 
+                    } // End of template m_mfRequestRequest 
+                    
+                } // End of group mfRequestRequestSend
+                
+                group mfRequestRequestRecv {
+                    
+                    /**
+                     * @desc    Receive template for MF-REQUEST.request service primitive
+                     * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MF-REQUEST.request
+                     * @param   p_ctx            Command issued by the ITS-S facilities layer and sent to the ITS-S management entity via the MF-SAP
+                     */
+                    template (present) MF_Request_request mw_mfRequestRequest_ctx( 
+                        in template (present) CTXrxNot p_ctx 
+                    ) := { 
+                        commandRef := ?, 
+                        ref := 11, 
+                        request_param := { CTXrxNot := p_ctx } 
+                    } // End of template mw_mfRequestRequest_ctx
+                    
+                    /**
+                     * @desc    Receive template for MF-REQUEST.request service primitive
+                     * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MF-REQUEST.request
+                     * @param   p_gCregClient   Command issued by the ITS-S facilities layer and sent to the ITS-S management entity via the MF-SAP
+                     */
+                    template (present) MF_Request_request mw_mfRequestRequest_gCregClient( 
+                        in template (present) CommandRef p_commandRef, 
+                        in template (present) GCregClient p_gCregClient
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 6, 
+                        request_param := { GCregClient := p_gCregClient } 
+                    } // End of template mw_mfRequestRequest_gCregClient
+                    
+                    /**
+                     * @desc    Receive template for MF-REQUEST.request service primitive
+                     * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MF-REQUEST.request
+                     * @param   p_ldmregister   Command issued by the ITS-S facilities layer and sent to the ITS-S management entity via the MF-SAP
+                     */
+                    template (present) MF_Request_request mw_mfRequestRequest_ldmRegister( 
+                        in template (present) CommandRef p_commandRef, 
+                        in template (present) LDMregister p_ldmregister
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 9, 
+                        request_param := { LDMregister := p_ldmregister } 
+                    } // End of template mw_mfRequestRequest_ldmRegister
+                    
+                } // End of group mfRequestRequestRecv
+                
+            } // End of group mfRequestRequest
+            
+        } // End of group mgtMfSapTemplates
+        
+        /**
+         * @desc MN-SAP service primitives templates
+         * @see ISO 24102-3 Clause 7
+         */
+        group mgtMnSapTemplates {
+            
+            group mnCommandRequest {
+                
+                group mfCommandRequestSend {
+                    
+                    /**
+                     * @desc Receive template for MN-COMMAND.request service primitive
+                     * @param p_commandRef    TODO
+                     * @param p_deleteFntp    TODO
+                     * @see ISO 24102-3 Clause 7.3.3
+                     */
+                    template (value) MN_Command_request m_mnCommandRequest_deleteFntp( 
+                        in template (value) CommandRef p_commandRef, 
+                        in template (value) DeleteFNTP p_deleteFntp 
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 4,
+                        command_param := { 
+                            FWTdelete := { 
+                                fwtNo := 0,
+                                fwt := { 
+                                    DeleteFNTP := p_deleteFntp
+                                } // End of field 'fwt' 
+                            } // End of field 'FWTdelete' 
+                        } // End of field 'request_param' 
+                    } // End of template m_mnCommandRequest_deleteFntp
+                    
+                } // group mnCommandRequestSend 
+                
+                group mnCommandRequestRecv { 
+                    
+                    /**
+                     * @desc Receive template for MN-COMMAND.request service primitive
+                     * @param p_commandRef    TODO
+                     * @param p_deleteFntp    TODO
+                     * @see ISO 24102-3 Clause 7.3.3
+                     */
+                    template (present) MN_Command_confirm mw_mnCommandConfirm_deleteFntpConf( 
+                        in template (present) CommandRef p_commandRef, 
+                        in template (present) DeleteFNTP p_deleteFntp 
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 4,
+                        cmdConfirm_param := { 
+                            FWTdelete := { 
+                                fwtNo := 0,
+                                fwt := { 
+                                    DeleteFNTP := p_deleteFntp
+                                } // End of field 'fwt' 
+                            } // End of field 'FWTdelete' 
+                        }, // End of field 'request_param' 
+						errStatus := 0
+                    } // End of template mw_mnCommandRequest_deleteFntp
+                    
+                    /**
+                     * @desc Unspecified receive template for MN-COMMAND.confirm service primitive
+                     * @see a_mgtMnSapPortDefault altstep statement
+                     * @see ISO 24102-3 Clause 7.3.3
+                     */
+                    template MN_Command_confirm mw_mnCommandConfirm_any := {
+                        commandRef := ?,
+                        ref := ?, 
+                        cmdConfirm_param := ?, 
+                        errStatus := ?
+                    } // End of template mw_mnCommandConfirm_any
+                    
+                    template MN_Command_confirm mdw_mnCommandConfirm(
+                        in template (present) ErrStatus p_errorStatus
+                    ) modifies mw_mnCommandConfirm_any:= {
+                        errStatus := p_errorStatus
+                    } // End of template mdw_mnCommandConfirm
+                    
+                } // group nCommandRequestRecv 
+                
+            } // End of group mnCommandRequest 
+                
+            group mnRequestRequest { 
+                
+                group mnRequestRequestSend { 
+                    
+                    /**
+                     * @desc Generic receive template for MN-REQUEST.request service primitive 
+                     * @param   p_commandRef    Unique cyclic reference number of command. 
+                     * @param   p_request_param MF-Request message description 
+                     */
+                    template (value) MN_Request_request m_mnRequestRequest_setNotFNTP( 
+                        in template (value) CommandRef p_commandRef, 
+                        in template (value) SetNotFNTP p_setNotFntp 
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 2,
+                        request_param := {
+                            FWTsetNot := { 
+                                fwtNo := 0, 
+                                fwt := { 
+                                    SetNotFNTP := p_setNotFntp 
+                                } // End of 'fwt' field 
+                            } // End of 'FWTsetNot' field 
+                        } // End of 'request_param' field 
+                    } // End of template m_mnRequestRequest_setNotFNTP 
+                    
+                } // End of group mnRequestRequestSend
+                
+                group mnRequestRequestRecv { 
+                    
+                    /**
+                     * @desc Unspecified receive template for MN-REQUEST.request service primitive
+                     * Used for:
+                     * <li>modifying restrictif template</li>
+                     * <li>default altstep</li>
+                     * @see a_mgtMnSapPortDefault altstep statement
+                     */
+                    template MN_Request_request mw_mnRequestRequest_any := {
+                        commandRef := ?,
+                        ref := ?, 
+                        request_param := ? 
+                    } // End of template mw_mnRequestRequest_any
+                    
+                    /**
+                     * @desc Unspecified receive template for MN-REQUEST.confirm service primitive
+                     * Used for:
+                     * <li>modifying restrictif template</li>
+                     * <li>default altstep</li>
+                     * @see a_mgtMnSapPortDefault altstep statement
+                     */
+                    template MN_Request_confirm mw_mnRequestConfirm_any := {
+                        commandRef := ?, 
+                        ref := ?, 
+                        reqConfirm_param := ?, 
+                        errStatus := ? 
+                    } // End of template mw_mnRequestConfirm_any
+                    
+                    /**
+                     * @desc    Receive template for MN-Request.confirm service primitive
+                     * @param   p_errorStatus Error status in response of MN-REQUEST.request service primitive
+                     */
+                    template MN_Request_confirm mw_mnRequestConfirm(
+                        in template (present) ErrStatus p_errorStatus
+                    ) modifies mw_mnRequestConfirm_any := {
+                        errStatus := p_errorStatus
+                    } // End of template mw_mnRequestConfirm
+                    
+                    /**
+                     * @desc Receive template for MN-REQUEST.request service primitive
+                     * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MNREQUEST.request
+                     * @param   p_mnReq         Command issued by the ITS-S facilities layer and sent to the ITS-S management entity via the MN-SAP
+                     */
+                    template MN_Request_request mw_mnRequestRequest_setNotFNTP( 
+                        in template (present) CommandRef p_commandRef, 
+                        in template (present) SetNotFNTP p_setNotFNTP 
+                    ) := { 
+                        commandRef := p_commandRef, 
+                        ref := 2,
+                        request_param := { 
+                            FWTsetNot := { 
+                                fwtNo := 0,
+                                fwt := { 
+                                    SetNotFNTP := p_setNotFNTP
+                                } // End of field 'fwt' 
+                            } // End of field 'FWTsetNot' 
+                        } // End of field 'request_param' 
+                    } // End of template mw_mnRequestRequest_setNotFNTP
+                    
+                } // End of group mnRequestRequestRecv
+                
+            } // End of group mnRequestRequest
+            
+            group fwtNotifies { 
+                
+                /**
+                 * @desc  Receive "FWTsetNot message" to notify the creation of an entry in a forwarding table
+                 * @see ISO 24102-3 Clause E.2.3
+                 */
+                template (present) MN_Request_request mdw_fwtSetNotRequestReq_any 
+                modifies mw_mnRequestRequest_any := {
+                    ref := 2, 
+                    request_param := { 
+                        FWTsetNot := { 
+                            fwtNo := 0,
+                            fwt := { 
+                                SetNotFNTP :=  mw_fwtSetNot_any 
+                            } // End of field 'fwt' 
+                        } // End of field 'FWTsetNot' 
+                    } // End of field 'request_param' 
+                } // End of template mdw_fWTSetNotRequestReq_any 
+                
+                /**
+                 * @desc  Receive "FWTsetNot message" to notify the creation of an entry in a forwarding table
+    	         * @param p_portNumber			The provided port number value
+		         * @param p_linkId				Set VCI link identifier 
+		         * @param p_remotePortNumber	The remote port number value
+		         * @param p_linkPortNumber		The linked port number value
+                 * @see ISO 24102-3 Clause E.2.3
+                 */
+                template (present) MN_Request_request mdw_fwtSetNotRequestReq( 
+                    in template (present) PortNumber p_portNumber, 
+                    in template (value) UserPriority p_userPriority, 
+                    in template (value) Link_ID p_linkId,  
+                    in template (value) PortNumber p_remotePortNumber, 
+                    in template (value) PortNumber p_linkPortNumber 
+                ) modifies mdw_fwtSetNotRequestReq_any := { 
+                    request_param := { 
+                        FWTsetNot := { 
+                            fwtNo := 0,
+                            fwt := { 
+                                SetNotFNTP :=  { 
+                                    remotePort := p_remotePortNumber, 
+                                    linkID := p_linkId, 
+                                    linkPort := p_linkPortNumber,  
+                                    serviceInfo := { 
+                                        servicePort := p_portNumber, 
+                                        hostITSscu := ?, 
+                                        servicePriority := 0 // FIXME Shall be a parameter 
+                                    },
+                                    priority := p_userPriority  
+                                }
+                            } // End of field 'fwt' 
+                        } // End of field 'FWTsetNot' 
+                    } // End of field 'request_param' 
+                } // End of template mdw_fwtSetNotRequestReq 
+
+                /**
+                 * @desc Receive MN_Request_request/FWTdeleteNot template
+                 * @param p_reference		The reference value associated to the provided port number
+                 * @see ISO 24102-3 Clause 7.3.3
+                 */
+                template MN_Request_request mdw_fwtDeleteFntp( 
+                    in template (present) integer p_reference 
+                ) modifies mw_mnRequestRequest_any := {
+                    ref := 4, 
+                    request_param := { 
+                        FWTdeleteNot := { 
+                            fwtNo := 2,
+                            fwt := { 
+                                DeleteNotFNTP := {
+                                    reference := p_reference
+                                }
+                            } // End of field 'fwt' 
+                        } // End of field 'FWTdeletNot' 
+                    } // End of field 'request_param' 
+                } // End of template mw_fwtDeleteFntp
+                
+            } // End of group fwtNotifies
+            
+            group fwtCommands {
+                
+                /**
+                 * @desc    Received template on forwarding table update request
+                 * @see     ISO 24102-3 Clause D.2.4
+                 */
+                template MN_Command_request mw_fwtUpdateCommandReq := {
+                    commandRef := ?, 
+                    ref := 3,
+                    command_param := { 
+                        FWTupdate := { 
+                            fwtNo := 0, 
+                            fwt := { 
+                                UpdateFNTP := mw_fwtUpdate  
+                            } // End of field 'fwt'
+                        } // End of field 'FWTupdate'
+                    } // End of field 'command_param'
+                } // End of template mw_fWTUpdateCommandReq
+                
+                /**
+                 * @desc    Received template on forwarding table change request
+                 * @see     ISO 24102-3 D.2.3 FWTset
+                 */
+                template MN_Command_request mw_fwtSetCommandReq := {
+                    commandRef := ?, 
+                    ref := 2,
+                    command_param := { 
+                        FWTset := { 
+                            fwtNo := 0, 
+                            fwt := { 
+                                SetFNTP := mw_fwtSet_any 
+                            } // End of field 'fwt'
+                        } // End of field 'FWTset'
+                    } // End of field 'command_param'
+                } // End of template mw_fwtSetCommandReq
+                
+                /**
+                 * @desc  Receive a "FWTupdate message" to update the FNTP forwarding table
+                 * @see ISO 24102-3 Clause E.2.4
+                 */
+                template UpdateFNTP mw_fwtUpdate := {
+                    fill := '0'B, 
+                    reference := ?, 
+                    remotePort := omit,
+                    linkID := omit,
+                    ciStatus := omit,
+                    linkPort := omit,
+                    serviceInfo := omit,
+                    priority := omit,
+                    timeout_ := 100
+                } // End of template mw_fwtUpdate
+                
+                /**
+                 * @desc    Generic received template on setting an entry in the forwarding table of a networking protocol
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 * @see     ISO 24102-3 D.2.3 FWTset
+                 */
+                template SetFNTP mw_fwtSet_any := {
+                    remotePort := ?,
+                    linkID := ?,
+                    ciStatus := ?,
+                    linkPort := ?,
+                    serviceInfo := ?,
+                    priority := ?,
+                    timeout_ := ?
+                } // End of template mw_fwtSet_any
+                
+                template SetNotFNTP mw_fwtSetNot_any := { 
+                    reference := ?, 
+                    remotePort := ?, 
+                    linkID := ?, 
+                    ciStatus := ?, 
+                    linkPort := ?, 
+                    serviceInfo := ?, 
+                    priority := ?, 
+                    timeout_ := ? 
+                } // End of template mw_fwtSetNot_any 
+                
+            } // End of group fwtCommands
+            
+        } // End of group mgtMnSapTemplates
+        
+        group mgtMiSapTemplates {
+            
+            group mgtMiSapTemplatesSend {
+                
+                /**
+                 * @desc    Send template for MI-COMMAND.request service primitive
+                 * @param   p_linkID        Link ID of the peer station
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MN-REQUEST.request
+                 * @param   p_command_param MI_Command message description
+                 * @see ISO 24102-3 Clause 6.4.2 MI-COMMAND.request
+                 */
+                template (value) MI_Command_request m_miCommandRequest_wakeUp( 
+                    in template (value) Link_ID p_linkId,
+                    in template (value) CommandRef p_commandRef, 
+                    in template (value) WakeUp p_wakeUp  
+                ) := { 
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    ref := 3,
+                    command_param := {
+                        WakeUp := p_wakeUp
+                    } // End of 'command_param' field 
+                } // End of template m_miCommandRequest_wakeUp
+                
+                /**
+                 * @desc Generic receive template for MN-REQUEST.request service primitive 
+                 * @param   p_linkId        Link identifier of the CI
+                 * @param   p_commandRef    Unique cyclic reference number of command. 
+                 * @param   p_request_param MI-Request message description 
+                 */
+                template (value) MI_Request_request m_miRequestRequest_regReq( 
+                    in template (value) Link_ID p_linkId, 
+                    in template (value) CommandRef p_commandRef, 
+                    in template (value) RegReq p_regReq 
+                ) := { 
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    ref := 1, 
+                    request_param := { RegReq := p_regReq } 
+                } // End of template m_miRequestRequest_regReq 
+                
+                /**
+                 * @desc Send template for MI-GET service primitive
+                 * @param   p_linkID        Link ID of the peer station
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MN-REQUEST.request
+                 * @param   p_get_param_no  Reference number of parameter to be monitored
+                 * @see ISO 24102-3 6.3.1 MI-GET.request
+                 * @see ISO 21218 Annex A (normative) I parameters
+                 */
+                template (value) MI_Get_request m_miGetRequest( 
+                    in template (value) Link_ID p_linkId,
+                    in template (value) CommandRef p_commandRef,
+                    in template (value) IParamNoList p_getParamNo
+                ) := {
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    get_param_no := p_getParamNo
+                } // End of template m_miGetRequest
+                
+                /**
+                 * @desc Send template for MI-SET service primitive
+                 * @param   p_linkID        Link ID of the peer station
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MN-REQUEST.request
+                 * @param   p_get_param_no  Reference number of parameter to be monitored
+                 * @see ISO 24102-3 6.3.1 MI-SET.request
+                 * @see ISO 21218 Annex A (normative) I parameters
+                 */
+                template (value) MI_Set_request m_miSetRequest( 
+                    in template (value) Link_ID p_linkId,
+                    in template (value) CommandRef p_commandRef,
+                    in template (value) IParamList p_setParam
+                ) := {
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    set_param := p_setParam
+                } // End of template m_miSetRequest
+                
+            } // End of group mgtMiSapTemplatesSend
+            
+            group mgtMiSapTemplatesRecv {
+                
+                /**
+                 * @desc    Receive template for MI-COMMAND.request service primitive
+                 * @param   p_linkID        Link ID of the peer station
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MN-REQUEST.request
+                 * @param   p_miCmd         MI-Command message description 
+                 * @see ISO 24102-3 6.4.2 MI-COMMAND.request
+                 */
+                template (present) MI_Command_request mw_miCommandRequest_wakeUp( 
+                    in template (present) Link_ID p_linkId, 
+                    in template (present) CommandRef p_commandRef, 
+                    in template (present) WakeUp p_wakeUp 
+                ) := { 
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    ref := 3,
+                    command_param := {WakeUp := p_wakeUp}
+                } // End of template mw_miCommandRequest_wakeUp
+                           
+                /**
+                 * @desc Send template for MI-COMMAND.confirm service primitive
+                 * @see ISO 24102-3 Clause 6.4.3 MI-COMMAND.confirm
+                 */
+                template (present) MI_Command_confirm mw_miCommandConfirm_wakeUp( 
+                    in template (present) Link_ID p_linkId, 
+                    in template (present) CommandRef p_commandRef
+                ) := {
+                    linkID := p_linkId,
+                    commandRef := p_commandRef,
+                    errStatus := 0
+                } // End of template mw_miCommandConfirm_wakeUp
+                
+                /**
+                 * @desc Receive template for MI-REQUEST.request service primitive
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MNREQUEST.request
+                 * @param   p_miReq         Command issued by the ITS-S facilities layer and sent to the ITS-S management entity via the MI-SAP
+                 */
+                template (present) MI_Request_request mw_miRequestRequest_regReq( 
+                    in template (present) Link_ID p_linkId, 
+                    in template (present) CommandRef p_commandRef, 
+                    in template (present) RegReq p_regReq 
+                ) := { 
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    ref := 1,
+                    request_param := { RegReq := p_regReq } 
+                } // End of template mw_miRequestRequest_regReq
+                
+                template (present) MI_Request_confirm mw_miRequestConfirm( 
+                    in template (present) ErrStatus p_errorStatus 
+                ) := { 
+                    linkID := ?, 
+                    commandRef := ?, 
+                    errStatus := p_errorStatus 
+                } // End of template mw_miRequestConfirm 
+                
+                /**
+                 * @desc Receive template for MI-GET.request service primitive
+                 * @param   p_linkID        Link ID of the peer station
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MN-REQUEST.request
+                 * @param   p_get_param_no  Reference number of parameter to be monitored
+                 * @see ISO 24102-3 6.3.1 MI-GET.request
+                 * @see ISO 21218 Annex A (normative) I parameters
+                 */
+                template (present) MI_Get_request mw_miGetRequest( 
+                    in template (present) Link_ID p_linkId,
+                    in template (present) CommandRef p_commandRef,
+                    in template (present) IParamNoList p_getParamNo
+                ) := {
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    get_param_no := p_getParamNo
+                } // End of template mw_miGetRequest
+                
+                /**
+                 * @desc Send template for MI-GET.confirm service primitive
+                 * @see ISO 24102-3 Clause 6.4.2 MI-GET.confirm
+                 */
+                template (present) MI_Get_confirm mw_miGetConfirm( 
+                    in template (present) Link_ID p_linkId,
+                    in template (present) CommandRef p_commandRef,
+				    in template (present) IParamList p_getParam
+                ) := {
+                    linkID := p_linkId,
+                    commandRef := p_commandRef,
+                    get_param := p_getParam
+                } // End of template mw_miGetConfirm
+                
+                /**
+                 * @desc Receive template for MI-SET.request service primitive
+                 * @param   p_linkID        Link ID of the peer station
+                 * @param   p_commandRef    Unique cyclic reference number of command. Same value as in related MN-REQUEST.request
+                 * @param   p_set_param     Reference number of parameter to be monitored
+                 * @see ISO 24102-3 6.3.1 MI-SET.request
+                 * @see ISO 21218 Annex A (normative) I parameters
+                 */
+                template (present) MI_Set_request mw_miSetRequest( 
+                    in template (present) Link_ID p_linkId,
+                    in template (present) CommandRef p_commandRef,
+                    in template (present) IParamList p_setParam
+                ) := {
+                    linkID := p_linkId, 
+                    commandRef := p_commandRef, 
+                    set_param := p_setParam
+                } // End of template mw_miSetRequest
+                
+                /**
+                 * @desc Send template for MI-SET.confirm service primitive
+                 * @see ISO 24102-3 Clause 6.2.2 MI-SET.confirm
+                 */
+                template (present) MI_Set_confirm mw_miSetConfirm( 
+                    in template (present) Link_ID p_linkId,
+                    in template (present) CommandRef p_commandRef,
+                    in template (present) Errors p_setParam
+                ) := {
+                    linkID := p_linkId,
+                    commandRef := p_commandRef, 
+                    set_param := p_setParam 
+                } // End of template mw_miSetConfirm
+                
+            } // End of mgtMiSapTemplatesRecv
+            
+        } // End of group mgtMiSapTemplates
+        
+    } // End of group mgtSapTemplates
+    
+} // End of module LibItsMgt_Templates

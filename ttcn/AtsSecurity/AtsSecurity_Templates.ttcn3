@@ -1,0 +1,62 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsSecurity/AtsSecurity_Templates.ttcn3 $
+ *            $Id: AtsSecurity_Templates.ttcn3 2230 2015-06-03 09:11:02Z mullers $
+ *  @desc     Module containing templates for secured GeoNetworking ATS
+ *
+ */
+module AtsSecurity_Templates {
+    
+//    // LibIts
+//    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+//    import from ITS_Container language "ASN.1:1997" all;
+//    
+    // LibItsBtp
+    import from LibItsBtp_TypesAndValues all;
+    import from LibItsBtp_Templates all;
+    import from LibItsBtp_Pixits all;
+    
+    // LibItsGeoNet
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsGeoNetworking_Templates all;
+    
+    template (present) BtpPayload mw_btpCamPayload := {
+        decodedPayload := {
+            camPacket := ?
+        },
+        rawPayload := ?
+    } // End of template mw_btpCamPayload
+    
+    
+    template (present) BtpPayload mw_btpDenmPayload := {
+        decodedPayload := {
+            denmPacket := ?
+        },
+        rawPayload := ?
+    } // End of template mw_btpDenmPayload
+    
+    template (present) Payload mw_secCamPayload := {
+        decodedPayload := {
+            btpPacket := mw_btpB(
+                PX_DESTINATION_PORT,
+                ?,
+                mw_btpCamPayload
+            )
+        },
+        rawPayload := ?
+        
+    } // End of template mw_secCamPayload
+    
+    template (present) Payload mw_secDenmPayload := {
+        decodedPayload := {
+            btpPacket := mw_btpB(
+                PX_DESTINATION_PORT,
+                ?,
+                mw_btpDenmPayload
+            )
+        },
+        rawPayload := ?
+        
+    } // End of template mw_secCamPayload
+    
+} // End of module AtsSecurity_Templates 

@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "601932b9-103d-436f-92ba-51fa3a849a71",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "601932b9-103d-436f-92ba-51fa3a849a71",
+            "type": "STRING",
+            "value": "Check that time_start_and_end is included in the AT certificate validation restrictions\r\nCheck that time_start_and_end is inside the AA certificate time restrictions"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "601932b9-103d-436f-92ba-51fa3a849a71",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating certificate_chain\r\n\t\t\t\tcontaining certificates[last-1] {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_authority' (2)\r\n\t\t\t\t\tcontaining validity_restrictions['time_start_and_end']\r\n\t\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\t\tindicating START_AA_VALIDITY\r\n\t\t\t\t\t\tcontaining end_validity\r\n\t\t\t\t\t\t\tindicating END_AA_VALIDITY\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t\tcontaining certificates[last] {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_ticket' (1)\r\n\t\t\t\t   containing validity_restrictions [0..N] {\r\n\t\t\t\t   not containing validity_restrictions['time_end']\r\n\t\t\t\t   and not containing validity_restrictions['time_start_and_duration']\r\n\t\t\t\t   and containing validity_restrictions['time_start_and_end']\r\n\t\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\t\tindicating START_AT_VALIDITY\r\n\t\t\t\t\t\t\t\t(START_AT_VALIDITY >= START_AA_VALIDITY )\r\n\t\t\t\t\t\tcontaining end_validity\r\n\t\t\t\t\t\t\tindicating END_AT_VALIDITY\r\n\t\t\t\t\t\t\t\t(END_AT_VALIDITY >= START_AT_VALIDITY <= END_AA_VALIDITY)\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "601932b9-103d-436f-92ba-51fa3a849a71",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "601932b9-103d-436f-92ba-51fa3a849a71",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "601932b9-103d-436f-92ba-51fa3a849a71"
+}

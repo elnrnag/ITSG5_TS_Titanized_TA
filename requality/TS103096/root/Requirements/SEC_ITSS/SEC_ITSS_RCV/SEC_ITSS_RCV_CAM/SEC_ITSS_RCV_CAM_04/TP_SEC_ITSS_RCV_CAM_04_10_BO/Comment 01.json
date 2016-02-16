@@ -1,0 +1,25 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "ITS-S can also discard it because of presence of unknown header.\r\nWhat to do???"
+        },
+        "_index": {
+            "key": "_index",
+            "type": "STRING",
+            "value": "1"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Comment"
+        }
+    },
+    "uuid": "0a43835b-a99f-4e44-9e6f-c75a86a396cc"
+}

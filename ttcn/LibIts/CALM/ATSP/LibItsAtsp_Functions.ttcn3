@@ -1,0 +1,1410 @@
+/**
+ *  @author     ETSI / STF455
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/ATSP/LibItsAtsp_Functions.ttcn3 $
+ *              $Id: LibItsAtsp_Functions.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Access Technology Layer (ISO 21218) functions
+ */
+module LibItsAtsp_Functions {
+	
+	// LibCommon
+    import from LibCommon_Sync {
+        function 
+            f_connect4SelfOrClientSync, f_disconnect4SelfOrClientSync, 
+            f_selfOrClientSyncAndVerdict, f_selfOrClientSyncAndVerdictTestBody; 
+        altstep a_shutdown 
+    };
+    import from LibCommon_VerdictControl {
+      type FncRetCode
+    };
+    import from LibCommon_Time {
+      function f_sleep, f_sleepIgnoreDef
+    };
+    import from LibCommon_BasicTypesAndValues { 
+        type UInt6, UInt8  
+    };
+	
+	// LibIts
+	
+	// LibItsCalm
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+			UserPriority, VCIserialNumber, EUI64,
+			LLserviceAddr, INdata, IN_SAPaddress, 
+			CIstatus, Link_ID, MedType, Errors, 
+			I_Param, I_ParamNo, MedID, VirtualCIs
+    };	
+	import from CALMmsap language "ASN.1:1997" { 
+        type 
+			CIstateChng, Events21218, ErrStatus,
+			MI_Request_request, MI_Request_confirm,
+			MI_Command_request, MI_Command_confirm,
+			CommandRef
+	};	
+	import from CALMmanagement language "ASN.1:1997" { 
+        type 	
+			ITS_scuId
+	};	
+	import from LibItsCalm_Interface { 
+        type 
+            UtInitialize, CfInitialize, CfEventInd, 
+            UtResult, CfResult, 
+            ItsCalm
+    };
+	
+	import from LibItsAtsp_Templates all;
+	import from LibItsAtsp_Pics all;
+	import from LibItsAtsp_Pixits all;
+	import from LibItsAtsp_TypesAndValues all;
+	import from LibItsCalm_Interface all;
+	import from LibItsFsap_TypesAndValues {
+		type AcFsapPrimitive
+	};
+	import from LibItsIicp_Functions {
+        altstep a_iicpDefault
+    };
+	import from LibItsMgt_TypesAndValues {
+        const c_dniCiid;
+		type IParamNoList, IParamList
+    }; 
+	import from LibItsMgt_Functions {
+		function f_getNextCommandRef
+	};
+	
+    /**
+     * @desc Upper tester functions
+     */
+    group utFunctions {
+        
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_utInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utAtspInitializeIut(template (value) UtInitialize p_utInitialize) runs on ItsCalm {
+        
+            utPort.send(p_utInitialize);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                    log("*** f_utAtspInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utAtspInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utAtspInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+        
+        } // End of function f_utAtspInitializeIut 
+        
+        /**
+         * @desc    Send a NFsapPrimitivesDown primitive and wait for the NFsapPrimitivesUp confirm response
+         * @param   p_utAtspEvent    The NFsapPrimitivesDown request
+         * @param   p_utAtspEventInd The NFsapPrimitivesDown response
+         * @param   p_discard        Set to true if responses shall be discard, otherwise the function failed 
+         * @param   p_result         The response value
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utAtspEventResponse( 
+            in template (value) UtAtspEvent p_utAtspEvent, 
+            in template (present) UtAtspEventInd p_utAtspEventInd, 
+            in boolean p_discard, 
+            out UtAtspEventInd p_result) 
+        runs on ItsCalm {
+            
+//            log("*** f_utAtspEventResponse: INFO: Send message: ", p_commandReq, " ***");
+            utPort.send(p_utAtspEvent);
+//            log("*** f_utAtspEventResponse: INFO: Expected UtCommandConfirm: ", p_commandConf, " ***");
+            tc_wait.start;
+            alt {
+                [] utPort.receive(p_utAtspEventInd) -> value p_result {
+//                    log("*** f_utAtspEventResponse: INFO: Receive expected confirm: message ***");
+                    tc_wait.stop;
+                }
+                [] utPort.receive(UtAtspEventInd:? ) -> value p_result {
+                    if (p_discard == false) { 
+                        tc_wait.stop; 
+                        log("*** f_utAtspEventResponse: ERROR: Event not correctly indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("fail", e_error);
+                    }
+                    else {
+                        log("*** f_utAtspEventResponse: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    }
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) {
+                        log("*** f_utAtspEventResponse: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                    else {
+                        log("*** f_utAtspEventResponse: INFO: Event not indicated at application layer ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                }
+            } // End of 'alt' statement
+            
+        } // End of function f_utAtspEventResponse
+        
+        /**
+         * @desc    Send a NFsapPrimitivesDown primitive and do not wait for the NFsapPrimitivesDown confirm response
+         * @param   p_utAtspEvent    The NFsapPrimitivesDown primitive
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_utAtspEvent( 
+            in template (value) UtAtspEvent p_utAtspEvent 
+        ) runs on ItsCalm { 
+            var UtAtspEventInd v_utAtspEventInd;
+            
+            utPort.send(p_utAtspEvent);
+            tc_noac.start;
+            alt {
+                [] utPort.receive(UtAtspEventInd:?) -> value v_utAtspEventInd { // FIXME Use altstep for UtPort
+                    tc_noac.stop;
+                    log("*** f_utAtspEvent: INFO: Unexpected message was received ***", v_utAtspEventInd);
+                    // FIXME Check the content of the notification, not sure which fields should be set - repeat;
+                }
+                [] tc_noac.timeout {
+                    log("*** f_utAtspEvent: INFO: CommandRequest succeed ***");
+                }
+            } // End of 'alt' statement 
+
+        } // End of function f_utAtspEvent
+        
+    } // End of group utFunctions
+
+    /**
+     * @desc Config tester functions
+     */
+    group cfFunctions { 
+        
+        /**
+         * @desc    Requests to initialize the configuration tester 
+         * @param   p_cfInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_cfAtspInitialize(template (value) CfInitialize p_cfInitialize) runs on ItsCalm {
+        
+            cfPort.send(p_cfInitialize);
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(CfResult:true) {
+                    tc_wait.stop;
+                    log("*** f_cfAtspInitialize: INFO: Configuration tester initialized ***");
+                }
+                [] cfPort.receive {
+                    tc_wait.stop;
+                    log("*** f_cfAtspInitialize: INFO: Configuration tester could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_cfAtspInitialize: INFO: Configuration tester could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+
+        } // End of function f_cfAtspInitialize 
+        
+        /**
+         * @desc    Await for notification on MN-SAP 
+         * @param   p_cfAtspEventInd    The MN_Request_request notification message.
+         * @param   p_discard           Set to true if responses shall be discard, otherwise the function failed 
+         * @verdict Unchanged on success, fail otherwise
+         */
+/* TODO To be removed        function f_cfAtspAwaitNotificationToManagement( 
+            in template CfAtspEventInd p_cfAtspEventInd, 
+            in boolean p_discard 
+        ) runs on ItsCalm {
+            var CfAtspEventInd p_result;
+            
+            log("*** f_cfAtspAwaitNotificationToManagement: INFO: Expected event: ", p_cfAtspEventInd, " ***");
+            tc_wait.start;
+            alt {
+                [] cfPort.receive(p_cfAtspEventInd) {
+                    tc_wait.stop;
+                    log("*** f_cfAtspAwaitNotificationToManagement: INFO: Notification event received ***");
+                }
+                [] cfPort.receive(CfAtspEventInd: ?) -> value p_result { 
+                    if (p_discard == false) { 
+                        tc_wait.stop;
+                        log("*** f_cfAtspAwaitNotificationToManagement: ERROR: Another event indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfAtspAwaitNotificationToManagement: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    } 
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) { 
+                        log("*** f_cfAtspAwaitNotificationToManagement: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    } else { 
+                        log("*** f_cfAtspAwaitNotificationToManagement: INFO: Event not indicated at application layer ***");
+                    }
+                }
+            } // End of 'alt' statement
+        
+        } // End of function f_cfAtspAwaitNotificationToManagement
+*/    
+    } // End of group cfFunctions
+    
+    /**
+     * @desc Test adapter setting functions
+     */
+	group atspConfigurationFunctions {
+		
+		/**
+         * @desc This configuration features:
+         */
+        function f_cf01Up() runs on ItsCalm {
+            
+            // Sanity check
+            
+            // Map
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            map(self:cfPort, system:cfPort);
+			map(self:atspPort, system:atspPort);
+            
+            // Connect
+            f_connect4SelfOrClientSync(); 
+            
+            // Set processing on shutdown
+            activate(a_cf01Down());
+            
+            // Initialize the component
+            f_initialiseComponent("cf01Up");
+
+            // Initialze the IUT
+            f_initialState();
+            
+        } // End of function f_cf01Up
+		
+		/**
+         * @desc    Deletes configuration cf01
+         */
+        function f_cf01Down() runs on ItsCalm {
+            
+            deactivate;
+            
+            // Unmap
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            unmap(self:cfPort, system:cfPort); 
+            unmap(self:atspPort, system:atspPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // End of f_cf01Down
+		
+		/**
+         * @desc    Behavior function for initializing component's variables and tables
+         * @param   p_componentName Name of the component
+         * @param   p_iicpMGM Set to true if IISC port shall be used
+         */
+        function f_initialiseComponent(in charstring p_componentName) runs on ItsMgt {
+            
+            // Initialize variables
+            
+            // Set defaults
+            activate(a_atspDefault()); 
+        } // End of function f_initialiseComponent
+	}
+	
+	group preambles {
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         */
+        function f_initialState() runs on ItsCalm {
+            f_utAtspInitializeIut(m_utAtspInitialize);
+            f_cfAtspInitialize(m_cfAtspInitialize);
+            f_sleepIgnoreDef(PX_WAIT_FOR_IUT_READY); // Wait until the IUT is in a stable situation 
+            cfPort.clear; // Because TestConfigIICP should trigger management port deletion message 
+        } // End of function f_initialState
+
+		
+        /**
+         * @desc Checks whether the IUT is in the initial CI state "active".
+         */
+        function f_initialCIstateActive() runs on ItsCalm return CIstatus {
+			var CIstatus v_CIstatus;
+			//  CI status has to be "active"
+			v_CIstatus := f_cnGetCiStatusParameterValueCI( f_get_CI_LinkID());
+			if( v_CIstatus != c_ciStatusActive)
+			// wrong status 
+			{
+				// Request operator to switch on the SUT or to activate the IUT
+				action("Switch on SUT or activate IUT");
+				f_cnAwaitRegistrationCI(f_get_CI_LinkID(), PX_CI_MED_TYPE, true);
+				f_cnAwaitEventNotificationCI(f_get_CI_LinkID(), mw_miEvent21218_5(mw_miCIStatusParam(c_ciStatusActive)), true);
+				v_CIstatus := f_cnGetCiStatusParameterValueCI( f_get_CI_LinkID());
+			}
+			// check again CI status after activation of IUT
+			if( v_CIstatus != c_ciStatusActive)
+			{
+				log("*** f_initialCIstateActive: ERROR: Invalid initial CI status returned ***", v_CIstatus);
+               	f_selfOrClientSyncAndVerdict("error", e_timeout);  // Might be just a time-out error
+				stop;
+			}
+			else
+			{
+				log("*** f_initialCIstateActive: Allowed initial CI status returned ***", v_CIstatus);
+			}
+			return v_CIstatus
+		}
+			// End of function f_initialCIstateActive
+
+        /**
+         * @desc Checks whether the IUT is in the initial CI state "active" or connected.
+         */
+        function f_initialCIstateActiveConnected() runs on ItsCalm return CIstatus {
+			var CIstatus v_CIstatus;
+			//  CI status has to be "active"
+			v_CIstatus := f_cnGetCiStatusParameterValueCI( f_get_CI_LinkID());
+			if( (v_CIstatus != c_ciStatusActive) and (v_CIstatus != c_ciStatusConnected))
+			// wrong status 
+			{
+				// Request operator to switch on the SUT or to activate the IUT
+				action("Switch on SUT or activate IUT");
+				f_cnAwaitRegistrationCI(f_get_CI_LinkID(), PX_CI_MED_TYPE, true);
+				f_cnAwaitEventNotificationCI(f_get_CI_LinkID(), mw_miEvent21218_5(mw_miCIStatusParam(c_ciStatusActive)), true);
+				v_CIstatus := f_cnGetCiStatusParameterValueCI( f_get_CI_LinkID());
+			}
+			// check again CI status after activation of IUT
+			if( (v_CIstatus != c_ciStatusActive) and (v_CIstatus != c_ciStatusConnected))
+			{
+				log("*** f_initialCIstateActive: ERROR: Invalid initial CI status returned ***", v_CIstatus);
+               	f_selfOrClientSyncAndVerdict("error", e_timeout);  // Might be just a time-out error
+				stop;
+			}
+			else
+			{
+				log("*** f_initialCIstateActive: Allowed initial CI status returned ***", v_CIstatus);
+			}
+			return v_CIstatus
+		}
+			// End of function f_initialCIstateActiveConnected
+
+		/**
+         * @desc Checks whether the IUT is in an operational initial CI state 
+		 * i.e. not in "not-existent", "existent", "unknown".
+         */
+        function f_initialCIstatesOperational() runs on ItsCalm return CIstatus {
+			var CIstatus v_CIstatus;
+			//  CI status has to be in any CI state except "not_existent", "existent", "unknown".
+			v_CIstatus := f_cnGetCiStatusParameterValueCI( f_get_CI_LinkID());
+			if( (v_CIstatus == c_ciStatusUnknown) or (v_CIstatus == c_ciStatusNot_existent) or (v_CIstatus == c_ciStatusExistent) )
+			// wrong status 
+			{
+				// Request operator to switch on the SUT or to activate the IUT
+				action("Switch on SUT or activate IUT");
+				f_cnAwaitRegistrationCI(f_get_CI_LinkID(), PX_CI_MED_TYPE, true);
+				f_cnAwaitEventNotificationCI(f_get_CI_LinkID(), mw_miEvent21218_5(mw_miCIStatusParam(c_ciStatusActive)), true);
+				v_CIstatus := f_cnGetCiStatusParameterValueCI( f_get_CI_LinkID());
+			}
+			// check again CI status after activation of IUT
+			if( (v_CIstatus == c_ciStatusUnknown) or (v_CIstatus == c_ciStatusNot_existent) or (v_CIstatus == c_ciStatusExistent) )
+			{
+				log("*** f_initialCIstatesOperational: ERROR: Invalid initial CI status returned ***", v_CIstatus);
+               	f_selfOrClientSyncAndVerdict("error", e_timeout);  // Might be just a time-out error
+				stop;
+			}
+			else
+			{
+				log("*** f_initialCIstatesOperational: Allowed initial CI status returned ***", v_CIstatus);
+			}
+			return v_CIstatus
+		}
+			// End of function f_initialCIstatesOperational
+		
+    } // End of group preambles
+    
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsCalm {
+            // Nothing to do
+        } // End of function f_poDefault
+        
+    } // End of group postambles
+	
+	group adapterControl {
+        
+        /**
+         * @desc    Triggers event in the test system adaptation.
+         * @param   p_event The event to trigger
+         */
+        function f_acTriggerEvent(
+            in template (value) AcFsapPrimitive p_event 
+        ) runs on ItsCalm {
+//            log("*** f_acTriggerEvent: send: ", p_event, "***");
+            acPort.send(p_event);
+        }
+    } // End of group adapterControl
+	
+	group atspFunctions {
+		
+		group miSAP {
+
+			/**
+	         * @desc Wait for Registration Request from IUT 
+	         * @param   p_linkID    Link-ID used by IUT
+	         * @param   p_medType   MedType of IUT
+			 * @param   p_discard   Unexpected Confirm messages will be discarded, or cause testcase failure
+	         */
+			function f_cnAwaitRegistrationCI( 
+	            in template Link_ID p_linkID,	// PIXIT Element
+	            in template MedType p_medType, 	// PIXIT Element
+	            in boolean p_discard 			// set to TRUE
+	        ) runs on ItsCalm {
+				if(PICS_DYNREG)
+				{
+					// Wait for MI-Request.request "RegReq"
+		            f_cnAwaitAndConfirmMI_RequestCI(mw_miRegRequest(p_linkID, ?, m_regRequest(p_medType)), p_discard);
+					
+					// Reply MI-Command.request "RegCmd"
+					f_cnSendMICOMMAND_RequestCheckSuccessCI(m_miRegistrationCommandRequest(
+															p_linkID, 
+															f_getNextCommandRef(), 
+															m_regCommand(PX_ITS_SCU_ID, p_medType)), p_discard);
+				}
+				// Check for reception of Status notification (I-Parameter 12 "CIstatus" set to "registered". 
+				f_cnAwaitEventNotificationCI(p_linkID, mw_miEvent21218_5(mw_miCIStatusParam(c_ciStatusRegistered)), p_discard);
+    	    } // End of function f_cnAwaitRegistrationCI	
+
+			/**
+			* @desc Wait for a specific MI-REQUEST and confirm it
+			* @param   p_expectedMI_Request		MI-Request to expect
+			* @param   p_discard   				Unexpected request messages will be discarded, or cause testcase failure
+			*/
+			function f_cnAwaitAndConfirmMI_RequestCI( 
+				in template MI_Request_request p_expectedMI_Request,
+   	         	in boolean p_discard 			// set to TRUE
+    	    ) runs on ItsCalm {
+				var CfAtspEventInd v_result;
+				var template CfAtspEventInd v_cfAtspEventInd;
+			
+				v_cfAtspEventInd := mw_cfAtspRequestRequest(p_expectedMI_Request);
+    	        log("*** f_cnAwaitAndConfirmMI_RequestCI: DEBUG: Expected MI-REQUEST.request: ", v_cfAtspEventInd, " ***");
+        	    tc_wait.start;
+            	alt {
+                	[] cfPort.receive(v_cfAtspEventInd) -> value v_result {
+                    	tc_wait.stop;
+	                    log("*** f_cnAwaitAndConfirmMI_RequestCI: INFO: MI-REQUEST.request received ***");
+						f_cnConfirmMI_RequestCI(m_cfAtspRequestConfirm(v_result.miRequestRequest, c_ciErrStatusSuccess));
+        	        }
+            	    [] cfPort.receive( { miRequestRequest := ? } ) -> value v_result { 
+                	    if (p_discard == false) { 
+                    	    tc_wait.stop;
+                        	log("*** f_cnAwaitAndConfirmMI_RequestCI: ERROR: An unexpected MI-REQUEST.Request was received ***", v_result);
+	                        f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+    	                } else { 
+        	                log("*** f_cnAwaitAndConfirmMI_RequestCI: DEBUG: An unexpected MI-REQUEST.Request was received, repeating check ***");
+							f_cnConfirmMI_RequestCI(m_cfAtspRequestConfirm(v_result.miRequestRequest, c_ciErrStatusSuccess));
+                	        repeat;
+                    	} 
+	                }
+					[] cfPort.receive(CfAtspEventInd : ?) -> value v_result { 
+        	            if (p_discard == false) { 
+            	            tc_wait.stop;
+                	        log("*** f_cnAwaitAndConfirmMI_RequestCI: ERROR: An unexpected message was received ***", v_result);
+                    	    f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+	                    } else { 
+    	                    log("*** f_cnAwaitAndConfirmMI_RequestCI: INFO: An unexpected message was received, repeating check ***");
+        	                repeat;
+            	        } 
+                	}
+	                [] tc_wait.timeout {
+    	                if (p_discard == false) { 
+        	                log("*** f_cnAwaitAndConfirmMI_RequestCI: ERROR: Timeout while waiting for event check result ***");
+            	            f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+                	    } else { // What is the purpose of this? 
+                    	    log("*** f_cnAwaitAndConfirmMI_RequestCI: INFO: Event not indicated at application layer ***");
+	                    }
+    	            }
+        	    } // End of 'alt' statement
+        	} // End of function f_cnAwaitAndConfirmMI_RequestCI
+	
+			/**
+			 * @desc Send an MI-REQUEST confirmation
+			 * @param   p_MI_RequestConfirm    Confirmation to send
+			 */
+			function f_cnConfirmMI_RequestCI( 
+				in template(value) MI_Request_confirm p_MI_RequestConfirm
+	        ) runs on ItsCalm {
+				//Local variables
+				var template CfAtspEvent v_cfConfirmEvent;
+			
+				v_cfConfirmEvent := m_cfAtspMIRequest_confirm(p_MI_RequestConfirm);
+				log("*** f_cnConfirmMI_RequestCI: DEBUG: Sending MI-REQUEST.confirm: ", v_cfConfirmEvent, " ***");
+				cfPort.send(v_cfConfirmEvent);
+	        } // End of function f_cnConfirmMI_RequestCI
+	
+			/**
+			 * @desc Send an MI-COMMAND request
+			 * @param   p_sentMI_Command    Command to send 
+			 */
+			function f_cnSendMICOMMAND_RequestCI( 
+				in template(value) MI_Command_request p_sentMI_Command
+	        ) runs on ItsCalm {
+				var template CfAtspEvent v_cfCommandEvent;
+				
+				v_cfCommandEvent := m_cfAtspCommandReqEvent(p_sentMI_Command);
+				log("*** f_cnSendMICOMMAND_RequestCI: DEBUG: Sending MI-COMMAND.request: ", v_cfCommandEvent, " ***");
+				cfPort.send(v_cfCommandEvent);
+			} // End of function f_cnSendMICOMMAND_RequestCI
+	
+			/**
+			 * @desc Send an MI-COMMAND request and wait for confirmation
+			 * @param   p_sentMI_Command    Command to send wait confirmation for
+			 * @param   p_discard   		Unexpected Request messages will be discarded, or cause testcase failure
+			 */
+			function f_cnSendMICOMMAND_RequestCheckSuccessCI( 
+				in template(value) MI_Command_request p_sentMI_Command,
+				in boolean p_discard 			// set to TRUE
+	        ) runs on ItsCalm {
+			
+				f_cnSendMICOMMAND_RequestCI(p_sentMI_Command);
+				f_cnAwaitCommandConfirmSuccess(p_sentMI_Command, p_discard);
+			} // End of function f_cnSendMICOMMAND_RequestCheckSuccessCI
+			
+			/**
+			 * @desc Await success confirmation for a specific command
+			 * @param   p_sentMI_Command    Command to wait confirmation for
+			 * @param   p_discard   		Unexpected Confirm messages will be discarded, or cause testcase failure
+			 */
+			function f_cnAwaitCommandConfirmSuccess(
+				in template(value) MI_Command_request p_sentMI_Command,
+	            in boolean p_discard 			// set to TRUE
+			) runs on ItsCalm {
+	           f_cnAwaitCommandConfirm(p_sentMI_Command, c_ciErrStatusSuccess, p_discard);
+	        } // End of function f_cnAwaitCommandConfirmSuccess
+	
+			/**
+			 * @desc Await confirmation with a specific content for a specific command
+			 * @param   p_sentMI_Command    Command to wait confirmation for
+			 * @param   p_expectedStatus    The specific status to expect
+			 * @param   p_discard   		Unexpected Confirm messages will be discarded, or cause testcase failure
+			 */
+			function f_cnAwaitCommandConfirm(
+				in template(value) MI_Command_request p_sentMI_Command,
+				in template(value) ErrStatus p_expectedStatus,
+	            in boolean p_discard 			// set to TRUE
+			) runs on ItsCalm {
+				var CfAtspEventInd v_result;
+				var template CfAtspEventInd v_cfAtspEventInd;
+				var template CfAtspEventInd v_cfAtspEventReq;
+			
+				v_cfAtspEventInd := mw_cfAtspCommandConfirm(
+								m_miCommandConfirm(
+									p_sentMI_Command.linkID, 
+									p_sentMI_Command.commandRef, 
+									p_expectedStatus));
+				
+				v_cfAtspEventReq := mw_cfAtspRequestRequest(
+								mw_miEventsRequest(
+									p_sentMI_Command.linkID,
+									?,
+									?));
+				
+	            log("*** f_cnAwaitCommandConfirm: DEBUG: Expected MI-COMMAND.confirm: ", v_cfAtspEventInd, " ***");
+    	        tc_wait.start;
+        	    alt {
+            	    [] cfPort.receive(v_cfAtspEventInd) -> value v_result {
+                	    tc_wait.stop;
+                    	log("*** f_cnAwaitCommandConfirm: INFO: Expected MI-COMMAND.confirm received ***");
+	                }
+    	            [] cfPort.receive( { miCommandConfirm := ? } ) -> value v_result { 
+	                    tc_wait.stop;
+    	                log("*** f_cnAwaitCommandConfirm: ERROR: An unexpected MI-COMMAND.confirm was received ***", v_result);
+        	            f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+            	    }
+					[] cfPort.receive( v_cfAtspEventReq ) -> value v_result {
+	                    if (p_discard == false) { 
+                    	    tc_wait.stop;
+                        	log("*** f_cnAwaitCommandConfirm: ERROR: An unexpected MI-COMMAND.confirm was received ***", v_result);
+	                        f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+    	                } else { 
+        	                log("*** f_cnAwaitCommandConfirm: INFO: An unexpected MI-COMMAND.confirm was received, repeating check ***");
+							f_cnConfirmMI_RequestCI(m_cfAtspRequestConfirm(v_result.miRequestRequest, c_ciErrStatusSuccess));
+                	        repeat;
+                    	}
+            	    }
+					[] cfPort.receive(CfAtspEventInd : ? ) -> value v_result { 
+                    	if (p_discard == false) { 
+                        	tc_wait.stop;
+	                        log("*** f_cnAwaitCommandConfirm: ERROR: An unexpected message was received ***", v_result);
+    	                    f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+        	            } else { 
+            	            log("*** f_cnAwaitCommandConfirm: INFO: An unexpected message was received, repeating check ***");
+                	        repeat;
+                    	} 
+	                }
+    	            [] tc_wait.timeout {
+        	            if (p_discard == false) { 
+            	            log("*** f_cnAwaitCommandConfirm: ERROR: Timeout while waiting for event check result ***");
+                	        f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+                    	} else { // What is the purpose of this? 
+                        	log("*** f_cnAwaitCommandConfirm: INFO: Event not indicated at application layer ***");
+	                    }
+    	            }
+        	    } // End of 'alt' statement
+	        } // End of function f_cnAwaitCommandConfirm
+			
+			
+			/**
+			 * @desc Return the number of VCIs values in the I-Parameter 33
+			 * @param   p_iParam    		VirtualCis parameter to check
+			 */
+			function f_getVirualCIcount(
+				in I_Param p_iParam 
+			) return integer{
+				if(p_iParam.paramNo == c_ciIParamNoVirtualCI)
+				{
+					return lengthof(p_iParam.parameter.VirtualCIs);
+				}
+				return 0;
+			} // End of function f_checkNoVirualCIs
+				
+			/**
+			 * @desc Force CI to change state, wait for notification of reaching specific state
+			 * @param   p_linkID    		Link-ID used by IUT
+			 * @param   p_newState    		New state to force
+			 * @param   p_expectedStatus    State to wait notification of
+			 * @param   p_discard   		Unexpected Confirm messages will be discarded, or cause testcase failure
+			 */
+			function f_cnTriggerStateChangeAndWaitCI( 
+	            in Link_ID p_linkID,	// PIXIT Element
+				in CIstateChng p_newState,
+				in CIstatus p_expectedStatus,
+	            in boolean p_discard 			// set to TRUE
+	        ) runs on ItsCalm {
+				//Local variables
+			
+				f_cnSendMICOMMAND_RequestCheckSuccessCI(m_miStateChangeCommandRequest(
+															p_linkID, 
+															f_getNextCommandRef(), 
+															p_newState), true);
+			
+				f_cnAwaitEventNotificationCI(p_linkID, mw_miEvent21218_5(
+											mw_miCIStatusParam(p_expectedStatus)), p_discard);
+			} // End of function f_cnTriggerStateChangeAndWaitCI
+
+			/**
+	         * @desc Wait for a specific event, respond with confirmation 
+	         * @param   p_linkID    Link-ID used by IUT
+	         * @param   p_ev21218   21218 event to expect
+			 * @param   p_discard   Unexpected event request messages will be discarded, or cause testcase failure
+	         */
+			function f_cnAwaitEventNotificationCI( 
+	            in template Link_ID p_linkID,	// PIXIT Element
+				in template Events21218 p_ev21218,
+	            in boolean p_discard 			// set to TRUE
+	        ) runs on ItsCalm {
+				f_cnAwaitAndConfirmMI_RequestCI(mw_miEventsRequest(p_linkID, ?, p_ev21218), p_discard);
+			} // End of function f_cnAwaitEventNotificationCI
+	
+			/**
+	         * @desc Set parameter values
+	         * @param   p_linkID    Link-ID used by IUT
+	         * @param   p_paramValueList   Parameter list to set values of
+			 * @param   p_discard   Unexpected Confirm messages will be discarded, or cause testcase failure 
+			 * @return  List of Errors representing set command success
+	         */
+			function f_cnSetIParameterValueCI( 
+	            in template Link_ID p_linkID,	// PIXIT Element
+				in IParamList p_paramValueList,
+	            in boolean p_discard 			// set to TRUE
+	        ) runs on ItsCalm return Errors {
+				//local variable(s)
+				var template CfAtspEvent v_setCIparams;
+				var template CfAtspEventInd v_cfSetSuccess;
+				var Errors v_cfSetErrorList;
+				var CfAtspEventInd v_result;
+				var CommandRef v_commandRef := f_getNextCommandRef();
+			
+				v_setCIparams := m_cfAtspSetReqEvent(
+									m_miSetRequest(
+										p_linkID,
+										v_commandRef,
+										p_paramValueList
+									)
+								);
+				cfPort.send(v_setCIparams);
+			
+				v_cfSetSuccess := mw_cfAtspEventIndSetConf(
+									mw_miSetConfirm(p_linkID, v_commandRef, ?));
+				log("*** f_cnSetIParameterValueCI: INFO: Expected MI-Set.confirm: ", v_cfSetSuccess, " ***");
+	        	tc_wait.start;
+		        alt {
+		            [] cfPort.receive(v_cfSetSuccess) -> value v_result{
+	    	            tc_wait.stop;
+						f_selfOrClientSyncAndVerdict("Expected message received", e_success);
+	        	        log("*** f_cnSetIParameterValueCI: INFO: Expected 'MI-Set.confirm' received ***");
+						v_cfSetErrorList := v_result.miSetConfirm.set_param;
+		            }
+		            [] cfPort.receive(CfAtspEventInd : ? ) -> value v_result { 
+	    	            if (p_discard == false) { 
+	        	            tc_wait.stop;
+	            	        log("*** f_cnSetIParameterValueCI: ERROR: An unexpected MI-COMMAND was received ***", v_result);
+	                	    f_selfOrClientSyncAndVerdict("error", e_error); // to be checked
+		                } else { 
+		                    log("*** f_cnSetIParameterValueCI: INFO: An unexpected MI-COMMAND was received, repeating check ***");
+	    	                repeat;
+	        	        } 
+	            	}
+		            [] tc_wait.timeout {
+		                if (p_discard == false) { 
+	    	                log("*** f_cnSetIParameterValueCI: ERROR: Timeout while waiting for event check result ***");
+	        	            f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+	            	    } else { // What is the purpose of this? 
+	                	    log("*** f_cnSetIParameterValueCI: INFO: Event not indicated at application layer ***");
+		                }
+		            }
+	    	    } // End of 'alt' statement
+				return v_cfSetErrorList;
+			} // End of function f_cnSetIParameterValueCI
+		
+			/**
+	         * @desc Get parameter values
+	         * @param   p_linkID    Link-ID used by IUT
+	         * @param   p_paramList   Parameter list to get values of
+			 * @param   p_discard   Unexpected Confirm messages will be discarded, or cause testcase failure 
+			 * @return  List of IParameter values requested
+	         */
+			function f_cnGetIParameterValueCI( 
+	            in template Link_ID p_linkID,	// PIXIT Element
+				in IParamNoList p_paramList,
+	            in boolean p_discard 			// set to TRUE
+	        ) runs on ItsCalm return IParamList {
+				//local variable(s)
+				var template CfAtspEvent v_getCIparam;
+				var template CfAtspEventInd v_cfGetSuccess;
+				var IParamList v_paramValueList := {};
+				var CfAtspEventInd v_result;
+				var CommandRef c_commandRef := f_getNextCommandRef();
+			
+				v_getCIparam := m_cfAtspGetReqEvent(
+									m_miGetRequest(
+										p_linkID,
+										c_commandRef,
+										p_paramList
+									)
+								);
+				cfPort.send(v_getCIparam);
+			
+				v_cfGetSuccess := mw_cfAtspEventIndGetConf(
+									mw_miGetConfirm(p_linkID, c_commandRef, ?));
+				log("*** f_cnGetIParameterValueCI: INFO: Expected MI-Get.confirm: ", v_cfGetSuccess, " ***");
+	        	tc_wait.start;
+		        alt {
+		            [] cfPort.receive(v_cfGetSuccess) -> value v_result{
+	    	            tc_wait.stop;
+	        	        log("*** f_cnGetIParameterValueCI: INFO: Expected 'MI-Get.confirm' received ***");
+						v_paramValueList := v_result.miGetConfirm.get_param;
+		            }
+		            [] cfPort.receive(CfAtspEventInd : ?) -> value v_result { 
+	    	            if (p_discard == false) { 
+	        	            tc_wait.stop;
+	            	        log("*** f_cnGetIParameterValueCI: ERROR: An unexpected MI-COMMAND was received ***", v_result);
+	                	    f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+		                } else { 
+		                    log("*** f_cnGetIParameterValueCI: INFO: An unexpected MI-COMMAND was received, repeating check ***");
+	    	                repeat;
+	        	        } 
+	            	}
+		            [] tc_wait.timeout {
+		                if (p_discard == false) { 
+	    	                log("*** f_cnGetIParameterValueCI: ERROR: Timeout while waiting for event check result ***");
+	        	            f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+	            	    } else { // What is the purpose of this? 
+	                	    log("*** f_cnGetIParameterValueCI: INFO: Event not indicated at application layer ***");
+		                }
+		            }
+	    	    } // End of 'alt' statement
+				return v_paramValueList;
+			}// End of function f_cnGetIParameterValueCI
+	
+			/**
+	         * @desc Get current CiStatus IParameter value
+	         * @param   p_linkID    Link-ID used by IUT
+			 * @return  The CIstatus value returned 
+	         */
+			function f_cnGetCiStatusParameterValueCI( 
+	            in template Link_ID p_linkID	// PIXIT Element
+	        ) runs on ItsCalm return CIstatus {
+				//local variable(s)
+				var template CfAtspEvent v_getCIparam;
+				var template CfAtspEventInd v_cfGetCiStatusValue;
+				var CIstatus v_ciStatus;
+				var CfAtspEventInd v_result;
+				var CommandRef v_commandRef := f_getNextCommandRef();
+			
+				v_ciStatus := c_ciStatusUnknown; // initialization with unknown status
+			
+				v_getCIparam := m_cfAtspGetReqEvent(
+										m_miGetRequest(
+											p_linkID,
+											v_commandRef,
+											{ c_ciIParamNoCiStatus }  )  );
+				cfPort.send(v_getCIparam);
+			
+				v_cfGetCiStatusValue := mw_cfAtspEventIndGetConf(
+										mw_miGetConfirm(p_linkID, v_commandRef, {
+											{
+												paramNo := c_ciIParamNoCiStatus,
+												parameter := {
+													CIstatus := ?
+												}
+											} 
+										}));
+				log("*** f_cnGetCiStatusParameterValueCI: INFO: Expected MI-Get.confirm: ", v_cfGetCiStatusValue, " ***");
+		        tc_wait.start;
+		        alt {
+			        [] cfPort.receive(v_cfGetCiStatusValue) -> value v_result{
+		                tc_wait.stop;
+		                log("*** f_cnGetCiStatusParameterValueCI: INFO: Expected 'MI-Get.confirm' received ***");
+						v_ciStatus := v_result.miGetConfirm.get_param[0].parameter.CIstatus;
+	        	    }
+	            	[] cfPort.receive(CfAtspEventInd : ?) -> value v_result { 
+                    	tc_wait.stop;
+	                    log("*** f_cnGetCiStatusParameterValueCI: ERROR: An unexpected MI-COMMAND was received ***", v_result);
+		                repeat;
+	    	        }
+	        	    [] tc_wait.timeout {
+                	    log("*** f_cnGetCiStatusParameterValueCI: ERROR: Timeout while waiting for event check result ***");
+                    	f_selfOrClientSyncAndVerdict("error", e_timeout);
+		            }
+		        } // End of 'alt' statement
+				return v_ciStatus;
+			}// End of function f_cnGetCiStatusParameterValueCI
+
+			/**
+	         * @desc Test addressability of CI using Get current CiStatus IParameter value
+	         * @param   p_linkID    Link-ID used by IUT
+			 * @return  The CIstatus value returned 
+	         */
+			function f_cnTestGetCiStatusParameterValueNoReplyExpected( 
+	            in template Link_ID p_linkID	
+	        ) runs on ItsCalm {
+				//local variable(s)
+				var template CfAtspEvent v_getCIparam;
+				var template CfAtspEventInd v_cfGetCiStatusValue;
+				var CIstatus v_ciStatus;
+				var CfAtspEventInd v_result;
+				var CommandRef v_commandRef := f_getNextCommandRef();
+			
+				v_getCIparam := m_cfAtspGetReqEvent(
+									m_miGetRequest(
+										p_linkID,
+										v_commandRef,
+										{ c_ciIParamNoCiStatus }
+									)
+								);
+				cfPort.send(v_getCIparam);
+			
+				v_cfGetCiStatusValue := mw_cfAtspEventIndGetConf(
+											mw_miGetConfirm(p_linkID, v_commandRef, {
+												{
+													paramNo := c_ciIParamNoCiStatus,
+													parameter := {
+														CIstatus := ?
+													}
+												}
+											}));
+				log("*** f_cnTestGetCiStatusParameterValueNoReplyExpected: INFO: MI-Get.request sent", v_getCIparam, " ***");
+		        tc_ac.start;
+	    	    alt {
+	        	    [] cfPort.receive(v_cfGetCiStatusValue){
+	            	    tc_ac.stop;
+	                	log("*** f_cnTestGetCiStatusParameterValueNoReplyExpected: ERROR: Unexpected 'MI-Get.confirm' received ***");
+						f_selfOrClientSyncAndVerdict("error", e_error);
+		            }
+	    	        [] tc_ac.timeout {
+            	        log("*** f_cnTestGetCiStatusParameterValueNoReplyExpected: INFO: Expected Timeout ***");
+                	    f_selfOrClientSyncAndVerdict("expected timeout", e_success);
+		            }
+		        } // End of 'alt' statement
+			}// End of function f_cnTestGetCiStatusParameterValueNoReplyExpected
+			
+		} // End of group miSAP
+		
+		group utPort {
+
+			/**
+			* @desc Send IN-UNITDATA.Request message
+			* @param   p_source_addr	Source address value
+			* @param   p_dst_addr		Destination address value
+			* @param   p_data			Data to send
+			* @param   p_priority		Priority value
+			*/
+			function f_utSendIN_UNITDATA_Request(
+				in template(value) LLserviceAddr p_source_addr, 
+				in template(value) LLserviceAddr p_dst_addr, 
+				in template(value) INdata p_data,
+				in template(value) UserPriority p_priority
+			) runs on ItsCalm {
+				var template UtAtspEvent v_utAtspEvent := m_utAtspEventDown(m_inPrimitivesDownUDR(
+																	m_inUnitDataRequest(p_source_addr, p_dst_addr, p_data, p_priority)));
+				log("*** f_fnIN_UNITDATA_Request: INFO: Sending IN-UNITDATA.request: ", v_utAtspEvent, " ***");
+				utPort.send(v_utAtspEvent);
+				
+				if(PICS_IN_UNITDATA_STATUS)
+				{
+					var template UtAtspEventInd v_result;
+					var template UtAtspEventInd v_recv := {
+						inSapPrimitivesUp := {
+							spRef := 1,
+							servPrimitive := {
+								IN_UNITDATA_STATUS_indication := {
+									source_addr := p_source_addr,
+									dest_addr := p_dst_addr,
+									data := p_data,
+									priority := p_priority,
+									accessParams := m_inUnitdataDefaultAP,
+									txStatus := c_ciINtxStatus_Success
+								}
+							}
+						}
+					};
+					tc_wait.start;
+	    	        alt {
+	        	        [] utPort.receive(v_recv){
+	            	        tc_wait.stop;
+	                	    log("*** f_utSendIN_UNITDATA_Request: INFO: IN-UNITDATA-STATUS.indication received ***");
+	                	}
+		                [] utPort.receive(UtAtspEventInd : ?) { 
+		                    tc_wait.stop;
+        	                log("*** f_utSendIN_UNITDATA_Request: ERROR: An unexpected message was received ***", v_result);
+            	            f_selfOrClientSyncAndVerdict("error", e_error);
+	            	    }
+	                	[] tc_wait.timeout {
+                        	log("*** f_utSendIN_UNITDATA_Request: ERROR: Timeout while waiting for event check result ***");
+	                        f_selfOrClientSyncAndVerdict("timeout", e_timeout);
+		                }
+	    	        } // End of 'alt' statement
+				}
+			}// End of function f_utSendIN_UNITDATA_Request
+			
+			/**
+	         * @desc Check proper executing of MI-SET.command for a single I-Parameter
+	         * @param   p_cfSetErrorList Error list returned in MI-SET.confirm
+			 * @return  Boolean: TRUE = success
+	         */
+			function f_cnCheckOneIparamSetSuccess( 
+				in I_ParamNo p_IparmNo,
+	            in Errors p_cfSetErrorList
+	        ) runs on ItsCalm return boolean {
+				//local variable(s)
+				var boolean v_returnValue;
+	
+				if(lengthof(p_cfSetErrorList) == 0){
+					// no error occured
+					v_returnValue := true;
+				}
+				else if(lengthof(p_cfSetErrorList) == 1){
+					// correct number or error statuses reported
+						if(p_cfSetErrorList[0].paramNo == p_IparmNo) {
+							// report for correct parameter
+							if (p_cfSetErrorList[0].errStatus == c_ciErrStatusSuccess) {
+								// success reported
+								v_returnValue := true;
+							}
+							else {
+								// Error reported
+								log("*** f_cnCheckOneIparamSetSuccess: ERROR: writing I-Parameter. Error code: ", p_cfSetErrorList[0].errStatus, " ***");
+								v_returnValue := false;
+							}
+						}
+						else {
+							// Report for incorrect parameter
+							log("*** f_cnCheckOneIparamSetSuccess: ERROR: writing I-Parameter: wrong I-ParamNo: ", p_cfSetErrorList[0].paramNo, " ***");
+							v_returnValue := false;
+						}
+				}
+				else {
+					// Incorrect size of Error list
+					log("*** f_cnCheckOneIparamSetSuccess: ERROR: writing I-Parameter: too many errors: ", lengthof(p_cfSetErrorList), " ***");
+					v_returnValue := false;
+				}
+								
+				return v_returnValue;
+			}// End of function f_cnCheckOneIparamSetSuccess
+			
+
+			/**
+	         * @desc Check proper executing of MI-GET.command for a single I-Parameter
+	         * @param   p_returnedValues Value list returned in MI-GET.confirm
+			 * @return  Boolean: TRUE = success
+	         */
+			function f_cnCheckOneIparamGetSuccess( 
+				in I_ParamNo p_IparmNo,
+	            in IParamList p_IparameterList,
+				out I_Param p_Iparam
+	        ) runs on ItsCalm return boolean {
+				//local variable(s)
+				var boolean v_returnValue;
+	
+				if(lengthof(p_IparameterList) == 1){
+					// correct number or returned values
+						if(p_IparameterList[0].paramNo == p_IparmNo) {
+							// correct parameter returned
+							p_Iparam := p_IparameterList[0];
+							log("*** f_cnCheckOneIparamGetSuccess: INFO: reading I-Parameter: ", p_IparmNo, " was correctly done: ", p_IparameterList[0].parameter, " ***");
+							v_returnValue := true;
+						}
+						else {
+							v_returnValue := false;
+							// Report for incorrect parameter
+							if(p_IparameterList[0].paramNo==c_ciIParamNoErrors){
+								// Error Code was returned
+								log("*** f_cnCheckOneIparamGetSuccess: ERROR: reading I-Parameter error: ", p_IparameterList[0].parameter, " was reported ***");
+							}
+							else {
+								log("*** f_cnCheckOneIparamGetSuccess: ERROR: the following I-Parameter: ", p_IparameterList[0].paramNo, " was was returned ***");
+							}
+						}
+					}
+					else {
+						// incorrect number or returned values
+						log("*** f_cnCheckOneIparamGetSuccess: ERROR: writing I-Parameter: too many errors: ", lengthof(p_IparameterList), " ***");
+						v_returnValue := false;
+					}
+								
+				return v_returnValue;
+			}// End of function f_cnCheckOneIparamGetSuccess
+			
+
+		} // End of group utPort
+		
+		group atspPort {
+
+			/**
+			* @desc Send IN-UNITDATA.Request message
+			* @param   p_source_addr	Source address value
+			* @param   p_dst_addr		Destination address value
+			* @param   p_data			Data to send
+			* @param   p_priority		Priority value
+			*/
+			function f_atspSendIN_UNITDATA_Request(
+				in template(value) LLserviceAddr p_source_addr, 
+				in template(value) LLserviceAddr p_dst_addr, 
+				in template(value) INdata p_data,
+				in template(value) UserPriority p_priority
+			) runs on ItsCalm {
+				var template AtspReq v_atspReq := m_atspReq(m_inPrimitivesDownUDR(
+																	m_inUnitDataRequest(p_source_addr, p_dst_addr, p_data, p_priority)));
+				log("*** f_fnIN_UNITDATA_Request: INFO: Sending IN-UNITDATA.request: ", v_atspReq, " ***");
+				atspPort.send(v_atspReq);
+				
+				if(PICS_IN_UNITDATA_STATUS) // this is applicable for the radio used to connect ITS test system with IUT
+				{
+					var template AtspInd v_result;
+					var template AtspInd v_recv := {
+							msgIn := {
+								spRef := 1,
+								servPrimitive := {
+									IN_UNITDATA_STATUS_indication := {
+										source_addr := p_source_addr,
+										dest_addr := p_dst_addr,
+										data := p_data,
+										priority := p_priority,
+										accessParams := m_inUnitdataDefaultAP,
+										txStatus := c_ciINtxStatus_Success
+																	}
+													}
+										}
+						}
+					tc_wait.start;
+	    	        alt {
+	        	        [] atspPort.receive(v_recv){
+	            	        tc_wait.stop;
+	                	    log("*** f_utSendIN_UNITDATA_Request: INFO: IN-UNITDATA-STATUS.indication received ***");
+	                	}
+		                [] atspPort.receive(AtspInd : { msgIn := ?, receptionTime := ? }/*TODO Use a template*/ ) -> value v_result { 
+		                    tc_wait.stop;
+        	                log("*** f_utSendIN_UNITDATA_Request: ERROR: An unexpected message was received ***", v_result);
+            	            f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+	            	    }
+	                	[] tc_wait.timeout {
+                        	log("*** f_utSendIN_UNITDATA_Request: ERROR: Timeout while waiting for event check result ***");
+	                        f_selfOrClientSyncAndVerdict("error", e_timeout); // to be checked
+		                }
+	    	        } // End of 'alt' statement
+
+				} // End of if block
+				
+			} // End of function f_atspSendIN_UNITDATA_Request
+
+		} // End of group atspPort
+		
+	}  // End of group atspFunctions
+
+	group atspAltsteps {
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_atspDefault() runs on ItsMgt {
+            [] tc_wait.timeout {
+                log("*** a_atspDefault: ERROR: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout {
+                log("*** a_atspDefault: ERROR: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] any timer.timeout {
+                log("*** a_atspDefault: INCONC: An unknown timer has expired in default ***"); 
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                log("*** a_atspDefault: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                if(self == mtc) {
+                    f_cf01Down();
+                }
+                stop;
+            }
+        } // End of altstep a_fsapDefault()
+        
+		
+        /**
+         * @desc Default handling cf01 de-initialisation.
+         */
+        altstep a_cf01Down() runs on ItsMgt {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf01Down();
+                log("*** a_cf01Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        } // End of altstep a_cf01Down()
+		
+    } // End of group fsapAltsteps
+	
+	group atspPIXITHelperFunctions
+	{
+        /**
+         * @desc used to address a VCI in IUT, e.g. to be deleted
+         */
+		function f_get_VCI_LinkID(
+						in EUI64 p_remoteCIID
+		) return Link_ID {
+			if(PICS_MAC48)
+			{
+	        	return {remoteCIID := p_remoteCIID, localCIID := PX_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := p_remoteCIID, 
+							localCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0)}
+			}
+	    } // end 
+
+		/**
+         * @desc used to address CI in IUT itself.
+         */
+		function f_get_CI_LinkID() return Link_ID{
+			if(PICS_MAC48)
+			{
+	        	return {remoteCIID := PX_REMOTE_CIID_LOCAL_CI, localCIID := PX_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0), 
+							localCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0)}
+			}
+	    } // end 
+		
+		/**
+         * @desc Local CIID value part of the IUT itself
+         */
+		function f_get_CI_Local_CIID() return EUI64{
+			if(PICS_MAC48)
+			{
+	        	return PX_LOCAL_CIID;
+			}
+			else
+			{
+		        return f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0);
+			}
+	    } // end 
+		
+        /**
+         * @desc used to address CI in the Test System itself
+         */
+		function f_get_TesterCI_LinkID() return Link_ID{
+			if(PICS_MAC48)
+			{
+	        	return {remoteCIID := PX_TESTER_REMOTE_CIID_LOCAL_CI, localCIID := PX_TESTER_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(0, 0, 0, 0), 
+							localCIID := f_get_EUI64_LegacyCI(0, 0, 0, 0)}
+			}
+	    } // end 
+		
+        /**
+         * @desc used to send via a UC-VCI
+         */
+		// source_address field
+		// use f_get_CI_LinkID
+		
+        /**
+         * @desc used to send via a UC-VCI in the IUT
+         */
+		// destination_address field
+		function f_get_DestinationVCI_UC_LinkID() return Link_ID{
+	        if(PICS_MAC48)
+			{
+	        	return {remoteCIID := PX_REMOTE_CIID_UC , localCIID := PX_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, PX_VCI_SERIAL_NUMBER), 
+							localCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0)}
+			}
+	    } // End of function f_get_DestinationVCI_UC_LinkID
+		
+        /**
+         * @desc used to send via a UC-VCI in the Test System to the IUT
+         */
+		// destination_address field
+		function f_get_TesterDestinationVCI_UC_LinkID() return Link_ID{
+	        if(PICS_MAC48)
+			{
+	        	return {remoteCIID := PX_TESTER_REMOTE_CIID_LOCAL_CI , localCIID := PX_TESTER_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(0, 0, 0, 255),  
+							localCIID := f_get_EUI64_LegacyCI(0, 0, 0, 0)}
+			}
+	    } // End of function f_get_DestinationVCI_UC_LinkID
+
+        /**
+         * @desc used to send via a BC-VCI in the IUT
+         */
+		// source_address field
+		// use f_get_CI_LinkID
+		
+        /**
+         * @desc used to send via a BC-VCI
+         */
+		// destination_address field
+		function f_get_DestinationVCI_BC_LinkID() return Link_ID{
+	        if(PICS_MAC48)
+			{
+		        return {remoteCIID := PX_REMOTE_CIID_BC, localCIID := PX_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(63, PX_ITS_SCU_ID, PX_Med_ID, 65535), 
+							localCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0)}
+			}
+		} // End of function f_get_DestinationVCI_BC_LinkID
+
+        /**
+         * @desc used to send via a BC-VCI in the Test System to the IUT
+         */
+		// destination_address field
+		function f_get_TesterDestinationVCI_BC_LinkID() return Link_ID{
+	        if(PICS_MAC48)
+			{
+		        return {remoteCIID := PX_REMOTE_CIID_BC, localCIID := PX_TESTER_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(63, 0, 0, 65535), 
+							localCIID := f_get_EUI64_LegacyCI(0, 0, 0, 0)}
+			}
+		} // End of function f_get_TesterDestinationVCI_BC_LinkID
+		
+        /**
+         * @desc used to send via a BC-VCI in the IUT
+         */
+		// source_address field
+		// use f_get_CI_LinkID
+		
+        /**
+         * @desc used to send via a MC-VCI
+         */
+		// destination_address field
+		function f_get_DestinationVCI_MC_LinkID() return Link_ID{
+	        if(PICS_MAC48)
+			{
+		        return {remoteCIID := PX_REMOTE_CIID_MC, localCIID := PX_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(PX_LEGACY_VCI_MC_GROUP_ID, PX_ITS_SCU_ID, PX_Med_ID, PX_VCI_SERIAL_NUMBER_MC), 
+							localCIID := f_get_EUI64_LegacyCI(0, PX_ITS_SCU_ID, PX_Med_ID, 0)}
+			}
+
+		} // End of function f_get_DestinationVCI_MC_LinkID
+		
+        /**
+         * @desc used to send via a MC-VCI in the Test System to the IUT
+         */
+		// destination_address field
+		function f_get_TesterDestinationVCI_MC_LinkID() return Link_ID{
+	        if(PICS_MAC48)
+			{
+		        return {remoteCIID := PX_REMOTE_CIID_MC, localCIID := PX_TESTER_LOCAL_CIID}
+			}
+			else
+			{
+		        return {	remoteCIID := f_get_EUI64_LegacyCI(PX_LEGACY_VCI_MC_GROUP_ID, 0, 0, PX_VCI_SERIAL_NUMBER_MC), 
+							localCIID := f_get_EUI64_LegacyCI(0, 0, 0, 0)}
+			}
+
+		} // End of function f_get_TesterDestinationVCI_MC_LinkID
+		
+        /**
+         * @desc used to create the EUI64 format of a legacy CI
+		 * @param   p_uCmCbCnumber		63 for BC, 0 for UC, 1-62 for MC group
+		 * @param	p_iTS_scuID			ITS-SCU-ID
+		 * @param	p_medID				MedID
+		 * @param	p_vCIserialNumber	Serial number unique in CI
+         */
+		function f_get_EUI64_LegacyCI (
+				in UInt6 p_uCmCbCnumber,
+				in ITS_scuId p_iTS_scuID, 
+				in MedID p_medID,
+				in VCIserialNumber p_vCIserialNumber
+			) return EUI64 {
+				var UInt8 v_U8Integer;
+				var EUI64 v_returnValue;
+				
+				v_U8Integer:= p_uCmCbCnumber * 4 +3; // 'shift left' two bits and set two lowest bits to one.
+				v_returnValue := 	int2oct(v_U8Integer,1) & 
+									int2oct(p_iTS_scuID,2) &
+									'FFFE'O &
+									int2oct(p_medID,1) &
+									int2oct(p_vCIserialNumber,2);
+				log("f_get_EUI64_LegacyCI: DEBUG: returns ", v_returnValue, " ***");
+				return v_returnValue;
+		} // End of function f_get_EUI64_LegacyCI
+		
+	} // End of group atspPIXITHelperFunctions
+	
+} // End of module LibItsAtsp_Functions

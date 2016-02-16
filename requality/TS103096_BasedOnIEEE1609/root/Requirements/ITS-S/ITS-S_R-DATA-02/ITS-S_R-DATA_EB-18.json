@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards valid signed data when the signer is a certificate chain in which an issuing certificate is not permitted to issue certificates of its subordinate certificate's type."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/6847c33e-7c6e-40e4-937b-c4554d17c4e0"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "421bb180-64d0-4b52-84e9-1b3cc140d595"
+}

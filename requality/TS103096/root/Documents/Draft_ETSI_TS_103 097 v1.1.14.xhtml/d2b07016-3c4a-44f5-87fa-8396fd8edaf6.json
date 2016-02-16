@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_d2b07016-3c4a-44f5-87fa-8396fd8edaf6\"><a name=\"d2b07016-3c4a-44f5-87fa-8396fd8edaf6\" id=\"id_d2b07016-3c4a-44f5-87fa-8396fd8edaf6\" class=\"requality_id\"><\/a>A rectangular region is only valid if the location <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">northwest<font style=\"font-family: Times New Roman;\"> is north of the location southeast<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "ef7d4ace-691e-47e9-92d5-8d84f6f065f7"
+}

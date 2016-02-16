@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "dcfe8769-1cc7-4dcb-ae56-3d9f17e07a5a",
+            "type": "STRING",
+            "value": "If ITS-S sends a signed message with general security profile check that the sent SecuredMessage contains Payload element of type signed, signed_external or signed_and_encrypted\r\nDo not know how to check signed_external or signed_and_encrypted"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "dcfe8769-1cc7-4dcb-ae56-3d9f17e07a5a",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "dcfe8769-1cc7-4dcb-ae56-3d9f17e07a5a",
+            "type": "STRING",
+            "value": "06. Check payload"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "dcfe8769-1cc7-4dcb-ae56-3d9f17e07a5a",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "dcfe8769-1cc7-4dcb-ae56-3d9f17e07a5a"
+}

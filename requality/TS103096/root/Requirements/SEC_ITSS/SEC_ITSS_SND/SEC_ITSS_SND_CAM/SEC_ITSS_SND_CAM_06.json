@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "27254aae-a5f1-4ab3-a3a7-3699e1a35fdd",
+            "type": "STRING",
+            "value": "If ITS-S sends a secured CAM check that the sent SecuredMessage contains the signer_info of type certificate when the ITS-S received a CAM from an unknown ITS-S."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "27254aae-a5f1-4ab3-a3a7-3699e1a35fdd",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/b687b200-06bf-4876-a5a6-1571bde7cea7"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "27254aae-a5f1-4ab3-a3a7-3699e1a35fdd",
+            "type": "STRING",
+            "value": "06. Check that IUT sends cert to unknown ITS-S"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "27254aae-a5f1-4ab3-a3a7-3699e1a35fdd",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "27254aae-a5f1-4ab3-a3a7-3699e1a35fdd"
+}

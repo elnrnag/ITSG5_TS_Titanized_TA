@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "b11462b8-676f-49d2-abad-bb7dc49fe8af",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "b11462b8-676f-49d2-abad-bb7dc49fe8af",
+            "type": "STRING",
+            "value": "Check that the Secured DENM contains non-empty payload of type signed."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "b11462b8-676f-49d2-abad-bb7dc49fe8af",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a DENM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid'] {\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t\tcontaining payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed'\r\n\t\t\t\tcontaining not-empty data\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "b11462b8-676f-49d2-abad-bb7dc49fe8af",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "b11462b8-676f-49d2-abad-bb7dc49fe8af",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b11462b8-676f-49d2-abad-bb7dc49fe8af"
+}

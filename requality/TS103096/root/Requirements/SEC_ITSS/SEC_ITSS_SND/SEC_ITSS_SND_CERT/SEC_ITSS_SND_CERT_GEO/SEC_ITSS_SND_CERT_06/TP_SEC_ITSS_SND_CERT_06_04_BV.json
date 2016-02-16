@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_USE_UN_STATS_REGION_DICTIONARY": {
+            "isGenerated": false,
+            "key": "PICS_USE_UN_STATS_REGION_DICTIONARY",
+            "origin": "003fbfd6-8b75-4a19-ba0c-2e114072a85e",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "003fbfd6-8b75-4a19-ba0c-2e114072a85e",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "003fbfd6-8b75-4a19-ba0c-2e114072a85e",
+            "type": "STRING",
+            "value": "Check Identified Region:\r\nMust contain value that correspond to numeric country codes as defined by United Nations Statistics Division\r\nSubordinate certificate restrictions must be a subset of the issuing certificate restrictions\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "003fbfd6-8b75-4a19-ba0c-2e114072a85e",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate_chain'\r\n\t\t\t\tcontaining certificates\r\n\t\t\t\t\tindicating CERTIFICATES {\r\n\t\t\t\t\t\tcontaining CERTIFICATES[0] {\r\n\t\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\t\t\tcontaining id_region {\r\n\t\t\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\t\t\tindicating 'un_stats' (1)\r\n\t\t\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\t\t\tindicating valid value according to UnStats document\r\n\t\t\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tcontaining CERTIFICATES[n] (1..N){\r\n\t\t\t\t\t\t\tcontaining no validity restriction of type region \r\n\t\t\t\t\t\t\tor containing validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\t\t\tcontaining id_region\r\n\t\t\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\t\t\tindicating 'un_stats' (1)\r\n\t\t\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\t\t\tindicating CERTIFICATES[n-1]\r\n\t\t\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].id_region\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t.region_identifier\r\n\t\t\t\t\t\t\t\t\t\tor  indicating any valid value according to \r\n\t\t\t\t\t\t\t\t\t\t\t\tUnStats document correspondent to the subregion of \r\n\t\t\t\t\t\t\t\t\t\t\t\tCERTIFICATES[n-1].validity_restrictions['region']\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t.id_region.region_identifier\r\n\t\t\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t\t\t\t\tindicating CERTIFICATES[n-1]\r\n\t\t\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].id_region.local_region\r\n\t\t\t\t\t\t\t\t\t\tor indicating any value if CERTIFICATES[n-1]\r\n\t\t\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].id_region.local_region == 0\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "003fbfd6-8b75-4a19-ba0c-2e114072a85e",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "003fbfd6-8b75-4a19-ba0c-2e114072a85e",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "003fbfd6-8b75-4a19-ba0c-2e114072a85e"
+}

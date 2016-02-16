@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "5b25108e-db13-477f-a863-df4a1803cf12",
+            "type": "STRING",
+            "value": "Check that the sent Secured CAM contains exactly one HeaderField its_aid that is set to 'AID_CAM' (16512)"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "5b25108e-db13-477f-a863-df4a1803cf12",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/505beac6-127f-4abe-904a-8da820820b8f"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "5b25108e-db13-477f-a863-df4a1803cf12",
+            "type": "STRING",
+            "value": "11. Check secured CAM its_aid value"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "5b25108e-db13-477f-a863-df4a1803cf12",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "5b25108e-db13-477f-a863-df4a1803cf12"
+}

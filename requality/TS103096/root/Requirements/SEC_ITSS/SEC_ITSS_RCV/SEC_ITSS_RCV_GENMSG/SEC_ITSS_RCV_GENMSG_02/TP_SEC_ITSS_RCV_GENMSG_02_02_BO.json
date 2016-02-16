@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "6d50930f-74ba-43a8-b618-aa2a9e017615",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "6d50930f-74ba-43a8-b618-aa2a9e017615",
+            "type": "STRING",
+            "value": "Check that IUT discards a Secured GN Message containing protocol version set to a value greater then 2"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "6d50930f-74ba-43a8-b618-aa2a9e017615",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining protocol_version \r\n\t\t\t\tindicating 3\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "6d50930f-74ba-43a8-b618-aa2a9e017615",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "6d50930f-74ba-43a8-b618-aa2a9e017615",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "6d50930f-74ba-43a8-b618-aa2a9e017615"
+}

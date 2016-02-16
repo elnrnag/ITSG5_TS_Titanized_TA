@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_83f9122f-3988-4955-99f7-5b08c1b7948f\"><a name=\"83f9122f-3988-4955-99f7-5b08c1b7948f\" id=\"id_83f9122f-3988-4955-99f7-5b08c1b7948f\" class=\"requality_id\"><\/a> In this case, the timer for the next inclusion of a field of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">certificate<font style=\"font-family: Times New Roman;\"> shall be restarted.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "bb1635e9-fa28-424d-acfa-3025fcf92f6a"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_7f3a6b4c-ea1c-4d17-bfc9-1a6338be1b9d\"><a name=\"7f3a6b4c-ea1c-4d17-bfc9-1a6338be1b9d\" id=\"id_7f3a6b4c-ea1c-4d17-bfc9-1a6338be1b9d\" class=\"requality_id\"><\/a>The dictionary that corresponds to <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">iso_3166_1<font style=\"font-family: Times New Roman;\"> shall contain values that correspond to numeric country codes as defined in <br />ISO 3166-1 [<a href=\"REF\">3<\/a>].<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "7f3a6b4c-ea1c-4d17-bfc9-1a6338be1b9d"
+}

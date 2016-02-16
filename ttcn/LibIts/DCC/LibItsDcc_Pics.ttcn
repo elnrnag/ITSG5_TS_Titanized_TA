@@ -1,0 +1,152 @@
+/**
+ *  @author     ETSI / STF421
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DCC/LibItsDcc_Pics.ttcn $
+ *              $Id: LibItsDcc_Pics.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc       DCC (TS 102 724) Pics
+ *  @see        ETSI TS 102 917-1
+ */
+module LibItsDcc_Pics {
+
+    group dccPics {
+    group roles {
+        /**
+         * @desc Is the IUT implemented to support the role of a single transceiver ITS station?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.2/1 
+         */
+		modulepar boolean PICS_SINGLE_TRANSCEIVER;
+
+        /**
+         * @desc Is the IUT implemented to support the role of a multiple transceiver ITS station?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.2/2 
+         */
+		modulepar boolean PICS_MULTIPLE_TRANSCEIVER;
+
+    } // end group roles
+    
+    group channelSupport {
+        /**
+         * @desc Does IUT support the usage of the ITS-G5B band?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.3/2 
+         */
+		modulepar boolean PICS_SUPPORT_ITS_G5B;
+
+        /**
+         * @desc Does IUT support the usage of the SCH1?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.4/2 
+         */
+		modulepar boolean PICS_SUPPORT_SCH1;
+
+        /**
+         * @desc Does IUT support the usage of the SCH2?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.4/3 
+         */
+		modulepar boolean PICS_SUPPORT_SCH2;
+
+        /**
+         * @desc Does IUT support the usage of the SCH3?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.4/4 
+         */
+		modulepar boolean PICS_SUPPORT_SCH3;
+
+        /**
+         * @desc Does IUT support the usage of the SCH4?
+         * @see  ETSI TS 102 917-1 v1.1.1 A.4/5 
+         */
+		modulepar boolean PICS_SUPPORT_SCH4;
+
+    } // end group channelSupport
+    
+    group maximumTransmissionPower {
+        /**
+         * @desc Give the maximum Transmission power for the CCH in the Relaxed state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/1 
+         */
+		modulepar integer PICS_MAXPOWER_CCH_RELAXED;
+
+        /**
+         * @desc Give the maximum Transmission power for the CCH in the Active state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/2 
+         */
+		modulepar integer PICS_MAXPOWER_CCH_ACTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the CCH in the Restrictive state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/3 
+         */
+		modulepar integer PICS_MAXPOWER_CCH_RESTRICTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH1 in the Relaxed state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/4 
+         */
+		modulepar integer PICS_MAXPOWER_SCH1_RELAXED;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH1 in the Active state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/5 
+         */
+		modulepar integer PICS_MAXPOWER_SCH1_ACTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH1 in the Restrictive state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/6 
+         */
+		modulepar integer PICS_MAXPOWER_SCH1_RESTRICTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH2 in the Relaxed state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/7 
+         */
+		modulepar integer PICS_MAXPOWER_SCH2_RELAXED;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH2 in the Active state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/8 
+         */
+		modulepar integer PICS_MAXPOWER_SCH2_ACTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH2 in the Restrictive state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/9 
+         */
+		modulepar integer PICS_MAXPOWER_SCH2_RESTRICTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH3 in the Relaxed state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/10 
+         */
+		modulepar integer PICS_MAXPOWER_SCH3_RELAXED;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH3 in the Active state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/11 
+         */
+		modulepar integer PICS_MAXPOWER_SCH3_ACTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH3 in the Restrictive state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/12 
+         */
+		modulepar integer PICS_MAXPOWER_SCH3_RESTRICTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH4 in the Relaxed state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/13 
+         */
+		modulepar integer PICS_MAXPOWER_SCH4_RELAXED;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH4 in the Active state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/14 
+         */
+		modulepar integer PICS_MAXPOWER_SCH4_ACTIVE;
+
+        /**
+         * @desc Give the maximum Transmission power for the SCH4 in the Restrictive state. Value in dBm.
+         * @see  ETSI TS 102 917-1 v1.1.1 A.5/15 
+         */
+		modulepar integer PICS_MAXPOWER_SCH4_RESTRICTIVE;
+		
+    } // end group maximumTransmissionPower
+    } // end group dccPics
+} // End of module LibItsDcc_Pics

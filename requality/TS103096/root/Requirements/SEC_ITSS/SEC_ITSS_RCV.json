@@ -1,0 +1,19 @@
+{
+    "attributes": {
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "93dc7631-4d29-4fc9-85a9-677a400a69ca",
+            "type": "STRING",
+            "value": "2. Receiver Behavior"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "93dc7631-4d29-4fc9-85a9-677a400a69ca",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "93dc7631-4d29-4fc9-85a9-677a400a69ca"
+}

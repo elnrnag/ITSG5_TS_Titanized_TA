@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_USE_ISO31661_REGION_DICTIONARY": {
+            "isGenerated": false,
+            "key": "PICS_USE_ISO31661_REGION_DICTIONARY",
+            "origin": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd",
+            "type": "STRING",
+            "value": "Check Identified Region:\r\nMust contain value that correspond to numeric country codes as defined in ISO 3166-1\r\nSubordinate certificate restrictions must be a subset of the issuing certificate restrictions\r\n\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate_chain'\r\n\t\t\t\tcontaining certificates\r\n\t\t\t\t\tindicating CERTIFICATES {\r\n\t\t\t\t\t\tcontaining CERTIFICATES[0] {\r\n\t\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\t\t\tcontaining id_region {\r\n\t\t\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\t\t\tindicating 'iso_3166_1' (0)\r\n\t\t\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\t\t\tindicating valid value according to 'iso_3166_1' dictionary\r\n\t\t\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tcontaining CERTIFICATES[n] (1..N){\r\n\t\t\t\t\t\t\tcontaining no validity restriction of type region \r\n\t\t\t\t\t\t\tor containing validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\t\t\tcontaining id_region \r\n\t\t\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\t\t\tindicating 'iso_3166_1' (0)\r\n\t\t\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\t\t\tindicating CERTIFICATES[n-1]\r\n\t\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].id_region.region_identifier\r\n\t\t\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t\t\t\t\tindicating CERTIFICATES[n-1]\r\n\t\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].id_region.local_region\r\n\t\t\t\t\t\t\t\t\t\tor indicating any value if CERTIFICATES[n-1]\r\n\t\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].id_region.local_region == 0\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "35c6bd73-97ab-4c91-aaf5-fc45d2964dfd"
+}

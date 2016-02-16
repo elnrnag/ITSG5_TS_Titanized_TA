@@ -1,0 +1,446 @@
+/**
+ *    @author     ETSI / STF405
+ *    @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/LibItsCalm_Interface.ttcn $
+ *                $Id: LibItsCalm_Interface.ttcn 829 2014-06-02 13:03:32Z garciay $
+ *    @desc       Module containing PTCs and interface ports definitions for ITS
+ *
+ */
+module LibItsCalm_Interface {
+    
+    // LibCommon
+    import from LibCommon_Sync { 
+        function f_selfOrClientSyncAndVerdict 
+    };
+    
+    // LibIts - IP Protocols
+
+    // LibItsCalm
+    import from CALMiitsscu language "ASN.1:1997" { 
+        type 
+            IIC_Request, IIC_Response, 
+            PduCounter 
+    }; 
+    import from CALMllsap language "ASN.1:1997" { 
+        type 
+            INsapPrimitivesUp, INsapPrimitivesDown, 
+            Time48IAT 
+    }; 
+    import from CALMmsap language "ASN.1:1997" { 
+        type 
+            CommandRef
+    }; 
+    import from CALMfntp language "ASN.1:1997" all; // FIXME Remove 'all' 
+    import from LibItsFntp_TypesAndValues { 
+        type 
+            UtFntpInitialize, UtFntpEvent, UtFntpEventInd, 
+            CfFntpInitialize, CfFntpEventInd 
+    }; 
+    import from LibItsFsap_TypesAndValues { 
+        type 
+            UtFsapInitialize, UtFsapEvent, UtFsapEventInd, 
+            CfFsapInitialize, CfFsapEventInd 
+            , AcFsapPrimitive  
+    };
+    import from LibItsIicp_TypesAndValues { 
+        type 
+            UtIicpInitialize, UtIicpEventInd, UtIicpEvent
+    }; 
+    import from LibItsAtsp_TypesAndValues { 
+        type 
+            UtAtspInitialize, UtAtspEventInd, UtAtspEvent,
+            CfAtspInitialize, CfAtspEventInd, CfAtspEvent
+    }; 
+    
+    // LibIts 
+    import from LibItsCommon_TestSystem { 
+        type ItsBaseComponent 
+    }; 
+    
+    group adapterInterface {
+        
+        group portDefinitions {
+            
+            /**
+             * @desc Adapter control port
+             */
+            type port AdapterControlPort message {
+                out 
+                    AcFsapPrimitive; // Non IP Protocols
+            } // End AdapterControlPort
+            
+            /**
+             * @desc Upper Tester port
+             */
+            type port UpperTesterPort message {
+                out 
+                    UtInitialize, UtFntpEvent, UtFsapEvent, UtIicpEvent, UtAtspEvent; 
+                in 
+                    UtResult, UtFntpEventInd, UtFsapEventInd, UtIicpEventInd, UtAtspEventInd 
+            } // End of UpperTesterPort
+            
+            /**
+             * @desc Configuration IUT port (Management SAP: Mx-SAP)
+             */
+            type port ConfigTesterPort message {
+                out 
+                    CfInitialize, CfAtspEvent; 
+                in 
+                    CfResult, CfFntpEventInd, CfFsapEventInd/*, CfIicpEventInd*/, CfAtspEventInd 
+            } // End of ConfigTesterPort
+            
+        } // End portDefinitions    
+
+    } // adapterInterface     
+    
+    group interfaceComponents {
+        
+        /**
+         * @desc Test component for ITS Management layer 
+         * @member utPort        Upper tester port 
+         * @member acPort        TA configuration port 
+         * @member iicpPort      IICP protocol port
+         */
+        type component ItsMgt extends ItsBaseComponent {
+            
+            port UpperTesterPort utPort;
+            port AdapterControlPort acPort;
+            port ConfigTesterPort cfPort;
+            
+            // MGT1 ports - Used to send remote command to/from 
+            port IicpPort iicpPort; // ITS station-internal management communications protocol 
+            
+            // Timers
+            
+            // Variables
+            var CommandRef vc_commandRef := 0; // Cyclic counter identifying a NF-FNTP-COM.request
+            var PduCounter vc_pduCounter := 0; // Cyclic counter identifying a IICP PDU counter
+            var integer vc_noFntpFwtEntry := 0;
+            
+        } // End of component ItsMgt
+
+        /**
+         * @desc Test component for ITS Network and Transport layer 
+         * @member fntpPort      Fast Network & Transport layer Protocol port 
+         * @member fsapPort      Fast Service Advertisement Protocol port 
+         * @member atspPort      Access Technology Support Protocol port
+         */
+        type component ItsCalm extends ItsMgt { 
+            // MGT2 ports - Used to send command to/from through SAP interfaces
+            port FsapPort fsapPort; // Fast Service Advertisement Protocol 
+            // NT3 ports 
+            port FntpPort fntpPort; 
+            // AccessLayer ports 
+            port AtspPort atspPort;
+            
+            // timers 
+            
+            // Variables for Fntp 
+            var charstring vc_componentName := ""; 
+            var PortNumber vc_portNumber := { portLong := 0 }; 
+            var integer vc_reference := 65535; // See noFNTPfwtEntries FIXME Create a constant
+            var UtEventInd vc_utEventInd; 
+            
+        } // End of component ItsCalm 
+        
+    } // End of group interfaceComponents 
+    
+    group interfacePorts { 
+                
+        group managementPorts { 
+            
+            group mgt1Ports {
+                
+                /**
+                 * @desc MGT1 IICP Port (IICP/LAN) 
+                 */
+                type port IicpPort message {
+                    inout
+                        IicpReq,
+                        IicpInd;
+                } // End of port IicpPort
+                
+            } // End of group mgt1Ports
+            
+            group mgt2Ports {
+                
+                /**
+                 * @desc MGT2 Fsap Port
+                 */
+                type port FsapPort message {
+                    in 
+                        FsapInd; 
+                    out
+                        FsapReq; 
+                } // End of port FsapPort
+                
+            } // End of group mgt2Ports
+            
+        } // End of group managementPorts
+
+        group networkAndTransportPorts {
+                    
+            group nt3Ports {
+                
+                /**
+                 * @desc NT3 Fntp Port
+                 */
+                type port FntpPort message { 
+                    in
+                        FntpInd;
+                    out 
+                        FntpReq
+                } // End of port FntpPort
+                
+            } // End of group nt3Ports
+            
+        } // End of group networkAndTransportPorts
+    
+        group accessLayerPorts {
+            
+            /**
+             * @desc AccessLayer Port (Radio, IR...) 
+             */
+            type port AtspPort message {
+                in
+                    AtspInd; 
+                out
+                    AtspReq; 
+            } // End of port AtsPort
+            
+        } // End of group accessLayerPorts
+        
+    } // End of group interfacePorts
+
+    group interfacePrimitives { 
+                
+        group managementPrimitives {
+            
+            group mgt1Primitives {
+                
+                /**
+                 * @desc MGT1 IICP Request Primitive 
+                 */
+                type record IicpReq {
+                    IicpMsg msgOut 
+                }
+                with { 
+                    encode "LibIts_Interface"
+                }
+                
+                /**
+                 * @desc TODO
+                 */
+                type union IicpMsg {
+                    IIC_Request     msg_req,
+                    IIC_Response    msg_resp 
+                } with { 
+                    encode (msg_req) "LibItsIicp_asn1";
+                    encode (msg_resp) "LibItsIicp_asn1";
+                    encode "LibIts_Interface"
+                }                
+
+                /**
+                 * @desc MGT1 IICP Request/Indication Primitive 
+                 */
+                type record IicpInd {
+                    IicpMsg msgIn, 
+                    Time48IAT  receptionTime   
+                }
+                with { 
+                    encode (receptionTime) "LibItsCALMllsap_asn1";
+                    encode "LibIts_Interface"
+                }
+                
+            } // End of group mgt1Primitives
+            
+            /**
+             * @desc    MGT2 Management Service Primitives
+             * @see     ISO/CD 24102-3
+             */
+            group mgt2Primitives { 
+                
+                /**
+                 * @desc TODO
+                 */
+                type union FsapReq { 
+                    NFsapPrimitivesUp    msgOut_nf, 
+                    INsapPrimitivesUp    msgOut_in
+                } with { 
+                    encode (msgOut_nf) "LibItsCALMfntp_asn1";
+                    encode (msgOut_in) "LibItsCALMllsap_asn1";
+                    encode "LibIts_Interface"
+                }
+                
+                /**
+                 * @desc TODO
+                 */
+                type union FsapMsg {
+                    NFsapPrimitivesDown    msgIn_nf,
+                    INsapPrimitivesDown    msgIn_in 
+                } with { 
+                    encode (msgIn_nf) "LibItsCALMfntp_asn1";
+                    encode (msgIn_in) "LibItsCALMllsap_asn1";
+                    encode "LibIts_Interface"
+                }                
+                type record FsapInd { 
+                    FsapMsg    msgIn,
+                    Time48IAT  receptionTime                    
+                } with { 
+                    encode (receptionTime) "LibItsCALMllsap_asn1";
+                    encode "LibIts_Interface"
+                }
+                                
+            } // End of group mgt2Primitives
+            
+        } // End of group managementPrimitives 
+        
+        group networkAndTransportPrimitives { 
+            
+            group nt3Primitives {
+                
+                /**
+                 * @desc FNTP output protocol port primitive 
+                 * @member msgOut Message to send to the protocol port (INsapPrimitivesUp)
+                 */
+                type union FntpReq { 
+                    INsapPrimitivesUp    msgOut
+                } with { 
+                    encode (msgOut) "LibItsCALMllsap_asn1";
+                    encode "LibIts_Interface"
+                }
+                
+                /**
+                 * @desc FNTP input protocol port primitive (INsapPrimitivesDown) 
+                 * @member msgIn Message monitored on the protocol port (INsapPrimitivesUp)
+                 * @member receptionTime Timestamp when then message is received by the test adapter (different than the generation generation timestamp)
+                 */
+                type record FntpInd { 
+                    INsapPrimitivesDown    msgIn,
+                    Time48IAT              receptionTime
+                } with { 
+                    encode (msgIn) "LibItsCALMllsap_asn1";
+                    encode (receptionTime) "LibItsCALMllsap_asn1";
+                    encode "LibIts_Interface"
+                }
+                
+            } // End of group nt3Primitives
+            
+        } // End of group networkAndTransportPrimitives
+        
+        group accessLayerPrimitives { 
+            
+            /**
+             * @desc ATSP (output from ITS test system) port primitive 
+             * @member msgOut Message to send to the protocol port (INsapPrimitivesDown)
+             * used to communicate with the radio box connected to the ITS test system 
+             */
+            type record AtspReq { 
+                INsapPrimitivesDown    msgOut
+            } with { 
+                encode (msgOut) "LibItsCALMllsap_asn1"
+                encode "LibIts_Interface"
+            }
+            
+            /**
+             * @desc ATSP (input to ITS test system) port primitive (INsapPrimitivesUp) 
+             * @member msgIn Message monitored on the protocol port (INsapPrimitivesUp)
+             */
+            type record AtspInd { 
+                INsapPrimitivesUp    msgIn,
+                Time48IAT            receptionTime
+            } with { 
+                encode (msgIn) "LibItsCALMllsap_asn1"
+                encode (receptionTime) "LibItsCALMllsap_asn1";
+                encode "LibIts_Interface"
+            }
+            
+        } // End of group accessLayerPrimitives
+        
+    } with {
+        encode "LibIts_Interface"
+    } // End of group interfacePrimitives
+    
+    group upperTester {
+        
+        /**
+         * @desc Upper Tester message to initialize IUT 
+         */
+        type union UtInitialize {
+            UtFntpInitialize utFntpInitialize,
+            UtFsapInitialize utFsapInitialize,
+            UtIicpInitialize utIicpInitialize,
+            UtAtspInitialize utAtspInitialize
+        }
+
+        /**
+         * @desc Upper Tester message to trigger an action on IUT 
+         */
+        type record UtTrigger {
+            UtEvent utEvent
+        }
+
+        /**
+         * @desc Upper Tester message to check event/status on IUT 
+         */    
+        type record UtCheck {
+            UtEvent utEvent
+        }
+
+        /**
+         * @desc Upper Tester message describing an action/event 
+         */
+        type union UtEvent { // TODO To be moved into each library (cf. CAM/DENM)
+            UtFntpEvent utFntpEvent, 
+            UtFsapEvent utFsapEvent,
+            UtAtspEvent utAtspEvent
+        }
+        
+        /**
+         * @desc Upper Tester message describing an incoming event 
+         */
+        type union UtEventInd { // TODO To be moved into each library (cf. CAM/DENM)
+            UtFntpEventInd utFntpEventInd, 
+            UtFsapEventInd utFsapEventInd,
+            UtAtspEventInd utAtspEventInd
+        }
+        
+        /**
+         * @desc Upper Tester response message  
+         */    
+        type boolean UtResult;
+        
+    } with {
+        encode "UpperTester"
+    } // End of group upperTester 
+    
+    group configIUT {
+        
+        /**
+         * @desc  Message to initialize Configuration Tester
+         */
+        type union CfInitialize {
+            CfFntpInitialize cfFntpInitialize, 
+            CfFsapInitialize cfFsapInitialize,
+            CfAtspInitialize cfAtspInitialize
+        }
+
+        type union CfEventInd { 
+            CfFntpEventInd cfFntpEventInd, 
+            CfFsapEventInd cfFsapEventInd,
+            CfAtspEventInd cfAtspEventInd
+        }
+        
+        type union CfEvent { 
+            CfAtspEvent cfAtspEvent
+        }
+        
+        /**
+         * @desc Config Tester response message  
+         */    
+        type boolean CfResult;
+        
+    } with {
+        encode "ConfigTester"
+    } // End of group configIUT 
+
+} // End of module LibItsCalm_Interface

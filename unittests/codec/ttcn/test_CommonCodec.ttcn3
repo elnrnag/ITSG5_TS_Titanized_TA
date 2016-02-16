@@ -1,0 +1,76 @@
+module test_CommonCodec /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+    
+    import from LibItsSecurity_TestSystem all;
+    
+    type component TCType extends ItsSecurityBaseComponent { }
+
+    type record TestRecord {
+        bitstring bs optional
+    }
+
+    function test_decodePDU<PDUType>(in template PDUType p_pdu, in template (present) octetstring p_expEncMsg) runs on TCType {
+        var PDUType v_decMsg;
+        var bitstring v_encMsg;
+        var integer v_res := 0;
+
+        v_res := decvalue(oct2bit(valueof(p_expEncMsg)), v_decMsg);
+        select (v_res) {
+            case (0) {
+                if(match(v_decMsg, p_pdu)) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+            case (1) {
+                setverdict(fail, "Decoding failed.");
+            }
+            case (2) {
+                setverdict(fail, "Not enough bits.");
+            }
+        } // End of 'select' statement
+    } // End of function test_decodePDU<PDUType>
+
+    function test_PDU<PDUType>(in PDUType p_pdu, in boolean p_decode:=true, in template (omit) bitstring p_expEncMsg:=omit) runs on TCType {
+        var PDUType v_decMsg;
+        var bitstring v_encMsg;
+        var integer v_res := 0;
+        var TestRecord v_tr := { bs := p_expEncMsg }
+        
+        v_encMsg := encvalue(p_pdu);
+        log("Encoded message: ", bit2oct(v_encMsg));
+        
+        if (not isbound(v_encMsg)) {
+            setverdict(fail, "Encoding failed!");
+            stop;
+        }
+        
+        if (ispresent(v_tr.bs)) {
+            if (not match(v_encMsg, p_expEncMsg)) {
+                setverdict(fail, "Encoding failed, not the expected result!");
+                stop;
+            }
+        }
+        
+        setverdict(pass, "Encoding passed.");
+        
+        if (p_decode == true) {
+            v_res := decvalue(v_encMsg, v_decMsg);
+            select (v_res) {
+                case (0) {
+                    if(match(v_decMsg, p_pdu)) {
+                        setverdict(pass);
+                    } else {
+                        setverdict(fail);
+                    }
+                }
+                case (1) {
+                    setverdict(fail, "Decoding failed.");
+                }
+                case (2) {
+                    setverdict(fail, "Not enough bits.");
+                }
+            }
+        }
+    } // End of function test_PDU<PDUType>
+}

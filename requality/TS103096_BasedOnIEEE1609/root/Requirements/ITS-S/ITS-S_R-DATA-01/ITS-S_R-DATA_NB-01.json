@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S accepts valid signed data from another ITS-S when the Signer Identifier is a Certificate Digest and the signature contains public key with various types."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/99d83a86-aa5b-4ece-8339-bba44fa734ce"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d94d9976-9580-401e-a8c8-7570893ec79e"
+}

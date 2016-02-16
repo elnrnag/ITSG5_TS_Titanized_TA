@@ -1,0 +1,69 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2016 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     DENM_Types_Test.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2016-02-08
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module DENM_Types
+{
+  import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+  import from ITS_Container language "ASN.1:1997" all;
+  import from LibItsDenm_TestSystem all;
+  import from TTCN_EncDec all;
+
+  external function enc_DENM_PDU( in DENM pdu) return octetstring;
+  external function dec_DENM_PDU( in octetstring stream) return DENM;
+
+function f_enc_DenmReq(in DenmReq pdu) return octetstring {
+  return enc_DENM_PDU(pdu.msgOut)
+}
+
+function f_dec_DenmReq(in octetstring stream) return DenmReq {
+  var DenmReq v_DenmReq;
+  v_DenmReq.msgOut:=dec_DENM_PDU(stream);
+  return v_DenmReq;
+
+}
+
+//function f_enc_DenmInd(in DenmInd pdu) return octetstring{}
+
+function f_dec_DenmInd(in octetstring stream) return DenmInd {
+  var DenmInd v_DenmInd;
+  var ExtDenmInd v_ExtDenmInd;
+  var octetstring v_os_per,v_os_raw;
+
+  var integer v_lengthof_ExtDenmInd := 12;
+
+  var integer v_start_of_raw := lengthof(stream) - v_lengthof_ExtDenmInd;
+  
+  v_os_per:=substr(stream, 0, v_start_of_raw);
+  v_os_raw:=substr(stream, v_start_of_raw, v_lengthof_ExtDenmInd);
+
+  v_ExtDenmInd:=f_dec_ExtDenmInd(v_os_raw);
+
+  v_DenmInd.msgIn:=dec_DENM_PDU(v_os_per);
+
+  v_DenmInd.gnNextHeader:=v_ExtDenmInd.gnNextHeader;
+  v_DenmInd.gnHeaderType:=v_ExtDenmInd.gnHeaderType;
+  v_DenmInd.gnHeaderSubtype:=v_ExtDenmInd.gnHeaderSubtype;
+  v_DenmInd.gnLifetime:=v_ExtDenmInd.gnLifetime;
+  v_DenmInd.gnTrafficClass:=v_ExtDenmInd.gnTrafficClass;
+  v_DenmInd.btpDestinationPort:=v_ExtDenmInd.btpDestinationPort;
+  v_DenmInd.btpInfo:=v_ExtDenmInd.btpInfo;
+
+  return v_DenmInd;
+
+}
+
+}
+
+

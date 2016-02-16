@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S accepts valid signed data from another ITS-S when the Signer Identifier is a Certificate without a lifetime set to duration."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/d7b499a1-2e5b-4f04-a837-48172874178b"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "2c80a6ab-fbee-4325-820c-5de3600c5dba"
+}

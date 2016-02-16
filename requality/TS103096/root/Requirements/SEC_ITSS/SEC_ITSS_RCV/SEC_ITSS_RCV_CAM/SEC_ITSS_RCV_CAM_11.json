@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "64442e91-7734-430b-bc99-08ab477e6430",
+            "type": "STRING",
+            "value": "Check that the signature contained in the SecuredMessage is calculated over the right fields by cryptographically verifying the signature."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "64442e91-7734-430b-bc99-08ab477e6430",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/edc30643-b58e-4c13-a10b-a3209100a17c"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "64442e91-7734-430b-bc99-08ab477e6430",
+            "type": "STRING",
+            "value": "11. Check signature"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "64442e91-7734-430b-bc99-08ab477e6430",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "64442e91-7734-430b-bc99-08ab477e6430"
+}

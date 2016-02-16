@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured DENM if the header_fields contain more than one element of header field of type: its_aid"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (DENM)\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'signer_info'\r\n\t\t\tand containing header_fields[1].type\r\n\t\t\t\tindicating 'generation_time'\r\n\t\t\tand containing header_fields[2].type\r\n\t\t\t\tindicating 'generation_location'\r\n\t\t\tand containing header_fields[3] {\r\n\t\t\t\tcontainint type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontainint its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t\tand containing header_fields[4] {\r\n\t\t\t\tcontainint type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontainint its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b3f7bcd9-ca79-4131-888a-21fdca0b4321"
+}

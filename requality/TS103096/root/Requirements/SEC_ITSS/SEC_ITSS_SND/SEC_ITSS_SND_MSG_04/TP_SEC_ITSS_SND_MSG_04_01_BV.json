@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "127db487-37ce-4029-998c-5d6d4f3fd06b",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "127db487-37ce-4029-998c-5d6d4f3fd06b",
+            "type": "STRING",
+            "value": "Check that when IUT sends the message signed with the digest, than this digest points to the AT certificate\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "127db487-37ce-4029-998c-5d6d4f3fd06b",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tand the IUT is configured to send more than one CAM per second\r\n\tand the IUT having sent last CAM\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate'\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send next CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate_digest_with_sha256'\r\n\t\t\t\t\tcontaining digest\r\n\t\t\t\t\t\treferencing the certificate\r\n\t\t\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\t\t\tindicating 'authorization_ticket'\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "127db487-37ce-4029-998c-5d6d4f3fd06b",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "127db487-37ce-4029-998c-5d6d4f3fd06b",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "127db487-37ce-4029-998c-5d6d4f3fd06b"
+}

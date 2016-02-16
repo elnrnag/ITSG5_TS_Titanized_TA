@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "7.3<img xmlns=\"http://www.w3.org/1999/xhtml\" width=\"18\" height=\"1\" border=\"0\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D\" />\n<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Arial'; font-size: 16pt;\">Generic security profile for other signed messages<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "259fb33a-69d9-40c4-ada8-e9a6c031e649"
+}

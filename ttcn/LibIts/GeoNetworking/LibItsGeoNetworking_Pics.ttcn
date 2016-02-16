@@ -1,0 +1,360 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/GeoNetworking/LibItsGeoNetworking_Pics.ttcn $
+ *              $Id: LibItsGeoNetworking_Pics.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       GeoNetworking PICS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsGeoNetworking_Pics {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+        
+    // LibIts
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsExternal_TypesAndValues {type MacAddress};
+    
+    group geoNwPics {
+        
+        /**
+         * @desc GeoNetworking address of the GeoAdhoc router
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar GN_Address PICS_GN_LOCAL_GN_ADDR := {
+            typeOfAddress := e_manual,
+            stationType := e_passengerCar,
+            stationCountryCode := c_uInt10Zero,
+            mid := c_6ZeroBytes
+        };
+        
+        /**
+         * @desc Is address manually configured
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar GnAddressConfigurationMethod PICS_GN_LOCAL_ADDR_CONF_METHOD := e_auto;
+        
+        /**
+         * @desc Is the IUT mobile?
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_IS_MOBILE := true;
+        
+        /**
+         * @desc Minimum update frequency of local position vector (LPV) in ms
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_MINIMUM_UPDATE_FREQUENCY_LPV := 1000;
+            
+        /**
+         * @desc Maximum size of GN-SDU [bytes]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_MAX_SDU_SIZE := 1398;
+        
+        /**
+         * @desc GN_MAX: Maximum size of GeoNetworking header [bytes]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_MAX_GN_HEADER_SIZE := 88;
+        
+        /**
+         * @desc Lifetime of location table entry [s]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_LIFETIME_LOC_TE := 20;
+        
+        /**
+         * @desc GN Security enabled or disabled
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_SECURITY := false;
+        
+        /**
+         * @desc Maximum number of retransmissions of LS_REQUEST packets
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_LOCATION_SERVICE_MAX_RETRANS := 10;
+        
+        /**
+         * @desc Duration of Location service retransmit timer [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_LOCATION_SERVICE_RETRANSMIT_TIMER := 1000;
+        
+        /**
+         * @desc Size of Location service packet buffer [Byte]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_LOCATION_SERVICE_PACKET_BUFFER_SIZE := 1024;
+        
+        /**
+         * @desc Duration of Beacon service retransmit timer [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_BEACON_SERVICE_RETRANSMIT_TIMER := 3000;
+        
+        /**
+         * @desc Maximum beacon jitter [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_BEACON_SERVICE_MAX_JITTER := 750;
+        
+        /**
+         * @desc Default hop limit indicating the maximum number of hops a packet travels
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar UInt8 PICS_GN_DEFAULT_HOP_LIMIT := 10;
+        
+        /**
+         * @desc Upper limit of the maximum lifetime [s]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_MAX_PACKET_LIFETIME := 600;
+        
+        /**
+         * @desc Lower limit of the packet repetition interval [km^2]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar float PICS_GN_MAX_GEO_AREA_SIZE:= 10.0;
+        
+        /**
+         * @desc Lower limit of the packet repetition interval [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_MIN_PACKET_REPETITION_INTERVAL := 100;
+        
+        /**
+         * @desc Default GeoUnicast forwarding algorithm
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar GeoUnicastForwardingAlgorithm PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM := e_greedy;
+        
+        /**
+         * @desc Default GeoBroadcast forwarding algorithm
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar GeoBroadcastForwardingAlgorithm PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM := e_advanced;
+        
+        /**
+         * @desc Minimum duration a GUC shall be buffered in the CBF packet buffer [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_GEOUNICAST_CBF_MIN_TIME := 1;
+        
+        /**
+         * @desc Maximum duration a GUC shall be buffered in the CBF packet buffer [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_GEOUNICAST_CBF_MAX_TIME := 100;
+
+        /**
+         * @desc Minimum duration a GBC shall be buffered in the CBF packet buffer [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_GEOBROADCAST_CBF_MIN_TIME := 1;
+        
+        /**
+         * @desc Maximum duration a GBC shall be buffered in the CBF packet buffer [ms]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_GEOBROADCAST_CBF_MAX_TIME := 100;
+                
+        /**
+         * @desc Default theoretical maximum communication range [m]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_DEFAULT_MAX_COMMUNICATION_RANGE := 1000;
+        
+        /**
+         * @desc Size of UC forwarding packet buffer [Kbytes]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_UC_FORWARDING_PACKET_BUFFER_SIZE := 256;
+        
+        /**
+         * @desc Size of BC forwarding packet buffer [Kbytes]
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar integer PICS_GN_BC_FORWARDING_PACKET_BUFFER_SIZE := 1024;
+        
+        /**
+         * @desc Support for Basic header
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_BASIC_HEADER := true;
+
+        /**
+         * @desc Support for Common header
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_COMMON_HEADER := true;
+
+        /**
+         * @desc Support for Beacon source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_BEACON_SRC := true;
+
+        /**
+         * @desc Support for Beacon destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_BEACON_DST := true;
+
+        /**
+         * @desc Support for GUC source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GUC_SRC := true;
+
+        /**
+         * @desc Support for GUC destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GUC_DST := true;
+
+        /**
+         * @desc Support for GUC forwarding
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GUC_FWD := true;
+
+        /**
+         * @desc Support for GBC source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GBC_SRC := true;
+
+        /**
+         * @desc Support for GBC destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GBC_DST := true;
+
+        /**
+         * @desc Support for GBC forwarding
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GBC_FWD := true;
+
+        /**
+         * @desc Support for GAC source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GAC_SRC := true;
+
+        /**
+         * @desc Support for GAC destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GAC_DST := true;
+
+        /**
+         * @desc Support for GAC forwarding
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_GAC_FWD := true;
+
+        /**
+         * @desc Support for SHB source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_SHB_SRC := true;
+
+        /**
+         * @desc Support for SHB destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_SHB_DST := true;
+
+        /**
+         * @desc Support for TSB source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_TSB_SRC := true;
+
+        /**
+         * @desc Support for TSB destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_TSB_DST := true;
+
+        /**
+         * @desc Support for TSB forwarding
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_TSB_FWD := true;
+
+        /**
+         * @desc Support for LS Request source operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_LS_REQ_SRC := true;
+
+        /**
+         * @desc Support for LS Request retransmission
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_LS_REQ_RETRANSMISSION := true;
+
+        /**
+         * @desc Support for LS Request destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_LS_REQ_DST := true;
+
+        /**
+         * @desc Support for LS Reply destination operations
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_LS_REP_DST := true;
+
+        /**
+         * @desc Support for LS forwarding
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_LS_FWD := true;
+
+        /**
+         * @desc Support for automatic address
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_ADDR_AUTO := true;
+
+        /**
+         * @desc Support for Managed address
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_ADDR_MANAGED := true;
+
+        /**
+         * @desc Support for Anonymous address
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_ADDR_ANONYMOUS := true;
+
+        /**
+         * @desc Support for DAD
+         * @see  ETSI TS 102 871-2 Table 4
+         */
+        modulepar boolean PICS_GN_DAD := true;
+
+         /**
+         * @desc MAX_COUNTER used in Advanced GBC forwarding
+         * @see  FIXME: not defined as protocol constant in base spec
+         */
+        modulepar integer PICS_GN_ADVANCED_BC_FORWARDING_MAX_COUNTER := 3;
+        
+        /**
+         * @desc IUT's Mac address
+         */
+        modulepar MacAddress PICS_IUT_MAC_ADDRESS := 'FFFFFFFFFFFF'O;
+
+    } // end geoNwPics
+    
+} // end LibItsGeoNetworking_Pics
+

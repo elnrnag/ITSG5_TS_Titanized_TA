@@ -1,0 +1,22 @@
+/**
+ *	@author 	ETSI / STF405
+ *  @version 	$URL: svn+ssh://vcs.etsi.org/TTCN3/ATS/Its/trunk/ttcn/AtsV2G/ItsV2G_TestControl.ttcn $
+ *				$Id: ItsV2G_TestControl.ttcn 278 2011-05-31 09:05:14Z reinaortega $
+ *	@desc		Test Control file for V2G
+ *
+ */
+module ItsV2G_TestControl {
+    
+    // ATS CAM
+    import from ItsV2G_TestCases {testcase all};
+    
+    // LibIts
+	
+    // Test Execution
+    control {
+        
+        if ( true ) { execute(TC_V2G_V2GR_ACV2G_BV_01()) };
+        
+    }
+    
+} // end ItsV2G_TestControl

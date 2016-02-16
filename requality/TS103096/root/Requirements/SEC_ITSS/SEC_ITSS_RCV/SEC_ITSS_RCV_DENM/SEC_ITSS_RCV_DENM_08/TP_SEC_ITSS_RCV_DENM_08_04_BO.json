@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_USE_IDENTIFIED_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_IDENTIFIED_REGION",
+            "origin": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe",
+            "type": "STRING",
+            "value": "Check that IUT discards Secured DENM if the HeaderField generation_location is outside of the identified validity region of the signing certificate"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields ['signer_info'].type\r\n\t\t\t\tindicating certificate\r\n\t\t\tand containing header_fields ['signer_info'].certificate (CERT_TS_AT_E)\r\n\t\t\t\tcontaining validity_restrictions ['region'] {\r\n\t\t\t\t\tcontaining region{\r\n\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\tindicating 'id_region'\r\n\t\t\t\t\t\tand containing identified_region\r\n\t\t\t\t\t\t\tindicating REGION\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\tand containing header_fields ['generation_location']\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating value outside of the REGION\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_DENM'\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "4f94e645-ce9e-4b8d-9e33-ffd7332ec3fe"
+}

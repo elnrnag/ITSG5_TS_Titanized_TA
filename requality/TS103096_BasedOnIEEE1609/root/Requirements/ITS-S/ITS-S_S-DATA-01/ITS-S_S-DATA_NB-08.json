@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S can generate valid signed data with ecdsa_nistp256_with_sha256."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/9035bf24-c5c2-4d90-843f-5f4e0a502b21"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "aaf7a49a-d0f9-41b4-a8f7-10357cbfea9c"
+}

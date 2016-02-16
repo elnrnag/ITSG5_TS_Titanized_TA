@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the subject_type of the AA certificate is set to authorization_authority\r\n"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating certificate_chain\r\n\t\t\t\tcontaining certificates[last-1] {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_authority' (2)\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "fe9c5ad6-e450-42d6-97d1-39e74490e8f6"
+}

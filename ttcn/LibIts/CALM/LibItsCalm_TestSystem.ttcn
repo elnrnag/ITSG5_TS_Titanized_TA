@@ -1,0 +1,36 @@
+/**
+ *    @author     ETSI / STF405
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/LibItsCalm_TestSystem.ttcn $
+ *                $Id: LibItsCalm_TestSystem.ttcn 829 2014-06-02 13:03:32Z garciay $
+ *    @desc        Test System module for ITS
+ *
+ */
+module LibItsCalm_TestSystem {
+    
+    // LibIts
+    import from LibItsCalm_Interface all;
+    
+    group componentDefinitions {
+
+         /**
+         * @desc ITS System Adapter
+         */
+        type component ItsCalmSystem {
+            
+            port UpperTesterPort utPort;
+            port AdapterControlPort acPort;
+            port ConfigTesterPort cfPort; 
+            
+            // MGT1 ports
+            port IicpPort iicpPort; // ITS station-internal management communications protocol 
+            // MGT2 ports
+            port FsapPort fsapPort; // Fast Service Advertisement Protocol 
+            // NT3 ports
+            port FntpPort fntpPort; // Fast Network & Transport layer Protocol 
+            //
+            port AtspPort atspPort; // Access Layer port 
+        } // End of component ItsCalmSystem
+        
+    } // End of group componentDefinitions
+     
+} // End of module LibItsCalm_TestSystem

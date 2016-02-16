@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_d55843ab-3d09-453b-a9b1-d7fc8752cfa8\"><a name=\"d55843ab-3d09-453b-a9b1-d7fc8752cfa8\" id=\"id_d55843ab-3d09-453b-a9b1-d7fc8752cfa8\" class=\"requality_id\"><\/a>The following <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Courier New'; font-size: 10pt;\">SubjectAttribute elements shall be included<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "c73e11c8-f818-4b1d-9c6c-e3ea41391338"
+}

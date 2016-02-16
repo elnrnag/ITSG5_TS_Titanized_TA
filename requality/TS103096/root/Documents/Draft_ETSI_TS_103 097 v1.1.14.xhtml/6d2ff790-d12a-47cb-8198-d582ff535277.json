@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6d2ff790-d12a-47cb-8198-d582ff535277\"><a name=\"6d2ff790-d12a-47cb-8198-d582ff535277\" id=\"id_6d2ff790-d12a-47cb-8198-d582ff535277\" class=\"requality_id\"><\/a>All certificates shall contain a <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">Signature<font style=\"font-family: Times New Roman;\"> field containing a signature calculated over these fields of the <font style=\"font-family: Courier New;\">Certificate<font style=\"font-family: Times New Roman;\"> data structure<\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "0e905c76-bcc4-4455-b4b5-b8924facbe05"
+}

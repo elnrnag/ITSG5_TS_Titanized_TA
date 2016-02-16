@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/7e096e44-bb1b-49db-91fa-6eeaf6f41b20"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "05. Authorization EB"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d9052ff1-9412-47c8-9466-37abc996378e"
+}

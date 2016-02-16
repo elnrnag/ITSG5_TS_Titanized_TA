@@ -1,0 +1,19 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "e0f22d25-281c-45ec-8cca-4c6028029dc3",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_e0f22d25-281c-45ec-8cca-4c6028029dc3\"><a name=\"e0f22d25-281c-45ec-8cca-4c6028029dc3\" id=\"id_e0f22d25-281c-45ec-8cca-4c6028029dc3\" class=\"requality_id\"><\/a>If the <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">signer_info<font style=\"font-family: Times New Roman;\"> is different from <font style=\"font-family: Courier New;\">self<font style=\"font-family: Times New Roman;\">, then the validity period defined by <font style=\"font-family: Courier New;\">time_end<font style=\"font-family: Times New Roman;\">, <font style=\"font-family: Courier New;\">time_start_and_end<font style=\"font-family: Times New Roman;\"> or <font style=\"font-family: Courier New;\">time_start_and duration<font style=\"font-family: Times New Roman;\"> shall be within the validity period of the certificate referenced by the <font style=\"font-family: Courier New;\">signer_info<font style=\"font-family: Times New Roman;\">.<\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e0f22d25-281c-45ec-8cca-4c6028029dc3",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "e0f22d25-281c-45ec-8cca-4c6028029dc3"
+}

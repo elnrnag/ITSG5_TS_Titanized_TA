@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S accepts a valid enrolment response with signature calculated using compressed representation of uncompressed public keys."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/636d6f4f-90c7-442c-8082-0fc0e888ff7c"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "aa435740-4bbc-4251-90a5-c716321b9802"
+}

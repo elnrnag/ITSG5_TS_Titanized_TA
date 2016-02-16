@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "dbac30a8-e850-46f2-b225-9c8718c90a2a",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "dbac30a8-e850-46f2-b225-9c8718c90a2a",
+            "type": "STRING",
+            "value": "Check that the secured DENM contains only one TrailerField of type signature.\r\nCheck that the signature contained in the SecuredMessage is calculated over the right fields by cryptographically verifying the signature."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "dbac30a8-e850-46f2-b225-9c8718c90a2a",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send DENM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_field ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate\r\n\t\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\t\tindicating 'authorization_ticket' (2)\r\n\t\t\t\t\t\tand containing subject_attributes['verification key'] (KEY)\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tcontaining header_fields ['its_aid'] {\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t\tcontaining trailer_fields {\r\n\t\t\t\tcontaining single instance of type TrailerField {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'signature'\r\n\t\t\t\t\tcontaining signature\r\n\t\t\t\t\t\tverifiable using KEY\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "dbac30a8-e850-46f2-b225-9c8718c90a2a",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "dbac30a8-e850-46f2-b225-9c8718c90a2a",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "dbac30a8-e850-46f2-b225-9c8718c90a2a"
+}

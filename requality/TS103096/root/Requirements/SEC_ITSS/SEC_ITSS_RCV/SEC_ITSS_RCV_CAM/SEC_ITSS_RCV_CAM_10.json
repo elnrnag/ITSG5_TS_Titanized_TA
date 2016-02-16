@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d24b7f9d-ee0f-4614-ac07-5898ae0f661f",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured CAMs with wrong payloads\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "d24b7f9d-ee0f-4614-ac07-5898ae0f661f",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2e99c742-b3c7-497d-ad35-af859d7e351d"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "d24b7f9d-ee0f-4614-ac07-5898ae0f661f",
+            "type": "STRING",
+            "value": "10. Check presence of traieler field"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d24b7f9d-ee0f-4614-ac07-5898ae0f661f",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d24b7f9d-ee0f-4614-ac07-5898ae0f661f"
+}

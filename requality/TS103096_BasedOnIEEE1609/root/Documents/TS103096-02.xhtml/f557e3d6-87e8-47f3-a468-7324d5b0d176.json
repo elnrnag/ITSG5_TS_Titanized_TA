@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "R<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Arial; font-size: 12pt;\">eceiving Data<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "f557e3d6-87e8-47f3-a468-7324d5b0d176"
+}

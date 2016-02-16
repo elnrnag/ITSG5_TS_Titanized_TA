@@ -1,0 +1,770 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Ipv6OverGeoNetworking/LibItsIpv6OverGeoNetworking_Functions.ttcn $
+ *              $Id: LibItsIpv6OverGeoNetworking_Functions.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc       Module containing functions for Ipv6OverGeoNetworking
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsIpv6OverGeoNetworking_Functions {
+    
+    // Libcommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Sync all;
+    import from LibCommon_Time all;
+    import from LibCommon_TextStrings all;
+    
+    // LibIts
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsGeoNetworking_Functions all;
+    import from LibItsGeoNetworking_Templates all;
+    import from LibItsGeoNetworking_TestSystem all;
+    import from LibItsIpv6OverGeoNetworking_TestSystem all;
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+    import from LibItsIpv6OverGeoNetworking_Templates all;
+    import from LibItsIpv6OverGeoNetworking_Pixits all;
+    import from LibItsExternal_TypesAndValues {type MacAddress};
+    
+    group ipv6OverGeoConfigurationFunctions {
+        
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - two ITS nodes (nodeA, nodeB)
+         *       - three GVLs
+         */
+        function f_cf01UpGn6() runs on ItsIpv6OverGeoNetworking {
+            
+            // Variables
+            var float v_distance;
+            
+            // Map
+            map(self:ipv6OverGeoNetworkingPort, system:ipv6OverGeoNetworkingPort);
+            
+            f_cf01Up();
+            v_distance := f_distance(f_getPosition(c_compNodeB), f_getPosition(c_compIut));
+            
+            // Compute IPv6 addresses
+            f_addAddresses(vc_addressTable, c_compIut);
+            f_addAddresses(vc_addressTable, c_compNodeA);
+            f_addAddresses(vc_addressTable, c_compNodeB);
+            
+            // Create additional areas
+            f_addArea(vc_areaTable, c_gvlArea1, 
+                f_computeSquareArea(f_getPosition(c_compIut), float2int(2.1 * v_distance)));
+            f_addArea(vc_areaTable, c_gvlArea2, 
+                f_computeSquareArea(f_getPosition(c_compIut), float2int(2.2 * v_distance)));
+            f_addArea(vc_areaTable, c_gvlArea3, 
+                f_computeSquareArea(f_getPosition(c_compIut), float2int(2.3 * v_distance)));
+            
+            // Create GVLs
+            f_addGvl(c_gvl1_name, f_getPrefix(1), f_getPrefixLength(1), c_gvlArea1, "");
+            f_addGvl(c_gvl2_name, f_getPrefix(2), f_getPrefixLength(2), c_gvlArea2, "");
+            f_addGvl(c_gvl3_name, f_getPrefix(3), f_getPrefixLength(3), c_gvlArea3, "");
+            
+            
+        } // end f_cf01Up
+        
+        /**
+         * @desc Deletes configuration cf01Gn6
+         */
+        function f_cf01DownGn6() runs on ItsIpv6OverGeoNetworking {
+            
+            // Map
+            unmap(self:ipv6OverGeoNetworkingPort, system:ipv6OverGeoNetworkingPort);
+            
+            f_cf01Down();
+            
+        } // end f_cf01Down
+        
+    } // end group ipv6OverGeoConfigurationFunctions
+    
+    group ipv6OverGeoNwAltsteps {
+        
+        /**
+         * @desc IPv6 default.
+         */
+        altstep a_ipv6Default() runs on ItsIpv6OverGeoNetworking {
+            var GeoNetworkingInd v_geoNwInd;
+            
+            [] geoNetworkingPort.receive (
+                mw_geoNwInd(
+                    mw_geoNwPdu(
+                        mw_geoNwBroadcastPacketWithNextHeaderAndPayload(
+                            ?, 
+                            ?, 
+                            e_ipv6,
+                            mw_ipv6Payload(
+                                mw_ipv6Packet(
+                                    ?,
+                                    ?,
+                                    ?,
+                                    mw_octetstringPayload(?)
+                                )
+                            )
+                        )
+                    )
+                )
+            ) {
+                log("*** " & testcasename() & ": INFO: Ignoring unsupported IPv6 packet ***");   
+                repeat;
+            }
+            [] geoNetworkingPort.receive (
+                mw_geoNwInd(
+                    mw_geoNwPdu(
+                        mw_geoNwBroadcastPacketWithNextHeaderAndPayload(
+                            ?, 
+                            ?, 
+                            e_ipv6,
+                            mw_ipv6Payload(
+                                ?
+                            )
+                        )
+                    )
+                )
+            ) -> value v_geoNwInd {
+                if (match(
+                       v_geoNwInd.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader.srcPosVector,
+                       (
+                           mw_longPosVectorPosition_withDelta(f_getPosition(c_compNodeA)), 
+                           mw_longPosVectorPosition_withDelta(f_getPosition(c_compNodeB))
+                       )
+                )) {
+                    log("*** " & testcasename() & ": INFO: Ignoring rebroadcasted IPv6 packet ***");   
+                    repeat;
+                }
+                else {
+                    log("*** " & testcasename() & ": ERROR: Received an unexpected message ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+            }
+            [] ipv6OverGeoNetworkingPort.receive(
+                mw_ipv6OverGeoNwInd(
+                    ?,
+                    ?,
+                    c_macBroadcastAddr,
+                    ? // TODO: rtAdv
+                )
+            )  {
+                log("*** " & testcasename() & ": INFO: Ignoring Router Advertisement ***");   
+                repeat; 
+            }
+            
+        } // end a_ipv6Default
+        
+    } // end ipv6OverGeoNwAltsteps
+    
+    group preambles {
+        
+        /**
+         * @desc Preamble for IPv6 neighbour nodes
+         */        
+        function f_prIpv6Neighbour() runs on ItsIpv6OverGeoNetworking {
+            f_prNeighbour();
+            activate(a_ipv6Default());
+        }
+        
+        /**
+         * @desc Preamble to configure the GVLs, either manual or via RA
+         * @param p_gvls            The GVLs to configure
+         * @param p_validLifetimes  The specific invalidation timer for the GVLs
+         */
+        function f_prConfigureGVL(
+            in GvlIdxList p_gvls,
+            in template (omit) UInt32List p_validLifetimes := omit
+        ) runs on ItsIpv6OverGeoNetworking 
+        return FncRetCode {
+            var integer i;
+            var charstring v_str := "";
+            var UInt32 v_validLifetime := c_validLifetime30s;
+            
+            if (lengthof(vc_gvlTable)<lengthof(p_gvls)) {
+                return e_error;
+            }
+            if (PX_CONFIG_MANUAL_GVL) {
+                // Manually configure GVL
+                for (i:=0; i<lengthof(p_gvls); i:=i+1) {
+                    v_str := v_str & "Prefix=" & oct2str(vc_gvlTable[i].prefix) & "/" & int2str(vc_gvlTable[i].prefixLength) & " "
+                    & "Area=" & vc_gvlTable[i].area & c_CRLF;
+                    if (isvalue(p_validLifetimes) and lengthof(p_validLifetimes)>=(i+1)) {
+                        v_str := " Lifetime=" & v_str & int2str(valueof(p_validLifetimes[i]));
+                    }
+                    v_str := v_str & c_CRLF;
+                }
+                action("Please configure manual SGVLs: " & c_CRLF & v_str & c_CRLF);
+                f_sleep(PX_TWAIT);
+            }
+            else {
+                for (i:=0; i<lengthof(p_gvls); i:=i+1) {
+                    if (isvalue(p_validLifetimes) and lengthof(p_validLifetimes)>=(i+1)) {
+                        v_validLifetime := valueof(p_validLifetimes[i]);
+                    }
+                    f_sendGeoBroadcastWithRtAdv(vc_gvlTable[i], c_compNodeA, v_validLifetime);
+                }
+                f_sleep(PX_T_BUILD_CONFIG);
+            }
+            f_acUpdateInterfaces();
+            
+            return e_success;
+        }
+        
+    } // end preambles
+    
+    group postambles {
+        
+        /**
+         * @desc Postamble for neighbour nodes
+         */
+        function f_poIpv6Neighbour() runs on ItsIpv6OverGeoNetworking {
+            f_poNeighbour();
+        }
+    } // end postambles
+    
+    group testAdapter {
+        
+        /**
+         * @desc    Retrieve IUT's interface names and associate them with predefined GVLs 
+         */
+        function f_acUpdateInterfaces() runs on ItsIpv6OverGeoNetworking {
+            
+            var AcGn6Response v_response;
+            var AcGn6InterfaceInfoList v_interfaceInfoList;
+            var integer i, j, k;
+            
+            acPort.send(m_acGetInterfaceInfos);
+            tc_ac.start;
+            alt {
+                [] acPort.receive(mw_acInterfaceInfos) -> value v_response {
+                    tc_ac.stop;
+                    
+                    v_interfaceInfoList := valueof(v_response.interfaceInfoList);
+                    // Go through interfaceInfos
+                    for(i:=0; i < sizeof(v_interfaceInfoList); i:=i+1) {
+                        // Go through IPv6 addresses configured for this interface
+                        for(j:=0; j < sizeof(v_interfaceInfoList[i].ipv6AddressList); j:=j+1) {
+                            // Compare IPv6 address to recorded GVL prefixes
+                            for(k:=0; k < sizeof(vc_gvlTable); k:=k+1) {
+                                if(f_isIpv6AddressCorrespondingToPrefix(
+                                    v_interfaceInfoList[i].ipv6AddressList[j], 
+                                    vc_gvlTable[k].prefix, 
+                                    vc_gvlTable[k].prefixLength)) {
+                                    // interface i is associated to GVL k
+                                    vc_gvlTable[k].interface := v_interfaceInfoList[i].interfaceName;
+                                    break;
+                                }
+                            }
+                            if(k >= sizeof(vc_gvlTable)) {
+                                // GVL already found
+                                break;
+                            }
+                        }
+                    }
+                }
+                [] acPort.receive {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": ERROR: Received unexpected message ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while waiting for adapter control event result ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+            }
+        }
+        
+    } // end group testAdapter
+    
+    group sendFunctions {
+        
+        /**
+         * @desc    Send a GeoBroadcast containing an IPv6 Router Advertisement
+         * @param   p_gvl       Name of the GVL for which the RA is sent
+         * @param   p_compName  Name of the component sending this packet
+         */
+        function f_sendGeoBroadcastWithRtAdv(
+            in template (value) GvlTableEntry p_gvl,
+            in charstring p_compName,
+            in UInt32 p_validLifetime := c_validLifetime30s
+        ) runs on ItsIpv6OverGeoNetworking {
+            
+            var AddressTableEntry v_nodeAddresses := f_getAddresses(p_compName);
+            var LongPosVector v_nodeLongPosVector := f_getPosition(p_compName);
+            
+            f_sendGeoNetMessageWithPayload(
+                m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwBroadcastPacket(
+                            v_nodeLongPosVector,
+                            vc_localSeqNumber,
+                            f_getGeoBroadcastArea(valueof(p_gvl.area))
+                        )
+                    )
+                ),
+                m_ipv6Payload(
+                    m_ipv6Packet(
+                        v_nodeAddresses.lla,
+                        c_allNodesMca,
+                        c_icmpHdr,
+                        m_rtAdvWithOptions(
+                            m_rtAdvOpt_prefixOpt(
+                                p_gvl.prefixLength,
+                                c_lFlag1,
+                                c_aFlag1,
+                                p_validLifetime,
+                                c_preferredLifetime30s,
+                                p_gvl.prefix
+                            )
+                        )
+                    )
+                )
+            );
+        }
+        
+    } //end group sendFunctions
+    
+    group miscellaneous {
+        
+        /**
+         * @desc    Add GVL information in the GVL table
+         * @param   p_gvlKey        Name of the GVL
+         * @param   p_prefix        IPv6 prefix associated with the GVL
+         * @param   p_prefixLength  Prefix length
+         * @param   p_area          Name of the GeoArea associated with the GVL
+         * @param   p_interface     Name of IUT's virtual interface associated with the GVL
+         */
+        function f_addGvl(
+            in charstring p_gvlKey,
+            in Oct16 p_prefix,
+            in UInt8 p_prefixLength,
+            in charstring p_area,
+            in charstring p_interface
+        ) runs on ItsIpv6OverGeoNetworking {
+            vc_gvlTable[lengthof(vc_gvlTable)] := {
+                key := p_gvlKey,
+                prefix := p_prefix,
+                prefixLength := p_prefixLength,
+                area := p_area,
+                interface := p_interface
+            };
+        } // end f_addGvl
+        
+        /**
+         * @desc    Gets the Geographical Virtual link entry associated to an area
+         * @param   p_gvlName   Name of the GVL
+         */
+        function f_getGvl(in charstring p_gvlName) runs on ItsIpv6OverGeoNetworking return GvlTableEntry {
+            var GvlTableEntry v_return;
+            var integer i := 0;
+            
+            for (i:=0; i<lengthof(vc_gvlTable); i:=i+1) {
+                if (vc_gvlTable[i].key == p_gvlName) {
+                    v_return := valueof(vc_gvlTable[i]);
+                }
+            }
+            
+            return v_return;
+            
+        } // end f_getGvl
+        
+        /**
+         * @desc    Gets interface name of one of IUT's GVL
+         * @param   p_gvlIdx   Index of the GVL
+         * @return  Name of the GVL interface
+         */
+        function f_getGvlInterface(in integer p_gvlIdx) runs on ItsIpv6OverGeoNetworking return charstring {
+            return vc_gvlTable[p_gvlIdx].interface
+        } // end f_getGvlInterface
+        
+        /**
+         * @desc    Gets IUT's TVL interface name
+         * @return  Name of the TVL interface
+         * @see     PX_GN6_TVL_INTERFACE_NAME
+         */
+        function f_getTvlInterface() runs on ItsIpv6OverGeoNetworking return charstring {
+            return PX_GN6_TVL_INTERFACE_NAME; 
+        } // end f_getTvlInterface
+        
+        /**
+         * @desc    Retrieves the MAC address from the GN address.
+         * @param   p_gnAddr The GN address
+         * @return  The MAC address
+         */
+        function f_gnAddr2MacAddr(in GN_Address p_gnAddr) return MacAddress {
+            return p_gnAddr.mid;
+        } // end f_gnAddr2MacAddr
+        
+        /**
+         * @desc    Retrieves the GN address from the MAC address.
+         * @param   p_macAddr The MAC address
+         * @return  The GN address
+         */
+        function f_macAddr2GnAddr(in MacAddress p_macAddr) return GN_Address {
+            var GN_Address v_gnAddr := valueof(m_dummyGnAddr);
+            v_gnAddr.mid := p_macAddr;
+            return v_gnAddr;
+        } // end f_macAddr2GnAddr
+        
+        /**
+         * @desc    Compute an Unique Interface ID based on a MAC Address
+         * @param   p_macAddr MAC Address
+         * @return  Unique interface ID
+         */
+        function f_createUniqueInterfaceId (  
+           in  Oct6 p_macAddr
+        )
+        return Oct8 {
+            var integer i;
+            var Oct3 v_leftPartMac := int2oct(0,3);
+            var Oct3 v_rightPartMac := int2oct(0,3);
+            var Bit24 v_leftPartBits := int2bit(0,24);
+            var Bit24 v_leftPartBitMask := oct2bit('020000'O);
+            
+            //get leftPart
+            for (i:=0; i<lengthof(p_macAddr)-3; i:=i+1) {
+                v_leftPartMac[i] := p_macAddr[i];
+            }
+            //get rightPart
+            for (i:=3; i<lengthof(p_macAddr); i:=i+1) {
+                v_rightPartMac[i-3] := p_macAddr[i];
+            }
+            //flipBit universalBit of leftPart
+            v_leftPartBits :=  oct2bit(v_leftPartMac);
+            v_leftPartBits := v_leftPartBits xor4b v_leftPartBitMask;
+            v_leftPartMac := bit2oct(v_leftPartBits);
+            //build InterfaceId
+            return v_leftPartMac & 'FFFE'O & v_rightPartMac;
+        } // end f_createUniqueInterfaceId
+        
+        /**
+         * @desc    Compute link-local, solicited-node multicast IPv6 addresses
+         *          and MAC-Solicited-node Address, based on prefix and MAC address
+         * @param   p_addressTable Address Table
+         * @param   p_componentName entity for which addresses are computed and added
+         * @return  Address table entry that will contain all the results
+         */
+        function f_addAddresses(
+            inout AddressTable p_addressTable,
+            in charstring p_componentName
+        ) runs on ItsIpv6OverGeoNetworking {
+            const UInt8 c_uniIdLen := 64;
+            var AddressTableEntry v_addressTableEntry;
+            var MacAddress v_macAddr;
+            var Oct8 v_interfaceIdReady := int2oct(0,8);
+            var Oct3 v_rightPartMac := int2oct(0,3);
+            var integer i;
+            
+            v_addressTableEntry.key := p_componentName;
+			var LongPosVector v_position := f_getPosition(p_componentName);
+            v_macAddr := f_gnAddr2MacAddr(v_position.gnAddr);
+            
+            v_addressTableEntry.macAddress := v_macAddr;
+            
+            // compute interface ID
+            v_interfaceIdReady := f_createUniqueInterfaceId(v_macAddr);
+            
+            // LLA
+            v_addressTableEntry.lla := 'FE80000000000000'O & v_interfaceIdReady;
+            
+            // get rightPart
+            for (i:=3; i<lengthof(v_macAddr); i:=i+1) {
+                v_rightPartMac[i-3] := v_macAddr[i];
+            }
+            
+            // SOL_NODE_MCA
+            v_addressTableEntry.solNodeMca := 'FF0200000000000000000001FF'O & v_rightPartMac;
+            
+            // MAC_MCA
+            v_addressTableEntry.macSolNodeMca := '3333FF'O & v_rightPartMac;
+            
+            p_addressTable[lengthof(p_addressTable)] := v_addressTableEntry;
+            
+        } // end f_computeAddresses
+        
+        /**
+         * @desc    Retrieve addresses from address table
+         * @param   p_positionKey   Reference key of the address entry
+         * @return  Address table entry
+         */
+        function f_getAddresses(
+            in charstring p_positionKey
+        ) runs on ItsIpv6OverGeoNetworking 
+        return AddressTableEntry {
+            
+            var AddressTableEntry v_return;
+            var integer i := 0;
+            
+            for (i:=0; i<lengthof(vc_addressTable); i:=i+1) {
+                if (vc_addressTable[i].key == p_positionKey) {
+                    v_return := vc_addressTable[i];
+                }
+            }
+            
+            return v_return;
+        } // end  f_getAddresses
+        
+        /**
+         * @desc    Compute 64 bits prefix
+         * @param   p_prefixBits Prefix
+         * @param   p_prefixLen  Prefix Length
+         * @return  Prefix
+         */
+        function f_compute64BitsPrefix(
+            in Bit128 p_prefixBits,
+            in UInt8  p_prefixLen
+        ) return Oct8 {
+            var integer i;
+            var Bit64 v_prefixReadyBits := int2bit(0, 64);
+            
+            if (p_prefixLen > 64) {
+                log("*** " & testcasename() & ": ERROR: Wrong prefixLen (max 64 bits) ***");
+                return int2oct(0, 8);
+            }
+            
+            //Fill v_prefixReady with existing Prefix
+            for (i:=0; i<p_prefixLen; i:=i+1) {
+                v_prefixReadyBits[i] := p_prefixBits[i];
+            }
+            return bit2oct(v_prefixReadyBits);
+        }
+        
+        /**
+         * @desc    Compute global address based on prefix and MAC address
+         * @param   p_compName Component name
+         * @param   p_prefix Prefix
+         * @param   p_prefixLen Prefix Length
+         * @return  Global IPv6 address
+         */
+        function f_computeGlobalAddress(
+            in charstring p_compName,
+            in Oct16 p_prefix, 
+            in UInt8 p_prefixLen
+        ) runs on ItsIpv6OverGeoNetworking
+        return Ipv6Address {
+            var Oct8 v_interfaceIdReady := int2oct(0,8);
+            
+            if (p_prefixLen > 64) {
+                log("*** " & testcasename() & ": ERROR: Wrong prefixLen ***");
+                return '00000000000000000000000000000000'O;
+            }
+            
+            // compute interface ID
+			var AddressTableEntry v_addresses := f_getAddresses(p_compName);
+            v_interfaceIdReady := f_createUniqueInterfaceId(v_addresses.macAddress);
+            
+            return f_compute64BitsPrefix(oct2bit(p_prefix), p_prefixLen) & v_interfaceIdReady;
+            
+        } // end f_computeGlobalAddress
+        
+        /**
+         * @desc    Compute Home Agent anycast address for a prefix
+         * @param   p_prefix    Prefix for which the address is computed
+         * @param   p_prefixLen Length of the prefix
+         * @return  Home Agent anycast address
+         */
+        function f_computeHomeAgentAnycastAddress(
+            in Oct16 p_prefix, 
+            in UInt8 p_prefixLen
+        ) return Ipv6Address {
+            var Oct8 v_haAnycast := 'FDFFFFFFFFFFFFFE'O;
+            
+            if (p_prefixLen != 64) {
+                log("*** " & testcasename() & ": ERROR: Wrong prefixLen ***");
+                return '00000000000000000000000000000000'O;
+            }
+            
+            return f_compute64BitsPrefix(oct2bit(p_prefix), p_prefixLen) & v_haAnycast;
+        } // end f_computeHomeAgentAnycastAddress
+        
+        /**
+         * @desc    Computes global-scoped unicast-prefix-based multicast Ipv6 address
+         * @param   p_prefix    Prefix for which the address is computed
+         * @param   p_prefixLen Length of the prefix in bits (max 64)
+         * @param   p_groupId   Group ID
+         * @return  Global-scoped unicast-prefix-based multicast Ipv6 address
+         */
+        function f_computeGlobalScopedUnicastPrefixBasedMulticastIpv6Address(
+            in Oct16  p_prefix, 
+            in UInt8  p_prefixLen,
+            in UInt32 p_groupId
+        ) return Ipv6Address {
+            var Oct3 v_leftPart := 'FF3E00'O;
+            
+            if (p_prefixLen>64) {
+                log("*** " & testcasename() & ": ERROR: Wrong prefixLen, max 64 bits allowed ***");
+                return int2oct(0, 16);
+            }
+            
+            return v_leftPart & int2oct(p_prefixLen, 1) & f_compute64BitsPrefix(oct2bit(p_prefix), p_prefixLen) & int2oct(p_groupId, 4);
+        }
+        
+        /**
+         * @desc    Computes geographic anycast Ipv6 address
+         * @param   p_prefix    Prefix for which the address is computed
+         * @param   p_prefixLen Length of the prefix in bits (max 64)
+         * @return  Geographic anycast Ipv6 address
+         */
+        function f_computeGeographicAnycastIpv6Address(
+            in Oct16  p_prefix, 
+            in UInt8  p_prefixLen
+        ) return Ipv6Address {
+            var Bit64 v_interfaceIdentifierField := '11111101'B & int2bit(1, 49) & c_itsGn6aslGeoAnycastID;
+            
+            if (p_prefixLen>64) {
+                log("*** " & testcasename() & ": ERROR: Wrong prefixLen, max 64 bits allowed ***");
+                return int2oct(0, 16);
+            }
+            
+            return f_compute64BitsPrefix(oct2bit(p_prefix), p_prefixLen) & bit2oct(v_interfaceIdentifierField);
+        }
+        
+        /**
+         * @desc    Gets a predefined prefix
+         * @param   p_index Index of the predefined prefix
+         * @return  IPv6 prefix
+         * @see     PX_GN6_PREFIX_1
+         * @see     PX_GN6_PREFIX_2
+         * @see     PX_GN6_PREFIX_3
+         */
+        function f_getPrefix(in integer p_index) return Oct16 {
+            
+            select (p_index) {
+                case (1) {
+                    return PX_GN6_PREFIX_1;
+                }
+                case (2) {
+                    return PX_GN6_PREFIX_2;
+                }
+                case (3) {
+                    return PX_GN6_PREFIX_3;
+                }
+            }
+            
+            return int2oct(0, 16);
+            
+        } // end f_getPrefix
+        
+        /**
+         * @desc    Gets the length of a predefined prefix
+         * @param   p_index Index of the predefined prefix
+         * @return  length of a prefix
+         * @see     PX_GN6_PREFIX_LENGTH_1
+         * @see     PX_GN6_PREFIX_LENGTH_2
+         * @see     PX_GN6_PREFIX_LENGTH_3
+         */
+        function f_getPrefixLength(in integer p_index) return UInt8 {
+            
+            select (p_index) {
+                case (1) {
+                    return PX_GN6_PREFIX_LENGTH_1;
+                }
+                case (2) {
+                    return PX_GN6_PREFIX_LENGTH_2;
+                }
+                case (3) {
+                    return PX_GN6_PREFIX_LENGTH_3;
+                }
+            }
+            
+            return 64;
+            
+        } // end f_getPrefixLength
+        
+        /**
+         * @desc    Checks whether an IPv6 address belongs to an IPv6 prefix
+         * @param   p_ipv6Address   IPv6 address to be checked
+         * @param   p_prefix        Prefix
+         * @param   p_prefixLength  Length of the prefix
+         * @return  Boolean - True if IPv6 address belongs to prefix, False otherwise  
+         */
+        function f_isIpv6AddressCorrespondingToPrefix(Ipv6Address p_ipv6Address, Ipv6Address p_prefix, UInt8 p_prefixLength) 
+        return boolean {
+            
+            var bitstring v_ipv6Address := oct2bit(p_ipv6Address);
+            var bitstring v_prefix := oct2bit(p_prefix);
+            var integer i;
+            
+            for(i:=0; i < p_prefixLength; i:=i+1) {
+                if(v_ipv6Address[i] != v_prefix[i]) {
+                    return false;
+                }
+            }
+            
+            return true;
+        } // end f_isIpv6AddressCorrespondingToPrefix
+        
+        /**
+         * @desc    Calculate ICMPv6 checksum on pseudo header according RFC 4443 - Clause 2.3
+         * @param   p_sourceAddress         Source address, 
+         * @param   p_destinationAddress    Destination address
+         * @param   p_payloadLength         Upper-Layer Packet Length
+         * @param   p_payload               Upper-Layer payload
+         * @param   p_nextHdr               Next header value (e.g. 0x3a for ICMPv6)
+         */
+        function f_computeIPv6CheckSum( 
+            in template (value) Ipv6Address p_sourceAddress, 
+            in template (value) Ipv6Address p_destinationAddress, 
+            in template (value) integer p_payloadLength, 
+            in template (value) octetstring p_payload,
+            in template (value) UInt8 p_nextHdr 
+        ) return Oct2 {
+            var Oct2 v_checksum := 'FFFF'O;
+            
+            log("*** " & testcasename() & ": INFO: calling fx_computeIPv6CheckSum() ***");
+            //TODO v_checksum := fx_computeIPv6CheckSum(p_sourceAddress, p_destinationAddress, p_payloadLength, p_payload, p_nextHdr);
+            
+            return v_checksum;
+        }
+        
+    } // end group miscellaneous
+    
+    group externalFunctions {
+        
+        /**
+         * @desc    Calculate ICMPv6 checksum on pseudo header according RFC 4443 - Clause 2.3
+         * @param   p_sourceAddress         Source address, 
+         * @param   p_destinationAddress    Destination address
+         * @param   p_payloadLength         Upper-Layer Packet Length
+         * @param   p_payload               Upper-Layer payload
+         * @param   p_nextHdr               Next header value (e.g. 0x3a for ICMPv6)
+         * @return  The checksum value
+         * <pre>
+         * Pseudo header is defined by RFC 2460 - Clause 8.1
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                                                               |
+         *  +                                                               +
+         *  |                                                               |
+         *  +                         Source Address                        +
+         *  |                                                               |
+         *  +                                                               +
+         *  |                                                               |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                                                               |
+         *  +                                                               +
+         *  |                                                               |
+         *  +                      Destination Address                      +
+         *  |                                                               |
+         *  +                                                               +
+         *  |                                                               |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                   Upper-Layer Packet Length                   |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         *  |                      zero                     |  Next Header  |
+         *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         * </pre>
+         */
+        /*TODO external function fx_computeIPv6CheckSum( 
+            in template (value) Ipv6Address p_sourceAddress, 
+            in template (value) Ipv6Address p_destinationAddress, 
+            in template (value) integer p_payloadLength, 
+            in template (value) octetstring p_payload, 
+            in template (value) UInt8 p_nextHdr 
+        ) return Oct2;*/
+        
+    } // End of group externalFunctions
+    
+} // end LibItsIpv6OverGeoNetworking_Functions
+

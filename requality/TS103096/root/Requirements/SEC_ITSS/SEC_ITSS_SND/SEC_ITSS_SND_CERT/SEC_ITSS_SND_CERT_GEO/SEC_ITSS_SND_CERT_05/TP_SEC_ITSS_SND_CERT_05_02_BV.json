@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "364a1c63-5b7e-4b6e-af2b-39501c1a292a",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "364a1c63-5b7e-4b6e-af2b-39501c1a292a",
+            "type": "STRING",
+            "value": "Check Polygonal Region:\r\nMust contain at least 3 and no more than 12 points.\r\nIntersections and holes are not permited.\r\nThe region must be inside the issuing certificate restrictions."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "364a1c63-5b7e-4b6e-af2b-39501c1a292a",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate_chain'\r\n\t\t\t\tcontaining certificates\r\n\t\t\t\t\tindicating CERTIFICATES {\r\n\t\t\t\t\t\tcontaining CERTIFICATES[N] {\r\n\t\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\tindicating 'polygon'\r\n\t\t\t\t\t\t\t\tcontaining polygonal_region {\r\n\t\t\t\t\t\t\t\t\tindicating length >=3 and <=12\r\n\t\t\t\t\t\t\t\t\tindicating continuous region without holes and intersections\r\n\t\t\t\t\t\t\t\t\t\twhich is inside the CERTIFICATES[N-1]\r\n\t\t\t\t\t\t\t\t\t\t.validity_restrictions['region'].polygonal_region\r\n\t\t\t\t\t\t\t\t\t\tif region validity restriction is containted in CERTIFICATES[N-1]\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "364a1c63-5b7e-4b6e-af2b-39501c1a292a",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "364a1c63-5b7e-4b6e-af2b-39501c1a292a",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "364a1c63-5b7e-4b6e-af2b-39501c1a292a"
+}

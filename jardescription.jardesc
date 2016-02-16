@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/home/elnrnag/TITAN/ITSTRIMapper/Output/TA.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ITSG5_TS_Titanized_TA/jardescription.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="/titan_tri_mapper/res/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <folder path="/ITSG5_TS_Titanized_TA/data"/>
+        <folder path="/ITSG5_TS_Titanized_TA/unittests"/>
+        <javaElement handleIdentifier="=ITSG5_TS_Titanized_TA/javasrc\/certificatesio"/>
+        <folder path="/ITSG5_TS_Titanized_TA/requality"/>
+        <folder path="/ITSG5_TS_Titanized_TA/javasrc"/>
+        <folder path="/ITSG5_TS_Titanized_TA/asn1"/>
+        <folder path="/ITSG5_TS_Titanized_TA/src"/>
+        <folder path="/ITSG5_TS_Titanized_TA/logs"/>
+        <file path="/ITSG5_TS_Titanized_TA/.project"/>
+        <javaElement handleIdentifier="=ITSG5_TS_Titanized_TA/javasrc\/extfunc"/>
+        <file path="/ITSG5_TS_Titanized_TA/ne-countries-50m.json"/>
+        <javaElement handleIdentifier="=ITSG5_TS_Titanized_TA/javasrc\/codec"/>
+        <folder path="/ITSG5_TS_Titanized_TA/settingsImage"/>
+        <javaElement handleIdentifier="=ITSG5_TS_Titanized_TA/javasrc\/common"/>
+        <folder path="/ITSG5_TS_Titanized_TA/TRI"/>
+        <javaElement handleIdentifier="=ITSG5_TS_Titanized_TA/javasrc\/adapter"/>
+        <folder path="/ITSG5_TS_Titanized_TA/tt3plugins"/>
+        <file path="/ITSG5_TS_Titanized_TA/.classpath"/>
+        <file path="/ITSG5_TS_Titanized_TA/taconfig.xml"/>
+        <folder path="/ITSG5_TS_Titanized_TA/titan.ProtocolModules.COMMON"/>
+        <javaElement handleIdentifier="=ITSG5_TS_Titanized_TA/javasrc\/geodesic"/>
+        <folder path="/ITSG5_TS_Titanized_TA/tools"/>
+        <folder path="/ITSG5_TS_Titanized_TA/ttcn"/>
+        <file path="/ITSG5_TS_Titanized_TA/tct3_javasrc_patch.patch"/>
+        <file path="/ITSG5_TS_Titanized_TA/LICENSE"/>
+        <file path="/ITSG5_TS_Titanized_TA/README.md"/>
+    </selectedElements>
+</jardesc>

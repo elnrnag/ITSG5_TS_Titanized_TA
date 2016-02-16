@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the ITS-S discards an authorization response error having the subordinate certificate operational permissions are not a subset ofthe issuing certificate operational permissions."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/54a108fe-9039-4ab9-b70c-fa6c288680b5"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "da043a5e-d6af-4c5b-a978-796ab978a4e4"
+}

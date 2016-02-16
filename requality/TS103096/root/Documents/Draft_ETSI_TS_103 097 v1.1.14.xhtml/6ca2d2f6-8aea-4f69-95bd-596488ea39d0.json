@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\"><a name=\"6ca2d2f6-8aea-4f69-95bd-596488ea39d0\" id=\"id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\" class=\"requality_id\"><\/a>Regular ITS stations shall use certificates containing a <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">SubjectInfo<\/span><\/font><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\"> of <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">SubjectType<\/span><\/font><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\"> <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\">authorization_ticket<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_6ca2d2f6-8aea-4f69-95bd-596488ea39d0\"> when communicating with other ITS-Stations<\/span><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "6ca2d2f6-8aea-4f69-95bd-596488ea39d0"
+}

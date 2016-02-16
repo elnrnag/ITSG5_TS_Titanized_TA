@@ -1,0 +1,25 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Perhaps to split it to 3 diffrent TPs:\r\n1. digest\r\n2. cert\r\n3. chain\r\n"
+        },
+        "_index": {
+            "key": "_index",
+            "type": "STRING",
+            "value": "1"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Comment"
+        }
+    },
+    "uuid": "ddd55881-6755-4745-9391-0f34720f3303"
+}

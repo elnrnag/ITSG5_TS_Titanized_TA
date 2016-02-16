@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_1b243599-d5bc-4e46-a449-8d24fb05ab5f\"><a name=\"1b243599-d5bc-4e46-a449-8d24fb05ab5f\" id=\"id_1b243599-d5bc-4e46-a449-8d24fb05ab5f\" class=\"requality_id\"><\/a>With the exception of <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">signer_info<font style=\"font-family: Times New Roman;\">, which is encoded first, all <font style=\"font-family: Courier New;\">header_field<font style=\"font-family: Times New Roman;\"> elements shall be included in ascending order according to the numbering of the enumeration of the according type structure<\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "7e59d21b-e333-429b-a36a-0386af9a61dd"
+}

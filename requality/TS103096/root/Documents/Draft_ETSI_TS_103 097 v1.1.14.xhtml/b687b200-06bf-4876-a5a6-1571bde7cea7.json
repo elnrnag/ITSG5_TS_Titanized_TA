@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_b687b200-06bf-4876-a5a6-1571bde7cea7\"><a name=\"b687b200-06bf-4876-a5a6-1571bde7cea7\" id=\"id_b687b200-06bf-4876-a5a6-1571bde7cea7\" class=\"requality_id\"><\/a>If the ITS-S receives a CAM from a previously unknown certificate, it shall include a field of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Courier New'; font-size: 10pt;\">certificate immediately in its next CAM, instead of including a field of type <font style=\"font-family: 'Courier New'; font-size: 10pt;\">certificate_digest_with_sha256. In this case, the timer for the next inclusion of a field of type <font style=\"font-family: 'Courier New'; font-size: 10pt;\">certificate shall be restarted.<\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "3e9ce935-fa51-4432-9425-e6a7483c01d5"
+}

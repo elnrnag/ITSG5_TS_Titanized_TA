@@ -1,0 +1,114 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL:$
+ *              $Id:$
+ *  @desc       test control file for Fast service advertisement protocol (ISO 24102-5)
+ */
+module ItsFsap_TestControl {
+    
+    // LibCommon 
+    
+    // ATS FSAP
+    import from ItsFsap_TestCases {
+        testcase all
+    };
+    
+    // LibIts
+    import from LibItsFsap_Pics all;
+    
+    // Test Execution
+    control {
+        
+//      9.1 Service provider
+//      9.1.1,4,5 Combined ITS-S host and ITS-S router - valid behavior
+        if (PICS_FSAP_ROLE_SP and PICS_ROLE_RH) {
+            execute(TC_FSAP_SP_HR_BV_01());
+            execute(TC_FSAP_SP_HR_BV_02());
+            execute(TC_FSAP_SP_HR_BV_03());
+        }
+        
+        if (PICS_FSAP_ROLE_SP and PICS_ROLE_RH and PICS_FSAP_MULTIPLE_AL_TECHNOLOGIES) {
+            execute(TC_FSAP_SP_HR_BV_04());
+        }
+        
+        if (PICS_FSAP_ROLE_SP and PICS_ROLE_RH and PICS_SIP_W_CTX) {
+            execute(TC_FSAP_SP_HR_BV_05());
+        }
+        
+//      9.1.1,4,5 Combined ITS-S host and ITS-S router - invalid behavior
+        if (PICS_FSAP_ROLE_SP and PICS_ROLE_RH) {
+            execute(TC_FSAP_SP_HR_BI_01());
+        }
+        
+        if (PICS_FSAP_ROLE_SP and PICS_ROLE_RH and PICS_FSAP_MULTIPLE_AL_TECHNOLOGIES) {
+            execute(TC_FSAP_SP_HR_BI_02());
+        }
+        
+//      9.1.2 ITS-S host only - valid behavior
+        if (PICS_FSAP_ROLE_SP and (PICS_ROLE_HONLY or (PICS_ROLE_RH and PICS_ITS_S_INW))) {
+            execute(TC_FSAP_SP_HO_BV_01());
+            execute(TC_FSAP_SP_HO_BV_02());
+            execute(TC_FSAP_SP_HO_BV_03());
+            execute(TC_FSAP_SP_HO_BV_04());
+        }
+        if (PICS_FSAP_ROLE_SP and (PICS_ROLE_HONLY or (PICS_ROLE_RH and PICS_ITS_S_INW)) and PICS_SIP_W_CTX) {
+            execute(TC_FSAP_SP_HO_BV_05());
+        }
+        
+//      9.1.2 ITS-S host only - invalid behavior
+        if (PICS_FSAP_ROLE_SP and (PICS_ROLE_HONLY or (PICS_ROLE_RH and PICS_ITS_S_INW))) {
+            execute(TC_FSAP_SP_HO_BI_01());
+            execute(TC_FSAP_SP_HO_BI_02());
+        }
+        
+//      9.2 ITS-S router only - valid behavior
+        if (PICS_FSAP_ROLE_SP and (PICS_ROLE_RONLY or (PICS_ROLE_RH and PICS_ITS_S_INW))) {
+            execute(TC_FSAP_SP_RO_BV_01());
+            execute(TC_FSAP_SP_RO_BV_02());
+            execute(TC_FSAP_SP_RO_BV_03());
+        }
+        if (PICS_FSAP_ROLE_SP and (PICS_ROLE_RONLY or (PICS_ROLE_RH and PICS_ITS_S_INW)) and PICS_SIP_W_CTX) {
+            execute(TC_FSAP_SP_RO_BV_04());
+            execute(TC_FSAP_SP_RO_BV_05());
+        }
+        
+//      9.x ITS-S router only - invalid behavior
+        if (PICS_FSAP_ROLE_SP and (PICS_ROLE_RONLY or (PICS_ROLE_RH and PICS_ITS_S_INW))) {
+            execute(TC_FSAP_SP_RO_BI_01());
+            execute(TC_FSAP_SP_RO_BI_02());
+        }
+        
+//      9.2 Service user
+//      9.2.1 Combined ITS-S host and ITS-S router - valid behavior
+        if (PICS_FSAP_ROLE_SU and PICS_ROLE_RH) {
+            execute(TC_FSAP_SU_HR_BV_01());
+        }
+        
+        if (PICS_FSAP_ROLE_SU and PICS_ROLE_RH and PICS_SIP_W_CTX and PICS_FSAP_CHANGE_COMM_CHANNEL) {
+            execute(TC_FSAP_SU_HR_BV_02());
+            execute(TC_FSAP_SU_HR_BV_03()); // Not applicable: 
+        }
+        
+        if (PICS_FSAP_ROLE_SU and PICS_ROLE_RH and PICS_FSAP_CHANGE_COMM_CHANNEL) {
+            execute(TC_FSAP_SU_HR_BV_04());
+            execute(TC_FSAP_SU_HR_BV_05()); // Not applicable: 
+        }
+//      9.2.2 ITS-S host only - valid behavior
+        if (PICS_FSAP_ROLE_SU and (PICS_ROLE_HONLY or (PICS_ROLE_RH and PICS_ITS_S_INW)) and PICS_SIP_W_CTX) {
+            execute(TC_FSAP_SU_HO_BV_01());
+            execute(TC_FSAP_SU_HO_BV_02());
+        }
+        
+        // 9.2.3 ITS-S router only - valid behavior
+        if (PICS_FSAP_ROLE_SU and (PICS_ROLE_RONLY or (PICS_ROLE_RH and PICS_ITS_S_INW))) {
+            execute(TC_FSAP_SU_RO_BV_01());
+        }
+        
+        if (PICS_FSAP_ROLE_SU and (PICS_ROLE_RONLY or (PICS_ROLE_RH and PICS_ITS_S_INW)) and PICS_SIP_W_CTX) {
+            execute(TC_FSAP_SU_RO_BV_02());
+            execute(TC_FSAP_SU_RO_BV_03());
+        }
+        
+    } // End of control
+    
+} // End of module ItsFsap_TestControl

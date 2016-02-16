@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_5\"><font style=\"font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\"><a name=\"05d797e2-9a7b-4b6f-a32f-e9bb0931628c\" id=\"id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\" class=\"requality_id\"><\/a>As <\/span><a href=\"type\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">ValidityRestriction<\/span><\/font><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><\/a><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\"> field restricting the time of validity, <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">time_start_and_end<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\"> shall be included.<\/span><\/font><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><\/font><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><\/font><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><\/p><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_49\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\">\n<\/span><font style=\"font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_05d797e2-9a7b-4b6f-a32f-e9bb0931628c\"><\/span><\/font><\/p>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "2039b186-41ea-4463-b043-9c882b29ee52"
+}

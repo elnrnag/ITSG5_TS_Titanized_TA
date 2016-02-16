@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "bf7c1018-feb3-4b92-82a5-b9022f643ca8",
+            "type": "STRING",
+            "value": "Check that the sent secured CAM contains exactly one HeaderField generation_time which is inside the validity time of the certificate referenced by the signer_info."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "bf7c1018-feb3-4b92-82a5-b9022f643ca8",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/e1c8b3e0-5da0-4e8d-8355-563039c7cdc7",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/48e8cd0f-df1a-4fd5-a36b-6d47370cb9c5"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "bf7c1018-feb3-4b92-82a5-b9022f643ca8",
+            "type": "STRING",
+            "value": "10. Check generation time"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "bf7c1018-feb3-4b92-82a5-b9022f643ca8",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "bf7c1018-feb3-4b92-82a5-b9022f643ca8"
+}

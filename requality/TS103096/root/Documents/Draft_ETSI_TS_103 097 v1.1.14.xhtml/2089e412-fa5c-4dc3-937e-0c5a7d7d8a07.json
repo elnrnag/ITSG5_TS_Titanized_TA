@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\"><a name=\"2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\" id=\"id_2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\" class=\"requality_id\"><\/a>The dictionary that corresponds to <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\">un_stats<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\"> shall contain values as defined by the United Nations Statistics Division, which is a superset of ISO 3166-1 [<\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"REF\"><span class=\"requality_text id_2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\">3<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_2089e412-fa5c-4dc3-937e-0c5a7d7d8a07\">] including compositions of regions.<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "2089e412-fa5c-4dc3-937e-0c5a7d7d8a07"
+}

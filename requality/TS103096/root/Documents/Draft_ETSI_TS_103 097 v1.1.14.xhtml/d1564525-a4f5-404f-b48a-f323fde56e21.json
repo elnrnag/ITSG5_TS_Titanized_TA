@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_d1564525-a4f5-404f-b48a-f323fde56e21\"><a name=\"d1564525-a4f5-404f-b48a-f323fde56e21\" id=\"id_d1564525-a4f5-404f-b48a-f323fde56e21\" class=\"requality_id\"><\/a>signer_info<\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Times New Roman;\">: this field shall contain exactly one field of the types <font style=\"font-family: Courier New;\">certificate_digest_with_sha256, certificate_chain<font style=\"font-family: Times New Roman;\"> or <font style=\"font-family: Courier New;\">certificate<font style=\"font-family: Times New Roman;\">, according to the following rules<\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "2b616d93-902b-4939-9284-28ece24c6495"
+}

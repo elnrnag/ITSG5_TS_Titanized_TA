@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/9cccead1-046a-49e6-9d2e-00cf8084ae28"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "04. Enrolment EB"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "bcd25a1f-928c-4aec-a45f-c5eba05bea17"
+}

@@ -1,0 +1,337 @@
+module test_LibItsBtp_TypesAndValues /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    
+    // LibItsBtp
+    import from LibItsBtp_TypesAndValues all;
+    import from LibItsBtp_TestSystem all;
+    import from LibItsBtp_Templates all;
+    
+    import from test_CommonCodec all;
+    
+    group LibItsBtp_testCases {
+        
+        group LibItsBtp_DummyTemplates {
+    
+            template (value) UtBtpTrigger m_utEventBtpA := {
+                btpA := {
+                    btpAHeader := {
+                        destinationPort := 1234,
+                        sourcePort := 5678
+                    }
+                }
+            }
+    
+            template (value) UtBtpTrigger m_utEventBtpB := {
+                btpB := {
+                    btpBHeader := {
+                        destinationPort := 123,
+                        destinationPortInfo := 432
+                    }
+                }
+            }
+    
+            template BtpInd m_btpInd(template (present) BtpPacket p_btpPkt) := {
+                msgIn := p_btpPkt
+            }
+    
+            template (value) BtpPacket m_btpA_Without_Payload (
+                template (value) BtpPortId  p_destPort,
+                template (value) BtpPortId  p_sourcePort
+            ):= {
+                header := { 
+                    btpAHeader := {
+                        destinationPort := p_destPort, 
+                        sourcePort := p_sourcePort
+                    }
+                }, 
+                payload := omit 
+            }
+    
+            template BtpPacket m_btpA_With_Payload ( 
+                in template (value) BtpPortId  p_destPort, 
+                in template (value) BtpPortId  p_sourcePort, 
+                in template DecodedBtpPayload p_decodedPayload, 
+                in template (value) octetstring p_rawPayload 
+            ) := { 
+                header := { 
+                    btpAHeader := {
+                        destinationPort := p_destPort, 
+                        sourcePort := p_sourcePort
+                    }
+                }, 
+                payload := { 
+                    decodedPayload := p_decodedPayload,
+                    rawPayload := p_rawPayload
+                } 
+            }
+    
+            template BtpPacket mw_btpA_With_Payload ( 
+                in template (present) BtpPortId  p_destPort, 
+                in template (present) BtpPortId  p_sourcePort, 
+                in template DecodedBtpPayload p_decodedPayload, 
+                in template (present) octetstring p_rawPayload 
+            ) := { 
+                header := { 
+                    btpAHeader := {
+                        destinationPort := p_destPort, 
+                        sourcePort := p_sourcePort
+                    }
+                }, 
+                payload := { 
+                    decodedPayload := p_decodedPayload,
+                    rawPayload := p_rawPayload
+                } 
+            }
+    
+            template (value) BtpPacket m_btpB_Without_Payload (
+                template (value) BtpPortId  p_destPort,
+                template (value) BtpPortId  p_destinationPortInfo
+            ):= {
+                header := { 
+                    btpBHeader := {
+                        destinationPort := p_destPort, 
+                        destinationPortInfo := p_destinationPortInfo
+                    }
+                }, 
+                payload := omit
+            }
+    
+        } // End of group LibItsBtp_DummyTemplates
+    
+        group testAcPrimitives {
+        } // End of group testAcPrimitives
+    
+        group testBtpPrimitiveMessages {
+    
+    //        /**
+    //         * @desc validate BtpReq/BTP type A
+    //         * @verdict Pass on success, Fail otherwise
+    //         */
+    //        testcase tc_BtpReq_A() runs on TCType system TCType {
+    //            test_PDU<BtpReq>(
+    //                m_btpReq( m_btpA_Without_Payload (1234, 5678)), 
+    //                true, 
+    //                oct2bit('4b000a34000732000404d2162e'O));
+    //        }
+    //
+    //        /**
+    //         * @desc validate BtpReq/BTP type A with payload
+    //         * @verdict Pass on success, Fail otherwise
+    //         */
+    //        testcase tc_BtpReq_A_With_Payload() runs on TCType system TCType {
+    //            test_PDU<BtpReq>(
+    //                m_btpReq( 
+    //                    m_btpAWithPorts ( 
+    //                        1234, 
+    //                        5678, 
+    //                        { 
+    //                            decodedPayload := omit, 
+    //                            rawPayload := 'ca5caded'O 
+    //                        } // End of 'payload' field 
+    //                    )), 
+    //                true, 
+    //                oct2bit('4b000e34000b32000404d2162eca5caded'O));
+    //        }
+    //
+    //        /**
+    //         * @desc validate BtpReq/BTP type A with payload
+    //         * @verdict Pass on success, Fail otherwise
+    //         */
+    //        testcase tc_BtpReq_A_With_DenmPayload() runs on TCType system TCType {
+    //            test_PDU<BtpReq>(
+    //                m_btpReq( 
+    //                    m_btpAWithPorts ( 
+    //                        1234, 
+    //                        5678, 
+    //                        { 
+    //                            decodedPayload := { 
+    //                                denmPacket := {
+    //                                    header := { 
+    //                                        protocolVersion := 0, 
+    //                                        messageID := 1, 
+    //                                        generationTime := 1319187879132 
+    //                                    }, 
+    //                                    denm := { 
+    //                                        management := { 
+    //                                            actionID := { 
+    //                                                stationID := 2339, 
+    //                                                sequenceNo := 29 
+    //                                            }, 
+    //                                            dataVersion := 0, 
+    //                                            expiryTime := 1319187938835, 
+    //                                            frequency := omit, 
+    //                                            reliability := 0, 
+    //                                            isNegation := false 
+    //                                        }, 
+    //                                        situation := { 
+    //                                            trafficFlowEffect := omit, 
+    //                                            situation := { cause := 103, subCause := 0 }, 
+    //                                            linkedCause := omit, 
+    //                                            severity := informative, 
+    //                                            eventCharact := omit, 
+    //                                            vehicleCommonParameters := omit, 
+    //                                            profile := omit 
+    //                                        }, 
+    //                                        location := { 
+    //                                            eventPosition := { 
+    //                                                eventPositionCurrentDefinition := { 
+    //                                                    refPosition := { 
+    //                                                        longitude := { hemisphere := east, degree := 0 }, 
+    //                                                        latitude := { hemisphere := north, degree := 0 }, 
+    //                                                        elevation := 0, 
+    //                                                        heading := 0, 
+    //                                                        streetName := omit, 
+    //                                                        positionConfidence := 0, 
+    //                                                        elevationConfidence := 0, 
+    //                                                        roadSegmentID := omit 
+    //                                                    }, 
+    //                                                    eventSpeed := 0 
+    //                                                } 
+    //                                            }, 
+    //                                            locationRef := { 
+    //                                                trace := { 
+    //                                                    traceID := 0, 
+    //                                                    waypoints := { 
+    //                                                        { ptLat := { hemisphere := south, degree := 0 }, 
+    //                                                            ptLong := { hemisphere := west, degree := 0 }, 
+    //                                                            ptAlt := 0 
+    //                                                         } 
+    //                                                    } 
+    //                                                }
+    //                                            }, 
+    //                                            relevanceArea := { 
+    //                                                geoAreaCenterLatitude := { hemisphere := south, degree := 0 }, 
+    //                                                geoAreaCenterLongitude := { hemisphere := west, degree := 0 }, 
+    //                                                shape := {circle := { radius := 0 } }, 
+    //                                                directionalityFilter := noFilter, 
+    //                                                disseminationAreaSize := omit 
+    //                                            } 
+    //                                        } 
+    //                                    } // End of 'denm' field 
+    //                                } // End of 'denmPacket' field 
+    //                            }, // End of 'decodedPayload' field 
+    //                            rawPayload := '0001013325b994dc400001246003a0002664b74fc2600067002d80000000000000000013880000007ffd00a0000000400000000013880085a80000001000000000000000'O 
+    //                        } // End of 'payload' field 
+    //                    )), 
+    //                true, 
+    //                oct2bit('4b004e34004b32000404d2162e0001013325b994dc400001246003a0002664b74fc2600067002d80000000000000000013880000007ffd00a0000000400000000013880085a80000001000000000000000'O));
+    //        }
+    //
+            /**
+             * @desc validate BtpReq/BTP type B
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_BtpReq_B() runs on TCType system TCType {
+                test_PDU<BtpReq>(
+                    m_btpReq( m_btpB_Without_Payload (4321, 8765)), 
+                    true, 
+                    oct2bit('10E1223D'O));
+            }
+    
+            /**
+             * @desc validate BtpReq/BTP type B with payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_BtpReq_B_With_Payload() runs on TCType system TCType {
+                test_PDU<BtpReq>(
+                    m_btpReq( 
+                        m_btpBWithPorts ( 
+                            4321, 
+                            8765, 
+                            { 
+                                decodedPayload := omit, 
+                                rawPayload := 'F1A7F007ED'O 
+                            } // End of 'payload' field 
+                        )), 
+                    true, 
+                    oct2bit('10E1223DF1A7F007ED'O));
+            }
+    
+            /**
+             * @desc validate BtpInd/BTP type A
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_BtpInd_A() runs on TCType system TCType {
+                test_PDU<BtpInd>(
+                    m_btpInd( m_btpA_Without_Payload (4321, 8765)), 
+                    true, 
+                    oct2bit('10E1223D'O));
+            }
+    
+            /**
+             * @desc validate BtpInd/BTP type A with payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_BtpInd_A_With_Payload() runs on TCType system TCType {
+                test_PDU<BtpInd>(
+                    m_btpInd( 
+                        m_btpAWithPorts (
+                            4321, 
+                            8765, 
+                            { 
+                                decodedPayload := omit, 
+                                rawPayload := 'F1A7F007ED'O 
+                            } // End of 'payload' field 
+                        )), 
+                    true, 
+                    oct2bit('10E1223DF1A7F007ED'O));
+            }
+    
+            testcase tc_BtpInd_A_With_CamPayload() runs on TCType system TCType {
+                test_decodePDU<BtpInd>(
+                    { msgIn := mw_btpA_With_Payload(4321, 8765, ?, ?) }, 
+                    '10E1223D01020001B20788B80059F48D95CDEFC8C5E0020020002461A83C000004805A100C4528399D4C387FFF80'O
+                );
+            }
+    
+            testcase tc_BtpInd_A_With_TrunkatedCamPayload() runs on TCType system TCType {
+                test_decodePDU<BtpInd>(
+                    { msgIn := mw_btpA_With_Payload(4321, 8765, ?, ?) }, 
+                    '10E1223D000c32000410e1223d00000133256c5b1e40000248d6c0000000000000000009c4080000003ffe83e80004000000000000007ffd7ffe00'O
+                );
+                
+                if (getverdict() == fail) {
+                    setverdict(pass);
+                } else {
+                    setverdict(fail);
+                }
+            }
+    
+            testcase tc_BtpInd_A_With_DenmPayload() runs on TCType system TCType {
+                test_decodePDU<BtpInd>(
+                    { msgIn := mw_btpA_With_Payload(4321, 8765, ?, ?) }, 
+                    '10E1223D01010001b207c70000d90380000a084901ea828212407b8cfa46cae6f7e4630001001000186a000009600c05b00000dffff7fffd8ce40400'O
+                );
+            }
+    
+        } // End of group testBtpPrimitiveMessages
+    
+        group LibItsBtp_testCases {
+            
+            testcase tc_BTP_A() runs on TCType system TCType {
+                test_PDU<BtpPacket>(m_btpA (BtpPayload:{decodedPayload := omit, rawPayload := '0102030405'O } ), true, oct2bit('000000000102030405'O));
+            }
+            
+        } // End of group LibItsBtp_testCases
+        
+        group testUtEvent {
+    
+            testcase tc_UtBtpInitialize() runs on TCType system TCType {
+                test_PDU<UtInitialize>(m_btpInitialize, false);
+            }
+    
+            testcase tc_UtEvent_A() runs on TCType system TCType {
+                test_PDU<UtBtpTrigger>(m_utEventBtpA, false);
+            }
+    
+            testcase tc_UtEvent_B() runs on TCType system TCType {
+                test_PDU<UtBtpTrigger>(m_utEventBtpB, false);
+            }
+    
+        } // End of group testUtEvent
+        
+    } // End of group LibItsBtp_testCases
+    
+} // End of module test_LibItsBtp_TypesAndValues

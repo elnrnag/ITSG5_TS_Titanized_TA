@@ -1,0 +1,17 @@
+/**
+ *  @author   ETSI / STFS46
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/V2G/LibItsV2G_Pixits.ttcn $
+ *            $Id: LibItsV2G_Pixits.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     V2G application layer protocols Pixits
+ *
+ */
+module LibItsV2G_Pixits {
+    
+    // LibIts
+    import from LibItsV2G_TypesAndValues all;
+    
+
+        
+
+    
+} // end LibItsV2G_Pixits

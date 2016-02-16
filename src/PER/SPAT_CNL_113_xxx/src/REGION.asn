@@ -1,0 +1,90 @@
+-- ############################################################################
+-- ^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-
+-- 
+-- Begin module: REGION
+-- 
+-- ^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-
+-- ############################################################################
+REGION DEFINITIONS AUTOMATIC TAGS::= BEGIN 
+
+
+-- =============================================================================
+-- DF_REG_AdvisorySpeed_Base (Desc Name) Record 36
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-AdvisorySpeed ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_ComputedLane_Base (Desc Name) Record 37
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-ComputedLane ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_GenericLane_Base (Desc Name) Record 40
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-GenericLane ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_Intersection_Base (Desc Name) Record 41
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-Intersection ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_LaneAttributes_Base (Desc Name) Record 44
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-LaneAttributes ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_LaneDataAttribute_Base (Desc Name) Record 45
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-LaneDataAttribute ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_MovementEvent_Base (Desc Name) Record 50
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-MovementEvent ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_MovementState_Base (Desc Name) Record 51
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-MovementState ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_NodeAttribute_Base (Desc Name) Record 52
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-NodeAttribute ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_NodeOffsetPoint_Base (Desc Name) Record 53
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-NodeOffsetPoint ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_RoadSegment_Base (Desc Name) Record 60
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-RoadSegment ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_SignalControlZone_Base (Desc Name) Record 61
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-SignalControlZone ::=  SEQUENCE { ... }
+
+
+-- =============================================================================
+-- DF_REG_SPAT_Base (Desc Name) Record 62
+-- From source: AMENDMENT Regional Data J2735 (DSRC)
+Reg-SPAT ::=  SEQUENCE { ... }
+
+
+END
+-- End of the REGION module.

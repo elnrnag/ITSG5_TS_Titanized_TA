@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "a12f656f-3a11-4840-ad76-31bfd5a60593",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "a12f656f-3a11-4840-ad76-31bfd5a60593",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured GN Message containing signature that is not verified using the verification key from the certificate contained in the message's signer info"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "a12f656f-3a11-4840-ad76-31bfd5a60593",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand containing header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate\r\n\t\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\t\tindicating 'authorization_ticket' (2)\r\n\t\t\t\t\t\tand containing subject_attributes['verification key'] (KEY)\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tand containing payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed'\r\n\t\t\t}\r\n\t\t\tand containing trailer_fields {\r\n\t\t\t\tcontaining single instance of type TrailerField {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'signature'\r\n\t\t\t\t\tcontaining signature\r\n\t\t\t\t\t\tNOT verifiable using KEY\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "a12f656f-3a11-4840-ad76-31bfd5a60593",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a12f656f-3a11-4840-ad76-31bfd5a60593",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "a12f656f-3a11-4840-ad76-31bfd5a60593"
+}

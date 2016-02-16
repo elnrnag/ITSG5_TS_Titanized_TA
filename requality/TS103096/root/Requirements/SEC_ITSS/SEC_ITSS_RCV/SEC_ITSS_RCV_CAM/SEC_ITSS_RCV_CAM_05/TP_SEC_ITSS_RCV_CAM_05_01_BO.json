@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured CAM if the header_fields contains a signer of type 'self'"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (CAM) {\r\n\t\t\tcontaining header_fields['signer_info']\r\n\t\t\t\tcontaining signer.type\r\n\t\t\t\t\tindicating 'self'\r\n\t\t\tand containing header_fields['generation_time']\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_CAM'\r\n\t\t\tand not containing other header fields\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "5881e4b8-96d2-4424-99f1-7e27a8245221"
+}

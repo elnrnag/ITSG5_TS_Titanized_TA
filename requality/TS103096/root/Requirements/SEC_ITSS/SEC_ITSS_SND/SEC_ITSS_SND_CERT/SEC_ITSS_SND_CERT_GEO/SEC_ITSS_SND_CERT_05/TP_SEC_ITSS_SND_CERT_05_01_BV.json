@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "20cca0f1-fd8d-4ec5-9759-21333efff1cf",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "20cca0f1-fd8d-4ec5-9759-21333efff1cf",
+            "type": "STRING",
+            "value": "Check Polygonal Region:\r\nMust contain at least 3 and no more than 12 points\r\nIntersections and holes are not permited\r\n\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "20cca0f1-fd8d-4ec5-9759-21333efff1cf",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\tcontaining certificate {\r\n\t\t\t\t\tcontaining validity_restrictions['region']{\r\n\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\tindicating 'polygon'\r\n\t\t\t\t\t\tcontaining polygonal_region {\r\n\t\t\t\t\t\t\tindicating length >=3 and <=12\r\n\t\t\t\t\t\t\tindicating continuous region without holes and intersections\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "20cca0f1-fd8d-4ec5-9759-21333efff1cf",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "20cca0f1-fd8d-4ec5-9759-21333efff1cf",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "20cca0f1-fd8d-4ec5-9759-21333efff1cf"
+}

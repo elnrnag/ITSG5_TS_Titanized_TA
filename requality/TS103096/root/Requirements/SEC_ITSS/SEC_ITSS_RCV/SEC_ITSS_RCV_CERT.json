@@ -1,0 +1,19 @@
+{
+    "attributes": {
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "2e88f94e-3fc6-4468-8f22-a4b9f5109648",
+            "type": "STRING",
+            "value": "Profiles for certificates"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "2e88f94e-3fc6-4468-8f22-a4b9f5109648",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "2e88f94e-3fc6-4468-8f22-a4b9f5109648"
+}

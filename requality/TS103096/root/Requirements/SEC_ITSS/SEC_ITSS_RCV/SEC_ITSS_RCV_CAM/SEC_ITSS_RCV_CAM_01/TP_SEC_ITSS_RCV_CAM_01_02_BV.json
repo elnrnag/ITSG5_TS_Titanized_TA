@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "ac77bf19-5e6f-4c6a-808f-a6724433e87b",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "ac77bf19-5e6f-4c6a-808f-a6724433e87b",
+            "type": "STRING",
+            "value": "Check that IUT accepts a well-formed Secured CAM containing certificate digest of the known certificate in signer_info"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "ac77bf19-5e6f-4c6a-808f-a6724433e87b",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT already received a Secured message containing certificate (CERT_TS_AT_A)\r\n\t\tcontaining subject_info.subject_type\r\n\t\t\tindicating 'authorization_ticket' (2)\r\n\t\tand containing subject_attributes['verification key'] (KEY)\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining protocol_version \r\n\t\t\t\tindicating value '2'\r\n\t\t\tand containing header_fields[0]\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\t\tand containing signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate_digest_with_sha256'\r\n\t\t\t\t\tand containing digest\r\n\t\t\t\t\t\treferencing to certificate (CERT_TS_AT_A)\r\n\t\t\t\t}\r\n\t\t\tand containing header_fields [1] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_time'\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating CURRENT_TIME\r\n\t\t\t}\r\n\t\t\tand containing header_fields[2] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tand containing payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed'\r\n\t\t\t\tcontaining data\r\n\t\t\t\t\tindicating length > 0\r\n\t\t\t\t\tcontaining CAM payload\r\n\t\t\t}\r\n\t\t\tand containing trailer_fields {\r\n\t\t\t\tcontaining single instance of type TrailerField {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'signature'\r\n\t\t\t\t\tcontaining signature\r\n\t\t\t\t\t\tverifiable using KEY\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "ac77bf19-5e6f-4c6a-808f-a6724433e87b",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "ac77bf19-5e6f-4c6a-808f-a6724433e87b",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "ac77bf19-5e6f-4c6a-808f-a6724433e87b"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Arial; font-size: 10pt;\">Enrolment Request Error acceptance<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "b44017ee-61e4-4aae-bf8e-3f7d39b086e9"
+}

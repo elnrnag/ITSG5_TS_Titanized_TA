@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE plugin PUBLIC "-//TESTING TECH//DTD TT3plugin//2.0" "TT3plugin.dtd"> 
+<plugin id="org.etsi.its.codec.ttcn.LibItsFntp_TypesAndValuesCodec" name="LibItsFntp_TypesAndValues Codec" provider-name="STF424_ITS_Test_Platform" version="1.0.0.0">
+  <runtime>
+    <library name="LibItsFntp_TypesAndValuesCodec.jar"/>
+    <library name="../../build"/>
+  </runtime>
+  <dependency>
+    <reference id="org.etsi.its.codec"/>
+  </dependency>
+</plugin>

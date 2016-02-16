@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "37db409a-d958-4970-80ef-088e908ae516",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "37db409a-d958-4970-80ef-088e908ae516",
+            "type": "STRING",
+            "value": "Check that the IUT accepts a message when its signing certificate contain the smaller region restriction then the issuing certificate.\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "6a0d40e5-3776-4b8f-8f3f-bf3e654ea8c4",
+            "type": "STRING",
+            "value": "radiuswith {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_08_02_BV_AT) {\r\n\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\tindicating 'polygon'\r\n\t\t\t\t\t\t\tcontaining polygonal_region\r\n\t\t\t\t\t\t\t\tindicating POLYGON_REGION_AT\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\t\t\treferencing to a CERT_TS_D_AA\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "37db409a-d958-4970-80ef-088e908ae516",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "37db409a-d958-4970-80ef-088e908ae516",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "6a0d40e5-3776-4b8f-8f3f-bf3e654ea8c4"
+}

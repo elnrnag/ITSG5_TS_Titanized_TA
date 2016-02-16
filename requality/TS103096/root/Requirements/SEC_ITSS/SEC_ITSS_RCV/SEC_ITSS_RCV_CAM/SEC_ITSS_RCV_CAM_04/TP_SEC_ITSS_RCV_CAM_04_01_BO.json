@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "d027a0e6-8a56-4bbf-8039-7cf43dfac24c",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d027a0e6-8a56-4bbf-8039-7cf43dfac24c",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured CAM if the header_fields contains more than one element of header field type: signer_info"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "d027a0e6-8a56-4bbf-8039-7cf43dfac24c",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (CAM)\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'signer_info'\r\n\t\t\tand containing header_fields[1].type\r\n\t\t\t\tindicating 'signer_info'\r\n\t\t\tand containing header_fields[2].type\r\n\t\t\t\tindicating 'generation_time'\r\n\t\t\tand containing header_fields[3] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "d027a0e6-8a56-4bbf-8039-7cf43dfac24c",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d027a0e6-8a56-4bbf-8039-7cf43dfac24c",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "d027a0e6-8a56-4bbf-8039-7cf43dfac24c"
+}

@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "5f117a44-fc62-47ed-becf-122a99cf7739",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "63083cc3-f6f7-447b-9220-6dba00166544",
+            "type": "STRING",
+            "value": "Check that the IUT discards a message when the signing AT certificate contains an DENM AID-SSP record whereas the issuing AA certificate doesn't contain the DENM record.\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "63083cc3-f6f7-447b-9220-6dba00166544",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a Secured DENM {\r\n\t\t\tcontaining header_fields ['signer_info'].signer.certificate (CERT_TS_13_02_BO_AT) {\r\n\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\treferencing to CERT_TS_13_02_BO_AA\r\n\t\t\t\t\t\tcontaining subject_attributes['its_aid_list']\r\n\t\t\t\t\t\t\tnot containing AID_DENM\r\n\t\t\t\tcontaining subject_attributes['its_aid_ssp_list']\r\n\t\t\t\t\tcontaining a record\r\n\t\t\t\t\t\tcontaining its_aid\r\n\t\t\t\t\t\t\tindicating AID_DENM\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "5f117a44-fc62-47ed-becf-122a99cf7739",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "5f117a44-fc62-47ed-becf-122a99cf7739",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "63083cc3-f6f7-447b-9220-6dba00166544"
+}

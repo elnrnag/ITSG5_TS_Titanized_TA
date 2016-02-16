@@ -1,0 +1,223 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/IICP/LibItsIicp_Pixits.ttcn3 $
+ *              $Id: LibItsIicp_Pixits.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Inter-ITS-SCU communications (ISO 24102-4) Pixits
+ */
+module LibItsIicp_Pixits {
+    
+    // LibCommon
+    import from LibCommon_DataStrings {
+        type Bit4
+    };
+    
+    // LibIts
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+            Link_ID, CIstatus, MedType, Errors 
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type 
+            MF_Command, MN_Command, MI_Command, 
+            MF_Request, MN_Request, MI_Request,
+            MF_Request_confirm, 
+            WakeUp, RegReq, StateCInotify, LDMregister 
+    };
+    import from CALMmanagement language "ASN.1:1997" {
+        type 
+            ITS_scuId, Talive 
+    };
+    import from CALMiitsscu language "ASN.1:1997" {
+        type ITS_SCUtype 
+    }; 
+    import from CALMfntp language "ASN.1:1997" {
+        type 
+            PortNumber, 
+            SetNotFNTP, DeleteFNTP 
+    };
+    import from LibItsMgt_TypesAndValues {
+        type IParamNoList, IParamList 
+    };
+    
+    /**
+     * @desc Defines the active CI link identifier
+     */
+    modulepar Link_ID PX_ACTIVE_VCI_LINK_ID := {
+        remoteCIID := '0000000000000000'O, 
+        localCIID := '0000000000000000'O 
+    };
+    
+    /**
+     * @desc ITS-SCU-ID of the source ITS-SCU which produces the request
+     */
+    modulepar ITS_scuId PX_SRC_ITS_SCU_ID := 5;
+    
+    /**
+     * @desc ITS_SCUtype of the source ITS-SCU which produces the request
+     */
+    modulepar ITS_SCUtype PX_SRC_ITS_SCU_TYPE := 2; // router
+    
+    /**
+     * @desc ITS-SCU-ID of the destination ITS-SCU which shall evaluate the request
+     */
+    modulepar ITS_scuId PX_DST_ITS_SCU_ID := 0;
+    
+    /**
+     * @desc The own ITS scuID
+     * @see ISO/WD 24102-4 - Table 2 — ITS-SCU-ID value assignment
+     */
+    modulepar ITS_scuId PX_LOCAL_ITS_SCU_ID := 8; 
+    
+    /**
+     * @desc The type ITS scuID
+     * @see ISO/WD 24102-4 - Table 2 — ITS-SCU-ID value assignment
+     */
+//    modulepar ITS_SCUtype PX_LOCAL_ITS_TYPE := 1; // ITS_SCUtype_host_ 
+    modulepar ITS_SCUtype PX_LOCAL_ITS_TYPE := 255; // any - broadcast address 
+    
+    /**
+     * @desc Host ITS-SCU-ID
+     */
+    modulepar ITS_scuId PX_HOST_SCU_ID := 0;
+    
+    /**
+     * @desc Alive timer
+     */
+    modulepar Talive PX_TALIVE := 5000;
+    
+    /**
+     * Wait until the IUT is in a stable situation (beaconing...)
+     */
+    modulepar float PX_WAIT_FOR_IUT_READY := 1.0;
+    
+    /**
+     * @desc MI-Command value used for IICP/COM/xx TPs
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar WakeUp PX_MI_RCMD_STATECINOTIFY := 10; 
+    
+    /**
+     * @desc MN-Command value used for IICP/COM/xx TPs
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar DeleteFNTP PX_MN_RCMD_FWTDELETEFNTP := {
+        reference := 10 
+    } 
+    
+    /**
+     * @desc MN-Request value used for IICP/COM/xx TPs
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar SetNotFNTP PX_MN_RCMD_FWYSETNOTIFY := {
+        reference := 0,
+        remotePort := {
+            portLong := 12345  
+        },
+        linkID := {
+            remoteCIID := '0000000000000000'O,
+            localCIID :=  '0000000000000000'O
+        },
+        ciStatus := 0,
+        linkPort := {
+            portShort := 0 
+        },
+        serviceInfo := {
+            servicePort := {
+                portShort := 0 
+            },
+            hostITSscu := 0,
+            servicePriority := 0
+        },
+        priority := 0,
+        timeout_ := 0
+    } 
+    
+    /**
+     * @desc MI-Request value used for IICP/COM/xx TPs
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar RegReq PX_MI_RCMD_REGTYPE := {
+        medType := 10 // FIXME Check why TTWB does not accespt MedType_iso17515_
+    }
+    
+    /**
+     * @desc Link-ID used for remote command
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar Link_ID PX_MI_RCMD_LINKID := {
+        remoteCIID := '0000000000000000'O, 
+        localCIID := '0000000000000000'O 
+    } 
+    
+    /**
+     * @desc MF-Command value used for IICP/COM/xx TPs
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar StateCInotify PX_MF_RCMD_STATECINOTIFY := {
+        linkId := {
+            remoteCIID := '0000000000000000'O, 
+            localCIID := '0000000000000000'O 
+        },
+        cIstatus := 8
+    } 
+    
+    /**
+     * @desc MF-Command value used for IICP/COM/xx TPs
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     */
+    modulepar LDMregister PX_MF_RCMD_LDM_REGISTER := {
+        iTS_scuId := 0,
+        reference := ''O
+    } 
+    
+    /**
+     * @desc List of reference number of parameter to be monitored
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     * @see ISO 21218 Table A.1 — I parameters
+     */
+    modulepar IParamNoList PX_MI_IPARAMNOLIST := { 
+        0, // AuxiliaryChannel 
+        1 // ControlChannel 
+    }
+    
+    /**
+     * @desc List of error status for each parameter to be monitored
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     * @see ISO 21218 Table A.1 — I parameters
+     */
+    modulepar IParamList PX_MI_IPARAMLIST := {
+        { 
+            paramNo := 0, 
+            parameter := { 
+                Errors := {
+                    {
+                        paramNo := 0, 
+                        errStatus := 0 
+                    }
+                }
+            } // End of 'errors' list
+        } // End of list of 'IParamList' list 
+    }
+    /**
+     * @desc List of errors 
+     * NOTE that this PIXIT is used just for compiling purposes. The real PIXIT shall be written according to the IUT capabilities
+     * @see ISO 21218 Clause A.2.53 Errors (I-Param.No=255)
+     */
+    modulepar Errors PX_MI_ERRORSLIST := {
+        {
+            paramNo := 0, 
+            errStatus := 0
+        } // End of SingleError list 
+    }
+    
+    /**
+     * @desc    Error status in response of MF-REQUEST.request service primitive
+     */
+    modulepar MF_Request_confirm PX_IIC_RESPONSE := { 
+        commandRef := 1, 
+        ref := 9, 
+        reqConfirm_param := {ITS_scuId := 0}, 
+        errStatus := 0 
+    } // End of modulepar PX_IIC_RESPONSE 
+    
+} // End of module LibItsIicp_Pixits

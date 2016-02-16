@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_b75ba1b0-386f-4343-905d-58169c7296de\"><a name=\"b75ba1b0-386f-4343-905d-58169c7296de\" id=\"id_b75ba1b0-386f-4343-905d-58169c7296de\" class=\"requality_id\"><\/a>For other certificate authorities, the <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Courier New'; font-size: 10pt;\">signer_info field shall be set to <font style=\"font-family: 'Courier New'; font-size: 10pt;\">certificate_digest_with_sha256.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "a14760f0-d6bb-4fa8-bf38-58437d0d8c88"
+}

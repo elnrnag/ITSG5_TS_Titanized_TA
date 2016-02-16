@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "d768e0ad-5e3b-441b-b3c3-6ce2e4a4d9d7",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d768e0ad-5e3b-441b-b3c3-6ce2e4a4d9d7",
+            "type": "STRING",
+            "value": "Check that ITS-S sends a Secured CAM containing the signer_info of type certificate when the ITS-S received a CAM from an unknown ITS-S."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "d768e0ad-5e3b-441b-b3c3-6ce2e4a4d9d7",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tand the IUT is configured to send more than one CAM per second\r\n\tand the IUT having already sent CAM at TIME_1\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate'\r\n\tand the IUT having received a SecuredMessage\r\n\t\t\t\t\t\t\tat TIME_2 (TIME_1 < TIME_2 < TIME_1+1sec)\r\n\t\tcontaining header_fields['its_aid']\r\n\t\t\tindicating 'AID_CAM'\r\n\t\tcontaining header_fields['signer_info'] {\r\n\t\t\tcontaining signer\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate_digest_with_sha256'\r\n\t\t\t\tcontaining digest\r\n\t\t\t\t\tindicating HashedId3 value\r\n\t\t\t\t\t\treferenced to unknown certificate\r\n\t\t}\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send CAM\r\n\t\t\t\t\tat TIME_3 (TIME_1 < TIME_2 < TIME_3 < TIME_1 + 1sec)\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_CAM'\r\n\t\t\tcontaining header_fields[0] {\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "d768e0ad-5e3b-441b-b3c3-6ce2e4a4d9d7",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d768e0ad-5e3b-441b-b3c3-6ce2e4a4d9d7",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "d768e0ad-5e3b-441b-b3c3-6ce2e4a4d9d7"
+}

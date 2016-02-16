@@ -1,0 +1,55 @@
+/**
+ *  @author     ETSI / STF484
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/MapSpat/LibItsMapSpat_Pixits.ttcn $
+ *              $Id: LibItsMapSpat_Pixits.ttcn 1088 2015-01-12 13:22:58Z berge $
+ *  @desc       MAP SPAT PIXIT
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsMapSpat_Pixits {
+    
+    // LibCommon
+    import from LibCommon_DataStrings all;
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from LibItsMapSpat_TypesAndValues all;
+    import from DSRC language "ASN.1:1997" all;
+    import from DSRC2 language "ASN.1:1997" all;
+    
+    group mapSpatPixits {
+        
+        group parametrisation {
+            
+            /**
+             * @desc MsgCount for MAP message sending
+             */
+            modulepar MsgCount PX_MSG_ISSUE_REVISION := 10;
+            
+            /**
+             * @desc MsgCount for IntersectionState DF sending
+             */
+            modulepar MsgCount PX_INTERSECTIONSTATE_REVISION := 20;
+
+            /**
+             * @desc Status for IntersectionState DF sending
+             */
+            modulepar IntersectionStatusObject PX_STATUS := '1000000000000000'B;
+
+            /**
+             * @desc Id for IntersectionReferenceID DF sending
+             */
+            modulepar IntersectionID PX_INTERSECTION_ID := 1500;
+
+            /**
+             * @desc SignalGroup for MovementState DF sending
+             */
+            modulepar SignalGroupID PX_SIGNAL_GROUP_ID := 128;
+            
+        } // end parametrisation
+        
+    } // end mapSpatPixits
+    
+} // end LibItsMapSpat_Pixits

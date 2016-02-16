@@ -1,0 +1,284 @@
+/**
+ *    @author   ETSI / STF405 / STF449
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CAM/LibItsCam_Functions.ttcn $
+ *              $Id: LibItsCam_Functions.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     Module containing common functions for ITS CAM
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCam_Functions {
+    
+    // LibCommon
+    import from LibCommon_Time all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    import from LibItsCam_TestSystem all;
+    import from LibItsCam_Templates all;
+    import from LibItsCam_TypesAndValues all;
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TypesAndValues all;
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;    
+
+    group utFuntions { 
+            
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_init The initialisation to trigger.
+         */
+        function f_utInitializeIut(template (value) UtInitialize p_init) runs on ItsCam {
+            var UtInitializeResult v_UtInitializeResult;
+			v_UtInitializeResult.utInitializeResult := true;
+            utPort.send(p_init);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtInitializeResult:v_UtInitializeResult) {
+                    tc_wait.stop;
+                    log("*** f_utInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+            
+        }
+        
+        /**
+         * @desc    Triggers event from the application layer
+         * @param   p_event The event to trigger.
+         */
+        function f_utTriggerEvent(template (value) UtCamTrigger p_event) runs on ItsCam {
+        	 var UtCamTriggerResult v_UtCamTriggerResult;
+	    v_UtCamTriggerResult.utCamTriggerResult := true;
+
+            utPort.send(p_event);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtCamTriggerResult:v_UtCamTriggerResult) {
+                    tc_wait.stop;
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                }
+                [] tc_wait.timeout {
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            }
+        }
+        
+        /**
+         * @desc    Changes the position of the IUT
+         * @param   p_position
+         */
+        function f_utChangePosition(template (value) UtChangePosition p_position) runs on ItsCam {
+            
+            utPort.send(p_position);
+            alt {
+                [] utPort.receive(UtChangePositionResult:?) {
+                    tc_wait.stop;
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                }
+                [] tc_wait.timeout {
+	                log("*** " & testcasename() & ": INFO: Could not receive expected UT message from IUT in time ***");
+	                f_selfOrClientSyncAndVerdict("error", e_timeout);
+	            }
+	            [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+	                repeat; 
+	            }
+            }
+        }
+                    
+    } // End of group utFunctions
+
+    group camConfigurationFunctions {
+        
+        /**
+         * @desc    Setups default configuration   
+         */
+        function f_cfUp() runs on ItsCam {
+            
+            map(self:utPort, system:utPort);
+            map(self:camPort, system:camPort);
+            f_connect4SelfOrClientSync();
+            
+        } // end f_cfUp
+        
+        /**
+         * @desc    Deletes default configuration 
+         */
+        function f_cfDown() runs on ItsCam {
+            
+//            unmap(self:utPort, system:utPort);
+            unmap(self:camPort, system:camPort);
+            unmap(self:utPort, system:utPort);
+            f_disconnect4SelfOrClientSync();
+            
+        } // end f_cfDown
+        
+    } // end of camConfigurationFunctions
+    
+    group defaults {
+    
+        /**
+         * @desc    basic default behaviour handling
+         */    
+        altstep a_default() runs on ItsCam {
+            
+            [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                log("*** a_default: INFO: CAM message received in default ***");
+                vc_camReceived := true;
+                repeat;
+            }
+            [] camPort.receive {
+                log("*** a_default: ERROR: event received on CAM port in default ***");
+                f_selfOrClientSyncAndVerdict("error", e_error);
+            }
+            [] any timer.timeout {
+                log("*** a_default: INCONC: a timer expired in default ***"); 
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                f_cfDown();
+                log("*** a_default: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;   
+            }
+        }//end altstep a_basicDefault
+        
+        /**
+         * @desc The default for handling upper tester messages.
+         */
+        altstep a_utDefault() runs on ItsCam {
+            var UtCamEventInd v_event;
+            [] utPort.receive(UtCamEventInd:?) -> value v_event {
+                //store every upper tester indication received
+                vc_utEvents[lengthof(vc_utEvents)] := v_event;
+                repeat;
+            }
+            [] utPort.receive {
+                log("*** " & testcasename() & ": INFO: Received unhandled/unknown UT message from IUT ***");
+                repeat;
+            }
+        }
+         
+    } // end of defaults  
+    
+    group preambles {
+        
+        /**
+         * @desc The default preamble.
+         */
+        function f_prDefault() runs on ItsCam {
+            vc_default := activate(a_default());
+            activate(a_utDefault());
+        }
+        
+        /**
+         * @desc    Initialize the IUT
+         * @remark  No specific actions specified in the base standard
+         */    
+        function f_prInitialState() runs on ItsCam {
+            
+            f_utInitializeIut(m_camInitialize);
+            
+            f_prDefault();
+            
+            //Allow burst mode at the beginning
+            f_sleep(1.0);
+            
+            camPort.clear;
+            tc_ac.start;
+            alt {
+                [] camPort.receive(mw_camInd ( mw_camMsg_any )){
+                    tc_ac.stop;                        
+                    log("*** " & testcasename() & ": INFO: Received initial CAM ***");
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Initial CAM not received ***");
+                    f_selfOrClientSyncAndVerdictPreamble("error", e_timeout);
+                }
+            }  
+        
+        } // end f_prInitialState
+    
+    } // end of preambles
+
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsCam {
+            //empty
+        }
+        
+    } // end group postambles
+    
+    group camPositionFunctions {
+        
+        /**
+         * @desc    Compute a position using a reference position, a distance 
+         *          and an orientation 
+         * 
+         * @param p_referencePosition The base reference position.
+         * @param p_offSet Distance to the reference position (in meter).
+         * 
+         * @return The new reference position.
+         */
+        function f_computePositionUsingDistance(in ReferencePosition p_referencePosition, in integer p_offSet) return ReferencePosition {
+            var ReferencePosition v_referencePosition := p_referencePosition;
+            
+            log("*** f_computePositionUsingDistance: INFO: calling fx_computePositionUsingDistance() ***");
+            fx_computePositionUsingDistance(
+                p_referencePosition.latitude,
+                p_referencePosition.longitude,
+                p_offSet,
+                p_referencePosition.positionConfidenceEllipse.semiMajorOrientation,
+                v_referencePosition.latitude,
+                v_referencePosition.longitude
+            );
+            return v_referencePosition;
+        }
+        
+    } // end group camPositionFunctions
+
+    group camGenerators {
+        function f_generateDefaultCam() 
+        return octetstring {
+            return bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg_vehicle(
+                                    f_getTsStationId(),
+                                    f_getCurrentTime() mod 65536, // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                                    m_tsPosition
+                                )
+                            )
+                        )
+                    );
+        }
+    } // end of group camGenerators  
+
+} // end LibItsCam_Functions
+

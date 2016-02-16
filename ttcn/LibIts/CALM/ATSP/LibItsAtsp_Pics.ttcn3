@@ -1,0 +1,232 @@
+/**
+ *  @author     ETSI / STF455
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/ATSP/LibItsAtsp_Pics.ttcn3 $
+ *              $Id: LibItsAtsp_Pics.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Access Technology Layer (ISO 21218) PICS
+ */
+module LibItsAtsp_Pics {
+    
+    /**
+	 * @desc ATSP PICS
+	 */
+    group atspPics {
+        
+        /**
+         * @desc PICS mnemonics for ISO 21218 "ITS - CALM - Access Technology Support"
+         * @see  ETSI TS 102 760-1 v_stf455_v06
+         */
+        modulepar boolean PICS_ACT := false;
+        
+        /**
+         * @desc Is IUT supporting BC-VCI transmitter?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/4
+         */
+        modulepar boolean PICS_BCVCI := false;
+        
+        /**
+         * @desc Is IUT of CI access class CIAC-1 (no user authentiaction required, usage of CI is free of charge)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.6/1
+         */
+        modulepar boolean PICS_CIAC1 := false;
+        
+        /**
+         * @desc Is IUT of CI access class CIAC-2 (access credentials required, usage of CI is subject of a service charge?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.6/2
+         */
+        modulepar boolean PICS_CIAC2 := false;
+
+        /**
+         * @desc Is IUT of CI access class CIAC-3 (access credentials required, usage of CI is free of charge)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.6/3
+         */
+        modulepar boolean PICS_CIAC3 := false;
+
+        /**
+         * @desc Is IUT of CI class CIC-il1 (non-deterministic ITS station-internal network interface)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/6
+         */
+        modulepar boolean PICS_CIC_il1 := false;
+
+        /**
+         * @desc Is IUT of CI class CIC-il2 (deterministic ITS station-internal network interface)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/7
+         */
+        modulepar boolean PICS_CIC_il2 := false;
+
+        /**
+         * @desc Is IUT of CI class CIC-l1 (multiple simultaneous peer stations transceiver)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/1
+         */
+        modulepar boolean PICS_CIC_l1 := false;
+
+        /**
+         * @desc Is IUT of CI class CIC-l2 (single peer station transceiver)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/2
+         */
+        modulepar boolean PICS_CIC_l2 := false;
+
+        /**
+         * @desc Is IUT of CI class CIC-l3 (groupcast transmitter only)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/3
+         */
+        modulepar boolean PICS_CIC_l3 := false;
+        
+
+        /**
+         * @desc Is IUT of CI class CIC-l4 (broadcast receiver only)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/4
+         */
+        modulepar boolean PICS_CIC_l4 := false;
+
+        /**
+         * @desc Is IUT of CI class CIC-l5 (CEN / Japanese DSRC)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.5/5
+         */
+        modulepar boolean PICS_CIC_l5 := false;
+
+        /**
+         * @desc Is IUT supporting the connection procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/7
+         */
+        modulepar boolean PICS_CONN := false;
+
+        /**
+         * @desc Is IUT supporting the Cross-CI prioritization - interferer procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/10
+         */
+        modulepar boolean PICS_CRCIP_I := false;
+
+        /**
+         * @desc Is IUT supporting the Cross-CI prioritization - victim procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/9
+         */
+        modulepar boolean PICS_CRCIP_V := false;
+
+        /**
+         * @desc Is IUT supporting deletion of VCIs?
+         * @see  ETSI TS 102 760-1 v_stf455_v04 C.11/18
+         */
+        modulepar boolean PICS_DELET := false;
+        /**
+         * @desc Is IUT supporting the disconnection procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/8
+         */
+        modulepar boolean PICS_DISCONN := false;
+
+        /**
+         * @desc Is IUT supporting dynamic registration using the standardized registration procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.1/1
+         */
+        modulepar boolean PICS_DYNREG := true;
+
+        /**
+         * @desc Is IUT supporting the inactivation procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/3
+         */
+        modulepar boolean PICS_INACT := false;
+
+        /**
+         * @desc Is IUT supporting the IN-UNITDATA-STATUS service?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.12/2
+         */
+        modulepar boolean PICS_INUDS := false;
+
+        /**
+         * @desc Is IUT supporting notification-only I-Parameters?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.24 any selected notify-only I-Parameter
+         */
+        modulepar boolean PICS_IPNO := false;
+
+        /**
+         * @desc Is IUT supporting read-only I-Parameters?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.21 and C.22 any selected read-only I-Parameter
+         */
+        modulepar boolean PICS_IPRO := false;
+
+        /**
+         * @desc Is IUT supporting read/write I-Parameters?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.19 and C.20 any selected read/write I-Parameter
+         */
+        modulepar boolean PICS_IPRW := false;
+
+        /**
+         * @desc Is IUT supporting write-only I-Parameters?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.23 any selected write-only I-Parameter
+         */
+        modulepar boolean PICS_IPWO := false;
+
+        /**
+         * @desc Is IUT useing 48 bit MAC addresses?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.4/1
+         */
+        modulepar boolean PICS_MAC48 := false;
+
+        /**
+         * @desc Is IUT supporting MC-VCI transmitter?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.8/2
+         */
+        modulepar boolean PICS_MCVCI := false;
+
+        /**
+         * @desc Is IUT supporting rejection of DL-UNITDATA.reqeusts with user priority smaller than given in parameter "MinimumUserPriority"?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/20
+         */
+        modulepar boolean PICS_REJECT := false;
+
+        /**
+         * @desc Is IUT supporting the resuming procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/6
+         */
+        modulepar boolean PICS_RES := false;
+
+        /**
+         * @desc Is IUT supporting the Regulatory Information Management procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/12
+         */
+        modulepar boolean PICS_RIM := false;
+
+        /**
+         * @desc Is IUT supporting SNAP?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.13/1
+         */
+        modulepar boolean PICS_SNAP := false;
+
+        /**
+         * @desc Is IUT supporting the suspension procedure?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.11/5
+         */
+        modulepar boolean PICS_SUSP := false;
+
+        /**
+         * @desc Is IUT supporting UC-VCI (transmitter and receiver)?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.8/3
+         */
+        modulepar boolean PICS_UCVCI := false;
+
+        /**
+         * @desc Is IUT supporting the UnitDataCmd command?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.15/12
+         */
+        modulepar boolean PICS_UDC := false;
+
+        /**
+         * @desc Is IUT supporting the WakeUp command?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.15/4
+         */
+        modulepar boolean PICS_WAKEUP := false;
+		
+		/**
+		 * @desc Is IUT supporting the IN-UNITDATA-STATUS service primitive?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.12/2
+		 */
+		modulepar boolean PICS_IN_UNITDATA_STATUS := false;
+
+		/**
+		 * @desc Is IUT supporting the Monitor command?
+         * @see  ETSI TS 102 760-1 v_stf455_v06 C.15/11
+		 */
+		modulepar boolean PICS_MONITOR := false;
+
+	} // End of group atspPics
+    
+} // End of module LibItsAtsp_Pics

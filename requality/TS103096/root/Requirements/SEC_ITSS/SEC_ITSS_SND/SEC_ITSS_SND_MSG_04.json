@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "fbd6acf6-53bb-4e95-8f1b-220795fc0e75",
+            "type": "STRING",
+            "value": "Regular ITS stations shall use certificates containing a SubjectInfo of SubjectType authorization_ticket when communicating with other ITS-Stations."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "fbd6acf6-53bb-4e95-8f1b-220795fc0e75",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/6ca2d2f6-8aea-4f69-95bd-596488ea39d0"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "fbd6acf6-53bb-4e95-8f1b-220795fc0e75",
+            "type": "STRING",
+            "value": "04. Check that AT certificate is used to sign communication messages of ITS-S."
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "fbd6acf6-53bb-4e95-8f1b-220795fc0e75",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "fbd6acf6-53bb-4e95-8f1b-220795fc0e75",
+            "type": "STRING",
+            "value": "complete"
+        }
+    },
+    "uuid": "fbd6acf6-53bb-4e95-8f1b-220795fc0e75"
+}

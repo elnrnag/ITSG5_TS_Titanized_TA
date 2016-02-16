@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "72ea145a-4e6d-4a28-9ff4-74f47e356dc5",
+            "type": "STRING",
+            "value": "\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "653ff300-7362-4acf-88f0-8fa11888cc51",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/77ca71c9-2055-4b9a-82ca-f5d720208b17"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "653ff300-7362-4acf-88f0-8fa11888cc51",
+            "type": "STRING",
+            "value": "13. Check AID-SSP subject attribute value conforming to the issuing certificate"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "72ea145a-4e6d-4a28-9ff4-74f47e356dc5",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "653ff300-7362-4acf-88f0-8fa11888cc51"
+}

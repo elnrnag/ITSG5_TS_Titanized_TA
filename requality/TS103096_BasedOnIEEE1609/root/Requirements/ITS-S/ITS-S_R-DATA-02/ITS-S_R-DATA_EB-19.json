@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a signed 1609.2 message if the version_and_type field is not set to the value 2."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/349eafe5-009a-4a18-8d70-9c2d8790de97"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "fb466960-dbd8-4f28-b4b7-ebcec7ef8b1c"
+}

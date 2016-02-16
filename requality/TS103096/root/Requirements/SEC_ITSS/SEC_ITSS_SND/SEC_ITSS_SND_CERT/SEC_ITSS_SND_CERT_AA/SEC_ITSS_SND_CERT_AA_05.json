@@ -1,0 +1,38 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c70",
+            "type": "STRING",
+            "value": "If ITS-S sends an AA certificate check that the SubjectAttribute elements are included: verification_key, assurance_level, its_aid_list."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c70",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/d55843ab-3d09-453b-a9b1-d7fc8752cfa8",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/14ac0cc9-e94e-4c1d-a0ab-949a68c449e2",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/f7f89eb7-edc5-4238-8886-a3865780f88e",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/7f3702e0-d33e-4be0-8a8f-632eb1d8f4dc"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c70",
+            "type": "STRING",
+            "value": "05. Check subject attributes presence and order"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c70",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "463b2a4d-4f6f-4d82-a44c-933479415c70"
+}

@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_USE_IDENTIFIED_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_IDENTIFIED_REGION",
+            "origin": "11beb3f5-f0e3-4bc3-8e45-246901d6652f",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "11beb3f5-f0e3-4bc3-8e45-246901d6652f",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "11beb3f5-f0e3-4bc3-8e45-246901d6652f",
+            "type": "STRING",
+            "value": "Check that the secured GeoNetworking message contains exactly one HeaderField generation_location which is inside the identified region containing in the validity restriction of the certificate pointed by the signer_info field"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "11beb3f5-f0e3-4bc3-8e45-246901d6652f",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT has been authorized with the AT certificate (CERT_AT_E) {\r\n\t\tcontaining validity_restrictions ['region'] {\r\n\t\t\tcontaining region{\r\n\t\t\t\tcontaining region_type\r\n\t\t\t\t\tindicating 'id_region'\r\n\t\t\t\tcontaining identified_region\r\n\t\t\t\t\tindicating REGION\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a Beacon\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tcontaining exactly one header_fields['generation_location']\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating value inside the REGION\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "11beb3f5-f0e3-4bc3-8e45-246901d6652f",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "11beb3f5-f0e3-4bc3-8e45-246901d6652f",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "11beb3f5-f0e3-4bc3-8e45-246901d6652f"
+}

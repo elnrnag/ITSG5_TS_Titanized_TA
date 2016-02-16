@@ -1,0 +1,1019 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FSAP/LibItsFsap_Templates.ttcn3 $
+ *              $Id: LibItsFsap_Templates.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Templates definitions for Fast service advertisement protocol (ISO 24102-5)
+ */
+module LibItsFsap_Templates {
+    // LibCommon 
+    
+    // LibIts 
+    
+    // LibItsCalm 
+    import from CALMmanagement language "ASN.1:1997" {
+        type 
+            ApplicationID, 
+            ITS_scuId, StationID
+    };
+    import from CITSapplMgmtApplReg language "ASN.1:1997" {
+        type 
+            ITSaid
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type 
+            FAsapPrimitivesDown, FAsapPrimitivesUp, 
+            MF_Request_request 
+            /* TODO To be removed
+            MF_Command_request, MF_Command_confirm, MF_Command, 
+            MF_Request */
+    };
+    import from CALMllsap language "ASN.1:1997" { 
+        type 
+            LLserviceAddr, Link_ID, 
+            INsapPrimitivesUp, INsapPrimitivesDown, 
+            IN_UNITDATA_request, IN_UNITDATA_indication, 
+            INdata 
+    }; 
+    import from CALMfntp language "ASN.1:1997" {
+        type 
+            PortNumber, FntpOptions, 
+            FNTPNPDU, ITSfpdu, 
+            NFsapPrimitivesUp, NFsapPrimitivesDown, 
+            NFfntpCommIndication 
+    };
+    import from CALMfsap language "ASN.1:1997" {
+        type 
+            GCregServer, GCderegServer, 
+            GCregClient, GCderegClient, 
+            GCschedule, 
+            ServiceDataReg, ServiceData, 
+            ContextData, 
+            ServiceList, ServiceInfo, 
+            NonipContext, 
+            ChannelList, 
+            SessionChannel, 
+            SAMserviceData, CTXserviceData, 
+            SAM, SAMrxNot, GCsam, GCsamctx, GCsamctxConf, 
+            CTX, CTXrxNot, GCctxTxCmd, GCctx 
+    };
+    import from LibItsFsap_TypesAndValues {
+        type 
+            UtFsapEvent, UtFsapEventInd, 
+            CfFsapEventInd 
+            , AcFsapPrimitive 
+    };
+    import from LibItsFsap_Pixits {
+        modulepar 
+            PX_FMTID_CTX, PX_VERSION_FSAP, PX_FMTID_SAM, 
+            PX_USER_PRIORITY, PX_REMOTE_PORT_NUMBER  
+    };
+    import from LibItsFntp_Templates { 
+        template 
+            m_fntpBasicNpdu, 
+            m_inUnitDataInd 
+    }; 
+    import from LibItsCalm_Pixits { 
+        modulepar 
+            PX_LOC_ITS_FSAP_ACCESS_SETTINGS_MX_SAP_SET, PX_LOC_ITS_FSAP_ACCESS_SETTINGS_MX_SAP_UNSET,  
+            PX_IUT_LOWER_LAYER_USED, PX_IUT_LOWER_LAYER_UNUSED, 
+            PX_IUT_TEST_MODE_ON 
+    }; 
+    import from LibItsCalm_Interface all;
+    
+    group fsapPrimitives {
+    
+        /**
+         * @desc    Send template for IN-SAP Messages (FsapPort Primitive)
+         * @param   p_inSapPrimitivesUp IN-SAP message to be sent
+         */
+        template (value) FsapReq m_fsapReq_nfSap(
+            template (value) NFsapPrimitivesUp p_nfSapPrimitivesUp
+        ) := {
+            msgOut_nf := p_nfSapPrimitivesUp
+        } // End of template m_fsapReq_nfSap 
+        
+        /**
+         * @desc    Receive template for IN-SAP message (FsapPort Primitive)
+         * @param   p_inSapPrimitivesDown Expected IN-SAP message
+         */
+        template FsapInd mw_fsapInd_nfSap(
+            template (present) NFsapPrimitivesDown p_nfSapPrimitivesDown
+        ) := {
+            msgIn := {
+                msgIn_nf := p_nfSapPrimitivesDown 
+            }, 
+            receptionTime := ? 
+        } // End of template mw_fsapInd_nfSap 
+        
+        /**
+         * @desc    Send template for DEN Message (DenmPort Primitive)
+         * @param   p_inSapPrimitivesUp IN-SAP message to be sent
+         */
+        template (value) FsapReq m_fsapReq_inSap(
+            template (value) INsapPrimitivesUp p_inSapPrimitivesUp
+        ) := {
+            msgOut_in := p_inSapPrimitivesUp
+        }
+        
+        /**
+         * @desc    Receive template for IN-SAP message (FntpPort Primitive)
+         * @param   p_inSapPrimitivesDown Expected IN-SAP message
+         */
+        template FsapInd mw_fsapInd_inSap(
+            template (present) INsapPrimitivesDown p_inSapPrimitivesDown
+        ) := {
+            msgIn := {
+                msgIn_in := p_inSapPrimitivesDown 
+            }, 
+            receptionTime := ? 
+        } // End of template mw_fsapInd_inSap 
+        
+        /**
+         * @desc    Primitive on IN-SAP interface
+         * @see     ISO/CD 21218 - Clause 8.3
+         * @see     ISO/CD 29281-2 - Clause 7.1.2
+         */
+        group inSapPrimitives {
+    
+            group sendOperation {
+
+                /**
+                 * @desc   Generate a SAM notification message through IN-SAP
+                 * @param p_insap_source_address   Source linkId
+                 * @param p_insap_dest_address     Destination linkId
+                 * @param p_sam                    The SAM message in octetstring format
+                 * @see   ISO/CD 21218 - Clause 8.3.3
+                 * @see   ISO 29281 - Clause 7.9.3
+                 */
+                template (value) INsapPrimitivesUp m_generateSamMessagePdu(
+                    in template (value) LLserviceAddr p_insapSourceAddress, 
+                    in template (value) LLserviceAddr p_insapDestAddress, 
+                    in template (value) INdata p_data 
+                ) := {
+                    spRef := 0, 
+                    servPrimitive := { 
+                        IN_UNITDATA_indication := {  
+                            source_addr := p_insapSourceAddress, 
+                            dest_addr := p_insapDestAddress, 
+                            data := p_data, 
+                            priority := PX_USER_PRIORITY, 
+                            accessParams := { 
+                                apRef := 0, 
+                                aParameter := { NullType := NULL }
+                            } 
+                        } // End of field 'inUnitdataInd'
+                    } // End of field 'servPrimitive'
+                } // End of template m_generateSamMessagePdu
+                
+                /**
+                 * @desc   Generate a CTX reception message through IN-SAP
+                 * @param p_insap_source_address   Source linkId
+                 * @param p_insap_dest_address     Destination linkId
+                 * @param p_ctx             The SAM message in octetstring format
+                 * @see   ISO/CD 21218 - Clause 8.3.3
+                 * @see   ISO 29281 - Clause 7.9.4
+                 */
+                template (value) INsapPrimitivesUp m_generateCtxMessagePdu(
+                    in template (value) LLserviceAddr p_insapSourceAddress, 
+                    in template (value) LLserviceAddr p_insapDestAddress, 
+                    in template (value) INdata p_ctx 
+                ) := {
+                    spRef := 0, 
+                    servPrimitive := { 
+                        IN_UNITDATA_indication := {  
+                            source_addr := p_insapSourceAddress, 
+                            dest_addr := p_insapDestAddress, 
+                            data := p_ctx, 
+                            priority := PX_USER_PRIORITY, 
+                            accessParams := { 
+                                apRef := 0, 
+                                aParameter := ?
+                            }
+                        } // End of field 'inUnitdataInd'
+                    } // End of field 'servPrimitive'
+                } // End of template m_generateCtxMessagePdu
+                
+            } // End of group sendOperation 
+                
+            group recvOperation {
+                
+                /**
+                 * @desc    Receive template for a SAP primitive message on IN-SAP interface
+                 * @param   p_inUnitdataRq  The IN-DATA.request SAP primitive message
+                 * @see     ISO/CD 21218 - Clause 8.3.1
+                 * @see     ISO/CD 29281-2 - Clause 7.1.2
+                 */
+                template INsapPrimitivesDown mw_fsapInSapPrimitiveReq(
+                    in template (present) IN_UNITDATA_request p_inUnitdataRq
+                ) := {
+                    spRef := 0, 
+                    servPrimitive := { IN_UNITDATA_request := p_inUnitdataRq } 
+                } // End of template m_fntpImPrimitiveReq
+                
+            } // End of group recvOperation 
+            
+        } // End of group inSapPrimitives 
+        
+        /**
+         * @desc    Primitive on IN-SAP interface
+         * @see     ISO/CD 21218 - Clause 8.3
+         * @see     ISO/CD 29281-2 - Clause 7.1.2
+         */
+        group nfSapPrimitives {
+            
+            group recvOperation {
+                
+                /**
+                 * @desc    Receive template for a SAP primitive message on IN-SAP interface
+                 * @param   p_inUnitdataRq  The IN-DATA.request SAP primitive message
+                 * @see     ISO/CD 21218 - Clause 8.3.1
+                 * @see     ISO/CD 29281-2 - Clause 7.1.2
+                 */
+                template (present) NFsapPrimitivesDown mw_fsapNfSapPrimitiveReq(
+                    in template (present) PortNumber p_servicePort,
+                    in template (present) Link_ID p_linkId,
+                    in template (present) ITSfpdu p_data 
+                ) := {
+                    spRef := 1,
+                    servPrimitive := { 
+                        NFfntpCommRequest := { 
+                            commRef := ?, 
+                            servicePort := p_servicePort, 
+                            remotePort := PX_REMOTE_PORT_NUMBER, 
+                            linkID := p_linkId, 
+                            data := p_data, 
+                            priority := PX_USER_PRIORITY, 
+                            controlField := ? 
+                        } // End of field 'NFfntpCommRequest'
+                    } // End of field 'servPrimitive'
+                } // End of template mw_fsapNfSapPrimitiveReq
+                
+            } // End of group recvOperation 
+            
+        } // End of group nfSapPrimitives 
+        
+        /**
+         * @desc Templates used to 
+         * <li>trigger message on Upper Tester</li>
+         * <li>capture indication message sent by the IUT</li>
+         */
+        group utPrimitives {
+            
+            /**
+             * @desc Initializes the FSAP IUT including support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) UtInitialize m_utFsapInitialize_with_management := { 
+                utFsapInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_FSAP_ACCESS_SETTINGS_MX_SAP_SET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_UNUSED, // PX_IUT_LOWER_LAYER_USED
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utFntpInitialize' 
+            } // End of template m_utFntpInitialize 
+            
+            /**
+             * @desc Initializes the FSAP IUT without support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) UtInitialize m_utFsapInitialize_without_management := { 
+                utFsapInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_FSAP_ACCESS_SETTINGS_MX_SAP_SET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_UNUSED, // PX_IUT_LOWER_LAYER_USED
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utFntpInitialize' 
+            } // End of template m_utFntpInitialize 
+            
+            /**
+             * @desc    Send template to generate a FAsapPrimitivesDown message
+             * @param   p_faSapPrimitivesDown The FAsapPrimitivesDown message
+             */
+            template (value) UtFsapEvent m_generateFaSapPrimitivesDown( 
+                in template (value) FAsapPrimitivesDown p_faSapPrimitivesDown 
+            ) := { 
+                faSapPrimitivesDown := p_faSapPrimitivesDown
+            } // End of template m_generateFaSapPrimitivesDown
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GcRegServerConf message
+             * @param   p_applicationID Application Identifier 
+             */
+            template UtFsapEventInd mw_fsapGcRegServerConf(
+                in template (present) ApplicationID p_applicationID 
+            ) := { 
+                faSapPrimitivesUp := {
+                    spRef := 3,
+                    servPrimitive := {
+                        GCregServerConf := {
+                            applicationID := p_applicationID 
+                        }
+                    }
+                }
+            } // End of template mw_fsapGcRegServerConf
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GcRegServerConf message
+             * @param   p_applicationID Application Identifier 
+             */
+            template UtFsapEventInd mw_fsapGcDeregServerConf(
+                in template (present) ApplicationID p_applicationID 
+            ) := { 
+                faSapPrimitivesUp := {
+                    spRef := 5,
+                    servPrimitive := {
+                        GCderegServerConf := {
+                            applicationID := p_applicationID 
+                        }
+                    }
+                }
+            } // End of template mw_fsapGcDeregServerConf
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GcRegClientConf message
+             * @param   p_applicationID Application Identifier 
+             */
+            template UtFsapEventInd mw_fsapGcRegClientConf(
+                in template (present) ApplicationID p_applicationID 
+            ) := { 
+                faSapPrimitivesUp := {
+                    spRef := 6,
+                    servPrimitive := {
+                        GCregClientConf := {
+                            applicationID := p_applicationID 
+                        }
+                    }
+                }
+            } // End of template mw_fsapGcRegClientConf
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GcDeregClientConf message
+             * @param   p_applicationID Application Identifier 
+             */
+            template UtFsapEventInd mw_fsapGcDeregClientConf(
+                in template (present) ApplicationID p_applicationID 
+            ) := { 
+                faSapPrimitivesUp := {
+                    spRef := 8,
+                    servPrimitive := {
+                        GCderegClientConf := {
+                            applicationID := p_applicationID 
+                        }
+                    }
+                }
+            } // End of template mw_fsapGcDeregClientConf
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GCctx message
+             * @param   p_gcCtx GCctx notification message 
+             */
+            template UtFsapEventInd mw_fsapGcCtx(
+                in template (present) GCctx p_gcCtx  
+            ) := { 
+               faSapPrimitivesUp := {
+                    spRef := 10,
+                    servPrimitive := {
+                        GCctx := p_gcCtx 
+                    } // End of field 'servPrimitive' 
+                } // End of field 'faSapPrimitivesUp' 
+            } // End of template mw_fsapGcCtx
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GCctx message
+             * @param   p_gcCtx GCctx notification message 
+             */
+            template UtFsapEventInd mw_fsapGcSam(
+                in template (present) GCsam p_gcSam 
+            ) := { 
+                faSapPrimitivesUp := {
+                    spRef := 9,
+                    servPrimitive := {
+                        GCsam := p_gcSam 
+                    } // End of field 'servPrimitive' 
+                } // End of field 'faSapPrimitivesUp' 
+            } // End of template mw_fsapGcSam
+            
+            /**
+             * @desc    Receive template for FAsapPrimitivesUp/GCsamctx message
+             * @param   p_gcSamCtx GCsamctx notification message 
+             */
+            template UtFsapEventInd mw_fsapGcSamCtx(
+                in template (present) GCsamctx p_gcSamCtx 
+            ) := { 
+                faSapPrimitivesUp := {
+                    spRef := 2,
+                    servPrimitive := {
+                        GCsamctx := p_gcSamCtx 
+                    } // End of field 'servPrimitive' 
+                } // End of field 'faSapPrimitivesUp' 
+            } // End of template mw_fsapGcSamCtx
+            
+        } // End of group utPrimitives
+        
+        group cfPrimitives { 
+            
+            /**
+             * @desc Initializes the Configuration tester
+             */
+            template (value) CfInitialize m_cfFsapInitialize := { 
+                cfFsapInitialize := { 
+                } // End of field 'cfFsapInitialize' 
+            } // End of template m_cfFsapInitialize 
+            
+            /**
+             * @desc    Receive template for configuration message (CfPort Primitive)
+             * @param   p_mfRequestRequest Expected MF_Request_request message
+             */
+            template CfFsapEventInd mw_cfFsapEventInd(
+                template (present) MF_Request_request p_mfRequestRequest
+            ) := {
+                mfRequestRequest := p_mfRequestRequest
+            } // End of template mw_cfFsapEventInd
+            
+        } // End of group cfPrimitives 
+        
+        group taPrimitives {
+            
+        } // End of group taPrimitives
+        
+        group cregServerMessage {
+            
+            group cregServerMessageSend {
+                
+                template (value) FAsapPrimitivesDown m_faSapPrimitivesDown_gcRegServer( 
+                    in template (value) GCregServer p_gcRegServer 
+                ) := { 
+                    spRef := 3, 
+                    servPrimitive := { GCregServer := p_gcRegServer } 
+                } // End of template m_generateFaSapPrimitivesDown
+                
+                template (value) FAsapPrimitivesDown m_faSapPrimitivesDown_gcDeregServer( 
+                    in template (value) GCderegServer p_gcDeregServer 
+                ) := { 
+                    spRef := 5, 
+                    servPrimitive := { GCderegServer := p_gcDeregServer } 
+                } // End of template m_faSapPrimitivesDown_gcDeregServer
+                
+                /**
+                 * @desc    Send a GCregServer registration request for an ITS-S application
+                 * @param   p_applicationId   The Application ID
+                 * @param   p_gCschedule      A set of scheduling information
+                 * @param   p_serviceDataReg  Additional service data information
+                 * @see ISO 24102-3 Table C.1 — MF-REQUESTs 
+                 * @see ISO 24102-5 Clause 8.2.1 Groupcast registration 
+                 */
+                template (value) GCregServer m_gcRegServer(
+                    in template (value) ApplicationID p_applicationId,
+                    in template (value) GCschedule p_gCschedule,
+                    in template (value) ServiceDataReg p_serviceDataReg
+                ) := {
+                        applicationID := p_applicationId,
+                        gCschedule := p_gCschedule,
+                        priority := PX_USER_PRIORITY,
+                        serviceDataReg := p_serviceDataReg
+                    //} // End of field 'gCregServer'
+                } // End of template m_gcRegServer
+                
+                template (value) GCderegServer m_gcDeregServer(
+                    in template (value) ApplicationID p_applicationId 
+                ) := {
+                        applicationID := p_applicationId 
+                } // End of template m_gcDeregServer
+                
+            } // End of group cregServerMessageSend
+            
+            group cregServerMessageRecv {
+                
+                /**
+                 * @desc    Generic receive GCregServer template
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 * @see ISO 24102-3 Table C.1 — MF-REQUESTs 
+                 * @see ISO 24102-5 Clause 8.2.1 Groupcast registration 
+                 */
+                template GCregServer mw_gCregServer_any := {
+                    applicationID := {
+                        hostITS_scuId := ?,
+                        seqNumber := ?
+                    }, // End of field applicationID''
+                    gCschedule := ?,
+                    priority := ?,
+                    serviceDataReg := {
+                        datareg := {
+                            nonipData := ?
+                        } // End of field 'datareg'
+                    } // End of field 'serviceDataReg'
+                } // End of template mw_gCregServer
+                
+            } // End of group cregServerMessageRecv
+            
+        } // End of group cregServerMessage
+        
+        group cregClientMessage {
+            
+            group cregClientMessageSend {
+                
+                template (value) FAsapPrimitivesDown m_faSapPrimitivesDown_gcRegClient( 
+                    in template (value) GCregClient p_gcRegClient 
+                ) := { 
+                    spRef := 6, 
+                    servPrimitive := { GCregClient := p_gcRegClient } 
+                } // End of template m_faSapPrimitivesDown_gcRegClient
+                
+                /**
+                 * @desc    Send template for a  GCregClient without a session, CTX is not requested
+                 * @param   p_applicationId   The Application ID
+                 * @param   p_serviceId       The globally unique ITS-AID of the ITS-S application
+                 * @see ISO 24102-5 Clause 8.5
+                 */
+                template (value) GCregClient m_gCregClientWithNoSessionAndNoCtx(
+                    in template (value) ApplicationID p_applicationId,
+                    in template (value) ITSaid p_serviceId
+                ) := {
+                    applicationID := p_applicationId,
+                    priority := PX_USER_PRIORITY,
+                    serviceID := p_serviceId,
+                    contextData := ''O
+                } // End of template m_gCregClientWithNoSessionAndNoCtx
+                
+                /**
+                 * @desc    Send template for a  GCregClient without a session, CTX is requested
+                 * @param   p_applicationId   The Application ID
+                 * @param   p_serviceId       The globally unique ITS-AID of the ITS-S application
+                 * @see ISO 24102-5 Clause 8.3.1 Groupcast registration
+                 */
+                template (value) GCregClient m_gCregClientWithSessionAndCtx( 
+                    in template (value) ApplicationID p_applicationId, 
+                    in template (value) ITSaid p_serviceId, 
+                    in template (value) ContextData p_contextData 
+                ) := { 
+               //     gCregClient := {
+                        applicationID := p_applicationId,
+                        priority := PX_USER_PRIORITY,
+                        serviceID := p_serviceId,
+                        contextData := p_contextData 
+                 //   } // End of field 'gCregClient'
+                } // End of template m_gCregClientWithSessionAndCtx
+                
+                template (value) FAsapPrimitivesDown m_faSapPrimitivesDown_gcDeregClient( 
+                    in template (value) ApplicationID p_applicationId 
+                ) := { 
+                    spRef := 8, 
+                    servPrimitive := { 
+                        GCderegClient := {
+                            applicationID := p_applicationId
+                        }
+                    } 
+                } // End of template m_faSapPrimitivesDown_gcRegClient
+                
+            } // End of group cregClientMessageSend
+            
+            group cderegServerMessageRecv {
+                
+            } // End of group cderegServerMessageRecv 
+            
+        } // End of group cregClientMessage
+        
+        group samMessage {
+            
+            group samMessageSend {
+                
+                /**
+                 * @desc    Send template for SAM
+                 * @param   p_applicationId   The Application ID
+                 * @param   p_serverId        Server identifier
+                 * @param   p_serviceData     Additional SAM service data information
+                 * @see ISO 24102-5 Clause 8.3.4 Reception of SAM and transmission of CTX
+                 */
+                template (value) SAM m_sam(
+                    in template (value) StationID p_serverId,
+                    in template (value) ITSaid p_serviceId,
+                    in template (value) ServiceList p_serviceList
+                ) := {
+                    fmtID := PX_FMTID_SAM, 
+                    version := PX_VERSION_FSAP, 
+                    serverID := p_serverId,
+                    serviceList := p_serviceList,
+                    channelList := { },
+                    ipServList := { // Empty list 
+                    }
+                } // End of template mw_sam
+                
+                template (value) GCsamctxConf m_gcSamCtxConf( 
+                    in template (value) ApplicationID p_applicationID, 
+                    in template (value) LLserviceAddr p_link, 
+                    in template (value) PortNumber p_port 
+                ) := {
+                    applicationID := p_applicationID, 
+                    link := p_link, 
+                    port_ := p_port 
+                } // End of template m_mfRequest_samRxNot
+                
+            } // End of group samMessageSend
+            
+            group samMessageRecv {
+                
+                template (value) FAsapPrimitivesDown m_faSapPrimitivesDown_gcSamCtxConf( 
+                    in template (value) GCsamctxConf p_gcSamCtxConf
+                ) := { 
+                    spRef := 2, 
+                    servPrimitive := { GCsamctxConf := p_gcSamCtxConf } 
+                } // End of template m_faSapPrimitivesDown_gcSamCtxConf
+                
+                /**
+                 * @desc    Receive template for SAM
+                 * @param   p_applicationId   The Application ID
+                 * @param   p_serverId        Server identifier
+                 * @param   p_serviceData     Additional SAM service data information
+                 * @see ISO 24102-5 Clause 8.3.4 Reception of SAM and transmission of CTX
+                 */
+                template (present) SAM mw_sam(
+                    in template (present) StationID p_serverId,
+                    in template (present) ServiceList p_serviceList
+                ) := {
+                    fmtID := PX_FMTID_SAM, 
+                    version := PX_VERSION_FSAP, 
+                    serverID := p_serverId,
+                    serviceList := p_serviceList,
+                    channelList := ?,
+                    ipServList := { // Empty list 
+                    }
+                } // End of template mw_sam
+                
+                template (present) SAM mw_sam_channelList(
+                    in template (present) StationID p_serverId,
+                    in template (present) ServiceList p_serviceList, 
+                    in template (present) ChannelList p_channelList
+                ) modifies mw_sam := {
+                    channelList := p_channelList
+                } // End of template mw_sam_channelList
+                
+                template (present) GCsam mw_gcSam( 
+                    in template (present) ApplicationID p_applicationId, 
+                    in template (present) StationID p_serverId, 
+                    in template (present) SAMserviceData p_samServiceData, 
+                    in template (present) LLserviceAddr p_linkId 
+                ) := { 
+                    applicationID := p_applicationId, 
+                    serverID := p_serverId, 
+                    serviceData := p_samServiceData, 
+                    link := p_linkId 
+                } // End of template mw_gcSam 
+                
+                /**
+                 * @desc    Receive template for GCsamctx
+                 * @param   p_applicationId   The Application ID
+                 * @param   p_serverId        Server identifier
+                 * @param   p_serviceInfo     Additional service data information
+                 * @see     ISO 24102-5 Clause 8.3.4 Reception of SAM and transmission of CTX
+                 */
+                template (present) GCsamctx mw_gcSamCtx(
+                    in template (present) ApplicationID p_applicationId,
+                    in template (present) StationID p_serverId,
+                    in template (present) ServiceInfo p_serviceInfo, 
+                    in template (present) LLserviceAddr p_link 
+                ) := {
+                    applicationID := p_applicationId,
+                    serverID := p_serverId,
+                    serviceInfo := p_serviceInfo, 
+                    link := p_link
+                } // End of template mdw_mfCommand_gcSamCtx
+                
+                /**
+                 * @desc    Receive template for SAMserviceData
+                 * @param p_serviceId       Service identifier
+                 * @param p_serviceData     Additional service data information
+                 * @param p_providerPort    Service user port number
+                 */
+                template (present) SAMserviceData mw_samDataServerciceWithAccessTechAndNonIp( 
+                    in template (present) ITSaid p_serviceId, 
+                    in template (present) ServiceData p_serviceData, 
+                    in template (present) PortNumber p_providerPort, 
+                    in template (present) SessionChannel p_sessionChannel 
+                ) := { 
+                    fill := '0000000'B, 
+                    servData := { 
+                        nonipService := { 
+                            serviceID := p_serviceId, 
+                            serviceData := p_serviceData, 
+                            providerPort := p_providerPort, 
+                            sessionChannel := p_sessionChannel 
+                        } // End of field 'nonipService'
+                    } // End of field 'servData'
+                } // End of template mw_samDataServerciceWithAccessTechAndNonIP
+                
+                template (present) ServiceInfo mw_serviceInfo_nonipService( 
+                    in template (present) ITSaid p_serviceId, 
+                    in template (present) PortNumber p_providerPort 
+                ) := {
+                    fill := '0000000'B,
+                    info := {
+                        nonipService := {
+                            serviceID := p_serviceId,
+                            providerPort := p_providerPort     
+                        } // End of field 'nonipService'
+                    } // End of field 'info'
+                } // End of template mw_serviceInfo_nonipService 
+                
+                template (present) SessionChannel mw_sessionChannel( 
+                    in template (present) integer p_serviceChannel 
+                ) := {
+                    serviceChannel := p_serviceChannel, 
+                    medium := ?, 
+                    schParams := ? 
+                } // End of template mw_sessionChannel
+        
+            } // End of group samMessageRecv
+            
+        } // End of group samMessage
+        
+        group ctxMessage {
+            
+            group ctxMessageSend {
+                
+                template (value) INsapPrimitivesUp m_inSapPrimitivesUp( 
+                    in template (value) LLserviceAddr p_insapSourceAddress, 
+                    in template (value) LLserviceAddr p_insapDestAddress, 
+                    in template (value) INdata p_inData 
+                ) := { 
+                    spRef := 0, 
+                    servPrimitive := {
+                        IN_UNITDATA_indication :=  
+                            m_inUnitDataInd( 
+                                p_insapSourceAddress, 
+                                p_insapDestAddress, 
+                                p_inData 
+                            ) 
+                    }
+                } // End of template m_inSapPrimitivesUp 
+                   
+                // FIXME To be continued 
+                template (value) NFsapPrimitivesUp m_nfSapPrimitivesUp( 
+                    in template (value) PortNumber p_servicePort,
+                    in template (value) PortNumber p_remotePort,
+                    in template (value) Link_ID p_linkId, 
+                    in template (value) ITSfpdu p_data 
+                ) := { 
+                    spRef := 2,
+                    servPrimitive := { 
+                        NFfntpCommIndication := { 
+                            servicePort := p_servicePort, 
+                            remotePort := p_remotePort, 
+                            linkID := p_linkId, 
+                            data := p_data, 
+                            priority := PX_USER_PRIORITY, 
+                            controlField := m_noFntpOptions 
+                        } 
+                    } 
+                } // End of template m_nfSapPrimitivesUp 
+                
+                /**
+                 * @desc    Send "CTX" in reply to SAM
+                 * @param   p_linkID    Source address 
+                 * @param   p_ctx       CTX information
+                 * @see ISO 24102-5 Clause 8.2.6
+                 * @see ISO 21218 Clause 5.4.2.1 & 5.4.2.2
+                 */
+                template (value) CTXrxNot m_ctxRxNot(
+                    in template (value) LLserviceAddr p_linkId,
+                    in template (value) CTX p_ctx
+                ) := {
+                   // cTXrxNot := {
+                        link := p_linkId,
+                        ctx := p_ctx
+                    //} //  // End of field 'cTXrxNot'
+                } // End of template m_ctxRxNot
+                
+                /**
+                 * @desc    Send template for CTX
+                 * @param   p_clientID  Client identifier
+                 * @see ISO 24102-5 Clause 8.2.6 Reception of CTX
+                 */
+                template (value) CTX m_ctx(
+                    in template (value) StationID p_clientId
+                ) := {
+                    fmtID := PX_FMTID_CTX, 
+                    version := PX_VERSION_FSAP, 
+                    clientID := p_clientId,
+                    servContextList := { },
+                    ipContextList := { }
+                } // End of template m_ctx
+                
+                template (value) CTX m_ctx_noip(
+                    in template (value) StationID p_clientId, 
+                    in template (value) NonipContext p_noIpContext
+                ) modifies m_ctx := {
+                    servContextList := { 
+                        p_noIpContext
+                    }
+                } // End of template m_ctx_noip
+                
+                /**
+                 * @desc    Send template for CTX in non-ip context
+                 * @param   p_serviceId     The globally unique ITS-AID of the ITS-S application
+                 * @param   p_contextData      Service port number
+                 * @param   p_userPort      Service port number
+                 * @see ISO2410-5 Clause 8.2.1 Groupcast registration
+                 * @see ISO2410-5 Figure 9 — serviceList
+                 */
+                template (value) NonipContext m_nonIpContext( 
+                    in template (value) ITSaid p_serviceId, 
+                    in template (value) ContextData p_contextData, 
+                    in template (value) PortNumber p_userPort 
+                ) := { 
+                    serviceID := p_serviceId, 
+                    contextData := p_contextData, 
+                    userPort := p_userPort 
+                } // End of template m_nonIpContext 
+                
+            } // End of group ctxMessageSend
+            
+            group ctxMessageRecv {
+                
+                /**
+                 * @desc    Receive template for GCctx
+                 * @param   p_applicationId     The application ID
+                 * @param   p_clientID          Client identifier
+                 * @param   p_serviceContext    Additional service context information
+                 * @see ISO 24102-5 Clause 8.2.6 Reception of CTX
+                 */
+                template (present) GCctx mdw_gCctx( // FIXME To be renamed 
+                    in template (present) ApplicationID p_applicationId, 
+                    in template (present) StationID p_clientId, 
+                    in template (present) CTXserviceData p_serviceContext 
+                ) := { 
+                    applicationID := p_applicationId, 
+                    clientID := p_clientId, 
+                    serviceContext := p_serviceContext 
+                } // End of template mdw_gCctx 
+                
+                /**
+                 * @desc    Receive template for GCctxTxCmd
+                 * @param   p_link  Source address
+                 * @param   p_ctx   CTX information
+                 * @see ISO 24102-5 Clause 8.3.4 Reception of SAM and transmission of CTX
+                 */
+                template (present) GCctxTxCmd mdw_mfCommand_gcCtxTxCmd( 
+                    in template (present) CALMllsap.LLserviceAddr p_link,
+                    in template (present) CTX p_ctx
+                ) := {
+                //    gCctxTxCmd := {
+                        link := p_link,
+                        ctx := p_ctx
+                  //  } // End of header 'gCctxTxCmd'
+                } // End of template mdw_mfCommand_gcCtxTxCmd
+                
+                /**
+                 * @desc    Generic receive template for CTX.
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 * @see ISO 24102-5 Clause 8.2.6 Reception of CTX
+                 */
+                template (present) CTX mw_ctx_any := {
+                    fmtID := PX_FMTID_CTX, 
+                    version := PX_VERSION_FSAP, 
+                    clientID := ?,
+                    servContextList := ?,
+                    ipContextList := ?
+                } // End of template mw_ctx_any
+                
+                /**
+                 * @desc    Send template for CTX
+                 * @param   p_clientID  Client identifier
+                 * @see ISO 24102-5 Clause 8.2.6 Reception of CTX
+                 */
+                template (present) CTX mdw_ctx(
+                    in template (present) StationID p_clientId
+                ) modifies mw_ctx_any := {
+                    clientID := p_clientId 
+                } // End of template mw_ctx
+                
+                /**
+                 * @desc    Receive template for CTX with non-ip service context
+                 * @param   p_servContext   Additional service data information for non-IP based services (timeout information)
+                 * @see ISO2410-5 Clause 8.2.1 Groupcast registration
+                 * @see ISO2410-5 Figure 9 — serviceList
+                 */
+                template (present) CTX mdw_ctx_nonIpContext( 
+                    in template (present) StationID p_clientId, 
+                    in template (present) NonipContext p_servContext 
+                ) modifies mdw_ctx := { 
+                    servContextList := { p_servContext } // FIXME To be reviewed during validation superset(p_servContext) 
+                } // End of template mdw_ctx_nonIpContext
+                
+                /**
+                 * @desc    Receive template for CTX in non-ip context
+                 * @param   p_serviceId     The globally unique ITS-AID of the ITS-S application
+                 * @param   p_userPort      Service port number
+                 * @see ISO2410-5 Clause 8.2.1 Groupcast registration
+                 * @see ISO2410-5 Figure 9 — serviceList
+                 */
+                template (present) NonipContext mw_nonIpContext( 
+                    in template (present) ITSaid p_serviceId, 
+                    in template (present) PortNumber p_userPort 
+                ) := { 
+                    serviceID := p_serviceId, 
+                    contextData := ?, 
+                    userPort := p_userPort 
+                } // End of template mw_nonIpContext 
+                
+                /**
+                 * @desc    Receive template for CTX in non-ip context
+                 * @param   p_serviceId     The globally unique ITS-AID of the ITS-S application
+                 * @param   p_userPort      Service port number
+                 * @param   p_contextData   A context data value
+                 * @see ISO2410-5 Clause 8.2.1 Groupcast registration
+                 * @see ISO2410-5 Figure 9 — serviceList
+                 */
+                template (present) NonipContext mw_nonIpContext_contextdata( 
+                    in template (present) ITSaid p_serviceId, 
+                    in template (present) PortNumber p_userPort, 
+                    in template (value) ContextData p_contextData 
+                ) modifies mw_nonIpContext := { 
+                    contextData := p_contextData 
+                } // End of template mw_nonIpContext 
+                
+                /**
+                 * @desc    Generic receive template for CTXserviceData
+                 * Used for:
+                 * <li>modifying restrictif template</li>
+                 * <li>default altstep</li>
+                 */
+                template (present) CTXserviceData mw_ctxDataServercice_any := {
+                    fill := '0000000'B,
+                    servData := ?
+                } // End of template mw_ctxDataServercice_any
+                
+                /**
+                 * @desc    Receive template for CTXserviceData
+                 * @param   p_serviceId     The globally unique ITS-AID of the ITS-S application
+                 * @param   p_contextData   Additional context data information for non-IP based services (timeout information)
+                 * @param   p_userPort      Service port number
+                 */
+                template (present) CTXserviceData mdw_ctxServiceDataNonIp(
+                    in template (present) ITSaid p_serviceId,
+                    in template (present) ContextData p_contextData,
+                    in template (present) PortNumber p_userPort
+                ) modifies mw_ctxDataServercice_any := {
+                    servData := {
+                        nonipContext := {
+                            serviceID := p_serviceId,
+                            contextData := p_contextData,
+                            userPort := p_userPort
+                        } // End of field 'nonipService'
+                    } // End of field 'servData'
+                } // End of template mdw_ctxServiceDataNonIp
+                
+            } // End of group ctxMessageRecv
+            
+        } // End of group ctxMessage
+        
+        /**
+         * @desc Fntp NPUD templates
+         */
+        group fsapFntpNpdu {
+            
+            /**
+             * @desc    Send template for basic NPDU for UC/BC transmission- N/single hop
+             * For basic FNTPNPDU, S-Hop is required (see ISO 29281-1 Clause 5.1.2 Basic mode of operation)
+             * @param   p_sourcePort        Source port
+             * @param   p_destinationPort   Destination port
+             */
+            template (value) FNTPNPDU m_fsapBasicFntpNpdu( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (value) ITSfpdu p_body 
+            ) modifies m_fntpBasicNpdu := { 
+                body := p_body 
+            } // End of template m_fntpBasicNpdu
+            
+            template (value) FntpOptions m_noFntpOptions := { 
+                intForw := omit, 
+                sec := omit, 
+                hops := omit, 
+                lpp := omit, 
+                cip := omit, 
+                opt5 := omit, 
+                opt6 := omit, 
+                opt7 := omit 
+            } // End of template m_noFntpOptions 
+            
+        } // End of group fsapFntpNpdu 
+        
+    } // End of group fsapPrimitives
+    
+} // End of module LibItsFsap_Templates

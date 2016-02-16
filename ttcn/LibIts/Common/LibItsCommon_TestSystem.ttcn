@@ -1,0 +1,48 @@
+/**
+ *    @author     ETSI / STF405
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Common/LibItsCommon_TestSystem.ttcn $
+ *                $Id: LibItsCommon_TestSystem.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *    @desc        Test System module for ITS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCommon_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_Time {modulepar all};
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    
+    group componentDefinitions {
+
+        /**
+         * @desc ITS Main Test Component 
+         */
+        type component ItsBaseMtc extends ItsBaseComponent, ServerSyncComp {
+
+            // timers
+            timer tc_guard := PX_TDONE;
+
+        } // end ItsMtc
+    
+        /**
+         * @desc    Upper tester and Adapter control component 
+         * @remark  SelfSyncComp extends ClientSyncComp. 
+         *          We can self-sync in a single-component setup or server-sync in a multi-component setup
+         */
+        type component ItsBaseComponent extends SelfSyncComp {
+            
+            // timers
+            timer tc_wait := PX_TWAIT;
+            timer tc_ac := PX_TAC;
+            timer tc_noac := PX_TNOAC;
+            
+        } // end ItsComponent
+    
+    } // End of group componentDefinitions
+     
+} // End of module LibItsCommon_TestSystem
+

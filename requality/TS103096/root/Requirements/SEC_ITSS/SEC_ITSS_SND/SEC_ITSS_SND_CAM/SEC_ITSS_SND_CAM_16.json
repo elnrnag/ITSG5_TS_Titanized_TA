@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "35d5fb61-1159-46a2-a52b-389aeffba52c",
+            "type": "STRING",
+            "value": "If ITS-S sends a secured CAM check that the signature contained in the SecuredMessage is calculated over the right fields by cryptographically verifying the signature."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "35d5fb61-1159-46a2-a52b-389aeffba52c",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/edc30643-b58e-4c13-a10b-a3209100a17c"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "35d5fb61-1159-46a2-a52b-389aeffba52c",
+            "type": "STRING",
+            "value": "16. Check signature"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "35d5fb61-1159-46a2-a52b-389aeffba52c",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "35d5fb61-1159-46a2-a52b-389aeffba52c"
+}

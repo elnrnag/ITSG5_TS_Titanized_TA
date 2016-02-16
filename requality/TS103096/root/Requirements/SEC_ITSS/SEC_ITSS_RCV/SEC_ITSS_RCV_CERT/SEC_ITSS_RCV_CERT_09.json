@@ -1,0 +1,44 @@
+{
+    "attributes": {
+        "PICS_USE_IDENTIFIED_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_IDENTIFIED_REGION",
+            "origin": "2a113f34-70ce-4f33-89a9-5436f1f6a4ce",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "e2057955-7a09-484a-ae5a-e7f034f29ec8",
+            "type": "STRING",
+            "value": "\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "2a113f34-70ce-4f33-89a9-5436f1f6a4ce",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/f727674f-3a77-4e61-877b-e5d2d9f5dc55",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a7eb2f2c-4f29-4ac4-a390-68308a532c8e",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/7f3a6b4c-ea1c-4d17-bfc9-1a6338be1b9d"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "2a113f34-70ce-4f33-89a9-5436f1f6a4ce",
+            "type": "STRING",
+            "value": "09. Check identified region of subordinate certificate"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e2057955-7a09-484a-ae5a-e7f034f29ec8",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "2a113f34-70ce-4f33-89a9-5436f1f6a4ce"
+}

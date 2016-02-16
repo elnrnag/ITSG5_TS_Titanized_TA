@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "e39d5667-8ae3-4b24-8375-74f40ebcb880",
+            "type": "STRING",
+            "value": "Do not required TPs.\r\nFully covered by ITS-S_CAM_16\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "e39d5667-8ae3-4b24-8375-74f40ebcb880",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/6c666f70-ff2e-4d9b-b25e-45bdd0b88099"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "e39d5667-8ae3-4b24-8375-74f40ebcb880",
+            "type": "STRING",
+            "value": "06. Check verification key validity"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e39d5667-8ae3-4b24-8375-74f40ebcb880",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "e39d5667-8ae3-4b24-8375-74f40ebcb880"
+}

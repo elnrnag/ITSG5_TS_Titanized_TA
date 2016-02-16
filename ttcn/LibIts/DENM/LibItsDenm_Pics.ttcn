@@ -1,0 +1,71 @@
+/**
+ *  @author   ETSI / STF405
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DENM/LibItsDenm_Pics.ttcn $
+ *            $Id: LibItsDenm_Pics.ttcn 1088 2015-01-12 13:22:58Z berge $
+ *  @desc     DENM PICS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsDenm_Pics {
+    
+    group denmPics {
+        
+        /**
+         * @desc Default expiry time of DENM generations 
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar integer PICS_DENM_DEFAULT_EXPIRY_TIME := 60000;
+        
+        /**
+         * @desc Support for DENM generation
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_GENERATION := true;
+
+        /**
+         * @desc Support for DENM update
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_UPDATE := true;
+
+        /**
+         * @desc Support for DENM repetition
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_REPETITION := true;
+
+        /**
+         * @desc Support for DENM cancellation
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_CANCELLATION := true;
+
+        /**
+         * @desc Support for DENM NEGATION
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_NEGATION := true;
+
+        /**
+         * @desc Support for DENM RECEPTION
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_RECEPTION := true;
+
+        /**
+         * @desc Support for Keep-Alive Forwarding
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_DENM_KAF := true;
+
+        /**
+         * @desc Support for impact recuction
+         * @see  ETSI TS 102 869-2 Table 3
+         */
+        modulepar boolean PICS_IMPACT_REDUCTION := true;
+
+    } // end denmPics
+    
+}

@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT accepts a well-formed Secured DENM signe with the certificate with a polygonal region validity restriction"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining protocol_version \r\n\t\t\t\tindicating value '2'\r\n\t\t\tand containing header_fields[0]\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\t\tand containing signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tand containing certificate (CERT_AT_D) {\r\n\t\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\t\tindicating 'authorization_ticket' (2)\r\n\t\t\t\t\t\tand containing subject_attributes['verification key'] (KEY)\r\n\t\t\t\t\t\tand containing validity_restrictions['region'] {\r\n\t\t\t\t\t\t\tcontaining region{\r\n\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\tindicating 'polygon'\r\n\t\t\t\t\t\t\t\tand containing polygonal_region\r\n\t\t\t\t\t\t\t\t\tindicating REGION\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\tand containing header_fields [1]\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'generation_time'\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating CURRENT_TIME\r\n\t\t\tand containing header_fields [2]\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'generation_location'\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating position inside the REGION\r\n\t\t\tand containing header_fields[3]\r\n\t\t\t\tcontaining type \r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\tand not containing any other header_fields\r\n\t\t\tand containing payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed'\r\n\t\t\t\tcontaining data\r\n\t\t\t\t\tindicating length > 0\r\n\t\t\t\t\tcontaining DENM payload\r\n\t\t\t}\r\n\t\t\tand containing trailer_fields {\r\n\t\t\t\tcontaining single instance of type TrailerField {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'signature'\r\n\t\t\t\t\tcontaining signature\r\n\t\t\t\t\t\tverifiable using KEY\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "f702ee4b-c417-4bdc-976c-5071749f76c5"
+}

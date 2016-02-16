@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT ignores the HeaderFields generation_location of received Secured CAM"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (CAM)\r\n\t\t\tcontaining header_fields[0]\t{\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signer_info'\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating certificate\r\n\t\t\t\t\tcontainig certificate\r\n\t\t\t\t\t\tindicating CERT_TS_AT_B\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tand containing header_fields[1].type\r\n\t\t\t\tindicating 'generation_time'\r\n\t\t\tand containing header_fields[2] {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'generation_location'\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating position outside of the validity restriction of CERT_TS_AT_B\r\n\t\t\t}\r\n\t\t\tand containing header_fields[3] {\r\n\t\t\t\tcontainint type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontainint its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT accepts a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "005d34eb-77e7-4904-9c9c-56a715ecef95"
+}

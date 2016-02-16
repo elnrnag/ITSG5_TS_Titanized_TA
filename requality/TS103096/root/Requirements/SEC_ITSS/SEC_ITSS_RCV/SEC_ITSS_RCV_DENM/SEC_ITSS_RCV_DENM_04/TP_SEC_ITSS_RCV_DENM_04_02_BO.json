@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured DENM if the header_fields does not contain the header field type: signer_info"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (DENM)\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'generation_time'\r\n\t\t\tand containing header_fields[1].type\r\n\t\t\t\tindicating 'generation_location'\r\n\t\t\tand containing header_fields[2]{\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM'\r\n\t\t\t}\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "47fe4522-948e-4cdb-a038-9e12e83c152f"
+}

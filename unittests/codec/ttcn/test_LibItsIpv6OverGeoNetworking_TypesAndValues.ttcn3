@@ -1,0 +1,520 @@
+module test_LibItsIpv6OverGeoNetworking_TypesAndValues /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+//    import from LibCommon_BasicTypesAndValues all;
+//    import from LibItsCommon_TypesAndValues all;
+//    import from LibItsIpv6OverGeoNetworking_TestSystem all;
+//    import from LibItsGeoNetworking_TypesAndValues all;
+//    import from LibItsGeoNetworking_Templates all;
+//    import from LibItsGeoNetworking_Pixits {
+//        modulepar PX_GN_UPPER_LAYER
+//    };
+//    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+//    import from LibItsIpv6OverGeoNetworking_Templates all;
+//    import from LibItsExternal_TypesAndValues all;
+//    import from test_CommonCodec all;
+//
+//    group LibItsGeoNetworking_DummyTemplates {
+//        
+//        template (value) GN_Address m_dummyGnAddrNodeA := {
+//            typeOfAddress := e_manual,
+//            stationType := {
+//                vehicleStation := {
+//                    stationType := e_vehicleStation,
+//                    vsKind := e_bus   
+//                }
+//            },
+//            stationSubType := e_private,
+//            stationCountryCode := 49,
+//            mid := 'a4fdea5ea5ed'O
+//        }
+//        
+//        template (value) LongPosVector m_dummyLongPosVectorNodeA := {
+//            gnAddr := m_dummyGnAddrNodeA,
+//            timestamp := 875,
+//            latitude := 265,
+//            longitude := 789,
+//            speed := 80,
+//            heading := 548,
+//            altitude := 12,
+//            timeAccuracy := 5,
+//            posAccuracy := 1,
+//            speedAccuracy := 3,
+//            headingAccuracy := 1,
+//            altitudeAccuracy := 2
+//        }
+//        
+//        template (value) Area m_dummyArea1 := {
+//            geoAreaPosLatitude := 298376,
+//            geoAreaPosLongitude := 32745,
+//            distanceA := 1234,
+//            distanceB := 5678,
+//            angle := 9123
+//        }
+//        
+//        template (value) GeoBroadcastArea m_dummyGeoBroadcastArea1 := {
+//            geoBroadcastSubType := e_geoBroadcastRect,
+//            geoBroadcastArea := m_dummyArea1
+//        }
+//        
+//    } // End of group LibItsGeoNetworking_DummyTemplates
+//    
+//    group LibItsIpv6OverGeoNetworking_DummyTemplates {
+//
+//        template (value) IPv6OverGeoNetworkingInd m_ipv6OverGeoNwInd(
+//            charstring p_interface,
+//            MacAddress p_srcMacAddr,
+//            MacAddress p_dstMacAddr,
+//            Ipv6Packet p_ipv6Packet
+//        ) := {
+//            interface := p_interface,
+//            macSourceAddress := p_srcMacAddr,
+//            macDestinationAddress := p_dstMacAddr,
+//            ipv6Packet := p_ipv6Packet
+//        }
+//
+//        template (value) AcGn6InterfaceInfoList m_trueAcInterfaceInfoList := { 
+//            { 
+//                interfaceName := "lo", 
+//                ipv6AddressList := { 
+//                    '00000000000000000000000000000001'O 
+//                } 
+//            }, 
+//            { 
+//                interfaceName := "eth1", 
+//                ipv6AddressList := { 
+//                    'FE8000000000000002D012FFFEF1ED0E'O 
+//                } 
+//            }, 
+//            { 
+//                interfaceName := "wlan0", 
+//                ipv6AddressList := { 
+//                    '200106603013F0050000000000000001'O, 
+//                    'FE80000000000000021BB1FFFEB18AA3'O 
+//                } 
+//            }, 
+//            { 
+//                interfaceName := "tun0", 
+//                ipv6AddressList := { 
+//                    '200106603013F0071400001BB1B18AA3'O, 
+//                    'FE800000000000001400001BB1B18AA3'O 
+//                } 
+//            }
+//        } // End of temlate m_trueAcInterfaceInfoList
+//
+//        template (value) AcGn6InterfaceInfoList m_dummyAcInterfaceInfoList := {
+//            {
+//                interfaceName := "Interface #0",
+//                ipv6AddressList := {
+//                    '1001061804000000000000005199cc70'O,
+//                    '1001061804000000000000005199cc71'O,
+//                    '1001061804000000000000005199cc72'O
+//                }
+//            },
+//            {
+//                interfaceName := "Interface #1",
+//                ipv6AddressList := {
+//                    '2001061804000000000000005199cc70'O,
+//                    '2001061804000000000000005199cc71'O,
+//                    '2001061804000000000000005199cc72'O
+//                }
+//            },
+//            {
+//                interfaceName := "Interface #2",
+//                ipv6AddressList := {
+//                    '3001061804000000000000005199cc70'O,
+//                    '3001061804000000000000005199cc71'O,
+//                    '3001061804000000000000005199cc72'O
+//                }
+//            }
+//        }
+//        
+//        template AcGn6Response m_dummyAcInterfaceInfos (template (present) AcGn6InterfaceInfoList p_interfaceInfoList) := {
+//            interfaceInfoList := p_interfaceInfoList
+//        }
+//        
+//        template (value) AcGn6Primitive m_dummyAcGetInterfaceInfos := {
+//            getInterfaceInfos := 3
+//        }
+//        
+//    } // End of group LibItsIpv6OverGeoNetworking_DummyTemplates
+//    
+//    group ipv6_DummyTemplates { // See http://www.zytrax.com/tech/protocols/ipv6-formats.html
+//        
+//        template (value) MacAddress m_srcMacAddress_01 := '0000860580da'O;
+//        template (value) MacAddress m_dstMacAddress_01 := '0060970769ea'O;
+//        template (value) Ipv6Address m_src_01 := 'fe80000000000000020086fffe0580da'O; 
+//        template (value) Ipv6Address m_dst_01 := 'fe80000000000000026097fffe0769ea'O; 
+//        
+//        template (value) MacAddress m_srcMacAddress_02 := '0000860580da'O;
+//        template (value) MacAddress m_dstMacAddress_02 := '0060970769ea'O;
+//        template (value) Ipv6Address m_src_02 := 'fe80000000000000020086fffe0580da'O; 
+//        template (value) Ipv6Address m_dst_02 := 'fe80000000000000026097fffe0769ea'O; 
+//        
+//        template (value) MacAddress m_srcMacAddress_03 := '0000860580da'O;
+//        template (value) MacAddress m_dstMacAddress_03 := '0060970769ea'O;
+//        template (value) Ipv6Address m_src_03 := 'fe80000000000000020086fffe0580da'O; 
+//        template (value) Ipv6Address m_dst_03 := 'fe80000000000000026097fffe0769ea'O; 
+//        template RtAdvOptions m_rtAdvOpt_srcLinkLayerAddr_03 := {
+//            srcLinkLayerAddr := {
+//                icmpType := c_srcLinkLayerAddress,
+//                optionLength := 8,
+//                linkLayerAddr := '00000000860580da'O
+//            },
+//            prefixInfoList := omit,
+//            otherOption := omit
+//        }
+//        
+//        template (value) MacAddress m_srcMacAddress_04 := '0060970769ea'O;
+//        template (value) MacAddress m_dstMacAddress_04 := '333300000001'O;
+//        template (value) Ipv6Address m_src_04 := 'fe80000000000000026097fffe0769ea'O; 
+//        template (value) Ipv6Address m_dst_04 := 'ff020000000000000000000000000001'O; 
+//        template SrcLinkLayerAddress m_srcLinkLayerAddr_04 := {
+//            icmpType := c_srcLinkLayerAddress,
+//            optionLength := 8,
+//            linkLayerAddr := '00000060970769ea'O
+//        }
+//        template RtAdvOptions m_rtAdvOpt_prefixOpt_04 (
+//            in template (value) UInt8 p_prefixLength,
+//            in template (value) UInt1 p_lFlag,
+//            in template (value) UInt1 p_aFlag,
+//            in template (value) UInt32 p_validLifetime,
+//            in template (value) UInt32 p_preferredLifetime,
+//            in template (value) Ipv6Address p_prefix,
+//            in template (value) SrcLinkLayerAddress p_srcLinkLayerAddr 
+//        ):={
+//            srcLinkLayerAddr := p_srcLinkLayerAddr,
+//            prefixInfoList := {
+//                m_prefixInfo(
+//                    p_prefixLength,
+//                    p_lFlag,
+//                    p_aFlag,
+//                    p_validLifetime,
+//                    p_preferredLifetime,
+//                    p_prefix
+//                )
+//            },
+//            otherOption := omit
+//        }
+//    } // End of group ipv6_DummyTemplates
+//    
+//    group testAcPrimitives {
+//        
+//        /**
+//         * 
+//         * @desc validate AcGn6Primitive primitive
+//         * @verdict Pass on success, Fail otherwise
+//         */
+//        testcase tc_ipv6GetInterfaceInfo() runs on TCType system TCType {
+//            test_PDU<AcGn6Primitive>(
+//                m_dummyAcGetInterfaceInfos, 
+//                true,
+//                oct2bit('02000400000003'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            );
+//        }
+//
+//        /**
+//         * @desc validate AcGn6Response
+//         * @verdict Pass on success, Fail otherwise
+//         */
+//        testcase tc_ipv6InterfaceInfoList() runs on TCType system TCType {
+//            test_PDU<AcGn6Response>(
+//                m_dummyAcInterfaceInfos(m_dummyAcInterfaceInfoList), 
+//                true,
+//                oct2bit('0400be6700bb030c496e74657266616365202330031001061804000000000000005199cc701001061804000000000000005199cc711001061804000000000000005199cc720c496e74657266616365202331032001061804000000000000005199cc702001061804000000000000005199cc712001061804000000000000005199cc720c496e74657266616365202332033001061804000000000000005199cc703001061804000000000000005199cc713001061804000000000000005199cc72'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            )
+//        }
+//        
+//        testcase tc_ipv6InterfaceInfoList2() runs on TCType system TCType {
+//            test_decodePDU<AcGn6Response>(
+//                m_dummyAcInterfaceInfos(m_trueAcInterfaceInfoList), 
+//                '04007804026c6f0100000000000000000000000000000001046574683101fe8000000000000002d012fffef1ed0e05776c616e3002200106603013f0050000000000000001fe80000000000000021bb1fffeb18aa30474756e3002200106603013f0071400001bb1b18aa3fe800000000000001400001bb1b18aa3'O
+//            )
+//        }
+//        
+//    } // End of group testAcPrimitives
+//    
+//    group ipv6 {
+//        
+//        testcase tc_geoNetReq_icmpv6_noAdvOptions() runs on TCType system TCType {
+//            if (PX_GN_UPPER_LAYER != e_ipv6) {
+//                log("PX_GN_UPPER_LAYER shall be set to e_ipv6");
+//                setverdict(inconc);
+//                stop;
+//            }
+//            test_PDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #0",
+//                    m_srcMacAddress_01,
+//                    m_dstMacAddress_01,
+//                    m_ipv6Packet(
+//                        m_src_01, 
+//                        m_dst_01, 
+//                        c_noNextHdr, 
+//                        omit
+//                    )
+//                ), 
+//                true,
+//                oct2bit('4f00410c496e746572666163652023300000860580da0060970769ea6000000000003bfffe80000000000000020086fffe0580dafe80000000000000026097fffe0769ea'O) // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            )
+//        }
+//        
+//        testcase tc_geoNetReq_icmpv6_withAdvOptions_prefixOpt() runs on TCType system TCType {
+//            var Ipv6Packet v_ipv6Packet := null;
+//            var octetstring v_buffer := '4f00710c496e746572666163652023310000860580da0060970769ea6000000000303afffe80000000000000020086fffe0580dafe80000000000000026097fffe0769ea8600273dff00ffffffffffff00000000030400c00000001e0000001e000000002001061804000000000000005199cc70'O; // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            
+//            if (PX_GN_UPPER_LAYER != e_ipv6) {
+//                log("PX_GN_UPPER_LAYER shall be set to e_ipv6");
+//                setverdict(inconc);
+//                stop;
+//            }
+//            
+//            test_PDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #1",
+//                    m_srcMacAddress_02,
+//                    m_dstMacAddress_02,
+//                    m_ipv6Packet(
+//                        m_src_02, 
+//                        m_dst_02, 
+//                        c_icmpHdr,
+//                        m_rtAdvWithOptions(
+//                            m_rtAdvOpt_prefixOpt(
+//                                0,
+//                                c_lFlag1,
+//                                c_aFlag1,
+//                                c_validLifetime30s,
+//                                c_preferredLifetime30s,
+//                                '2001061804000000000000005199cc70'O
+//                            )
+//                        )
+//                    )
+//                ), 
+//                false,
+//                oct2bit(v_buffer) 
+//            );
+//            v_ipv6Packet := m_ipv6Packet(
+//                m_src_02, 
+//                m_dst_02, 
+//                c_icmpHdr,
+//                m_rtAdvWithOptions(
+//                    m_rtAdvOpt_prefixOpt(
+//                        0,
+//                        c_lFlag1,
+//                        c_aFlag1,
+//                        c_validLifetime30s,
+//                        c_preferredLifetime30s,
+//                        '2001061804000000000000005199cc70'O
+//                    )
+//                )
+//            );
+//            v_ipv6Packet.ipv6Hdr.payloadLength := 48;
+//            v_ipv6Packet.ipv6Payload.routerAdvMsg.checksum := '273d'O;
+//            test_decodePDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #1",
+//                    m_srcMacAddress_02,
+//                    m_dstMacAddress_02,
+//                    v_ipv6Packet
+//                ), 
+//                v_buffer
+//            );
+//        }
+//        
+//        testcase tc_geoNetReq_icmpv6_withAdvOptions_linkLayerAddr() runs on TCType system TCType {
+//            var Ipv6Packet v_ipv6Packet := null;
+//            var octetstring v_buffer := '4f005b0c496e746572666163652023310000860580da0060970769ea60000000001a3afffe80000000000000020086fffe0580dafe80000000000000026097fffe0769ea86006b8eff00ffffffffffff00000000010800000000860580da'O; // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            
+//            if (PX_GN_UPPER_LAYER != e_ipv6) {
+//                log("PX_GN_UPPER_LAYER shall be set to e_ipv6");
+//                setverdict(inconc);
+//                stop;
+//            }
+//            test_PDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #1",
+//                    m_srcMacAddress_03,
+//                    m_dstMacAddress_03,
+//                    m_ipv6Packet(
+//                        m_src_03, 
+//                        m_dst_03, 
+//                        c_icmpHdr,
+//                        m_rtAdvWithOptions(
+//                            m_rtAdvOpt_srcLinkLayerAddr_03
+//                        )
+//                    )
+//                ), 
+//                false,
+//                oct2bit(v_buffer) // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            );
+//            v_ipv6Packet := m_ipv6Packet(
+//                m_src_03, 
+//                m_dst_03, 
+//                c_icmpHdr,
+//                m_rtAdvWithOptions(
+//                    m_rtAdvOpt_srcLinkLayerAddr_03
+//                )
+//            );
+//            v_ipv6Packet.ipv6Hdr.payloadLength := 26;
+//            v_ipv6Packet.ipv6Payload.routerAdvMsg.checksum := '6B8E'O;
+//            test_decodePDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #1",
+//                    m_srcMacAddress_03,
+//                    m_dstMacAddress_03,
+//                    v_ipv6Packet
+//                ), 
+//                v_buffer
+//            );
+//        }
+//        
+//        testcase tc_geoNetReq_icmpv6_withAdvOptions_prefixOpt_linkLayerAddr() runs on TCType system TCType {
+//            var Ipv6Packet v_ipv6Packet := null;
+//            var octetstring v_buffer := '4f007b0c496e746572666163652023310060970769ea33330000000160000000003a3afffe80000000000000026097fffe0769eaff02000000000000000000000000000186001221ff00ffffffffffff00000000010800000060970769ea030440c00036ee800036ee80000000003ffe0507000000010000000000000000'O; // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            
+//            if (PX_GN_UPPER_LAYER != e_ipv6) {
+//                log("PX_GN_UPPER_LAYER shall be set to e_ipv6");
+//                setverdict(inconc);
+//                stop;
+//            }
+//            test_PDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #1",
+//                    m_srcMacAddress_04,
+//                    m_dstMacAddress_04,
+//                    m_ipv6Packet(
+//                        m_src_04, 
+//                        m_dst_04, 
+//                        c_icmpHdr,
+//                        m_rtAdvWithOptions(
+//                            m_rtAdvOpt_prefixOpt_04(
+//                                64,
+//                                c_lFlag1,
+//                                c_aFlag1,
+//                                3600000,
+//                                3600000,
+//                                '3ffe0507000000010000000000000000'O,
+//                                m_srcLinkLayerAddr_04
+//                            )
+//                        )
+//                    )
+//                ), 
+//                false,
+//                oct2bit(v_buffer) // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            );
+//            v_ipv6Packet := m_ipv6Packet(
+//                m_src_04, 
+//                m_dst_04, 
+//                c_icmpHdr,
+//                m_rtAdvWithOptions(
+//                    m_rtAdvOpt_prefixOpt_04(
+//                        64,
+//                        c_lFlag1,
+//                        c_aFlag1,
+//                        3600000,
+//                        3600000,
+//                        '3ffe0507000000010000000000000000'O,
+//                        m_srcLinkLayerAddr_04
+//                    )
+//                )
+//            );
+//            v_ipv6Packet.ipv6Hdr.payloadLength := 58;
+//            v_ipv6Packet.ipv6Payload.routerAdvMsg.checksum := '1221'O;
+//            test_decodePDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #1",
+//                    m_srcMacAddress_04,
+//                    m_dstMacAddress_04,
+//                    v_ipv6Packet
+//                ), 
+//                v_buffer
+//            );
+//        }
+//    } // End of group ipv6
+//    
+//    group testIpv6OverGeoNetPrimitiveMessages {
+//        
+//        /**
+//         * @desc validate IPv6OverGeoNetworkingReq
+//         * @verdict Pass on success, Fail otherwise
+//         */
+//        testcase tc_ipv6OverGeoNetReq() runs on TCType system TCType {
+//            var Ipv6Packet v_ipv6Packet := null;
+//            var octetstring v_buffer := '4f00690c496e7465726661636520233000508d4938ea00b0d0c7c19d60000000002806ff2001061804000000000000005199cc70200106180001800000000000000000058c9b00506ae7073600000000a0021630299c00000204058c0402080a00dd1a390000000001030302'O; // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            
+//            if (PX_GN_UPPER_LAYER != e_ipv6) {
+//                log("PX_GN_UPPER_LAYER shall be set to e_ipv6");
+//                setverdict(inconc);
+//                stop;
+//            }
+//            test_PDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #0",
+//                    '00508d4938ea'O,
+//                    '00b0d0c7c19d'O,
+//                    m_ipv6Packet(
+//                        '2001061804000000000000005199cc70'O, 
+//                        '20010618000180000000000000000005'O, 
+//                        6,
+//                        { octetstringMsg := '8c9b00506ae7073600000000a0021630299c00000204058c0402080a00dd1a390000000001030302'O } ) ), 
+//                false, 
+//                oct2bit(v_buffer));
+//            v_ipv6Packet := m_ipv6Packet(
+//               '2001061804000000000000005199cc70'O, 
+//               '20010618000180000000000000000005'O, 
+//               6,
+//               { octetstringMsg := '8c9b00506ae7073600000000a0021630299c00000204058c0402080a00dd1a390000000001030302'O } 
+//            ); 
+//            v_ipv6Packet.ipv6Hdr.payloadLength := 40; // payload length = 40
+//            test_decodePDU<IPv6OverGeoNetworkingReq>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #0",
+//                    '00508d4938ea'O,
+//                    '00b0d0c7c19d'O,
+//                    v_ipv6Packet
+//                ), 
+//                v_buffer
+//            );
+//        }
+//        
+//        testcase tc_ipv6OverGeoNetInd() runs on TCType system TCType {
+//            var Ipv6Packet v_ipv6Packet := null;
+//            var octetstring v_buffer := '4e00690c496e7465726661636520233000b0d0c7c19d00508d4938ea60000000002806ff2001061804000000000000005199cc70200106180001800000000000000000058c9b00506ae7073600000000a0021630299c00000204058c0402080a00dd1a390000000001030302'O; // Check for 'LibItsIPv6GeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//            
+//            if (PX_GN_UPPER_LAYER != e_ipv6) {
+//                log("PX_GN_UPPER_LAYER shall be set to e_ipv6");
+//                setverdict(inconc);
+//                stop;
+//            }
+//            test_PDU<IPv6OverGeoNetworkingInd>(
+//                m_ipv6OverGeoNwInd(
+//                    "Interface #0",
+//                    '00b0d0c7c19d'O,
+//                    '00508d4938ea'O, // On purpose: IUT must use this value
+//                    m_ipv6Packet( // payload length = 40
+//                        '2001061804000000000000005199cc70'O, 
+//                        '20010618000180000000000000000005'O, 
+//                        6,
+//                        { octetstringMsg := '8c9b00506ae7073600000000a0021630299c00000204058c0402080a00dd1a390000000001030302'O } ) ), 
+//                false, 
+//                oct2bit(v_buffer)
+//            );
+//            v_ipv6Packet := m_ipv6Packet(
+//                '2001061804000000000000005199cc70'O, 
+//                '20010618000180000000000000000005'O, 
+//                6,
+//                { octetstringMsg := '8c9b00506ae7073600000000a0021630299c00000204058c0402080a00dd1a390000000001030302'O } 
+//            ); 
+//            v_ipv6Packet.ipv6Hdr.payloadLength := 40; // payload length = 40
+//            test_decodePDU<IPv6OverGeoNetworkingInd>(
+//                m_ipv6OverGeoNwReq(
+//                    "Interface #0",
+//                    '00b0d0c7c19d'O,
+//                    '00508d4938ea'O, // On purpose: IUT must use this value
+//                    v_ipv6Packet
+//                ), 
+//                v_buffer
+//            );
+//        }
+//        
+//    }
+//
+} // End of module test_LibItsIpv6OverGeoNetworking_TypesAndValues

@@ -1,0 +1,310 @@
+/**
+ *  @author   ETSI / STF405 / STF449
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Ipv6OverGeoNetworking/LibItsIpv6OverGeoNetworking_Templates.ttcn $
+ *            $Id: LibItsIpv6OverGeoNetworking_Templates.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc     IPv6 over GeoNetworking Protocol Templates
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsIpv6OverGeoNetworking_Templates {
+    
+    //LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    //LibIts
+    import from LibItsIpv6OverGeoNetworking_TestSystem all;
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+    import from LibItsGeoNetworking_TypesAndValues {type Payload};
+    import from LibItsExternal_TypesAndValues {type MacAddress};
+    
+    group ipv6OverGeoNwPrimitivesTemplates {
+    
+        /**
+         * @desc    Send template for IPv6OverGeoNetworking packet (IPv6OverGeoNetworking Primitive)
+         * @param   p_interface     Which virtual interface to use for sending the packet
+         * @param   p_srcMacAddr    Link-layer source address
+         * @param   p_dstMacAddr    Link-layer destination address
+         * @param   p_ipv6Packet    IPv6 packet to be sent
+         */
+        template (value) IPv6OverGeoNetworkingReq m_ipv6OverGeoNwReq(
+            template (value) charstring p_interface,
+            template (value) MacAddress p_srcMacAddr,
+            template (value) MacAddress p_dstMacAddr,
+            template (value) Ipv6Packet p_ipv6Packet
+        ) := {
+            interface := p_interface,
+            macSourceAddress := p_srcMacAddr,
+            macDestinationAddress := p_dstMacAddr,
+            ipv6Packet := p_ipv6Packet
+        }
+        
+        /**
+         * @desc    Receive template for IPv6OverGeoNetworking packet (IPv6OverGeoNetworking Primitive)
+         * @param   p_interface     On which virtual interface the packet is expected
+         * @param   p_srcMacAddr    Link-layer source address
+         * @param   p_dstMacAddr    Link-layer destination address
+         * @param   p_ipv6Packet    Expected IPv6 packet
+         */
+        template IPv6OverGeoNetworkingInd mw_ipv6OverGeoNwInd(
+            template (present) charstring p_interface,
+            template (present) MacAddress p_srcMacAddr,
+            template (present) MacAddress p_dstMacAddr,
+            template (present) Ipv6Packet p_ipv6Packet
+        ) := {
+            interface := p_interface,
+            macSourceAddress := p_srcMacAddr,
+            macDestinationAddress := p_dstMacAddr,
+            ipv6Packet := p_ipv6Packet
+        }
+    
+    } // ipv6OverGeoNwPrimitivesTemplates
+    
+    group ipv6 {
+        
+        /**
+         * @desc    Send template for GN6 payload of type IPv6
+         * @param   p_ipv6Packet    IPv6 packet to be used as GN6 payload
+         */
+        template (value) Payload m_ipv6Payload(in template (value) Ipv6Packet p_ipv6Packet) := {
+            decodedPayload := {ipv6Packet := p_ipv6Packet},
+            rawPayload := ''O
+        }
+        
+        /**
+         * @desc    Receive template for GN6 payload of type IPv6
+         * @param   p_ipv6Packet    Expected IPv6 packet to be received as GN6 payload
+         */
+        template (present) Payload mw_ipv6Payload(in template (present) Ipv6Packet p_ipv6Packet) := {
+            decodedPayload := {ipv6Packet := p_ipv6Packet},
+            rawPayload := ?
+        }
+        
+        /**
+         * @desc    Send template for IPv6 packet
+         * @param   p_srcAddr   IPv6 source address
+         * @param   p_dstAddr   IPv6 destination address
+         * @param   p_nextHdr   IPv6's next header
+         * @param   p_payload   IPv6 payload
+         */
+        template (value) Ipv6Packet m_ipv6Packet(
+            in template (value) Ipv6Address p_srcAddr,
+            in template (value) Ipv6Address p_dstAddr,
+            in template (value) UInt8 p_nextHdr,
+            in template (omit) Ipv6Payload p_payload
+        ) := {
+            ipv6Hdr := m_ipv6Header(p_srcAddr, p_dstAddr, p_nextHdr),
+            extHdrList := omit,
+            ipv6Payload := p_payload
+        }
+
+        /**
+         * @desc    Reception template for IPv6 packet
+         * @param   p_srcAddr   IPv6 source address
+         * @param   p_dstAddr   IPv6 destination address
+         * @param   p_nextHdr   IPv6's next header
+         * @param   p_payload   IPv6 payload
+         */
+        template Ipv6Packet mw_ipv6Packet(
+            in template (present) Ipv6Address p_srcAddr,
+            in template (present) Ipv6Address p_dstAddr,
+            in template (present) UInt8 p_nextHdr,
+            in template Ipv6Payload p_payload
+        ) := {
+            ipv6Hdr := mw_ipv6Header(p_srcAddr, p_dstAddr, p_nextHdr),
+            extHdrList := omit,
+            ipv6Payload := p_payload
+        }
+        
+        /**
+         * @desc    Send template for IPv6 header
+         * @param   p_srcAddr   IPv6 source address
+         * @param   p_dstAddr   IPv6 destination address
+         * @param   p_nextHdr   IPv6's next header
+         */
+        template (value) Ipv6Header m_ipv6Header(
+            in template (value) Ipv6Address p_srcAddr,
+            in template (value) Ipv6Address p_dstAddr,
+            in template (value) UInt8 p_nextHdr
+        ) := {
+            version := 6,
+            trafficClass := 0,
+            flowLabel := 0, 
+            payloadLength := 0, //indicates that the adaptation will fill the correct value
+            nextHeader := p_nextHdr,
+            hopLimit := 255,
+            sourceAddress := p_srcAddr,
+            destinationAddress := p_dstAddr
+        }
+        
+        /**
+         * @desc    Receive template for IPv6 header
+         * @param   p_srcAddr   IPv6 source address
+         * @param   p_dstAddr   IPv6 destination address
+         * @param   p_nextHdr   IPv6's next header
+         */
+        template Ipv6Header mw_ipv6Header(
+            in template (present) Ipv6Address p_srcAddr,
+            in template (present) Ipv6Address p_dstAddr,
+            in template (present) UInt8 p_nextHdr
+        ) := {
+            version := 6,
+            trafficClass := ?,
+            flowLabel := ?, 
+            payloadLength := ?,
+            nextHeader := p_nextHdr,
+            hopLimit := ?,
+            sourceAddress := p_srcAddr,
+            destinationAddress := p_dstAddr
+        }
+        
+        /**
+         * @desc    Send template for IPv6 payload containing Router Advertisement
+         * @param   p_rtAdvOptions  Router Advertisement options
+         */
+        template (value) Ipv6Payload m_rtAdvWithOptions(
+            in template (omit) RtAdvOptions p_rtAdvOptions
+        ) := {
+            routerAdvMsg := {
+                icmpType := c_rtAdvMsg,
+                icmpCode := 0,
+                checksum := c_2ZeroBytes, //indicates that the adaptation will fill the correct value
+                curHopLimit := 255,
+                managedConfigFlag := 0,
+                otherConfigFlag := 0,
+                homeAgentFlag := 0,
+                reserved := 0,
+                routerLifetime := c_uInt16Max,
+                reachableTime := c_uInt32Max,
+                retransTimer := 0,
+                rtAdvOptions := p_rtAdvOptions
+            }
+        }
+        
+        /**
+         * @desc    Receive template for IPv6 payload containing Router Advertisement
+         * @param   p_rtAdvOptions  Router Advertisement options
+         */
+        template Ipv6Payload mw_rtAdvWithOptions(
+            in template RtAdvOptions p_rtAdvOptions
+        ) := {
+            routerAdvMsg := {
+                icmpType := c_rtAdvMsg,
+                icmpCode := 0,
+                checksum := ?, 
+                curHopLimit := ?,
+                managedConfigFlag := ?,
+                otherConfigFlag := ?,
+                homeAgentFlag := ?,
+                reserved := ?,
+                routerLifetime := ?,
+                reachableTime := ?,
+                retransTimer := ?,
+                rtAdvOptions := p_rtAdvOptions
+            }
+        }
+        
+        /**
+         * @desc    Send template for IPv6 payload containing Router Advertisement
+         * @param   p_rtAdvOptions  Router Advertisement options
+         */
+        template (value) Ipv6Payload m_octetstringPayload(
+            in template (value) octetstring p_payload
+        ) := {
+        	octetstringMsg := p_payload
+        }
+        
+        /**
+         * @desc    Receive template for IPv6 payload containing Router Advertisement
+         * @param   p_rtAdvOptions  Router Advertisement options
+         */
+        template Ipv6Payload mw_octetstringPayload(
+            in template (present) octetstring p_payload
+        ) := {
+            octetstringMsg := p_payload
+        }
+        
+        /**
+         * @desc    Send template for IPv6 Prefix option
+         * @param   p_prefixLength      Length of the prefix.
+         * @param   p_lFlag             Value for link flag.
+         * @param   p_aFlag             Value for autoconfiguration flag.
+         * @param   p_validLifetime     Value for valid life time duration.
+         * @param   p_preferredLifetime Value for preffered life time duration.
+         * @param   p_prefix            Address prefix to be used
+         */
+        template RtAdvOptions m_rtAdvOpt_prefixOpt (
+            in template (value) UInt8 p_prefixLength,
+            in template (value) UInt1 p_lFlag,
+            in template (value) UInt1 p_aFlag,
+            in template (value) UInt32 p_validLifetime,
+            in template (value) UInt32 p_preferredLifetime,
+            in template (value) Ipv6Address p_prefix
+        ):={
+            srcLinkLayerAddr := omit,
+            prefixInfoList := {
+                m_prefixInfo(
+                    p_prefixLength,
+                    p_lFlag,
+                    p_aFlag,
+                    p_validLifetime,
+                    p_preferredLifetime,
+                    p_prefix
+                )
+            },
+            otherOption := omit
+        }
+        
+        /**
+         * @desc    Send template for IPv6 Prefix info
+         * @param   p_prefixLength      The length of the prefix
+         * @param   p_lFlag             Value for link flag.
+         * @param   p_aFlag             Value for autoconfiguration flag.
+         * @param   p_validLifetime     Value for valid life time duration.
+         * @param   p_preferredLifetime Value for preferred life time duration.
+         * @param   p_prefix            Address prefix to be used
+         */
+        template PrefixInfo m_prefixInfo (
+            in template (value) UInt8 p_prefixLength,
+            in template (value) UInt1 p_lFlag,
+            in template (value) UInt1 p_aFlag,
+            in template (value) UInt32 p_validLifetime,
+            in template (value) UInt32 p_preferredLifetime,
+            in template (value) Ipv6Address p_prefix
+        ):= {
+            icmpType:= c_prefixInfo,
+            optionLength:= c_prefixInfoLen,
+            prefixLength:= p_prefixLength,
+            linkFlag:=p_lFlag,
+            autoConfigFlag:=p_aFlag,
+            rtAddrFlag := c_rtAddrFlag0,
+            reserved1:=0,
+            validLifetime:=p_validLifetime,
+            preferredLifetime:=p_preferredLifetime,
+            reserved2:=0,
+            prefix:= p_prefix
+        }
+        
+    } // end group ipv6
+    
+    group gn6AcPrimitives {
+        
+        /**
+         * @desc    TA primitive for querying link-layer interfaces information
+         */
+        template (value) AcGn6Primitive m_acGetInterfaceInfos := {
+            getInterfaceInfos := 3
+        }
+        
+        /**
+         * @desc    TA primitive for retrieving link-layer interfaces information
+         */
+        template AcGn6Response mw_acInterfaceInfos := {
+            interfaceInfoList := ?
+        }
+    } // end gn6AcPrimitives
+    
+} // end LibItsIpv6OverGeoNetworking_TypesAndValues
+

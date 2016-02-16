@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "bf91278c-506d-4a9e-a67c-6f8cac7c5f77",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "41294566-8787-4cd9-8e86-4fa788f38613",
+            "type": "STRING",
+            "value": "Check that the IUT discards a Secured DENM when the signing certificate doesn't contain an AID_DENM record in its_aid_ssp_list subject attribute\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "41294566-8787-4cd9-8e86-4fa788f38613",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a Secured DENM {\r\n\t\t\tcontaining header_fields ['its_aid'] {\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_DENM' (16513)\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_12_03_BO_AT) {\r\n\t\t\t\t\t\tcontaining subject_attributes['its_aid_ssp_list']\r\n\t\t\t\t\t\t\tnot containing an item\r\n\t\t\t\t\t\t\t\tcontaining its_aid\r\n\t\t\t\t\t\t\t\t\tindicating 'AID_DENM' (16513)\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "bf91278c-506d-4a9e-a67c-6f8cac7c5f77",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "bf91278c-506d-4a9e-a67c-6f8cac7c5f77",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "41294566-8787-4cd9-8e86-4fa788f38613"
+}

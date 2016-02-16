@@ -1,0 +1,132 @@
+/**
+ *    @author     ETSI / STFS46
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/V2G/LibItsV2G_TestSystem.ttcn $
+ *                $Id: LibItsV2G_TestSystem.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *    @desc        Test System module for ITS V2G
+ *
+ */
+module LibItsV2G_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_Time {modulepar all};
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    import from LibItsCommon_TestSystem all;
+    import from LibItsV2G_TypesAndValues all;
+    
+    //XSD
+    import from iso_15118_2_2010_MsgDef all;
+	import from iso_15118_2_2010_MsgDataTypes all;
+    
+    group portDefinitions {
+    
+		/**
+		 * @desc Adapter control port
+		 */
+		type port AdapterControlPort message {
+			out 
+				AcV2Gprimitive;
+			in 
+				AcV2Gresponse;
+		} // end AdapterControlPort
+		
+        /**
+         * @desc Upper Tester port
+         */
+        type port UpperTesterPort message {
+            out 
+                UtInitialize, UtTrigger, UtCheck;
+            in 
+                UtResult;
+        } // end UpperTesterPort
+        
+    } // end portDefinitions
+
+    group interfacePorts {
+
+        group v2gApplicationLayerPorts {
+            
+            group ap1Ports {
+
+                /**
+                 * @desc AP1 V2G Application Layer Port  
+                 */
+                type port V2Gport message {
+                    in V2Gind;
+                    out V2Greq;
+                } // end V2Gport
+                                
+            } // End of group ap1Ports
+            
+        } // End of group v2gApplicationLayerPorts
+    
+    } // End of group interfacePorts
+    
+    group componentDefinitions {
+
+        /**
+         * @desc ITS System Adapter
+         */
+        type component ItsV2Gsystem {
+            
+            port UpperTesterPort utPort;
+			port AdapterControlPort acPort;
+            
+            // NT1 ports 
+            port V2Gport v2gPort;
+            
+        } // end component ItsAdapter
+        
+    } // End of group componentDefinitions
+    
+    /**
+     * @desc Test component for ITS V2G Application layer 
+     */
+    type component ItsV2G extends ItsBaseComponent {
+        
+        port UpperTesterPort utPort;
+		port AdapterControlPort acPort;
+        
+        // NT1 ports 
+        port V2Gport v2gPort;
+                
+        // timers
+		timer tc_v2g_secc_sequenceTimeout := c_v2g_seccSequenceTimeout * 0.95;
+		timer tc_v2g_evcc_sequenceTimeout := c_v2g_evccSequenceTimeout * 0.95;
+        
+        // Global variables    E X A M P L E 
+        var sessionIDType_TYPE vc_sId;
+		var evccIDType_TYPE vc_evccId;
+		var V2Gind vc_v2gIndMessage;
+                
+    } // End of component ItsV2G
+        
+    group v2gApplicationLayerPrimitives { 
+            
+        group ap1Primitives {
+
+            /**
+             * @desc AP1 V2G Indication Primitive 
+             */
+            type union V2Gind {
+				V2G_Message v2gIn,
+				Sdp_Message	sdpIn
+            }
+        
+            /**
+             * @desc AP1 V2G Request Primitive 
+             */
+            type union V2Greq {
+				V2G_Message v2gOut,
+				Sdp_Message	sdpOut
+            }
+                        
+        } // end ap1Primitives
+        
+    } // End of group v2gApplicationLayerPrimitives    
+    with {
+        encode "LibIts_Interface"
+    } // end interfacePrimitives    
+     
+} // End of module LibItsV2G_TestSystem

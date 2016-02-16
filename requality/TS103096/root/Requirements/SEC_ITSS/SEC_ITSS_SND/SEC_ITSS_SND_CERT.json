@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "355c1af1-9c61-4b54-9842-6dda41da8a8b",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/ab0b5578-5740-40f7-8480-37bc9cf0396e"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "355c1af1-9c61-4b54-9842-6dda41da8a8b",
+            "type": "STRING",
+            "value": "Profiles for certificates"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "355c1af1-9c61-4b54-9842-6dda41da8a8b",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "355c1af1-9c61-4b54-9842-6dda41da8a8b"
+}

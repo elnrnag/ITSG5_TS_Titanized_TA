@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_0df98c72-fcf5-46bd-ac32-c67617caeadc\"><a name=\"0df98c72-fcf5-46bd-ac32-c67617caeadc\" id=\"id_0df98c72-fcf5-46bd-ac32-c67617caeadc\" class=\"requality_id\"><\/a>version<\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Times New Roman;\"> specifies this certificate's version and shall be set to <font style=\"font-family: Courier New;\">2<font style=\"font-family: Times New Roman;\"> for conformance with the present document<\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "0df98c72-fcf5-46bd-ac32-c67617caeadc"
+}

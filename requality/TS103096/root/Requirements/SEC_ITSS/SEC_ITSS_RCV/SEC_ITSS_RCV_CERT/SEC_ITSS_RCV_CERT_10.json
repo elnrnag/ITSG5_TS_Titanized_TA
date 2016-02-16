@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "40eba84f-fd0f-4692-ba28-b317bfe68c6e",
+            "type": "STRING",
+            "value": "\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "f0b6f241-7910-470f-9f38-b98a4413c564",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/cb021a09-729d-4a2a-8b11-17717bbeaf73",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/29646d66-9184-45a3-a1e6-dc84c19a3a8a"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "f0b6f241-7910-470f-9f38-b98a4413c564",
+            "type": "STRING",
+            "value": "10. Check time validity restriction presence"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "40eba84f-fd0f-4692-ba28-b317bfe68c6e",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "f0b6f241-7910-470f-9f38-b98a4413c564"
+}

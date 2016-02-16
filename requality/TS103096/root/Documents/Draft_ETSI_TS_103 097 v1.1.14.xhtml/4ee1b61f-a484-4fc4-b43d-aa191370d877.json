@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "A certificate is considered valid if the current time is within the validity period specified in the certificate, the current region is within the validity region specified in the certificate, the type of the certificate is valid for the current type of communication, the signature, which covers all fields except the signature itself, is valid, and the certificate of the signer is valid as signer for the given certificate's type. If the certificate is self-signed, it is valid if it is stored as a trusted certificate."
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "960bc297-9317-4c48-b578-daa71c7cf2b4"
+}

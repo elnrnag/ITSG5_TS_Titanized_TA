@@ -1,0 +1,26 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "fad8a90a-7f48-4169-a694-973d61d97a02",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/dc173140-21db-4c79-93a8-7f24aff8cea0"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "fad8a90a-7f48-4169-a694-973d61d97a02",
+            "type": "STRING",
+            "value": "Generic Signed Message Profile"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "fad8a90a-7f48-4169-a694-973d61d97a02",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "fad8a90a-7f48-4169-a694-973d61d97a02"
+}

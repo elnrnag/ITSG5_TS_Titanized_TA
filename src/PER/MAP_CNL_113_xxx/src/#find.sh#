@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for FOUND in $(ls -1 *)
+do
+    echo $FOUND
+done
+

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE plugin PUBLIC "-//TESTING TECH//DTD TT3plugin//2.0" "TT3plugin.dtd"> 
+<plugin id="org.etsi.its.adapter" name="ETSI Its Adapter" provider-name="ETSI" version="1.0.0.0">
+  <runtime>
+    <library name="EtsiItsAdapter.jar"/>
+    <library name="JSon/gson-2.3.jar"/>
+    <library name="jnetpcap-1.4.r1425/jnetpcap.jar"/>
+    <library name="Preserve/CryptoLib.jar"/>
+    <library name="Preserve/bcprov-jdk16-146.jar"/>
+    <library name="Preserve/de.fraunhofer.sit.c2x.pki.ca.jar"/>
+    <library name="Preserve/de.fraunhofer.sit.c2x.pki.etsi_ts103097v1114.jar"/>
+    <library name="Preserve/commons-codec-1.4.jar"/>
+    <library name="../../build"/>
+    <native path="JSon"/>
+    <native path="jnetpcap-1.4.r1425"/>
+    <native path="Preserve"/>
+  </runtime>
+  <dependency>
+    <reference id="org.etsi.adapter"/>
+  </dependency>
+</plugin>

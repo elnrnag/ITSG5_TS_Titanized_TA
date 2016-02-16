@@ -1,0 +1,107 @@
+/**
+ *    @author   ETSI / STF405 / STF449
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CAM/LibItsCam_Pics.ttcn $
+ *              $Id: LibItsCam_Pics.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     CAM PICS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCam_Pics {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    
+    group camPics {
+        
+        /**
+         * @desc Is IUT a public transport vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_PUBLICTRANS := false;
+        
+        /**
+         * @desc Is IUT a special transport vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_SPECIALTRANS := false;
+        
+        /**
+         * @desc Is IUT a dangerous goods vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_DANGEROUSGOODS := false;
+        
+        /**
+         * @desc Is IUT a road works vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_ROADWORKS := false;
+        
+        /**
+         * @desc Is IUT a rescue vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_RESCUE := false;
+        
+        /**
+         * @desc Is IUT an emergency vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_EMERGENCY := false;
+        
+        /**
+         * @desc Is IUT a safety car vehicle 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_SAFETY_CAR := false;
+        
+        /**
+         * @desc Does IUT support 'specialVehicleContainer' in CamParameters?
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_SPECIALVEHICLECONTAINER := true;
+        
+        /**
+         * @desc Maximum time interval between CAM generations (in seconds).
+         *       Default value, as per base standard: 1.0s 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar float PICS_T_GENCAMMAX := 1.000;
+        
+        /**
+         * @desc Minimum time interval between CAM generations (in seconds).
+         *       Default value, as per base standard: 0.1s 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar float PICS_T_GENCAMMIN := 0.100;
+        
+        /**
+         * @desc Minimum time interval between CAM generations (in seconds) 
+         *       according to the requirements of the 
+         *       Decentralized Congestion Control(DCC).
+         *       Default value, as per base standard: 0.1s 
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar float PICS_T_GENCAMDCC := 0.100;
+        
+        /**
+         * @desc Support for CAM generation
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_CAM_GENERATION := true;
+
+        /**
+         * @desc Support for CAM reception
+         * @see  ETSI TS 102 868-2 Table 3
+         */
+        modulepar boolean PICS_CAM_RECEPTION := true;
+        
+        /**
+         * @desc Is the IUT RSU?
+         */
+        modulepar boolean PICS_RSU := false;
+    } // end camPics
+    
+} // end LibItsCam_Pics

@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "55cddc35-25a0-4631-bce3-188808cf4369",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "55cddc35-25a0-4631-bce3-188808cf4369",
+            "type": "STRING",
+            "value": "Check that IUT discards a SecuredMessage if the issuer certificate of the authorization ticket certificate contains the subject type \"authorization_ticket\""
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "55cddc35-25a0-4631-bce3-188808cf4369",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields ['signer_info'].signer.certificate (CERT_TS_03_01_BO_AT) {\r\n\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\treferencing to CERT_TS_A_AT\r\n\t\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}\r\n"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "55cddc35-25a0-4631-bce3-188808cf4369",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "55cddc35-25a0-4631-bce3-188808cf4369",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "55cddc35-25a0-4631-bce3-188808cf4369"
+}

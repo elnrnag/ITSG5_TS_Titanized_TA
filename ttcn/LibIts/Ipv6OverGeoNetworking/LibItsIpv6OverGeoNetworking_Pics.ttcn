@@ -1,0 +1,34 @@
+/**
+ *  @author     ETSI / STF405
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Ipv6OverGeoNetworking/LibItsIpv6OverGeoNetworking_Pics.ttcn $
+ *              $Id: LibItsIpv6OverGeoNetworking_Pics.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc       IPv6 Over GeoNetworking PICS
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsIpv6OverGeoNetworking_Pics {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+        
+    // LibIts
+    import from LibItsGeoNetworking_TypesAndValues all;
+    
+    group ipv6OverGeoNwPics {
+        
+        /**
+         * @desc Indicates whether the GN6ASL shall resolve the destination link-layer-address 
+         *       from the IPv6 address.
+         *       FALSE, perform address resolution, otherwise do not.
+         * @see  ETSI TS 102 859-1 A.10/10
+         */
+        modulepar boolean PICS_GN6_ASL_VI_RESOL_ADDR := true;
+
+                
+    } // end ipv6OverGeoNwPics
+    
+} // end LibItsIpv6OverGeoNetworking_Pics
+

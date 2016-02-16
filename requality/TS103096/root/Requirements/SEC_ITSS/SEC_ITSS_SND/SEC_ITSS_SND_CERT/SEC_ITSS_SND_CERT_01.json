@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "202ea35f-8278-4dce-85e1-91e0400f4a32",
+            "type": "STRING",
+            "value": "Check that the certificate version is 2"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "202ea35f-8278-4dce-85e1-91e0400f4a32",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/c4cd2dea-c087-49fa-9d20-b08451557a51",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/0df98c72-fcf5-46bd-ac32-c67617caeadc"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "202ea35f-8278-4dce-85e1-91e0400f4a32",
+            "type": "STRING",
+            "value": "01. Check that certificate version is 2"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "202ea35f-8278-4dce-85e1-91e0400f4a32",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "202ea35f-8278-4dce-85e1-91e0400f4a32"
+}

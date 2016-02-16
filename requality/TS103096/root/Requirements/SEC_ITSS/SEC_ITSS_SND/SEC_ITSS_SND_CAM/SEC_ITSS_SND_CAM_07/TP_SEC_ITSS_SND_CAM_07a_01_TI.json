@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "cbaeb67c-5951-4e88-a4e0-f652dcb0676a",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "cbaeb67c-5951-4e88-a4e0-f652dcb0676a",
+            "type": "STRING",
+            "value": "Check that IUT restarts the certificate sending timer when the certificate has been sent"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "cbaeb67c-5951-4e88-a4e0-f652dcb0676a",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tand the IUT is configured to send more than one CAM per second\r\n\tand the IUT having already sent CAM at TIME_1\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate'\r\n\tand the IUT having received a CAM\r\n\t\t\t\t\t\t\tat TIME_2 (TIME_1 +0.3sec) {\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate_digest_with_ecdsap256'\r\n\t\tcontaining header_fields['signer_info'].signer.digest\r\n\t\t\treferenced to unknown certificate\r\n\t}\r\n\tand the IUT having sent CAM at TIME_3 (TIME_3 > TIME_2)\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate'\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is sending the next CAM at TIME_4\r\n\t\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\t\tindicating 'certificate'\r\n\t} then {\r\n\t\tthe difference between TIME_4 and TIME_3 is about of 1sec\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "cbaeb67c-5951-4e88-a4e0-f652dcb0676a",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "cbaeb67c-5951-4e88-a4e0-f652dcb0676a",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "cbaeb67c-5951-4e88-a4e0-f652dcb0676a"
+}

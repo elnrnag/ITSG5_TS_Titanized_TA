@@ -1,0 +1,179 @@
+/**
+ *    @author     ETSI / STF421
+ *  @version      $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DCC/LibItsDcc_TestSystem.ttcn $
+ *                $Id: LibItsDcc_TestSystem.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *    @desc       Test System module for ITS
+ *
+ */
+module LibItsDcc_TestSystem {
+
+    // LibCommon
+    import from LibCommon_Time {modulepar all;}
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsCommon_TestSystem all;
+    
+    import from LibItsDcc_TypesAndValues all;
+    
+        
+    group portDefinitions {
+        
+        /**
+         * @desc Upper Tester port
+         */
+        type port UpperTesterPort message {
+            out 
+                UtInitialize, UtTrigger;
+            in 
+                UtResult
+        } // end UpperTesterPort
+        
+        /**
+         * @desc IN Port used to trigger events at the access layer and to monitor the results
+         */
+        type port InPort message {
+            in InSta;
+            out InReq;
+        } // End of port InPort
+
+        /**
+         * @desc RRX Port used to receive events at the radio access 
+         */
+        type port RrxPort message {
+            in RrxInd;
+        } // End of port InPort
+
+        /**
+         * @desc Check Port used for intercomponent exchange of data to check
+         */
+        type port CheckPort message {
+            inout all;
+        }
+        
+    } // end portDefinitions
+
+    group componentDefinitions {
+
+     /**
+     * @desc ITS System Adapter
+     */
+    type component ItsDccSystem {
+        
+        port UpperTesterPort utPort;
+        port InPort inPort;
+        port RrxPort rrxPort;
+        port SyncPort syncPort;
+        
+    } // End of component ItsDccSystem
+    
+    /**
+     * @desc Test component for configuration of the channel traffic states 
+     */
+    type component UtComp extends ItsBaseComponent {
+
+        port UpperTesterPort utPort;
+        
+        //timers
+        
+        //component variables
+
+        //default
+        var default vc_default := null;
+        
+        //global variables
+        
+    } // End of component UtComp
+
+    /**
+     * @desc Test component for ITS Access layer 
+     */
+    type component ItsInDcc extends ItsBaseComponent {
+
+        // IN ports
+        port InPort inPort;
+        port CheckPort checkPort;
+
+        //timers
+        
+        //component variables
+
+        //default
+        var default vc_default := null;
+        
+        //global variables
+        
+    } // End of component ItsInDcc
+    
+    /**
+     * @desc Test component for ITS Access layer 
+     */
+    type component ItsRrxDcc extends ItsBaseComponent {
+
+        // RRX ports
+        port RrxPort rrxPort;
+        port CheckPort checkPort;
+
+        //timers
+        
+        //component variables
+
+        //default
+        var default vc_default := null;
+        
+        //global variables
+        
+    } // End of component ItsInDcc
+    
+    /**
+     * @desc Test component for ITS DCC MTC
+     */
+    type component ItsDccMts extends ItsBaseMtc {
+
+        // MTC ports
+        port CheckPort checkPort;
+
+        //timers
+        
+        //component variables
+        var UtComp vc_utComp;
+        var ItsInDcc vc_itsInDcc;
+        var ItsRrxDcc vc_itsRrxDcc;
+
+        //default
+        var default vc_default := null;
+        
+        //global variables
+        
+    } // End of component ItsDccMts
+    
+    } // End of group componentDefinitions
+     
+    group upperTester {
+        
+        /**
+         * @desc Upper Tester message to initialize IUT 
+         */
+        type union UtInitialize {
+            UtRadioInitialize utRadioInitialize
+        }
+
+        /**
+         * @desc Upper Tester message to trigger an action on IUT 
+         */
+        type record UtTrigger {
+            UtRadioEvent utRadioEvent
+        }
+
+        /**
+         * @desc Upper Tester response message  
+         */    
+        type boolean UtResult;
+        
+            
+    } // End of group upper tester 
+    with {
+        encode "LibIts_Interface"
+    } // End of group interfacePrimitives
+} // End of module LibItsDcc_TestSystem

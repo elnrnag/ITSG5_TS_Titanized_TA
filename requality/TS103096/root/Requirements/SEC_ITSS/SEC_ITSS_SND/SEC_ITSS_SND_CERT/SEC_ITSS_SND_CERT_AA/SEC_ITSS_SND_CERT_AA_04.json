@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c60",
+            "type": "STRING",
+            "value": "If ITS-S sends an AA certificate check that the SignerInfo field is set to certificate_digest_with_ecdsa256"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c60",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/b75ba1b0-386f-4343-905d-58169c7296de"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c60",
+            "type": "STRING",
+            "value": "04. Check that signer info is a digest"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "463b2a4d-4f6f-4d82-a44c-933479415c60",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "463b2a4d-4f6f-4d82-a44c-933479415c60"
+}

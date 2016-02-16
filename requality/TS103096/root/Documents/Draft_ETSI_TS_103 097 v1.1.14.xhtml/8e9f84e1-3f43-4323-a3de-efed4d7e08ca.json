@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_8e9f84e1-3f43-4323-a3de-efed4d7e08ca\"><a name=\"8e9f84e1-3f43-4323-a3de-efed4d7e08ca\" id=\"id_8e9f84e1-3f43-4323-a3de-efed4d7e08ca\" class=\"requality_id\"><\/a> <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">service_specific_permissions<font style=\"font-family: Times New Roman;\"> shall have a maximum length of 31 octets.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "8e9f84e1-3f43-4323-a3de-efed4d7e08ca"
+}

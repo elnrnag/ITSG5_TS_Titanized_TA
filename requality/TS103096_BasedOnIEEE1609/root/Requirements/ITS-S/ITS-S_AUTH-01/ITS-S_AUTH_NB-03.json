@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S generates valid authorization request with a certificate containing lifetime field when cf flag is set use_start_validity and lifetime_is_duration."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/dc7a7060-fe4e-4af0-89b5-0fdf66144be0"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9f00f289-ff7d-4cbc-bea8-7b9c1f9cb05c"
+}

@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that message generation time is inside the validity period of the signing certificate\r\nCheck that message generation time value is realistic (according to values proposed in C2C SEC12)"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate in the next CAM \r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['generation_time'] {\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating TIME_1 (CUR_TIME - 5min <= TIME_1 <= CUR_TIME + 5min)\r\n\t\t\t}\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate {\r\n\t\t\t\t\t\tnot containing validity_restrictions['time_start_and_end']\r\n\t\t\t\t\t\tor containing validity_restrictions['time_start_and_end'] {\r\n\t\t\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\t\t\tindicating value <= TIME_1\r\n\t\t\t\t\t\t\tcontaining end_validity\r\n\t\t\t\t\t\t\t\tindicating value > TIME_1\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tcontaining its_aid\r\n\t\t\t\tindicating 'AID_CAM'\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "af331703-4a34-4b41-bd02-8ac2eba2ec18"
+}

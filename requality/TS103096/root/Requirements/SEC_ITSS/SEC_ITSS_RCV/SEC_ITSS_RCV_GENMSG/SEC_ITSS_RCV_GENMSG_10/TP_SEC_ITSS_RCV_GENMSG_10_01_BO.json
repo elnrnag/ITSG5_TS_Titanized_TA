@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "a385953e-e7c1-4323-b128-ecd9b644f0fc",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "a385953e-e7c1-4323-b128-ecd9b644f0fc",
+            "type": "STRING",
+            "value": "Check that IUT discards the Secured GN Message doesn't containing the TrailerField of type 'signature'"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "a385953e-e7c1-4323-b128-ecd9b644f0fc",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand containing trailer_fields\r\n\t\t\t\tnot containing any instance of type TrailerField {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'signature'\r\n\t\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "a385953e-e7c1-4323-b128-ecd9b644f0fc",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a385953e-e7c1-4323-b128-ecd9b644f0fc",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "a385953e-e7c1-4323-b128-ecd9b644f0fc"
+}

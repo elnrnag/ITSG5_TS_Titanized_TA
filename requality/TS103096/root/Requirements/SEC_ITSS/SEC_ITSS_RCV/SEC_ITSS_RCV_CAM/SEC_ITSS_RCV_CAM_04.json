@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "86c7a2a5-a614-4062-8ea8-a5370f5cfcb2",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured CAM containing wrong elements of the header fields\r\nCheck that optinal header fields are allowed"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "86c7a2a5-a614-4062-8ea8-a5370f5cfcb2",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/c7afae7a-c9c2-4459-972d-33da342b7baf",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/e3771490-69a8-4c5b-bc32-154f8b145f6a"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "86c7a2a5-a614-4062-8ea8-a5370f5cfcb2",
+            "type": "STRING",
+            "value": "04. Check header fields"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "86c7a2a5-a614-4062-8ea8-a5370f5cfcb2",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "86c7a2a5-a614-4062-8ea8-a5370f5cfcb2"
+}

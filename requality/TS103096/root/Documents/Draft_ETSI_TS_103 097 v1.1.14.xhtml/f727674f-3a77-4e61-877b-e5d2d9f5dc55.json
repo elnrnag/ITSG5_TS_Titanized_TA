@@ -1,0 +1,19 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "f727674f-3a77-4e61-877b-e5d2d9f5dc55",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_f727674f-3a77-4e61-877b-e5d2d9f5dc55\"><a name=\"f727674f-3a77-4e61-877b-e5d2d9f5dc55\" id=\"id_f727674f-3a77-4e61-877b-e5d2d9f5dc55\" class=\"requality_id\"><\/a>A certificate shall contain a validity restriction of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">region<font style=\"font-family: Times New Roman;\">, if the certificate referenced by the <font style=\"font-family: Courier New;\">signer_info<font style=\"font-family: Times New Roman;\"> contains a validity restriction of type <font style=\"font-family: Courier New;\">region<\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "f727674f-3a77-4e61-877b-e5d2d9f5dc55",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "f727674f-3a77-4e61-877b-e5d2d9f5dc55"
+}

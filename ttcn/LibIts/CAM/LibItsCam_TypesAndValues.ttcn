@@ -1,0 +1,136 @@
+/**
+ *    @author   ETSI / STF405 / STF449
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CAM/LibItsCam_TypesAndValues.ttcn $
+ *              $Id: LibItsCam_TypesAndValues.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     Module containing types and values for CAM Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCam_TypesAndValues {
+
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+
+    group camValues {
+
+		const ItsPduHeader.protocolVersion c_protocolVersionCam := 1;
+        const ItsPduHeader.messageID c_messageIdCam := 2;
+        
+ 		const float c_lowFrequencyGenerationTime := 0.5; //500 ms
+        const float c_specialVehicleGenerationTime := 0.5; //500 ms
+       
+        const AccelerationControl c_accCtrlIdle             := '0000000'B;
+        const AccelerationControl c_brakePedalEngaged       := '1000000'B;
+        const AccelerationControl c_gasPedalEngaged         := '0100000'B;
+        const AccelerationControl c_emergencyBrakeEngaged   := '0010000'B;
+        const AccelerationControl c_collisionWarningEngaged := '0001000'B;
+        const AccelerationControl c_accEngaged              := '0000100'B;
+        const AccelerationControl c_cruiseControlEngaged    := '0000010'B;
+        const AccelerationControl c_speedLimiterEngaged     := '0000001'B;
+       
+        const ExteriorLights c_elAllLightsOff           := '00000000'B;
+        const ExteriorLights c_lowBeamHeadlightsOn      := '10000001'B;
+        const ExteriorLights c_highBeamHeadlightsOn     := '01000010'B;
+        const ExteriorLights c_leftTurnSignalOn         := '00100100'B;
+        const ExteriorLights c_rightTurnSignalOn        := '00010000'B;
+        const ExteriorLights c_daytimeRunningLightsOn   := '00001000'B;
+        const ExteriorLights c_reverseLightOn           := '00000100'B;
+        const ExteriorLights c_fogLightOn               := '00000010'B;
+        const ExteriorLights c_parkingLightsOn          := '00000001'B; 
+        
+        const VehicleRole c_vehicleRole_publicTransport := publicTransport;
+        const VehicleRole c_vehicleRole_specialTransport := specialTransport;
+        const VehicleRole c_vehicleRole_dangerousGoods := dangerousGoods;
+        const VehicleRole c_vehicleRole_roadWork := roadWork;
+        const VehicleRole c_vehicleRole_rescue := rescue;
+        const VehicleRole c_vehicleRole_emergency := emergency;
+        const VehicleRole c_vehicleRole_safetyCar := safetyCar;
+        
+        const DangerousGoodsBasic c_dangerousGoodsBasic_explosives1 := explosives1;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_explosives2 := explosives2;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_explosives3 := explosives3;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_explosives4 := explosives4;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_explosives5 := explosives5;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_explosives6 := explosives6;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_flammableGases := flammableGases;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_nonFlammableGases := nonFlammableGases;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_toxicGases := toxicGases;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_flammableLiquids := flammableLiquids;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_flammableSolids := flammableSolids;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_substancesLiableToSpontaneousCombustion := substancesLiableToSpontaneousCombustion;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_substancesEmittingFlammableGasesUponContactWithWater := substancesEmittingFlammableGasesUponContactWithWater;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_oxidizingSubstances := oxidizingSubstances;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_organicPeroxides := organicPeroxides;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_toxicSubstances := toxicSubstances;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_infectiousSubstances := infectiousSubstances;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_radioactiveMaterial := radioactiveMaterial;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_corrosiveSubstances := corrosiveSubstances;
+        const DangerousGoodsBasic c_dangerousGoodsBasic_miscellaneousDangerousSubstances := miscellaneousDangerousSubstances;
+        
+    } // end group camValues
+
+    group utPrimitives {
+
+        /**
+         * @desc 
+         * @member changeCurvature Changes the curvature.
+         * @member changeSpeed Changes the speed in cm/s.
+         * @member setAccelerationControlStatus Sets the acceleration control status.
+         * @member setExteriorLightsStatus Sets the exterior lights status.
+         * @member changeHeading Changes the heading.
+         * @member setDriveDirection Sets the drive direction.
+         * @member setStationType
+         * @member setVehicleRole
+         * @member setEmbarkationStatus
+         * @member setPtActivation
+         * @member setDangerousGoods
+         * @member setLightBarSireneStatus
+         * @member changeYawRate Changes the yaw rate in offsets of 0.01 degrees per second.
+         */
+        type union UtCamTrigger {
+            CurvatureValue changeCurvature,
+            Int16 changeSpeed,
+            AccelerationControl setAccelerationControlStatus,
+            ExteriorLights setExteriorLightsStatus,
+            HeadingValue changeHeading,
+            DriveDirection setDriveDirection,
+            YawRateValue changeYawRate,
+            StationType setStationType,
+            VehicleRole setVehicleRole,
+            EmbarkationStatus setEmbarkationStatus,
+            PtActivation setPtActivation,
+            DangerousGoodsBasic setDangerousGoods,
+            LightBarSirenInUse setLightBarSirene
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester result message of request of triggering of an event at IUT 
+         */        
+		type record UtCamTriggerResult {
+			boolean utCamTriggerResult
+		} with { variant (utCamTriggerResult) "FIELDLENGTH(8)" };
+        
+        /**
+         * @desc Upper Tester message to check event/status on CAM IUT 
+         */
+        type record UtCamEventInd {
+            CAM camMsg
+        } with { variant "" };
+            
+        
+        /**
+         * @desc List of Upper Tester messages to check event/status on CAM IUT 
+         */
+        type record of UtCamEventInd UtCamEventIndList with { variant "" };
+        
+    } 
+} with { encode "RAW" };
+

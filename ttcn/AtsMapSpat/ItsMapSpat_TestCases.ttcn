@@ -1,0 +1,915 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsMapSpat/ItsMapSpat_TestCases.ttcn $
+ *              $Id: ItsMapSpat_TestCases.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *    @desc     CAM Testcases (TP version: 0.0.1)
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+
+module ItsMapSpat_TestCases {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_Sync all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Time all;
+    
+    // LibIts
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TypesAndValues {
+        type UtChangePosition
+    };
+    import from LibItsMapSpat_TestSystem all;
+    import from LibItsMapSpat_Functions all;
+    import from LibItsMapSpat_Templates all;
+    import from LibItsMapSpat_TypesAndValues all;
+    import from LibItsMapSpat_Pics {modulepar all};
+    
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DSRC language "ASN.1:1997" all;
+    import from REG_D language "ASN.1:1997" all;
+
+    group MapSpatMessageDissemination { 
+            
+        /**
+        * @desc Verify that when sending a MapData message the DSRCmsgSubID is set to value 1.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *   with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a MapData message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message
+        *                containing DSRCmsgSubID
+        *                    set to value 1
+        *        }
+        *    }
+        * </pre>
+        * 
+        * @version   0.0.1
+        * @see       ETSI TS 103 191-2 v0.0.1 TP/MAP-SPAT/MSD/BV-01
+        * @reference SAE J2735 [1] Clause 7.34
+        */
+        testcase TC_MAP_SPAT_MSD_BV_01 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_mapSubId1 ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received MAP with DSRCmsgSubID == 1. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                            
+        } // end TC_MAP_SPAT_MSD_BV-01
+
+        /**
+        * @desc Verify that when sending a SPAT message the DSRCmsgSubID is set to value 1.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a SPAT message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid SPAT message
+        *                containing DSRCmsgSubID
+        *                    set to value 1
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-02
+        * @reference SAE J2735 [1] Clause 7.34
+        */
+        testcase TC_MAP_SPAT_MSD_BV_02 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            // Triggering a SPAT message
+            f_utTriggerEvent ( m_utTriggerEvent ( spatMsg ) );
+            
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_spatInd ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_spatSubId1 ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received SPAT with DSRCmsgSubID == 1. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_spatInd ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_anySpat ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-02
+
+        /**
+        * @desc Repetition < 10s. Verify that: when the IUT is composing a new message with the same content as the most recent message
+        * with the same DSRCmsgID, and less than 10 seconds have elapsed since it sent the previous message, the IUT uses the same MsgCount value.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *        and the IUT has sent a MapData message
+        *            containing MsgCount
+        *                set to VALUE_1
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a new MapData message with the same content is generated
+        *            and the repetition time is lesser than 10 s
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message
+        *                containing MsgCount
+        *                    set to VALUE_1
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version   0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-05
+        * @reference SAE J2735 [1] Clause 7.92
+        */
+        testcase TC_MAP_SPAT_MSD_BV_05 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var MsgCount    v_msgCount;
+            var MapInd        v_message;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            // Triggering MAP message repetition lesser than 10s
+            v_msgCount := f_utTriggerEvent ( m_utTriggerEvent ( mapRepL10s ) );
+            // Receiving first MAP message
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) -> value v_message { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received first MAP message. ***");
+                    v_msgCount := v_message.msgIn.msgMap.mapData.msgIssueRevision;
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
+                }
+            }
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            // Receiving repetition MAP message before 10s
+            tc_ac.start (10.0);
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) -> value v_message { 
+                    tc_ac.stop;
+                    if ( v_message.msgIn.msgMap.mapData.msgIssueRevision == v_msgCount ) {
+                        log("*** " & testcasename() & ": PASS: Successfully received Second MAP message with correct Count. ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    else {
+                        log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-05
+
+        /**
+        * @desc Repetition >= 10s Verify that: when the IUT is composing a new message with the same content as the most recent message
+        * with the same DSRCmsgID, and at least 10 seconds have elapsed since it sent the previous message, the IUT sets the MsgCount to any valid value.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *        and the IUT has sent a MapData message
+        *            containing MsgCount
+        *                set to VALUE_1
+}
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a new MapData message with the same content is generated
+        *            and the repetition time is greather or egal  than 10 s
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message
+        *                containing MsgCount
+        *                    set to any valid value
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version   0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-06
+        * @reference SAE J2735 [1] Clause 7.92
+        */
+        testcase TC_MAP_SPAT_MSD_BV_06 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var MsgCount    v_msgCount;
+            var MapInd        v_message;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            // Triggering MAP message repetition greather than 10s
+            v_msgCount := f_utTriggerEvent ( m_utTriggerEvent ( mapRepG10s ) );
+            // Receiving first MAP message
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) -> value v_message { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received first MAP message. ***");
+                    v_msgCount := v_message.msgIn.msgMap.mapData.msgIssueRevision;
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
+                }
+            }
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            // Receiving repetition MAP message after 10s
+            tc_ac.start (20.0);
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) -> value v_message { 
+                    tc_ac.stop;
+                    if ( v_message.msgIn.msgMap.mapData.msgIssueRevision != v_msgCount ) {
+                        log("*** " & testcasename() & ": PASS: Successfully received Second MAP message with correct Count. ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    else {
+                        log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-06
+
+        /**
+        * @desc Verify that the MsgCRC (if present) is the last data element of the MapData message.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a MapData message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message
+        *                not containing MsgCRC
+        *                or
+        *                containing MsgCRC
+        *                    as the last data element of the message
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version   0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-08
+        * @reference SAE J2735 [1] Clause 7.93
+        */
+        testcase TC_MAP_SPAT_MSD_BV_08 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_mapNoMsgCrc ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received MAP with no MsgCRC. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_mapMsgCrcLast ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received MAP with MsgCRC as the last data element of the message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-08
+
+        /**
+        * @desc Verify that the LayerType is not contained in the MapData message.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a MapData message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message
+        *                not containing LayerType
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-09
+        * @reference SAE J2735 [1] Clause 7.83
+        */
+        testcase TC_MAP_SPAT_MSD_BV_09 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_mapNoLayerType ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received MAP with no LayerType. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-09
+
+        /**
+        * @desc Verify that the IntersectionReferenceID contained in the SPAT message correspond to a previously received intersection MAP.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *        and the IUT has sent a MapData message
+        *            containing IntersectionList
+        *                containing INTERSECTION_1
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a SPAT message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid SPAT message
+        *                 containing IntersectionReferenceID
+        *                    corresponding to INTERSECTION_1 
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-10
+        * @reference SAE J2735 [1] Clause 6.29
+        */
+        testcase TC_MAP_SPAT_MSD_BV_10 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var MapInd        v_message;
+            var SpatInd        v_spat;
+            var IntersectionGeometryList v_intersections;
+            var integer        i,j;
+            var boolean        v_result := false;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            // Receiving MAP message - Saving IntersectionList
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) -> value v_message { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received MAP message. ***");
+                    v_intersections := v_message.msgIn.msgMap.mapData.intersections;
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
+                }
+            }
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            f_utTriggerEvent ( m_utTriggerEvent ( spatMsg ) );
+            
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_spatInd ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_anySpat ) ) ) -> value v_spat { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": Successfully received SPAT message. ***");
+                    for ( i := 0 ; i < lengthof ( v_intersections ) and not v_result ; i := i+1 ) {
+                        for ( j := 0 ; j < lengthof ( v_spat.msgIn.msgSpat.spatData.intersections ) ; j := j+1 ) {
+                            if ( v_intersections[ i ].id == v_spat.msgIn.msgSpat.spatData.intersections[ j ].id ) {
+                                v_result := true;
+                            }
+                        }
+                    }
+                    if ( v_result ) {
+                        log("*** " & testcasename() & ": PASS: concordance of intersection ID. ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    else {
+                        log("*** " & testcasename() & ": FAIL: non concordance of intersection ID. ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-10
+
+        /**
+        * @desc Verify that the MapData message is well formatted.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a MapData message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message
+        *                containing DSRCmsgSubID
+        *                    set to value 1
+        *                containing MsgCount
+        *                not containing LayerType
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-11
+        * @reference SAE J2735 [1] Clause 10
+        */
+        testcase TC_MAP_SPAT_MSD_BV_11 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_mapWellFormatted ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received a well formatted MAP. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-11
+
+        /**
+        * @desc Verify that the SPAT message is well formatted.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a SPAT message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid SPAT message
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-12
+        * @reference SAE J2735 [1] Clause 10
+        */
+        testcase TC_MAP_SPAT_MSD_BV_12 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            // Triggering a SPAT message
+            f_utTriggerEvent ( m_utTriggerEvent ( spatMsg ) );
+            
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_spatInd ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_spatSubId1 ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received SPAT with DSRCmsgSubID == 1. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_spatInd ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_anySpat ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-12
+
+        /**
+        * @desc Verify that when sending a MapData message, the IUT encapsulates the message into a GN SHB message.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a MapData message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid MapData message encapsulated into a GN SHB message
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-15
+        * @reference No clause – Implicit to use in ITS
+        */
+        testcase TC_MAP_SPAT_MSD_BV_15 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var MapInd        v_message;
+            const UInt8 c_gnHtTsb := 5;
+            const UInt8 c_gnHstShb := 0;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_mapIndWithGnParameters ( mw_mapPdu ( mw_itsPduHeaderMap , mw_mapWellFormatted ), -, c_gnHtTsb, c_gnHstShb ) ) -> value v_message { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received MAP. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_mapInd ( mw_mapPdu ( mw_itsPduHeaderMap , mw_anyMap ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-15
+
+        /**
+        * @desc Verify that when sending a SPAT message, the IUT encapsulates the message into a GN SHB message.
+        * <pre>
+        * Pics Selection: PICS_RSU
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            a SPAT message is generated
+        *        }
+        *        then {
+        *            the IUT sends a valid SPAT message encapsulated into a GN SHB message
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version     0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSD//BV-16
+        * @reference No clause – Implicit to use in ITS
+        */
+        testcase TC_MAP_SPAT_MSD_BV_16 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var SpatInd        v_message;
+            const UInt8 c_gnHtTsb := 5;
+            const UInt8 c_gnHstShb := 0;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            f_utTriggerEvent ( m_utTriggerEvent ( spatMsg ) );
+            
+            tc_ac.start;
+            alt {
+                []    mapSpatPort.receive ( mw_spatIndWithGnParameters ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_spatSubId1 ), -, c_gnHtTsb, c_gnHstShb ) ) -> value v_message { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: Successfully received SPAT. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                []    mapSpatPort.receive ( mw_spatInd ( mw_spatPdu ( mw_itsPduHeaderSpat , mw_anySpat ) ) ) { 
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: Received an incorrect MAP message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []    tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSD_BV-16
+
+    } // end group MapSpatMessageDissemination
+
+    group MapSpatMessageProcessing { 
+
+        /**
+        * @desc Verify  that: when the IUT receives a GN SHB message encapsulating a MapData message, it pass the message to the application layer.
+        * <pre>
+        * Pics Selection: PICS_VEHICLE
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            the IUT receives a valid MapData message encapsulated into a GN SHB message
+            *    }
+        *        then {
+        *            the IUT forwards the MapData message content to upper layers
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version   0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSP//BV-01
+        * @reference No clause – Implicit to use in ITS
+        */
+        testcase TC_MAP_SPAT_MSP_BV_01 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var MapReq        v_mapReq;
+            var integer        i;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            v_mapReq := valueof (  m_mapReq ( m_mapPdu ( m_map ) ) );
+            mapSpatPort.send( v_mapReq ) ;
+            
+            f_sleep(PX_TAC);
+            for ( i:=0 ; i < lengthof ( vc_utMapEvents ) and not match ( v_mapReq.msgOut, vc_utMapEvents[i].mapMsg ) ; i := i+1 ) {
+                // empty on purpose 
+            }
+            if ( i < lengthof ( vc_utMapEvents ) ) {
+                log("*** " & testcasename() & ": PASS: MAP was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: MAP was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSP_BV_01
+
+        /**
+        * @desc Verify  that: when the IUT receives a GN SHB message encapsulating a SPAT message, it pass the message to the application layer.
+        * <pre>
+        * Pics Selection: PICS_VEHICLE
+        * Initial conditions: 
+        *    with {
+        *        the IUT being in the "initial state"
+        *    }
+        * Expected behaviour:
+        *    ensure that {
+        *        when { 
+        *            the IUT receives a valid SPAT message encapsulated into a GN SHB message
+            *    }
+        *        then {
+        *            the IUT forwards the SPAT message content to upper layers
+        *        }
+        *    }
+        * </pre>
+        *
+        * @version   0.0.1
+        * @see         ETSI TS 103 191-2 V0.0.1 TP/MAP-SPAT/MSP//BV-02
+        * @reference No clause – Implicit to use in ITS
+        */
+        testcase TC_MAP_SPAT_MSP_BV_02 () runs on ItsMapSpat system ItsMapSpatSystem {
+                
+            // Local variables
+            var SpatReq        v_spatReq;
+            var integer        i;
+                
+            // Test component configuration
+            f_cfUp();
+                
+            // Preamble
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+            // Test Body
+            v_spatReq := valueof (  m_spatReq ( m_spatPdu ( m_spat ) ) );
+            mapSpatPort.send ( v_spatReq ) ;
+            
+            f_sleep(PX_TAC);
+            for ( i:=0 ; i < lengthof ( vc_utSpatEvents ) and not match ( v_spatReq.msgOut , vc_utSpatEvents[i].spatMsg ) ; i:=i+1 ) {
+                // empty on purpose 
+            }
+            if ( i < lengthof ( vc_utSpatEvents ) ) {
+                log("*** " & testcasename() & ": PASS: SPAT was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: SPAT was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+                
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+                
+        } // end TC_MAP_SPAT_MSP_BV_02
+
+    } // end group MapSpatMessageProcessing
+    
+} // end ItsMapSpat_TestCases

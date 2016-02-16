@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d2a74c3e-bd79-498a-8985-f218991a5f16",
+            "type": "STRING",
+            "value": "Check that the certificate verification key contains ECC point of type set to either compressed_lsb_y_0, compressed_lsb_y_1 or uncompressed\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "d2a74c3e-bd79-498a-8985-f218991a5f16",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/52e65b64-5d7e-4adc-970d-aa084d0c7c58",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/25b0f26c-366c-4c32-bc6b-dbbdd297bfec"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "d2a74c3e-bd79-498a-8985-f218991a5f16",
+            "type": "STRING",
+            "value": "08. Check ECC point type of the certificate verification key"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d2a74c3e-bd79-498a-8985-f218991a5f16",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "d2a74c3e-bd79-498a-8985-f218991a5f16"
+}

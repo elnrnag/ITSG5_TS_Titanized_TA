@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PICS_USE_UN_STATS_REGION_DICTIONARY": {
+            "isGenerated": false,
+            "key": "PICS_USE_UN_STATS_REGION_DICTIONARY",
+            "origin": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3",
+            "type": "STRING",
+            "value": "Check Identified Region:\r\nMust contain value that correspond to numeric country codes as defined by United Nations Statistics Division\r\n\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\tcontaining certificate {\r\n\t\t\t\t\tcontaining validity_restrictions['region']{\r\n\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\tcontaining id_region {\r\n\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\tindicating 'un_stats' (1)\r\n\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\tindicating valid value according to UN-Stats dictionary\r\n\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "bb431690-8e0a-42e7-ae81-1a3f14f5b3b3"
+}

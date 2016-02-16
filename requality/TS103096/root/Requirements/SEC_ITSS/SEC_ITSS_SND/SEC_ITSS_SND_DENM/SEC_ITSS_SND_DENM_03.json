@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "9355a664-df22-474a-b29f-0aa1452311f4",
+            "type": "STRING",
+            "value": "If ITS-S sends a secured DENM check that the sent SecuredMessage contains exactly one signer_info field of type certificate"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "9355a664-df22-474a-b29f-0aa1452311f4",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/dd620987-9e01-4fc8-b471-201d0592ff22"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "9355a664-df22-474a-b29f-0aa1452311f4",
+            "type": "STRING",
+            "value": "03. Check that signer info is a certificate"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "9355a664-df22-474a-b29f-0aa1452311f4",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9355a664-df22-474a-b29f-0aa1452311f4"
+}

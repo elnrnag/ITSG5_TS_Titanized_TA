@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "f21d3428-4da7-4f1e-b24b-58d32a3e037c",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "f21d3428-4da7-4f1e-b24b-58d32a3e037c",
+            "type": "STRING",
+            "value": "Check that the IUT sends the Secured CAM containing the signer_info of type certificate when it received a CAM containing a request of unrecognized certificate that matches with the currently used AT certificate ID of the IUT."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "f21d3428-4da7-4f1e-b24b-58d32a3e037c",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tand the IUT is configured to send more than one CAM per second\r\n\tand the IUT having already sent CAM at TIME_1\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate' \r\n\tand the IUT having received a SecuredMessage \r\n\t\t\t\t\t\tat TIME_2 (TIME_1 < TIME_2 < TIME_1+1sec)\r\n\t\tcontaining header_fields['request_unrecognized_certificate']\r\n\t\t\tcontaining digests {\r\n\t\t\t\tcontaining HashedId3 value\r\n\t\t\t\t\treferencing to the AT certificate\r\n\t\t\t\tand not containing HashedId3 value\r\n\t\t\t\t\treferencing to the AA certificate\r\n\t\t\t}\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a CAM\r\n\t\t\t\tat TIME_3 (TIME_1 < TIME_2 < TIME_3 < TIME_1+1sec)\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining security_profile\r\n\t\t\t\tindicating '1'\r\n\t\t\tcontaining header_fields['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate\r\n\t\t\t\t\t\treferenced by the requested digest \r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "f21d3428-4da7-4f1e-b24b-58d32a3e037c",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "f21d3428-4da7-4f1e-b24b-58d32a3e037c",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "f21d3428-4da7-4f1e-b24b-58d32a3e037c"
+}

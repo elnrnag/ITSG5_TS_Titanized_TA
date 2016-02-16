@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S accepts valid signed data from another ITS-S when signed with a certificate containing an IdentifiedNotLocalizedScope and a zero-length subject_name field."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/e55978bd-4bf8-4a52-90c8-80ba82d61fcf"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "cec9c4e6-7de4-45d7-bc7c-2bb1b2799b8a"
+}

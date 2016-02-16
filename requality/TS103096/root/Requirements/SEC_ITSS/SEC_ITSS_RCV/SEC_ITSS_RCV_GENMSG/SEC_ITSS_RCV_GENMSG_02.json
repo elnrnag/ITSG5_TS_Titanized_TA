@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "7f450356-63c4-41af-a0f3-a575142d2dd9",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a Secured CAM containing protocol version unequal to 2"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "7f450356-63c4-41af-a0f3-a575142d2dd9",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/da6b3098-07d5-49aa-876f-6ae437a945ef"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "7f450356-63c4-41af-a0f3-a575142d2dd9",
+            "type": "STRING",
+            "value": "02. Check the message protocol version"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "7f450356-63c4-41af-a0f3-a575142d2dd9",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "7f450356-63c4-41af-a0f3-a575142d2dd9",
+            "type": "STRING",
+            "value": "in process"
+        }
+    },
+    "uuid": "7f450356-63c4-41af-a0f3-a575142d2dd9"
+}

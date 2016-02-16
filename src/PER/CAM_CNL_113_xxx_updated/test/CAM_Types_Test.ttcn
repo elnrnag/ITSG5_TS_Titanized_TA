@@ -1,0 +1,117 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2015 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     CAM_Types_Test.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2015-10-20
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module CAM_Types_Test
+{
+  import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+  import from ITS_Container language "ASN.1:1997" all;
+  import from CAM_Types all;
+
+  type component Empty_CT {
+  
+  }
+
+  const ReferencePosition p_referencePosition := { 
+        latitude := 99,
+        longitude := 2432,
+        positionConfidenceEllipse := {
+                semiMajorConfidence := 578,
+                semiMinorConfidence := 88,
+                semiMajorOrientation := 900
+        },
+        altitude := {
+                altitudeValue := 888,
+                altitudeConfidence := outOfRange
+        }
+  };
+
+  const CAM c := {
+        header := {
+                protocolVersion := 3,
+                messageID := 10,
+                stationID := 99
+            },
+            cam := {
+                generationDeltaTime := 1600,
+                camParameters := {
+                    basicContainer := {
+                        stationType := 4,
+                        referencePosition := p_referencePosition
+                    },
+                    highFrequencyContainer := {
+                        basicVehicleContainerHighFrequency := {
+                            heading := {
+                                headingValue := 151,
+                                headingConfidence := 10
+                            },
+                            speed := {
+                                speedValue := 45,
+                                speedConfidence := 5
+                            },
+                            driveDirection := forward,
+                            vehicleLength := {
+                                vehicleLengthValue := 50,
+                                vehicleLengthConfidenceIndication := noTrailerPresent
+                            },
+                            vehicleWidth := 21,
+                            longitudinalAcceleration := {
+                                longitudinalAccelerationValue := 150,
+                                longitudinalAccelerationConfidence := 40
+                            },
+                            curvature := {
+                                curvatureValue := 1010,
+                                curvatureConfidence := unavailable
+                            },
+                            curvatureCalculationMode := yawRateUsed,
+                            yawRate := {
+                                yawRateValue := 1231,
+                                yawRateConfidence := unavailable
+                            },
+                            accelerationControl := '1010001'B,
+ 			    lanePosition := 5,
+                            //lanePosition := vehicleWidth,
+                            steeringWheelAngle := { steeringWheelAngleValue := 77, steeringWheelAngleConfidence := 7 },
+                            lateralAcceleration := { lateralAccelerationValue := 11, lateralAccelerationConfidence := 77 },
+                            verticalAcceleration := { verticalAccelerationValue := -11, verticalAccelerationConfidence := 44 },
+                            performanceClass := 4,
+                            cenDsrcTollingZone := {
+                                protectedZoneLatitude := 7974,
+                                protectedZoneLongitude := 798797,
+                                cenDsrcTollingZoneID := 4966101
+                            }
+                        }
+                    },
+                    lowFrequencyContainer := { basicVehicleContainerLowFrequency := { vehicleRole := specialTransport, exteriorLights := '11010111'B, pathHistory := {} } },
+                    specialVehicleContainer := { dangerousGoodsContainer := { dangerousGoodsBasic := explosives5 } }
+                }
+            }
+        };
+
+
+  testcase tc_encdec() runs on Empty_CT {
+    if(c == dec_CAM_PDU(enc_CAM_PDU(c))){
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+  
+  control{
+    execute(tc_encdec());
+  }
+  
+}
+
+

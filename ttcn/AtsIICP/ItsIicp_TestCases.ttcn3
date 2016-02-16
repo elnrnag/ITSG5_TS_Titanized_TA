@@ -1,0 +1,3477 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL:$
+ *              $Id:$
+ *  @desc       ITS station-internal management communications protocol (ISO 24102-4) test cases
+ */
+module ItsIicp_TestCases {
+    
+    // Libcommon
+    import from LibCommon_Time all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Sync all;
+    
+    // LibIts
+    import from CALMiitsscu language "ASN.1:1997" all;
+    import from CALMmsap language "ASN.1:1997" {
+        type 
+            CommandRef, 
+            MF_Command_request, MN_Command_request, MI_Command_request, 
+            MF_Request_request, MN_Request_request, MI_Request_request, 
+            MF_Command_confirm, MN_Command_confirm, MI_Command_confirm, 
+            MI_Get_request, MI_Set_request, 
+            MI_Get_confirm, MI_Set_confirm, 
+            StateCInotify, FWTdelete, FWTdeleteConf  
+    };
+    import from LibItsFntp_TypesAndValues {
+        const c_portSam;
+    };
+    import from LibItsIicp_TypesAndValues all; // TODO Remove 'all'
+    import from LibItsIicp_Templates all; 
+    import from LibItsIicp_Functions all; 
+    import from LibItsIicp_Pixits all; 
+    import from LibItsIicp_Pics all; 
+    import from LibItsMgt_Templates all; 
+    import from LibItsMgt_Functions { 
+        function 
+            f_getIutSourceItsScuId, f_getIutSourceItsScuIdAlive, f_getIutDestItsScuId, f_getIutOtherItsScuId, 
+            f_getIutMedType, f_getIutCiAccessClass, f_getIutCiClass, 
+            f_getNextCommandRef, f_getNextPduCounter 
+    };
+    import from LibItsCalm_Interface { 
+        type ItsCalm 
+    };
+    import from LibItsCalm_TestSystem {
+        type ItsCalmSystem
+    };
+    
+    // 8.1 Management
+    group management {
+        
+        group validBehavior {
+            
+            /**
+             * @desc    Generation of ITS-SCUalive message after power on - no other ITS-SCU in the SUT
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having no knowledge about other ITS-SCUs in the SUT
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT starting
+             *      }
+             *      then {
+             *          the IUT generates an ITS-SCUalive (new) message with DestinationITS-SCU-ID=65535 
+             *          and with SourceITS-SCU-ID equal to the own ITS-SCU ID, indicating its pre-selected ITS-SCU-ID and its IST-SCUtype, 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IIC Communication Manager
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BV/01
+             */
+            testcase TC_IICP_MGM_BV_01() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                timer t_minRetransTimer := f_getIutTaliveRetransmitTimer();
+                timer t_maxRetransTimer := f_getIutTaliveRetransmitTimer() + f_getIutTaliveMaxJitter();
+                var boolean v_firstMessageReceived := false;
+                
+//                log("*** TC_IICP_MGM_BV_01: t_minRetransTimer= ", f_getIutTaliveRetransmitTimer());
+//                log("*** TC_IICP_MGM_BV_01: t_minRetransTimer= ", f_getIutTaliveRetransmitTimer() + f_getIutTaliveMaxJitter());
+//                stop;
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BV_01: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BV_01: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                
+                // Clause 'then'
+                iicpPort.clear;
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndReq( 
+                            mdw_iicRequestTx_scuAlive(
+                                f_getIutSourceItsScuIdAlive(),  // Used to indicate "own/local ITS-SCU" (ISO/WD 24102-4 Table 2 — ITS-SCU-ID value assignment)
+                                65535,                          // Broadcast
+                                mw_scuAlive(
+                                    255,                        // ITS-SCUalive (new) message
+                                    f_getIutLocalItsType() 
+                                )
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BV_01: INFO: The IUT has generated a IIC_Request/SCUAlive ***");
+                        if (v_firstMessageReceived == false) { // First message is reached, start timer now
+                            v_firstMessageReceived := true;
+                            t_maxRetransTimer.start;
+                            t_minRetransTimer.start;
+                            repeat;
+                        } else {
+                            if (t_minRetransTimer.running) {
+                                log("*** TC_IICP_MGM_BV_01: FAIL: IIC_Request/SCUAlive not transmitted at prescribed periodicity (too early) ***");
+                                t_minRetransTimer.stop;
+                                t_maxRetransTimer.stop;
+                                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error);
+                            } else {
+                                t_maxRetransTimer.stop;
+                                log("*** TC_IICP_MGM_BV_01: PASS: IIC_Request/SCUAlive transmitted at prescribed periodicity ***");
+                                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                            }
+                        }
+                    }
+                    [] t_minRetransTimer.timeout {
+                        log("*** TC_IICP_MGM_BV_01: INFO: Ready for retransmission ***");
+                        repeat;
+                    }
+                    [] t_maxRetransTimer.timeout {
+                        log("*** TC_IICP_MGM_BV_01: INCONC: IIC_Request/SCUAlive not transmitted at prescribed periodicity (too late) ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BV_01: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BV_01: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BV_01
+            
+            /**
+             * @desc    Reception of ITS-SCUalive (new) message with no address conflict
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ITS-SCUalive (new) message without address conflict
+             *      }
+             *      then {
+             *          the IUT shall acknowledge this with ErrorStatus = 0 using MF-COMMAND IICresponseTX
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BV/02
+             */
+            testcase TC_IICP_MGM_BV_02() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+//                var IicpInd v_iicpSim;
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BV_02: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BV_02: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_sendAliveMessage(
+                    f_getIutSourceItsScuId(),    // The ITS SCU-ID of the sender
+                    f_getIutDestItsScuId(), 
+                    m_scuAlive(
+                        255,                    // ITS-SCUalive (new) message
+                        f_getIutSourceItsScuType() 
+                    )
+                );
+                log("*** TC_IICP_MGM_BV_02: INFO: ITS-SCUalive (new) message without address conflict triggered ***");
+                log(
+                    "*** TC_IICP_MGM_BV_02: DEBUG: Expected template: ",
+                    mw_iicpIndResp( 
+                        mdw_iicResponseTx_scuAlive(
+                            f_getIutDestItsScuId(),
+                            f_getIutSourceItsScuId(),
+                            mw_scuAlive(
+                                255,                        // ITS-SCUalive (new) message
+                                f_getIutLocalItsType() 
+                            ),
+                            0 // Check why TTWB raises an error using duplicateITS-scuId
+                    )), 
+                    "***");
+                // Clause 'then'
+                iicpPort.clear;
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndResp( 
+                            mdw_iicResponseTx_scuAlive(
+                                f_getIutDestItsScuId(),
+                                f_getIutSourceItsScuId(),
+                                mw_scuAlive(
+                                    0,
+                                    f_getIutLocalItsType() 
+                                ),
+                                0 // Check why TTWB raises an error using duplicateITS-scuId
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BV_02: PASS: The IUT has generated a MF-COMMAND IICresponseTX ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BV_02: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BV_02: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BV_02
+            
+            /**
+             * @desc    Reception of ITS-SCUalive (new) message with address conflict
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ITS-SCUalive (new) message with address conflict, i.e. from an ITS-SCU having the same ITS-SCU-ID
+             *      }
+             *      then {
+             *          the IUT shall acknowledge this with ErrorStatus = 2 using MF-COMMAND IICresponseTX for transmission to all ITS-SCUs
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BV/03
+             */
+            testcase TC_IICP_MGM_BV_03() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BV_03: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BV_03: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_sendAliveMessage(
+                    f_getIutDestItsScuId(),        // Both source and destination are identical ==> conflict expected
+                    f_getIutDestItsScuId(),
+                    m_scuAlive(
+                        255,                        // ITS-SCUalive (new) message
+                        f_getIutSourceItsScuType() 
+                    )
+                );
+                log("*** TC_IICP_MGM_BV_03: INFO: ITS-SCUalive (new) message with address conflict triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndResp( 
+                            mdw_iicResponseTx_scuAlive(
+                                f_getIutDestItsScuId(),
+                                65535,
+                                ?,
+                                2 // Check why TTWB raises an error using duplicateITS-scuId
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BV_03: PASS: The IUT has detetcted the address conflict ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BV_03: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BV_03: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BV_03
+            
+            /**
+             * @desc    Reception of ITS-SCUalive (alive) message with no address conflict
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ITS-SCUalive (alive) message without address conflict
+             *      }
+             *      then {
+             *          the IUT does not show any visible reaction
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BV/04
+             */
+            testcase TC_IICP_MGM_BV_04() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) VCI_info_res v_vCI_info_res;
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BV_04: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BV_04: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_sendAliveMessage(
+                    f_getIutSourceItsScuId(),    // The ITS SCU-ID of the sender
+                    f_getIutDestItsScuId(), 
+                    m_scuAlive(
+                        0,                    // ITS-SCUalive (alive) message
+                        f_getIutSourceItsScuType() 
+                    )
+                );
+                log("*** TC_IICP_MGM_BV_04: INFO: TS-SCUalive (alive) message without address conflict triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    // The default altstep manages unsollicited messages
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_MGM_BV_04: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BV_04: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BV_04
+            
+            /**
+             * @desc    Periodic transmission of ITS-SCUalive (alive) message
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having transmitted an ITS-SCUalive (alive) message with DestinationITS-SCU-ID=65535 
+             *          and with SourceITS-SCU-ID equal to the own ITS-SCU ID, which does not result in an address conflict
+             *      }
+             *      then {
+             *          the IUT transmits the next ITS-SCUalive (alive) message after the time span given in parameter Talive
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BV/05
+             */
+            testcase TC_IICP_MGM_BV_05() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                timer t_minRetransTimer;
+                timer t_maxRetransTimer;
+                var boolean v_firstMessageReceived := false;
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BV_05: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BV_05: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndReq( 
+                            mdw_iicRequestTx_scuAlive(
+                                f_getIutDestItsScuId(),
+                                65535,                          // Broadcast
+                                mw_scuAlive(
+                                    0,                          // ITS-SCUalive (alive) message
+                                    ? 
+                                )
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BV_05: INFO: The IUT has generated a IIC_Request/SCUAlive ***");
+                        if (v_firstMessageReceived == false) { // First message is reached, start timer now
+                            v_firstMessageReceived := true;
+                            t_maxRetransTimer.start(int2float(f_getIutTalive()) * 1.1); // Wait for 110% of Talive 
+                            t_minRetransTimer.start(int2float(f_getIutTalive()) * 0.9); // Wait for 90% of Talive 
+                            repeat;
+                        } else {
+                            if (t_minRetransTimer.running) {
+                                log("*** TC_IICP_MGM_BV_05: FAIL: IIC_Request/SCUAlive not transmitted at prescribed periodicity (too early) ***");
+                                t_minRetransTimer.stop;
+                                t_maxRetransTimer.stop;
+                                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error);
+                            } else {
+                                t_maxRetransTimer.stop;
+                                log("*** TC_IICP_MGM_BV_05: PASS: IIC_Request/SCUAlive transmitted at prescribed periodicity ***");
+                                f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                            }
+                        }
+                    }
+                    [] t_minRetransTimer.timeout {
+                        log("*** TC_IICP_MGM_BV_05: INFO: Ready for retransmission ***");
+                        repeat;
+                    }
+                    [] t_maxRetransTimer.timeout {
+                        log("*** TC_IICP_MGM_BV_05: INCONC: IIC_Request/SCUAlive not transmitted at prescribed periodicity (too late) ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BV_05: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BV_05: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BV_05
+            
+            /**
+             * @desc    Transmission of ITS-SCUalive (delete) message
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT wants to shut down and stop operation
+             *      }
+             *      then {
+             *          the IUT transmits an ITS-SCUalive (delete) message with DestinationITS-SCU-ID=65535 and with SourceITS-SCU-ID equal to the own ITS-SCU ID using MF-COMMAND IICrequestTX
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BV/06
+             */
+            testcase TC_IICP_MGM_BV_06() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BV_06: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BV_06: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                action("Shutdown IUT");
+                // Clause 'then'
+                tc_ac.start; 
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndReq( 
+                            mdw_iicRequestTx_scuAlive(
+                                f_getIutDestItsScuId(),         // The IUT has its own ITS SCU-ID
+                                65535,                          // Broadcast
+                                mw_scuAlive(
+                                    1,                          // ITS-SCUalive (delete) message
+                                    f_getIutLocalItsType() 
+                    )))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BV_06: PASS: The IUT has generated a ITS-SCUalive (delete) message ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BV_06: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BV_06: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BV_06
+            
+        } // End of group validBehavior
+        
+        group invalidBehavior {
+            
+            /**
+             * @desc    Reception of ITS-SCUalive (alive) message with address conflict
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ITS-SCUalive (alive) message with address conflict , i.e. from an ITS-SCU having the same ITS-SCU-ID
+             *      }
+             *      then {
+             *          the IUT shall acknowledge this with ErrorStatus = 2 using MF-COMMAND IICresponseTX for transmission to all ITS-SCUs,
+             *          and the IUT shall delete its own ITS-SCU-ID and shall register newly by sending an ITS-SCU (new) message indicating a new ITS-SCU-ID with MF-COMMAND IICrequestTX to the IIC Communication Manager for transmission to all ITS-SCUs
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BI/01
+             */
+            testcase TC_IICP_MGM_BI_01() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BI_01: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BI_01: INFO: Preamble: IUT was setup properly ***");
+               
+                // Test Body
+                // Clause 'when'
+                f_sendAliveMessage(
+                    f_getIutDestItsScuId(),        // Both source and destination are identical ==> conflict expected
+                    f_getIutDestItsScuId(), 
+                    m_scuAlive(
+                        0,                         // ITS-SCUalive (alive) message
+                        f_getIutSourceItsScuType() 
+                    )
+                );
+                log("*** TC_IICP_MGM_BI_01: INFO: ITS-SCUalive (alive) message with address conflict triggered ***");
+                // Clause 'then'
+                tc_ac.start; 
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndResp( 
+                            mdw_iicResponseTx_scuAlive(
+                                f_getIutDestItsScuId(),        // The IUT has its own ITS SCU-ID
+                                65535,                         // Broadcast
+                                ?, 
+                                2 // Check why TTWB raises an error using duplicateITS-scuId
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BI_01: PASS: The IUT has  detetcted the address conflict ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BI_01: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BI_01: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BI_01
+            
+            /**
+             * @desc    Reception of ITS-SCUalive message with unknown AliveMessage
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ITS-SCUalive message with unknown AliveMessage
+             *      }
+             *      then {
+             *          the IUT acknowledges the message with ErrorStatus 3
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BI/02
+             */
+            testcase TC_IICP_MGM_BI_02() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BI_02: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BI_02: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_sendAliveMessage(
+                    f_getIutLocalItsScuId(), 
+                    f_getIutDestItsScuId(), 
+                    m_scuAlive(
+                        128,                        // 128 is an undefined AliveMessage
+                        f_getIutSourceItsScuType() 
+                    )
+                );
+                log("*** TC_IICP_MGM_BI_02: INFO: Unknown ITS-SCUalive AliveMessage message triggered ***");
+                // Clause 'then'
+                tc_ac.start; 
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndResp( 
+                            mdw_iicResponseTx_scuAlive(
+                                f_getIutDestItsScuId(),
+                                ?,
+                                ?,
+                                3 // Check why TTWB raises an error using duplicateITS-scuId
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BI_02: INFO: The IUT has  detetcted the invalid AliveMessage ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BI_02: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BI_02: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BI_02
+            
+            /**
+             * @desc    Reception of ITS-SCUalive message with unknown ITS-SCU type
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ITS-SCUalive message with unknown ITS-SCU type
+             *      }
+             *      then {
+             *          the IUT acknowledges the message with ErrorStatus 4
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/MGM/BI/03
+             */
+            testcase TC_IICP_MGM_BI_03() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_IICP_MGM)) {
+                    log("*** TC_IICP_MGM_BI_03: ERROR: 'PICS_IICP_MGM' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_MGM_BI_03: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_sendAliveMessage(
+                    f_getIutLocalItsScuId(), 
+                    f_getIutDestItsScuId(), 
+                    m_scuAlive(
+                        0,                          // ITS-SCUalive (alive) message
+                        15                          // Unknown ITS-SCU type
+                    )
+                );
+                log("*** TC_IICP_MGM_BI_03: INFO: Unknown ITS-SCUalive with unknown ITS-SCU type message triggered ***");
+                // Clause 'then'
+                tc_ac.start; 
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndResp( 
+                            mdw_iicResponseTx_scuAlive(
+                                f_getIutDestItsScuId(),
+                                ?,
+                                ?,
+                                4 // Check why TTWB raises an error using duplicateITS-scuId
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_MGM_BI_03: INFO: The IUT has  detetcted the invalid AliveMessage type ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_MGM_BI_03: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_MGM_BI_03: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_MGM_BI_03
+            
+        } // End of group invalidBehavior
+        
+    } // End of group management
+    
+    // 8.2 Communications
+    group communications {
+        
+        group validBehavior {
+            
+            /**
+             * @desc    Transmission of IIC-Request VCI-info to all types of ITS-SCUs
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received the request to send an VCI-info message to all ITS-SCUs
+             *      }
+             *      then {
+             *          the IUT generates an VCI-info message with DestinationITS-SCU-ID=65535 
+             *          and with SourceITS-SCU-ID equal to the own ITS-SCU ID, 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IIC Communication Manager for transmission to all ITS-SCUs
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/01
+             */
+            testcase TC_IICP_COM_BV_01() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) VCI_info_res v_vCI_info_res;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_01: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_pduRequest := m_pduRequest_vciInfoReq(
+                    m_vciInfoReq(
+                        f_getIutMedType(), 
+                        f_getIutCiAccessClass(), 
+                        f_getIutCiClass() 
+                    )
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        65535,                           // Broadcast 
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_01: INFO: Request to send an VCI-info message to all ITS-SCUs triggered ***");
+                // Clause 'then'
+                v_vCI_info_res := m_vciInfoRes(
+                                      m_vciInfo(
+                                          f_getIutCiLinkId(), 
+                                          f_getIutMedType(), 
+                                          f_getIutCiAccessClass(), 
+                                          f_getIutCiClass(), 
+                                          8 // Active, see CIstatus_active_
+                                      ) // End of 'm_vciInfo' field
+                                  ); // End of 'm_vciInfoRes' field
+                tc_ac.start; 
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_McmdRq( 
+                            v_pduRequest.iicpReq.McmdRq
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_01: INFO: Receive McmdRq from MX-SAP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_McmdRs(
+                                m_mcmdRs_vciInfoRes(
+                                    v_vCI_info_res
+                                ) // End of 'm_mcmdRs_vciInfoRes' field
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_01: INFO: VCI-info-Res sent ***");
+						log("*** TC_IICP_COM_BV_01: DEBUG: ",
+						    mw_iicpIndResp(
+                                mw_iicpResponse_vciInfoRes(
+                                    f_getIutDestItsScuId(),
+                                    ?, //f_getIutSourceItsScuId(),
+                                    v_vCI_info_res
+                            )),
+						    " ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mw_iicpResponse_vciInfoRes(
+                                f_getIutDestItsScuId(),
+                                ?, //f_getIutSourceItsScuId(),
+                                v_vCI_info_res
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_01: PASS: The IUT has generated a McmdRs IICresponse ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_01: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_01: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_01
+            
+            /**
+             * @desc    Transmission of IIC-Request VCI-info to ITS-SCUs with ITS-S router role
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received the request to send an VCI-info message to all ITS-SCUs
+             *      }
+             *      then {
+             *          the IUT generates an VCI-info message with DestinationITS-SCU-ID=2 
+             *          and with SourceITS-SCU-ID equal to the own ITS-SCU ID, 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IIC Communication Manager for transmission to all ITS-SCUs
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/02
+             */
+            testcase TC_IICP_COM_BV_02() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) VCI_info_res v_vCI_info_res;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_02: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_pduRequest := m_pduRequest_vciInfoReq(
+                    m_vciInfoReq(
+                        f_getIutMedType(), 
+                        f_getIutCiAccessClass(), 
+                        f_getIutCiClass() 
+                    )
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        f_getIutDestItsScuId(),            
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_02: INFO: Request to send an VCI-info message to all ITS-SCUs triggered ***");
+                // Clause 'then'
+                v_vCI_info_res := m_vciInfoRes(
+                                      m_vciInfo(
+                                          f_getIutCiLinkId(), 
+                                          f_getIutMedType(), 
+                                          f_getIutCiAccessClass(), 
+                                          f_getIutCiClass(), 
+                                          8 // Active, see CIstatus_active_
+                                      ) // End of 'm_vciInfo' field
+                                  ); // End of 'm_vciInfoRes' field
+                tc_ac.start; 
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_McmdRq( 
+                            v_pduRequest.iicpReq.McmdRq
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_02: INFO: Receive McmdRq from MX-SAP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_McmdRs(
+                                m_mcmdRs_vciInfoRes(
+                                    v_vCI_info_res
+                                ) // End of 'm_mcmdRs_vciInfoRes' field
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_02: INFO: VCI-info-Res sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mw_iicpResponse_vciInfoRes(
+                                f_getIutDestItsScuId(),
+                                ?,
+                                v_vCI_info_res
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_02: PASS: The IUT has generated a McmdRs IICresponse ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_02: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_02: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_02
+            
+            /**
+             * @desc    Transmission of IIC-Request VCI-info to ITS-SCUs with ITS-S host role
+             * <pre>
+             * Pics Selection: PICS_ROLE_HONLY or PICS_ROLE_RH
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received the request to send an VCI-info message to all ITS-SCUs
+             *      }
+             *      then {
+             *          the IUT generates an VCI-info message with DestinationITS-SCU-ID"private address from the ITS-SCU which generated the request"  
+             *          and with SourceITS-SCU-ID equal to the own ITS-SCU ID, 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IIC Communication Manager for transmission to all ITS-SCUs
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/03
+             */
+            testcase TC_IICP_COM_BV_03() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) VCI_info_res v_vCI_info_res;
+                
+                // Test control
+                if (not(PICS_ROLE_HONLY or PICS_ROLE_RH)) {
+                    log("*** TC_IICP_COM_BV_03: ERROR: 'PICS_ROLE_HONLY or PICS_ROLE_RH' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_03: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_pduRequest := m_pduRequest_vciInfoReq(
+                    m_vciInfoReq(
+                        f_getIutMedType(), 
+                        f_getIutCiAccessClass(), 
+                        f_getIutCiClass() 
+                    )
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        65535,                           // Broadcast 
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_03: INFO: Request to send an VCI-info message to all ITS-SCUs triggered ***");
+                // Clause 'then'
+                v_vCI_info_res := m_vciInfoRes(
+                                      m_vciInfo(
+                                          f_getIutCiLinkId(), 
+                                          f_getIutMedType(), 
+                                          f_getIutCiAccessClass(), 
+                                          f_getIutCiClass(), 
+                                          8 // Active, see CIstatus_active_
+                                      ) // End of 'm_vciInfo' field
+                                  ); // End of 'm_vciInfoRes' field
+                tc_ac.start; 
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_McmdRq( 
+                            v_pduRequest.iicpReq.McmdRq
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_01: INFO: Receive McmdRq from MX-SAP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_McmdRs(
+                                m_mcmdRs_vciInfoRes(
+                                    v_vCI_info_res
+                                ) // End of 'm_mcmdRs_vciInfoRes' field
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_03: INFO: VCI-info-Res sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mw_iicpResponse_vciInfoRes(
+                                f_getIutDestItsScuId(),
+                                ?,
+                                v_vCI_info_res
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_01: PASS: The IUT has generated a McmdRs IICresponse ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_03: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_03: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_03
+            
+            /**
+             * @desc    Transmission of IIC-Request VCI-update to all types of ITS-SCUs
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID 
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT wants to provide an update of its own VCI information to all ITS-SCUs
+             *      }
+             *      then {
+             *          the IUT generates an VCI-update message with DestinationITS-SCU-ID=65535 
+             *          and with SourceITS-SCU-ID equal to the own ITS-SCU ID, 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IICA for transmission to all ITS-SCUs
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/04
+             */
+            testcase TC_IICP_COM_BV_04() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+               
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_04: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                action("IUT wants to provide an update of its own VCI information to all ITS-SCUs"); // FIXME I have no idea on how to trigger this kind of event
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive(
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_vciUpdate(
+                                ?,
+                                65535,                           // Broadcast
+                                { }                              // Empty list
+                    ))) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_04: PASS: the IUT generates an VCI-update message ***");
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_04: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_04: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_04
+            
+            /**
+             * @desc    Reception of VCI-update request message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an VCI-update request message
+             *      }
+             *      then {
+             *          the IUT does not show any visible reaction
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/05
+             */
+            testcase TC_IICP_COM_BV_05() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_05: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        f_getIutDestItsScuId(),            
+                        f_getNextPduCounter(), 
+                        m_pduRequest_vciUpdateReq_empty
+                    )
+                );
+                log("*** TC_IICP_COM_BV_05: INFO: VCI-update request message triggered ***");
+                // Clause 'then'
+                tc_noac.start; // No message expected
+                alt {
+                    // Default altstep manages unsollicited message
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BV_05: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_05: INFO: test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_05
+            
+            /**
+             * @desc    Transmission of IIC-Request MF-rcmd to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the ITS-S management requests remote access to the MF-SAP in another ITS-SCU
+             *      }
+             *      then {
+             *          the IUT generates an MF-rcmd request message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/06
+             */
+            testcase TC_IICP_COM_BV_06() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MF_Request_request v_mf_Request_request;
+               
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_06: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mf_Request_request := m_mfRequestRequest_ldmRegister( // Any MF-Request-request that could trigger a remote request at Management layer
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMfRequest()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mf_Request_request := v_mf_Request_request }
+                );
+                log("*** TC_IICP_COM_BV_06: INFO: MF-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_mfRequestRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mf_Request_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_06: PASS: The IUT has generated a MF-Request-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_06: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_06: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_06
+            
+            /**
+             * @desc    Transmission of IIC-Request MN-rcmd to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the ITS-S management requests remote access to the MN-SAP in another ITS-SCU
+             *      }
+             *      then {
+             *          the IUT generates an MN-rcmd message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/07
+             */
+            testcase TC_IICP_COM_BV_07() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MN_Request_request v_mn_Request_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_07: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mn_Request_request := m_mnRequestRequest_setNotFNTP( // Any MN-Request-request that could trigger a remote request at Management layer
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMnRequest()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mn_Request_request := v_mn_Request_request }
+                );
+                log("*** TC_IICP_COM_BV_07: INFO: MN-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_mnRequestRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mn_Request_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_07: PASS: The IUT has generated a MN-Request-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_07: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_07: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_07
+            
+            /**
+             * @desc    Transmission of IIC-Request MI-rcmd to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the ITS-S management requests remote access to the MI-SAP in another ITS-SCU
+             *      }
+             *      then {
+             *          the IUT generates an MI-rcmd message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/08
+             */
+            testcase TC_IICP_COM_BV_08() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MI_Request_request v_mi_Request_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_08: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Request_request := m_miRequestRequest_regReq( // Any MI-Request-request that could trigger a remote request at Management layer
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMiRequest()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mi_Request_request := v_mi_Request_request }
+                );
+                log("*** TC_IICP_COM_BV_08: INFO: MI-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_miRequestRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mi_Request_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_08: PASS: The IUT has generated a MI-Request-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_08: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_08: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_08
+            
+            /**
+             * @desc    Transmission of IIC-Request MI-rget to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the ITS-S management requests remote access to the MI-SAP in another ITS-SCU in order to get the value of an I-Parameter
+             *      }
+             *      then {
+             *          the IUT generates an MI-rget message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MI-GET IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/09
+             */
+            testcase TC_IICP_COM_BV_09() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MI_Get_request v_mi_Get_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_09: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Get_request := m_miGetRequest( // Any MI-Get-request that could trigger a remote request at Management layer
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutIparamNoList()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mi_Get_request := v_mi_Get_request }
+                );
+                log("*** TC_IICP_COM_BV_09: INFO: MI-Get-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_miGetRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mi_Get_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_09: PASS: The IUT has generated a MI-Get-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_09: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_09: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_09
+            
+            /**
+             * @desc    Transmission of IIC-Request MI-rset to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the ITS-S management requests remote access to the MI-SAP in another ITS-SCU in order to set the value of an I-Parameter
+             *      }
+             *      then {
+             *          the IUT generates an MI-rset message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/10
+             */
+            testcase TC_IICP_COM_BV_10() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MI_Set_request v_mi_Set_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_10: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Set_request := m_miSetRequest( // Any MI-Set-request that could trigger a remote request at Management layer
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutIparamList()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mi_Set_request := v_mi_Set_request }
+                );
+                log("*** TC_IICP_COM_BV_10: INFO: MI-Set-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_miSetRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mi_Set_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_10: PASS: The IUT has generated a MI-Set-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_10: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_10: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_10
+            
+            /**
+             * @desc    Transmission of MF-rcmd response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID "own"
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MF-rcmd request message from an ITS-SCU with ITS-SCU-ID="other" which requires a response
+             *      }
+             *      then {
+             *          the IUT generates an MF-rcmd response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICresponseTX to the IICA 
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/11
+             */
+            testcase TC_IICP_COM_BV_11() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) MF_Command_request v_mf_Command_request;
+                var template (value) MF_Command_confirm v_mf_Command_confirm;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_11: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mf_Command_request := m_mfCommandRequest_stateCInotify( // Any MF-Command-request which requires a response
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMfCommand() 
+                );
+                v_pduRequest := m_pduRequest_mfCommandReq(
+                    v_mf_Command_request
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),
+                        f_getIutDestItsScuId(),
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_11: INFO: MF-rcmd request message done ***");
+                // Clause 'then'
+                v_mf_Command_confirm := m_mfCommand_confirm_stateCInotify(
+                    v_mf_Command_request.commandRef
+                );
+                tc_ac.start;
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_MfCommandRequest( 
+                            v_pduRequest.iicpReq.MF_Command_request
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_11: INFO: Receive MF-Command-request from 'other' IICP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_MfCommandConfirm(
+                                v_mf_Command_confirm
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_11: INFO: MF-Command-confirm sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mdw_iicpResponse_mfCommandConfirm(
+                                f_getIutDestItsScuId(),
+                                ?, //f_getIutSourceItsScuId(),
+                                v_mf_Command_confirm
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_11: PASS: The IUT has generated a MF-COMMAND IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_11: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_11: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_11
+            
+            /**
+             * @desc    transmission of MN-rcmd response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID "own"
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MN-rcmd request message from an ITS-SCU with ITS-SCU-ID="other" which requires a response
+             *      }
+             *      then {
+             *          the IUT generates an MN-rcmd response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICresponseTX to the IICA 
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/12
+             */
+            testcase TC_IICP_COM_BV_12() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) MN_Command_request v_mn_Command_request;
+                var template (value) MN_Command_confirm v_mn_Command_confirm;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_12: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mn_Command_request := m_mnCommandRequest_deleteFntp( // Any MN-Command-request which requires a response
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMnCommand() 
+                );
+                v_pduRequest := m_pduRequest_mnCommandReq(
+                    v_mn_Command_request
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),
+                        f_getIutDestItsScuId(),
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_12: INFO: MN-rcmd request message done ***");
+                // Clause 'then'
+                v_mn_Command_confirm := mw_mnCommandConfirm_deleteFntpConf(
+                    v_mn_Command_request.commandRef,
+                    f_getIutRemoteCmdForMnCommand()
+                );
+				log("*** TC_IICP_COM_BV_12: DEBUG: ",
+                    mw_utIicpEventInd_MnCommandRequest( 
+                        v_pduRequest.iicpReq.MN_Command_request
+				    ),
+				    " ***"
+				);
+                tc_ac.start;
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_MnCommandRequest( 
+                            v_pduRequest.iicpReq.MN_Command_request
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_12: INFO: Receive MN-Command-request from 'other' IICP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_MnCommandConfirm(
+                                v_mn_Command_confirm
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_12: INFO: MN-Command-confirm sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mdw_iicpResponseTx_mnCommandConfirm(
+                                f_getIutDestItsScuId(),
+                                ?, //f_getIutSourceItsScuId(),
+                                v_mn_Command_confirm
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_12: PASS: The IUT has generated a MN-COMMAND IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_12: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_12: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_12
+            
+            /**
+             * @desc    Transmissiom of MI-rcmd response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID "own"
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MI-rcmd request message from an ITS-SCU with ITS-SCU-ID="other" which requires a response
+             *      }
+             *      then {
+             *          the IUT generates an MI-rcmd response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICresponseTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/13
+             */
+            testcase TC_IICP_COM_BV_13() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) MI_Command_request v_mi_Command_request;
+                var template (value) MI_Command_confirm v_mi_Command_confirm;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_13: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Command_request := m_miCommandRequest_wakeUp( // Any MI-Command-request which requires a response
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMiCommand() 
+                );
+                v_pduRequest := m_pduRequest_miCommandReq(
+                    v_mi_Command_request
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),
+                        f_getIutDestItsScuId(),
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_13: INFO: MI-rcmd request message done ***");
+                // Clause 'then'
+                v_mi_Command_confirm := mw_miCommandConfirm_wakeUp(
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    v_mi_Command_request.commandRef
+                );
+                tc_ac.start;
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_MiCommandRequest( 
+                            v_pduRequest.iicpReq.MI_Command_request
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_13: INFO: Receive MI-Command-request from 'other' IICP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_MiCommandConfirm(
+                                v_mi_Command_confirm
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_13: INFO: MI-Command-confirm sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mdw_iicpResponseTx_miCommandConfirm(
+                                f_getIutDestItsScuId(),
+                                ?, //f_getIutSourceItsScuId(),
+                                v_mi_Command_confirm
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_13: PASS: The IUT has generated a MI-COMMAND IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_13: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_13: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_13
+            
+            /**
+             * @desc    Transmission of MI-rget response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID "own"
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MI-rcmd request message from an ITS-SCU with ITS-SCU-ID="other" which constitutes an authorized get request
+             *      }
+             *      then {
+             *          the IUT generates an MI-rget response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICresponseTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/14
+             */
+            testcase TC_IICP_COM_BV_14() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) MI_Get_request v_mi_Get_request;
+                var template (value) MI_Get_confirm v_mi_Get_confirm;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_14: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Get_request := m_miGetRequest( // Any MI-Command-request which requires a response
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutIparamNoList() 
+                );
+                v_pduRequest := m_pduRequest_miGetReq(
+                    v_mi_Get_request
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),
+                        f_getIutDestItsScuId(),
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_14: INFO: MI-rcmd request message done ***");
+                // Clause 'then'
+                v_mi_Get_confirm := mw_miGetConfirm(
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    v_mi_Get_request.commandRef,
+                    f_getIutIparamList() 
+                );
+                tc_ac.start;
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_MiGetRequest( 
+                            v_pduRequest.iicpReq.MI_Get_request
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_14: INFO: Receive MI-Get-request from 'other' IICP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_MiGetConfirm(
+                                v_mi_Get_confirm
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_14: INFO: MI-Get-confirm sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mdw_iicpResponseTx_miGetConfirm(
+                                f_getIutDestItsScuId(),
+                                ?, //f_getIutSourceItsScuId(),
+                                v_mi_Get_confirm
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_14: PASS: The IUT has generated a MI-GET IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_14: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_14: INFO: Test body done ***");
+              
+              // Postamble
+              f_poDefault();
+              f_cf01Down();
+              
+          } // End of testcase TC_IICP_COM_BV_14
+            
+            /**
+             * @desc    Transmission of MI-rset response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID "own"
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MI-rset request message from an ITS-SCU with ITS-SCU-ID="other" which constitutes an unauthorized set request
+             *      }
+             *      then {
+             *          the IUT generates an MI-rset response message providing the requested value with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", indicating the proper error code, 
+             *          and forwards this with MI-COMMAND IICresponseTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/15
+             */
+            testcase TC_IICP_COM_BV_15() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                var template (value) MI_Set_request v_mi_Set_request;
+                var template (value) MI_Set_confirm v_mi_Set_confirm;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_15: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Set_request := m_miSetRequest( // Any MI-Command-request which requires a response
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutIparamList() 
+                );
+                v_pduRequest := m_pduRequest_miSetReq(
+                    v_mi_Set_request
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),
+                        f_getIutDestItsScuId(),
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_15: INFO: MI-rcmd request message done ***");
+                // Clause 'then'
+                v_mi_Set_confirm := mw_miSetConfirm(
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    v_mi_Set_request.commandRef,
+                    f_getIutErrorsList() 
+                );
+                tc_ac.start;
+                alt { 
+                    [] utPort.receive(
+                        mw_utIicpEventInd_MiSetRequest( 
+                            v_pduRequest.iicpReq.MI_Set_request
+                    )) {
+                        tc_ac.stop;
+                        log("*** TC_IICP_COM_BV_15: INFO: Receive MI-Set-request from 'other' IICP ***");
+                        f_utIicpEvent(
+                            m_utIicpEvent_MiSetConfirm(
+                                v_mi_Set_confirm
+                            ) 
+                        );
+                        log("*** TC_IICP_COM_BV_15: INFO: MI-Set-confirm sent ***");
+                        tc_ac.start;
+                        repeat;
+                    }
+                    [] iicpPort.receive(
+                        mw_iicpIndResp(
+                            mdw_iicpResponseTx_miSetConfirm(
+                                f_getIutDestItsScuId(),
+                                ?, //f_getIutSourceItsScuId(),
+                                v_mi_Set_confirm
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_15: PASS: The IUT has generated a MI-SET IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_15: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_15: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_15
+            
+            /**
+             * @desc    Reception of MF-rreq request message to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU ID "own", 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          ITS-S management entity is used by ITS-S facilities layer to request access to a remote management
+             *      }
+             *      then {
+             *          the IUT generates an MF-rreq message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MF-COMMAND IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/16
+             */
+            testcase TC_IICP_COM_BV_16() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MF_Request_request v_mf_Request_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_16: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mf_Request_request := m_mfRequestRequest_ldmRegister( // Any MF-Request-request that could trigger a remote request at Management layer
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMfRequest()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mf_Request_request := v_mf_Request_request }
+                );
+                log("*** TC_IICP_COM_BV_16: INFO: MF-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_mfCommandRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mf_Request_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_16: PASS: The IUT has generated a MF-Command-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_16: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_16: INFO: Test body done ***");
+               
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_16
+            
+            /**
+             * @desc    Transmission of IIC-Request MN-rreq to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          ITS-S management entity is used by ITS-S networking&transport layer to request access to a remote management
+             *      }
+             *      then {
+             *          the IUT generates an MN-rreq message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MN-COMMAND IICrequestTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/17
+             */
+            testcase TC_IICP_COM_BV_17() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MN_Request_request v_mn_Request_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_17: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mn_Request_request := m_mnRequestRequest_setNotFNTP( // Any MN-Request-request that could trigger a remote request at Management layer
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMnRequest()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mn_Request_request := v_mn_Request_request }
+                );
+                log("*** TC_IICP_COM_BV_17: INFO: MN-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_mnCommandRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mn_Request_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_17: PASS: The IUT has generated a MN-Command-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_17: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_17: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_17
+            
+            /**
+             * @desc    Transmission of IIC-Request MI-rreq to a specific ITS-SCU
+             * <pre>
+             * Pics Selection: PICS_IICP_MGM
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *      and knows the private ITS-SCU-ID "other" of another ITS-SCU
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the ITS-S management entity requests a remote access to the management entity in another ITS-SCU
+             *      }
+             *      then {
+             *          the IUT generates an MI-rreq message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MI-COMMAND IICrequestTX to the IIC Communication Manager
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/18
+             */
+            testcase TC_IICP_COM_BV_18() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) MI_Request_request v_mi_Request_request;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_18: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_mi_Request_request := m_miRequestRequest_regReq( // Any MI-Request-request that could trigger a remote request at Management layer
+                    f_getIutRemoteCmdForMiRequestLinkID(),
+                    f_getNextCommandRef(), 
+                    f_getIutRemoteCmdForMiRequest()
+                );
+                f_utIicpEvent(
+                    UtIicpEvent: { mi_Request_request := v_mi_Request_request }
+                );
+                log("*** TC_IICP_COM_BV_18: INFO: MI-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndReq(
+                            mdw_iicRequestTx_miCommandRequest(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                v_mi_Request_request
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_18: PASS: The IUT has generated a MI-Command-request IICrequestTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_18: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_18: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_18
+            
+            /**
+             * @desc    Transmission of IIC-Request MI-rreq response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MI-rreq request message from an ITS-SCU with ITS-SCU-ID="other" which requires a response
+             *      }
+             *      then {
+             *          the IUT generates an MI-rreq response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MI-COMMAND IICresponseTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/19
+             */
+            testcase TC_IICP_COM_BV_19() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_19: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_pduRequest := m_pduRequest_miRequestRequest(
+                    m_miRequestRequest_regReq( // Any MI-Request-request that could trigger a remote request at Management layer
+                        f_getIutRemoteCmdForMiRequestLinkID(),
+                        f_getNextCommandRef(), 
+                        f_getIutRemoteCmdForMiRequest()
+                    )
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        f_getIutDestItsScuId(),         // 'own'
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_19: INFO: MI-Request-request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndResp(
+                            mdw_iicResponseTx_miCommandConfirm(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                ?
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_19: PASS: The IUT has generated a MI-Command-confirm IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_19: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_19: INFO: Test body done ***");
+               
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_19
+            
+            /**
+             * @desc    Transmission of MN-rreq response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MN-rreq request message from an ITS-SCU with ITS-SCU-ID="other" which requires a response
+             *      }
+             *      then {
+             *          the IUT generates an MN-rreq response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MN-COMMAND IICresponseTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/20
+             */
+            testcase TC_IICP_COM_BV_20() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_20: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_pduRequest := m_pduRequest_mnRequestRequest(
+                    m_mnRequestRequest_setNotFNTP(  // Any MN-Request-request that could trigger a remote request at Management layer
+                        f_getNextCommandRef(), 
+                        f_getIutRemoteCmdForMnRequest() 
+                    )
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        f_getIutDestItsScuId(),         // 'own'
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_20: INFO: MN-rreq request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndResp(
+                            mdw_iicpResponseTx_mnCommandConfirm(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                ?
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_20: INFO: The IUT has generated a MN-rreq IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_20: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_20: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_20
+            
+            /**
+             * @desc    Transmission of MI-rreq response message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an MI-rreq request message from an ITS-SCU with ITS-SCU-ID="other" which requires a response
+             *      }
+             *      then {
+             *          the IUT generates an MI-rreq response message with DestinationITS-SCU-ID="other" 
+             *          and with SourceITS-SCU-ID "own", 
+             *          and forwards this with MI-COMMAND IICresponseTX to the IICA
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/21
+             */
+            testcase TC_IICP_COM_BV_21() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                var template (value) PduRequest v_pduRequest;
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_21: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                v_pduRequest := m_pduRequest_miRequestRequest(
+                    m_miRequestRequest_regReq( // Any MI-Request-request that could trigger a remote request at Management layer
+                        f_getIutCiLinkId(), 
+                        f_getNextCommandRef(), 
+                        f_getIutRemoteCmdForMiRequest() 
+                    )
+                );
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutOtherItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        f_getIutDestItsScuId(),         // 'own'
+                        f_getNextPduCounter(), 
+                        v_pduRequest
+                    )
+                );
+                log("*** TC_IICP_COM_BV_21: INFO: MI-rreq request message triggered ***");
+                // Clause 'then'
+                tc_ac.start;
+                alt { 
+                    [] iicpPort.receive( 
+                        mw_iicpIndResp(
+                            mdw_iicResponseTx_miCommandConfirm(
+                                f_getIutDestItsScuId(),
+                                f_getIutOtherItsScuId(),
+                                ?
+                    ))) {
+                        tc_ac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success);
+                        log("*** TC_IICP_COM_BV_21: INFO: The IUT has generated a MI-rreq IICresponseTX ***");
+                    }
+                    [] tc_ac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                        log("*** TC_IICP_COM_BV_21: INCONC: Expected message not received ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_21: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_21
+            
+            /**
+             * @desc    Reception of an ICC-Request message with invalid DestinationITS-SCU-ID=1
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ICC-Request message with invalid DestinationITS-SCU-ID=1 (ITS-S host)
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/22
+             */
+            testcase TC_IICP_COM_BV_22() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_22: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        1,                               // Invalid DestinationITS-SCU-ID (ITS-S host)
+                        f_getNextPduCounter(),
+                        m_pduRequest_vciInfoReq(
+                            m_vciInfoReq(
+                                f_getIutMedType(), 
+                                f_getIutCiAccessClass(), 
+                                f_getIutCiClass() 
+                            )
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BV_22: INFO:  Invalid DestinationITS-SCU-ID=1 (ITS-S host) triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    // Default altstep manages unsollicited messages
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BV_22: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_22: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_22
+            
+            /**
+             * @desc    Reception of an ICC-Request message with invalid DestinationITS-SCU-ID=2
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID "own" 
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ICC-Request message with invalid DestinationITS-SCU-ID=2 (ITS-S router)
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BV/23
+             */
+            testcase TC_IICP_COM_BV_23() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BV_23: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        2,                               // Invalid DestinationITS-SCU-ID (ITS-S router)
+                        f_getNextPduCounter(),
+                        m_pduRequest_vciInfoReq(
+                            m_vciInfoReq(
+                                f_getIutMedType(), 
+                                f_getIutCiAccessClass(), 
+                                f_getIutCiClass() 
+                            )
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BV_23: INFO:  Invalid DestinationITS-SCU-ID=2 (ITS-S router) triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    // Default altstep manages unsollicited messages
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BV_23: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BV_23: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BV_23
+            
+        } // End of group validBehavior
+        
+        group invalidBehavior {
+            
+            /**
+             * @desc    Reception of an ICC-Request message with invalid DestinationITS-SCU-ID (reserved)
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ICC-Request message with invalid DestinationITS-SCU-ID (reserved)
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/01
+             */
+            testcase TC_IICP_COM_BI_01() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_01: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        5,                               // Invalid DestinationITS-SCU-ID (reserved)
+                        f_getNextPduCounter(),
+                        m_pduRequest_vciInfoReq(
+                            m_vciInfoReq(
+                                f_getIutMedType(), 
+                                f_getIutCiAccessClass(), 
+                                f_getIutCiClass() 
+                            )
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_01: INFO: Message with an invalid DestinationITS-SCU-ID (reserved) triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    // Default altstep manages unsollicited messages
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_01: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_01: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_01
+            
+            /**
+             * @desc    Reception of an ICC-Response message with invalid DestinationITS-SCU-ID=1
+             * <pre>
+             * Pics Selection: PICS_ROLE_RONLY
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ICC-Response message with invalid DestinationITS-SCU-ID=1 (ITS-S host)
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/02
+             */
+            testcase TC_IICP_COM_BI_02() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_ROLE_RONLY)) {
+                    log("*** TC_IICP_COM_BI_02: ERROR: 'PICS_ROLE_RONLY' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_02: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Response(
+                    m_iicResponse(
+                        f_getIutSourceItsScuId(),           // The IUT has its own ITS SCU-ID 
+                        1,                                  // Invalid DestinationITS-SCU-ID=1 (ITS-S host)
+                        f_getNextPduCounter(),
+                        m_pduResponse_mfRequestConfirm(
+                            f_getIutIicResponse()
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_02: INFO: Message with an invalid DestinationITS-SCU-ID (reserved) triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    [] iicpPort.receive {
+                        tc_noac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                        log("*** TC_IICP_COM_BI_02: FAIL: No message was expected ***");
+                    }
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_02: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_02: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_02
+            
+            /**
+             * @desc    Reception of an ICC-Response message with invalid DestinationITS-SCU-ID=2
+             * <pre>
+             * Pics Selection: PICS_ROLE_HONLY
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *          the IUT having received an ICC-Response message with invalid DestinationITS-SCU-ID (reserved)
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/03
+             */
+            testcase TC_IICP_COM_BI_03() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                if (not(PICS_ROLE_HONLY)) {
+                    log("*** TC_IICP_COM_BI_03: ERROR: 'PICS_ROLE_HONLY' required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_03: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Response(
+                    m_iicResponse(
+                        f_getIutSourceItsScuId(),           // The IUT has its own ITS SCU-ID 
+                        2,                                  // Invalid DestinationITS-SCU-ID=2 (ITS-S router)
+                        f_getNextPduCounter(),
+                        m_pduResponse_mfRequestConfirm(
+                            f_getIutIicResponse()
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_03: INFO: Message with an invalid DestinationITS-SCU-ID (reserved) triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    [] iicpPort.receive {
+                        tc_noac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                        log("*** TC_IICP_COM_BI_03: FAIL: No message was expected ***");
+                    }
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_03: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_03: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_03
+            
+            /**
+             * @desc    Reception of an ICC-Response message with invalid DestinationITS-SCU-ID (reserved)
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an ICC-Response message with invalid DestinationITS-SCU-ID (reserved)
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/04
+             */
+            testcase TC_IICP_COM_BI_04() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_04: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Response(
+                    m_iicResponse(
+                        f_getIutSourceItsScuId(),           // The IUT has its own ITS SCU-ID 
+                        5,                                  // Invalid DestinationITS-SCU-ID (reserved)
+                        f_getNextPduCounter(),
+                        m_pduResponse_mfRequestConfirm(
+                            f_getIutIicResponse()
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_04: INFO: Message with an invalid DestinationITS-SCU-ID (reserved) triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    [] iicpPort.receive {
+                        tc_noac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                        log("*** TC_IICP_COM_BI_04: FAIL: No message was expected ***");
+                    }
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_04: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_04: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_04
+            
+            /**
+             * @desc    Reception of an ICC-Request message with odd "PDU-Counter" value
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an IIC-Request message with odd "PDU-Counter" value
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/05
+             */
+            testcase TC_IICP_COM_BI_05() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                // Assume that 'Initial conditions' are achieved
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_05: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        65535,                           // Broadcast 
+                        f_getNextPduCounter() + 1,       // Odd "PDU-Counter" value
+                        m_pduRequest_vciInfoReq(
+                            m_vciInfoReq(
+                                f_getIutMedType(), 
+                                f_getIutCiAccessClass(), 
+                                f_getIutCiClass() 
+                            )
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_05: INFO: Request with Odd PDU-Counter value triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    // Default altstep manages unsollicited messages
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_05: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_05: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_05
+            
+            /**
+             * @desc    Reception of an ICC-Response message with even "PDU-Counter" value
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received an IIC-Response message with even "PDU-Counter" value
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/06
+             */
+            testcase TC_IICP_COM_BI_06() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_06: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Response(
+                    m_iicResponse(
+                        f_getIutSourceItsScuId(), 
+                        65535,                              // Valid DestinationITS-SCU-ID
+                        f_getNextPduCounter() + 1,          // Odd "PDU-Counter" value
+                        m_pduResponse_mfRequestConfirm(
+                            f_getIutIicResponse()
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_06: INFO: IIC-Response message with even PDU-Counter value triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    [] iicpPort.receive {
+                        tc_noac.stop;
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                        log("*** TC_IICP_COM_BI_06: FAIL: No message was expected ***");
+                    }
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_06: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_06: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_06
+            
+            /**
+             * @desc    Reception of an ICC-Response message with "PDU-Counter" not indicating a previous ICC-Request message
+             * <pre>
+             * Pics Selection: 
+             * Config Id: CF01
+             * Initial conditions: 
+             *  with {
+             *      the IUT having its own ITS-SCU-ID, 
+             *      the ITU not awaiting an IIC-Response message
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT having received a privately addressed IIC-Response message with odd "PDU-Counter" value
+             *      }
+             *      then {
+             *          the IUT deletes the received message
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @version 1.2.1
+             * @see     ETSI TS 102 797-2 v1.2.1 IICP/COM/BI/07
+             */
+            testcase TC_IICP_COM_BI_07() runs on ItsCalm system ItsCalmSystem {
+                // Local variables
+                
+                // Test control
+                // No PICS to be checked
+                
+                // Test component configuration
+                f_cf01Up();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                // Clause 'Initial conditions'
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                log("*** TC_IICP_COM_BI_07: INFO: Preamble: IUT was setup properly ***");
+                
+                // Test Body
+                // Clause 'when'
+                f_iicpEvent_IIC_Request(
+                    m_iicRequest(
+                        f_getIutSourceItsScuId(),        // The IUT has its own ITS SCU-ID 
+                        65535,                           // Broadcast 
+                        f_getNextPduCounter() + 1,      // Odd "PDU-Counter" value
+                        m_pduRequest_vciInfoReq(
+                            m_vciInfoReq(
+                                f_getIutMedType(), 
+                                f_getIutCiAccessClass(), 
+                                f_getIutCiClass() 
+                            )
+                        )
+                    )
+                );
+                log("*** TC_IICP_COM_BI_07: INFO: Privately addressed IIC-Response message with odd PDU-Counter value triggered ***");
+                // Clause 'then'
+                tc_noac.start;
+                alt {
+                    // Default altstep manages unsollicited messages
+                    [] tc_noac.timeout {
+                        f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                        log("*** TC_IICP_COM_BI_07: PASS: No message received as expected ***");
+                    }
+                } // End of 'alt' statement
+                log("*** TC_IICP_COM_BI_07: INFO: Test body done ***");
+                
+                // Postamble
+                f_poDefault();
+                f_cf01Down();
+                
+            } // End of testcase TC_IICP_COM_BI_07
+            
+        } // End of group invalidBehavior
+        
+    } // End of group communications
+    
+} // End of module ItsIicp_TestCases

@@ -1,0 +1,222 @@
+/**
+ *  @author     ETSI / STF421
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DCC/LibItsDcc_TypesAndValues.ttcn $
+ *              $Id: LibItsDcc_TypesAndValues.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *  @desc       DCC (TS 102 724) Types
+ *  @see        ETSI TS 102 917-3
+ */
+module LibItsDcc_TypesAndValues {
+    
+    // LibCommon
+    
+    // LibIts
+    
+    group utRadioPrimitives {
+        
+        /**
+         * @desc Trigger to initialize the IUT.
+         */
+        type record UtRadioInitialize {
+        }
+        
+        /**
+         * @desc Radio Event to bring the IUT to defined channel states.
+         */
+        type record UtRadioEvent {
+            ChannelState cchChannelState optional,
+            ChannelState sch1ChannelState optional,
+            ChannelState sch2ChannelState optional,
+            ChannelState sch3ChannelState optional,
+            ChannelState sch4ChannelState optional
+        }
+        
+    } // End of group utRadioPrimitives
+    
+    group rrxSapPrimitives {
+        /**
+         * @desc Receive an indication related to frames sent by the IUT at the radio interface.
+         */
+        type record RrxInd { 
+            Channel channel,
+            integer measuredPower
+        }
+        
+    } // End of group rrxSapPrimitives
+
+    group inSapPrimitives {
+        
+            /**
+             * @desc IN Request Primitive 
+             */
+            type record InReq {
+                integer     commandReference,
+                octetstring referenceBurst,
+                integer     requestedSendPower,
+                integer     dCCProfileIdentifier
+            } // End InReq
+            
+            /**
+             * @desc IN Status Primitive 
+             */
+            type record InSta {
+                integer commandReference,
+                Channel channel,
+                boolean transmissionSuccessStatus,
+                integer achievedSendPower
+            } // End InSta
+            
+    } // End of group inSapPrimitives
+
+    group subFields {
+
+        type enumerated Channel {
+             cCH(0),
+             sCH1(1),
+             sCH2(2),
+             sCH3(3),
+             sCH4(4)
+        }
+            
+        type enumerated ChannelState {
+             relaxed(0),
+             active(1),
+             restrictive(2)
+        }
+            
+    } // End of group subFields
+    
+    group moduleParTables {
+        
+        type integer ProfileType(0..infinity);
+        
+        type record ProfileTimeAspect {
+            ProfileType profile,
+            float messageInterval, //in Hz
+            float tOff //in ms
+        }
+        
+        type record of ProfileTimeAspect ProfileTimeAspects;
+        
+        type record ChannelProfileTimeAspect {
+            ChannelState state,
+            record of ProfileTimeAspect aspects
+        }
+        
+        type record of ChannelProfileTimeAspect ChannelProfileTimeAspects;
+        
+        type record TimeChannelAspect {
+            float messageInterval, //in Hz
+            float tOff, //in ms
+            record of ChannelState sch1States
+        }
+        
+        type record ChannelTimeChannelAspect {
+            ChannelState cchState,
+            TimeChannelAspect aspect
+        }
+        
+        type record of ChannelTimeChannelAspect ChannelTimeChannelAspects;
+        
+        type record SingleChannelTimeChannelAspect {
+            ChannelState cchState,
+            SingleTimeChannelAspect aspect
+        }
+        
+        type record SingleTimeChannelAspect {
+            float messageInterval, //in Hz
+            float tOff, //in ms
+            ChannelState sch1State
+        }
+        
+        type record ProfileChannelTimeChannelAspect {
+            ProfileType profile,
+            ChannelTimeChannelAspects aspects
+        }
+        
+        type record ProfileTimeChannelAspect {
+            ProfileType profile,
+            TimeChannelAspect aspect
+        }
+        
+        type record ProfileSingleChannelTimeChannelAspect {
+            ProfileType profile,
+            SingleChannelTimeChannelAspect aspect
+        }
+        
+        type record ProfileSingleTimeChannelAspect {
+            ProfileType profile,
+            SingleTimeChannelAspect aspect
+        }
+        
+        type record of ProfileChannelTimeChannelAspect ProfileChannelTimeChannelAspects;
+        
+        type record of ProfileTimeChannelAspect ProfileTimeChannelAspects;
+        
+        type record SingleChannelAspect {
+            ChannelState cchState,
+            ChannelState sch1State,
+            ChannelState sch2State
+        }
+        
+        type record ProfileSingleChannelAspect {
+            ProfileType profile,
+            SingleChannelAspect aspect
+        }
+        
+        type record SingleChannelAspect2 {
+            ChannelState cchState,
+            ChannelState sch3State
+        }
+        
+        type record ProfileSingleChannelAspect2 {
+            ProfileType profile,
+            SingleChannelAspect2 aspect
+        }
+        
+        type record ProfileChannelAspect {
+            ProfileType profile,
+            record of record {
+                ChannelState cchState,
+                record of record {
+                    ChannelState sch1State,
+                    ChannelState sch2State
+                } states
+            } aspects
+        }
+        
+        type record of ProfileChannelAspect ProfileChannelAspects;
+        
+        type record ProfileChannelAspect2 {
+            ProfileType profile,
+            record of record {
+                ChannelState cchState,
+                record of ChannelState sch3States
+            } aspects
+        }
+        
+        type record of ProfileChannelAspect2 ProfileChannelAspects2;
+        
+        type record ChannelProfileAspect {
+            ChannelState state,
+            record of ProfileType profiles
+        }
+        
+        type record SingleChannelProfileAspect {
+            ChannelState state,
+            ProfileType profile
+        }
+        
+        type record of ChannelProfileAspect ChannelProfileAspects;
+        
+        type record of ChannelState ChannelStates;
+    }
+    
+    group Constants {
+        
+        const integer c_maxCommandReference := 256;
+     
+     } // End of group Constants
+}
+with {
+    encode "LibItsDcc_TypesAndValues"
+} //End of module LibItsDcc_TypesAndValues

@@ -1,0 +1,507 @@
+#!/bin/sh 
+
+
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../asn1/LibIts/ITS-Container'}
+
+ln -sf $protocolmodulepath/ITS_Container.asn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../asn1/LibIts/CAM'}
+
+ln -sf $protocolmodulepath/CAM.asn . 
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../asn1/LibIts/DENM'}
+
+ln -sf $protocolmodulepath/DENM.asn .
+                               
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibCommon'}
+
+ln -sf $protocolmodulepath/LibCommon_AbstractData.ttcn .
+ln -sf $protocolmodulepath/LibCommon_DataStrings.ttcn .
+ln -sf $protocolmodulepath/LibCommon_TextStrings.ttcn .
+ln -sf $protocolmodulepath/LibCommon_VerdictControl.ttcn .
+ln -sf $protocolmodulepath/LibCommon_BasicTypesAndValues.ttcn . 
+ln -sf $protocolmodulepath/LibCommon_Sync.ttcn .
+ln -sf $protocolmodulepath/LibCommon_Time.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/Common'}
+
+ln -sf $protocolmodulepath/LibItsCommon_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsCommon_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsExternal_TypesAndValues.ttcn .
+ln -sf $protocolmodulepath/LibItsCommon_Pixits.ttcn .
+ln -sf $protocolmodulepath/LibItsCommon_TypesAndValues.ttcn .
+
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../titan.ProtocolModules.COMMON/src'}
+
+ln -sf $protocolmodulepath/General_Types.ttcn .
+
+ln -sf ../src/Makefile.bak  ./Makefile
+
+ln -sf ../src/External_Functions.cc .
+ln -sf ../src/ASN_EncDec.ttcn .
+
+ln -sf ../src/TTCN_EncDec.ttcn .
+
+ln -sf ../src/cfg.cfg .
+
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/BTP'}
+
+ln -sf $protocolmodulepath/LibItsBtp_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsBtp_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsBtp_Templates.ttcn .
+ln -sf $protocolmodulepath/LibItsBtp_Pixits.ttcn .
+ln -sf $protocolmodulepath/LibItsBtp_TypesAndValues.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsBTP'}
+ln -sf $protocolmodulepath/ItsBtp_TestControl.ttcn .
+ln -sf $protocolmodulepath/ItsBtp_TestCases.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/CAM'}
+
+ln -sf $protocolmodulepath/LibItsCam_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsCam_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsCam_Templates.ttcn .
+ln -sf $protocolmodulepath/LibItsCam_Pics.ttcn .
+ln -sf $protocolmodulepath/LibItsCam_TypesAndValues.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsCAM'}
+ln -sf $protocolmodulepath/ItsCam_TestControl.ttcn .
+ln -sf $protocolmodulepath/ItsCam_TestCases.ttcn .
+ln -sf $protocolmodulepath/ItsCam_TpFunctions.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/DENM'}
+
+ln -sf $protocolmodulepath/LibItsDenm_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsDenm_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsDenm_Templates.ttcn .
+ln -sf $protocolmodulepath/LibItsDenm_Pics.ttcn .
+ln -sf $protocolmodulepath/LibItsDenm_TypesAndValues.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsDENM'}
+ln -sf $protocolmodulepath/ItsDenm_TestControl.ttcn .
+ln -sf $protocolmodulepath/ItsDenm_TestCases.ttcn .
+ln -sf $protocolmodulepath/ItsDenm_TpFunctions.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/GeoNetworking'}
+
+ln -sf $protocolmodulepath/LibItsGeoNetworking_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsGeoNetworking_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsGeoNetworking_Templates.ttcn .
+ln -sf $protocolmodulepath/LibItsGeoNetworking_Pics.ttcn .
+ln -sf $protocolmodulepath/LibItsGeoNetworking_Pixits.ttcn .
+ln -sf $protocolmodulepath/LibItsGeoNetworking_TypesAndValues.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/Ipv6OverGeoNetworking'}
+
+ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Templates.ttcn .
+ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Pics.ttcn .
+ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Pixits.ttcn .
+ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_TypesAndValues.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/Security'}
+
+#ln -sf $protocolmodulepath/LibItsSecurity_Functions.ttcn .
+ln -sf $protocolmodulepath/LibItsSecurity_TestSystem.ttcn .
+ln -sf $protocolmodulepath/LibItsSecurity_Templates.ttcn .
+ln -sf $protocolmodulepath/LibItsSecurity_Pics.ttcn .
+ln -sf $protocolmodulepath/LibItsSecurity_Pixits.ttcn .
+ln -sf $protocolmodulepath/LibItsSecurity_TypesAndValues.ttcn .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsGeoNetworking'}
+ln -sf $protocolmodulepath/ItsGeoNetworking_TestControl.ttcn .
+ln -sf $protocolmodulepath/ItsGeoNetworking_TestCases.ttcn .
+ln -sf $protocolmodulepath/ItsGeoNetworking_TpFunctions.ttcn .
+
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../TRI'}
+
+ln -sf $protocolmodulepath/BtpPort.cc  .
+ln -sf $protocolmodulepath/BtpPort.hh  .
+ln -sf $protocolmodulepath/TRI_interface_Types.ttcn  .
+ln -sf $protocolmodulepath/TRI_mapper_API.cc  .
+ln -sf $protocolmodulepath/TRI_mapper_API.hh  .
+ln -sf $protocolmodulepath/UpperTesterPort.cc  .
+ln -sf $protocolmodulepath/UpperTesterPort.hh  .
+ln -sf $protocolmodulepath/UpperTesterCAMPort.cc  .
+ln -sf $protocolmodulepath/UpperTesterCAMPort.hh  .
+ln -sf $protocolmodulepath/UpperTesterGNPort.cc  .
+ln -sf $protocolmodulepath/UpperTesterGNPort.hh  .
+
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../CAM_CNL_113_xxx_updated/src'}
+
+ln -sf $protocolmodulepath/AccelerationConfidence.c .
+ln -sf $protocolmodulepath/AccelerationConfidence.h .
+ln -sf $protocolmodulepath/AccelerationControl.c .
+ln -sf $protocolmodulepath/AccelerationControl.h .
+ln -sf $protocolmodulepath/AccidentSubCauseCode.c .
+ln -sf $protocolmodulepath/AccidentSubCauseCode.h .
+ln -sf $protocolmodulepath/ActionID.c .
+ln -sf $protocolmodulepath/ActionID.h .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-AdhesionSubCauseCode.c .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-AdhesionSubCauseCode.h .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-ExtremeWeatherConditionSubCauseCode.c .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-ExtremeWeatherConditionSubCauseCode.h .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-PrecipitationSubCauseCode.c .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-PrecipitationSubCauseCode.h .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-VisibilitySubCauseCode.c .
+ln -sf $protocolmodulepath/AdverseWeatherCondition-VisibilitySubCauseCode.h .
+ln -sf $protocolmodulepath/Altitude.c .
+ln -sf $protocolmodulepath/AltitudeConfidence.c .
+ln -sf $protocolmodulepath/AltitudeConfidence.h .
+ln -sf $protocolmodulepath/Altitude.h .
+ln -sf $protocolmodulepath/AltitudeValue.c .
+ln -sf $protocolmodulepath/AltitudeValue.h .
+ln -sf $protocolmodulepath/asn_application.h .
+ln -sf $protocolmodulepath/asn_codecs.h .
+ln -sf $protocolmodulepath/asn_codecs_prim.c .
+ln -sf $protocolmodulepath/asn_codecs_prim.h .
+ln -sf $protocolmodulepath/asn_internal.h .
+ln -sf $protocolmodulepath/asn_SEQUENCE_OF.c .
+ln -sf $protocolmodulepath/asn_SEQUENCE_OF.h .
+ln -sf $protocolmodulepath/asn_SET_OF.c .
+ln -sf $protocolmodulepath/asn_SET_OF.h .
+ln -sf $protocolmodulepath/asn_system.h .
+ln -sf $protocolmodulepath/BasicContainer.c .
+ln -sf $protocolmodulepath/BasicContainer.h .
+ln -sf $protocolmodulepath/BasicVehicleContainerHighFrequency.c .
+ln -sf $protocolmodulepath/BasicVehicleContainerHighFrequency.h .
+ln -sf $protocolmodulepath/BasicVehicleContainerLowFrequency.c .
+ln -sf $protocolmodulepath/BasicVehicleContainerLowFrequency.h .
+ln -sf $protocolmodulepath/ber_decoder.c .
+ln -sf $protocolmodulepath/ber_decoder.h .
+ln -sf $protocolmodulepath/ber_tlv_length.c .
+ln -sf $protocolmodulepath/ber_tlv_length.h .
+ln -sf $protocolmodulepath/ber_tlv_tag.c .
+ln -sf $protocolmodulepath/ber_tlv_tag.h .
+ln -sf $protocolmodulepath/BIT_STRING.c .
+ln -sf $protocolmodulepath/BIT_STRING.h .
+ln -sf $protocolmodulepath/BOOLEAN.c .
+ln -sf $protocolmodulepath/BOOLEAN.h .
+ln -sf $protocolmodulepath/CAM.asn .
+ln -sf $protocolmodulepath/CAM.c .
+ln -sf $protocolmodulepath/CAM_EncDec.cc .
+ln -sf $protocolmodulepath/CAM.h .
+ln -sf $protocolmodulepath/CamParameters.c .
+ln -sf $protocolmodulepath/CamParameters.h .
+ln -sf $protocolmodulepath/cam.tpd .
+ln -sf $protocolmodulepath/CAM_Types.ttcn .
+ln -sf $protocolmodulepath/CauseCode.c .
+ln -sf $protocolmodulepath/CauseCode.h .
+ln -sf $protocolmodulepath/CauseCodeType.c .
+ln -sf $protocolmodulepath/CauseCodeType.h .
+ln -sf $protocolmodulepath/CenDsrcTollingZone.c .
+ln -sf $protocolmodulepath/CenDsrcTollingZone.h .
+ln -sf $protocolmodulepath/CenDsrcTollingZoneID.c .
+ln -sf $protocolmodulepath/CenDsrcTollingZoneID.h .
+ln -sf $protocolmodulepath/ClosedLanes.c .
+ln -sf $protocolmodulepath/ClosedLanes.h .
+ln -sf $protocolmodulepath/CollisionRiskSubCauseCode.c .
+ln -sf $protocolmodulepath/CollisionRiskSubCauseCode.h .
+ln -sf $protocolmodulepath/constraints.c .
+ln -sf $protocolmodulepath/constraints.h .
+ln -sf $protocolmodulepath/constr_CHOICE.c .
+ln -sf $protocolmodulepath/constr_CHOICE.h .
+ln -sf $protocolmodulepath/constr_SEQUENCE.c .
+ln -sf $protocolmodulepath/constr_SEQUENCE.h .
+ln -sf $protocolmodulepath/constr_SEQUENCE_OF.c .
+ln -sf $protocolmodulepath/constr_SEQUENCE_OF.h .
+ln -sf $protocolmodulepath/constr_SET_OF.c .
+ln -sf $protocolmodulepath/constr_SET_OF.h .
+ln -sf $protocolmodulepath/constr_TYPE.c .
+ln -sf $protocolmodulepath/constr_TYPE.h .
+ln -sf $protocolmodulepath/CoopAwareness.c .
+ln -sf $protocolmodulepath/CoopAwareness.h .
+ln -sf $protocolmodulepath/Curvature.c .
+ln -sf $protocolmodulepath/CurvatureCalculationMode.c .
+ln -sf $protocolmodulepath/CurvatureCalculationMode.h .
+ln -sf $protocolmodulepath/CurvatureConfidence.c .
+ln -sf $protocolmodulepath/CurvatureConfidence.h .
+ln -sf $protocolmodulepath/Curvature.h .
+ln -sf $protocolmodulepath/CurvatureValue.c .
+ln -sf $protocolmodulepath/CurvatureValue.h .
+ln -sf $protocolmodulepath/DangerousEndOfQueueSubCauseCode.c .
+ln -sf $protocolmodulepath/DangerousEndOfQueueSubCauseCode.h .
+ln -sf $protocolmodulepath/DangerousGoodsBasic.c .
+ln -sf $protocolmodulepath/DangerousGoodsBasic.h .
+ln -sf $protocolmodulepath/DangerousGoodsContainer.c .
+ln -sf $protocolmodulepath/DangerousGoodsContainer.h .
+ln -sf $protocolmodulepath/DangerousGoodsExtended.c .
+ln -sf $protocolmodulepath/DangerousGoodsExtended.h .
+ln -sf $protocolmodulepath/DangerousSituationSubCauseCode.c .
+ln -sf $protocolmodulepath/DangerousSituationSubCauseCode.h .
+ln -sf $protocolmodulepath/DeltaAltitude.c .
+ln -sf $protocolmodulepath/DeltaAltitude.h .
+ln -sf $protocolmodulepath/DeltaLatitude.c .
+ln -sf $protocolmodulepath/DeltaLatitude.h .
+ln -sf $protocolmodulepath/DeltaLongitude.c .
+ln -sf $protocolmodulepath/DeltaLongitude.h .
+ln -sf $protocolmodulepath/DeltaReferencePosition.c .
+ln -sf $protocolmodulepath/DeltaReferencePosition.h .
+ln -sf $protocolmodulepath/der_encoder.c .
+ln -sf $protocolmodulepath/der_encoder.h .
+ln -sf $protocolmodulepath/DriveDirection.c .
+ln -sf $protocolmodulepath/DriveDirection.h .
+ln -sf $protocolmodulepath/DrivingLaneStatus.c .
+ln -sf $protocolmodulepath/DrivingLaneStatus.h .
+ln -sf $protocolmodulepath/EmbarkationStatus.c .
+ln -sf $protocolmodulepath/EmbarkationStatus.h .
+ln -sf $protocolmodulepath/EmergencyContainer.c .
+ln -sf $protocolmodulepath/EmergencyContainer.h .
+ln -sf $protocolmodulepath/EmergencyPriority.c .
+ln -sf $protocolmodulepath/EmergencyPriority.h .
+ln -sf $protocolmodulepath/EmergencyVehicleApproachingSubCauseCode.c .
+ln -sf $protocolmodulepath/EmergencyVehicleApproachingSubCauseCode.h .
+ln -sf $protocolmodulepath/EnergyStorageType.c .
+ln -sf $protocolmodulepath/EnergyStorageType.h .
+ln -sf $protocolmodulepath/EventHistory.c .
+ln -sf $protocolmodulepath/EventHistory.h .
+ln -sf $protocolmodulepath/EventPoint.c .
+ln -sf $protocolmodulepath/EventPoint.h .
+ln -sf $protocolmodulepath/ExteriorLights.c .
+ln -sf $protocolmodulepath/ExteriorLights.h .
+ln -sf $protocolmodulepath/GenerationDeltaTime.c .
+ln -sf $protocolmodulepath/GenerationDeltaTime.h .
+ln -sf $protocolmodulepath/HardShoulderStatus.c .
+ln -sf $protocolmodulepath/HardShoulderStatus.h .
+ln -sf $protocolmodulepath/HazardousLocation-AnimalOnTheRoadSubCauseCode.c .
+ln -sf $protocolmodulepath/HazardousLocation-AnimalOnTheRoadSubCauseCode.h .
+ln -sf $protocolmodulepath/HazardousLocation-DangerousCurveSubCauseCode.c .
+ln -sf $protocolmodulepath/HazardousLocation-DangerousCurveSubCauseCode.h .
+ln -sf $protocolmodulepath/HazardousLocation-ObstacleOnTheRoadSubCauseCode.c .
+ln -sf $protocolmodulepath/HazardousLocation-ObstacleOnTheRoadSubCauseCode.h .
+ln -sf $protocolmodulepath/HazardousLocation-SurfaceConditionSubCauseCode.c .
+ln -sf $protocolmodulepath/HazardousLocation-SurfaceConditionSubCauseCode.h .
+ln -sf $protocolmodulepath/Heading.c .
+ln -sf $protocolmodulepath/HeadingConfidence.c .
+ln -sf $protocolmodulepath/HeadingConfidence.h .
+ln -sf $protocolmodulepath/Heading.h .
+ln -sf $protocolmodulepath/HeadingValue.c .
+ln -sf $protocolmodulepath/HeadingValue.h .
+ln -sf $protocolmodulepath/HeightLonCarr.c .
+ln -sf $protocolmodulepath/HeightLonCarr.h .
+ln -sf $protocolmodulepath/HighFrequencyContainer.c .
+ln -sf $protocolmodulepath/HighFrequencyContainer.h .
+ln -sf $protocolmodulepath/HumanPresenceOnTheRoadSubCauseCode.c .
+ln -sf $protocolmodulepath/HumanPresenceOnTheRoadSubCauseCode.h .
+ln -sf $protocolmodulepath/HumanProblemSubCauseCode.c .
+ln -sf $protocolmodulepath/HumanProblemSubCauseCode.h .
+ln -sf $protocolmodulepath/IA5String.c .
+ln -sf $protocolmodulepath/IA5String.h .
+ln -sf $protocolmodulepath/InformationQuality.c .
+ln -sf $protocolmodulepath/InformationQuality.h .
+ln -sf $protocolmodulepath/INTEGER.c .
+ln -sf $protocolmodulepath/INTEGER.h .
+ln -sf $protocolmodulepath/ItineraryPath.c .
+ln -sf $protocolmodulepath/ItineraryPath.h .
+ln -sf $protocolmodulepath/ITS_Container.asn .
+ln -sf $protocolmodulepath/ItsPduHeader.c .
+ln -sf $protocolmodulepath/ItsPduHeader.h .
+ln -sf $protocolmodulepath/LanePosition.c .
+ln -sf $protocolmodulepath/LanePosition.h .
+ln -sf $protocolmodulepath/LateralAcceleration.c .
+ln -sf $protocolmodulepath/LateralAcceleration.h .
+ln -sf $protocolmodulepath/LateralAccelerationValue.c .
+ln -sf $protocolmodulepath/LateralAccelerationValue.h .
+ln -sf $protocolmodulepath/Latitude.c .
+ln -sf $protocolmodulepath/Latitude.h .
+ln -sf $protocolmodulepath/LightBarSirenInUse.c .
+ln -sf $protocolmodulepath/LightBarSirenInUse.h .
+ln -sf $protocolmodulepath/Longitude.c .
+ln -sf $protocolmodulepath/Longitude.h .
+ln -sf $protocolmodulepath/LongitudinalAcceleration.c .
+ln -sf $protocolmodulepath/LongitudinalAcceleration.h .
+ln -sf $protocolmodulepath/LongitudinalAccelerationValue.c .
+ln -sf $protocolmodulepath/LongitudinalAccelerationValue.h .
+ln -sf $protocolmodulepath/LowFrequencyContainer.c .
+ln -sf $protocolmodulepath/LowFrequencyContainer.h .
+ln -sf $protocolmodulepath/NativeEnumerated.c .
+ln -sf $protocolmodulepath/NativeEnumerated.h .
+ln -sf $protocolmodulepath/NativeInteger.c .
+ln -sf $protocolmodulepath/NativeInteger.h .
+ln -sf $protocolmodulepath/NumberOfOccupants.c .
+ln -sf $protocolmodulepath/NumberOfOccupants.h .
+ln -sf $protocolmodulepath/OCTET_STRING.c .
+ln -sf $protocolmodulepath/OCTET_STRING.h .
+ln -sf $protocolmodulepath/PathDeltaTime.c .
+ln -sf $protocolmodulepath/PathDeltaTime.h .
+ln -sf $protocolmodulepath/PathHistory.c .
+ln -sf $protocolmodulepath/PathHistory.h .
+ln -sf $protocolmodulepath/PathPoint.c .
+ln -sf $protocolmodulepath/PathPoint.h .
+ln -sf $protocolmodulepath/per_decoder.c .
+ln -sf $protocolmodulepath/per_decoder.h .
+ln -sf $protocolmodulepath/per_encoder.c .
+ln -sf $protocolmodulepath/per_encoder.h .
+ln -sf $protocolmodulepath/PerformanceClass.c .
+ln -sf $protocolmodulepath/PerformanceClass.h .
+ln -sf $protocolmodulepath/per_opentype.c .
+ln -sf $protocolmodulepath/per_opentype.h .
+ln -sf $protocolmodulepath/per_support.c .
+ln -sf $protocolmodulepath/per_support.h .
+ln -sf $protocolmodulepath/PosCentMass.c .
+ln -sf $protocolmodulepath/PosCentMass.h .
+ln -sf $protocolmodulepath/PosConfidenceEllipse.c .
+ln -sf $protocolmodulepath/PosConfidenceEllipse.h .
+ln -sf $protocolmodulepath/PosFrontAx.c .
+ln -sf $protocolmodulepath/PosFrontAx.h .
+ln -sf $protocolmodulepath/PositioningSolutionType.c .
+ln -sf $protocolmodulepath/PositioningSolutionType.h .
+ln -sf $protocolmodulepath/PositionOfOccupants.c .
+ln -sf $protocolmodulepath/PositionOfOccupants.h .
+ln -sf $protocolmodulepath/PositionOfPillars.c .
+ln -sf $protocolmodulepath/PositionOfPillars.h .
+ln -sf $protocolmodulepath/PosLonCarr.c .
+ln -sf $protocolmodulepath/PosLonCarr.h .
+ln -sf $protocolmodulepath/PosPillar.c .
+ln -sf $protocolmodulepath/PosPillar.h .
+ln -sf $protocolmodulepath/PostCrashSubCauseCode.c .
+ln -sf $protocolmodulepath/PostCrashSubCauseCode.h .
+ln -sf $protocolmodulepath/ProtectedCommunicationZone.c .
+ln -sf $protocolmodulepath/ProtectedCommunicationZone.h .
+ln -sf $protocolmodulepath/ProtectedCommunicationZonesRSU.c .
+ln -sf $protocolmodulepath/ProtectedCommunicationZonesRSU.h .
+ln -sf $protocolmodulepath/ProtectedZoneID.c .
+ln -sf $protocolmodulepath/ProtectedZoneID.h .
+ln -sf $protocolmodulepath/ProtectedZoneRadius.c .
+ln -sf $protocolmodulepath/ProtectedZoneRadius.h .
+ln -sf $protocolmodulepath/ProtectedZoneType.c .
+ln -sf $protocolmodulepath/ProtectedZoneType.h .
+ln -sf $protocolmodulepath/PtActivation.c .
+ln -sf $protocolmodulepath/PtActivationData.c .
+ln -sf $protocolmodulepath/PtActivationData.h .
+ln -sf $protocolmodulepath/PtActivation.h .
+ln -sf $protocolmodulepath/PtActivationType.c .
+ln -sf $protocolmodulepath/PtActivationType.h .
+ln -sf $protocolmodulepath/PublicTransportContainer.c .
+ln -sf $protocolmodulepath/PublicTransportContainer.h .
+ln -sf $protocolmodulepath/ReferencePosition.c .
+ln -sf $protocolmodulepath/ReferencePosition.h .
+ln -sf $protocolmodulepath/RelevanceDistance.c .
+ln -sf $protocolmodulepath/RelevanceDistance.h .
+ln -sf $protocolmodulepath/RelevanceTrafficDirection.c .
+ln -sf $protocolmodulepath/RelevanceTrafficDirection.h .
+ln -sf $protocolmodulepath/RequestResponseIndication.c .
+ln -sf $protocolmodulepath/RequestResponseIndication.h .
+ln -sf $protocolmodulepath/RescueAndRecoveryWorkInProgressSubCauseCode.c .
+ln -sf $protocolmodulepath/RescueAndRecoveryWorkInProgressSubCauseCode.h .
+ln -sf $protocolmodulepath/RescueContainer.c .
+ln -sf $protocolmodulepath/RescueContainer.h .
+ln -sf $protocolmodulepath/RestrictedTypes.c .
+ln -sf $protocolmodulepath/RestrictedTypes.h .
+ln -sf $protocolmodulepath/RoadType.c .
+ln -sf $protocolmodulepath/RoadType.h .
+ln -sf $protocolmodulepath/RoadWorksContainerBasic.c .
+ln -sf $protocolmodulepath/RoadWorksContainerBasic.h .
+ln -sf $protocolmodulepath/RoadworksSubCauseCode.c .
+ln -sf $protocolmodulepath/RoadworksSubCauseCode.h .
+ln -sf $protocolmodulepath/RSUContainerHighFrequency.c .
+ln -sf $protocolmodulepath/RSUContainerHighFrequency.h .
+ln -sf $protocolmodulepath/SafetyCarContainer.c .
+ln -sf $protocolmodulepath/SafetyCarContainer.h .
+ln -sf $protocolmodulepath/SemiAxisLength.c .
+ln -sf $protocolmodulepath/SemiAxisLength.h .
+ln -sf $protocolmodulepath/SequenceNumber.c .
+ln -sf $protocolmodulepath/SequenceNumber.h .
+ln -sf $protocolmodulepath/SignalViolationSubCauseCode.c .
+ln -sf $protocolmodulepath/SignalViolationSubCauseCode.h .
+ln -sf $protocolmodulepath/SlowVehicleSubCauseCode.c .
+ln -sf $protocolmodulepath/SlowVehicleSubCauseCode.h .
+ln -sf $protocolmodulepath/SpecialTransportContainer.c .
+ln -sf $protocolmodulepath/SpecialTransportContainer.h .
+ln -sf $protocolmodulepath/SpecialTransportType.c .
+ln -sf $protocolmodulepath/SpecialTransportType.h .
+ln -sf $protocolmodulepath/SpecialVehicleContainer.c .
+ln -sf $protocolmodulepath/SpecialVehicleContainer.h .
+ln -sf $protocolmodulepath/Speed.c .
+ln -sf $protocolmodulepath/SpeedConfidence.c .
+ln -sf $protocolmodulepath/SpeedConfidence.h .
+ln -sf $protocolmodulepath/Speed.h .
+ln -sf $protocolmodulepath/SpeedLimit.c .
+ln -sf $protocolmodulepath/SpeedLimit.h .
+ln -sf $protocolmodulepath/SpeedValue.c .
+ln -sf $protocolmodulepath/SpeedValue.h .
+ln -sf $protocolmodulepath/StationarySince.c .
+ln -sf $protocolmodulepath/StationarySince.h .
+ln -sf $protocolmodulepath/StationaryVehicleSubCauseCode.c .
+ln -sf $protocolmodulepath/StationaryVehicleSubCauseCode.h .
+ln -sf $protocolmodulepath/StationID.c .
+ln -sf $protocolmodulepath/StationID.h .
+ln -sf $protocolmodulepath/StationType.c .
+ln -sf $protocolmodulepath/StationType.h .
+ln -sf $protocolmodulepath/SteeringWheelAngle.c .
+ln -sf $protocolmodulepath/SteeringWheelAngleConfidence.c .
+ln -sf $protocolmodulepath/SteeringWheelAngleConfidence.h .
+ln -sf $protocolmodulepath/SteeringWheelAngle.h .
+ln -sf $protocolmodulepath/SteeringWheelAngleValue.c .
+ln -sf $protocolmodulepath/SteeringWheelAngleValue.h .
+ln -sf $protocolmodulepath/SubCauseCodeType.c .
+ln -sf $protocolmodulepath/SubCauseCodeType.h .
+ln -sf $protocolmodulepath/Temperature.c .
+ln -sf $protocolmodulepath/Temperature.h .
+ln -sf $protocolmodulepath/TimestampIts.c .
+ln -sf $protocolmodulepath/TimestampIts.h .
+ln -sf $protocolmodulepath/Traces.c .
+ln -sf $protocolmodulepath/Traces.h .
+ln -sf $protocolmodulepath/TrafficConditionSubCauseCode.c .
+ln -sf $protocolmodulepath/TrafficConditionSubCauseCode.h .
+ln -sf $protocolmodulepath/TrafficRule.c .
+ln -sf $protocolmodulepath/TrafficRule.h .
+ln -sf $protocolmodulepath/TransmissionInterval.c .
+ln -sf $protocolmodulepath/TransmissionInterval.h .
+ln -sf $protocolmodulepath/TurningRadius.c .
+ln -sf $protocolmodulepath/TurningRadius.h .
+ln -sf $protocolmodulepath/UTF8String.c .
+ln -sf $protocolmodulepath/UTF8String.h .
+ln -sf $protocolmodulepath/ValidityDuration.c .
+ln -sf $protocolmodulepath/ValidityDuration.h .
+ln -sf $protocolmodulepath/VDS.c .
+ln -sf $protocolmodulepath/VDS.h .
+ln -sf $protocolmodulepath/VehicleBreakdownSubCauseCode.c .
+ln -sf $protocolmodulepath/VehicleBreakdownSubCauseCode.h .
+ln -sf $protocolmodulepath/VehicleIdentification.c .
+ln -sf $protocolmodulepath/VehicleIdentification.h .
+ln -sf $protocolmodulepath/VehicleLength.c .
+ln -sf $protocolmodulepath/VehicleLengthConfidenceIndication.c .
+ln -sf $protocolmodulepath/VehicleLengthConfidenceIndication.h .
+ln -sf $protocolmodulepath/VehicleLength.h .
+ln -sf $protocolmodulepath/VehicleLengthValue.c .
+ln -sf $protocolmodulepath/VehicleLengthValue.h .
+ln -sf $protocolmodulepath/VehicleMass.c .
+ln -sf $protocolmodulepath/VehicleMass.h .
+ln -sf $protocolmodulepath/VehicleRole.c .
+ln -sf $protocolmodulepath/VehicleRole.h .
+ln -sf $protocolmodulepath/VehicleWidth.c .
+ln -sf $protocolmodulepath/VehicleWidth.h .
+ln -sf $protocolmodulepath/VerticalAcceleration.c .
+ln -sf $protocolmodulepath/VerticalAcceleration.h .
+ln -sf $protocolmodulepath/VerticalAccelerationValue.c .
+ln -sf $protocolmodulepath/VerticalAccelerationValue.h .
+ln -sf $protocolmodulepath/WheelBaseVehicle.c .
+ln -sf $protocolmodulepath/WheelBaseVehicle.h .
+ln -sf $protocolmodulepath/WMInumber.c .
+ln -sf $protocolmodulepath/WMInumber.h .
+ln -sf $protocolmodulepath/WrongWayDrivingSubCauseCode.c .
+ln -sf $protocolmodulepath/WrongWayDrivingSubCauseCode.h .
+ln -sf $protocolmodulepath/xer_decoder.c .
+ln -sf $protocolmodulepath/xer_decoder.h .
+ln -sf $protocolmodulepath/xer_encoder.c .
+ln -sf $protocolmodulepath/xer_encoder.h .
+ln -sf $protocolmodulepath/xer_support.c .
+ln -sf $protocolmodulepath/xer_support.h .
+ln -sf $protocolmodulepath/YawRate.c .
+ln -sf $protocolmodulepath/YawRateConfidence.c .
+ln -sf $protocolmodulepath/YawRateConfidence.h .
+ln -sf $protocolmodulepath/YawRate.h .
+ln -sf $protocolmodulepath/YawRateValue.c .
+ln -sf $protocolmodulepath/YawRateValue.h .
+
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../DENM_CNL_113_xxx/src'}
+
+
+

@@ -1,0 +1,180 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsSecurity/ItsSecurity_TestControl.ttcn3 $
+ *            $Id: ItsSecurity_TestControl.ttcn3 2230 2015-06-03 09:11:02Z mullers $
+ *  @desc     Test Control file for Security Protocol 
+ *
+ */
+module ItsSecurity_TestControl {
+    
+    // LibItsGeoNetworking
+    import from LibItsGeoNetworking_Pics all;
+    
+    // ItsSecurity
+    import from ItsSecurity_TestCases all;
+    import from LibItsSecurity_Pics all;
+    
+    // Test Execution
+    control {
+        
+        if (PICS_GN_SECURITY) {
+            if (PICS_ITS_AID_OTHER_PROFILE) {
+                execute(TC_SEC_ITSS_SND_MSG_01());
+            }
+            execute(TC_SEC_ITSS_SND_MSG_04_01());
+            execute(TC_SEC_ITSS_SND_MSG_04_02());
+            execute(TC_SEC_ITSS_SND_MSG_05_01());
+            
+            execute(TC_SEC_ITSS_SND_CAM_04_01());
+            execute(TC_SEC_ITSS_SND_CAM_05_01());
+            execute(TC_SEC_ITSS_SND_CAM_05_02());
+            execute(TC_SEC_ITSS_SND_CAM_06_01());
+            execute(TC_SEC_ITSS_SND_CAM_07_01());
+            execute(TC_SEC_ITSS_SND_CAM_08_01());
+            execute(TC_SEC_ITSS_SND_CAM_09_01());
+            execute(TC_SEC_ITSS_SND_CAM_10_01());
+            execute(TC_SEC_ITSS_SND_CAM_11_01());
+            execute(TC_SEC_ITSS_SND_CAM_12_01());
+            execute(TC_SEC_ITSS_SND_CAM_14_01());
+            execute(TC_SEC_ITSS_SND_CAM_16_01());
+            
+            execute(TC_SEC_ITSS_SND_DENM_02_01());
+            execute(TC_SEC_ITSS_SND_DENM_03_01());
+            execute(TC_SEC_ITSS_SND_DENM_04_01());
+            if (PICS_CERTIFICATE_SELECTION) {
+                execute(TC_SEC_ITSS_SND_DENM_05_01());
+                if (PICS_USE_CIRCULAR_REGION) {
+                    execute(TC_SEC_ITSS_SND_DENM_05_03());
+                }
+                if (PICS_USE_RECTANGULAR_REGION) {
+                    execute(TC_SEC_ITSS_SND_DENM_05_04());
+                }
+                if (PICS_USE_POLYGONAL_REGION) {
+                    execute(TC_SEC_ITSS_SND_DENM_05_05());
+                }
+                if (PICS_USE_IDENTIFIED_REGION) {
+                    execute(TC_SEC_ITSS_SND_DENM_05_06());
+                }
+            }
+            execute(TC_SEC_ITSS_SND_DENM_06_01());
+            execute(TC_SEC_ITSS_SND_DENM_08_01());
+            execute(TC_SEC_ITSS_SND_DENM_10_01());
+            
+            if (PICS_ITS_AID_OTHER_PROFILE) {
+                execute(TC_SEC_ITSS_SND_GENMSG_02_01());
+                execute(TC_SEC_ITSS_SND_GENMSG_03_01());
+                execute(TC_SEC_ITSS_SND_GENMSG_04_01());
+                if (PICS_CERTIFICATE_SELECTION) {
+
+                    execute(TC_SEC_ITSS_SND_GENMSG_05_01());
+                    if (PICS_USE_CIRCULAR_REGION) {
+                        execute(TC_SEC_ITSS_SND_GENMSG_05_02());
+                    }
+                    if (PICS_USE_RECTANGULAR_REGION) {
+                        execute(TC_SEC_ITSS_SND_GENMSG_05_03());
+                    }
+                    if (PICS_USE_POLYGONAL_REGION) {
+                        execute(TC_SEC_ITSS_SND_GENMSG_05_04());
+                    }
+                    if (PICS_USE_IDENTIFIED_REGION) {
+                        execute(TC_SEC_ITSS_SND_GENMSG_05_05());
+                    }
+                } else {
+                    execute(TC_SEC_ITSS_SND_GENMSG_05_06());
+                }
+                execute(TC_SEC_ITSS_SND_GENMSG_06_01());
+                execute(TC_SEC_ITSS_SND_GENMSG_07_01());
+            }
+            
+            execute(TC_SEC_ITSS_RCV_CAM_01_01_BV());
+            execute(TC_SEC_ITSS_RCV_CAM_01_02_BV());
+            execute(TC_SEC_ITSS_RCV_CAM_01_03_BV());
+            execute(TC_SEC_ITSS_RCV_CAM_02_01_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_02_02_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_01_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_02_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_03_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_04_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_06_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_08_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_04_09_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_07_01_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_09_02_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_09_03_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_09_04_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_09_05_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_09_06_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_10_01_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_10_02_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_11_01_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_11_02_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_12_01_BO());
+            execute(TC_SEC_ITSS_RCV_CAM_12_02_BO());
+            
+            execute(TC_SEC_ITSS_RCV_DENM_01_01_BV());
+            if (PICS_USE_CIRCULAR_REGION) {
+                execute(TC_SEC_ITSS_RCV_DENM_01_02_BV());
+            }
+            if (PICS_USE_RECTANGULAR_REGION) {
+                execute(TC_SEC_ITSS_RCV_DENM_01_03_BV());
+            }
+            if (PICS_USE_POLYGONAL_REGION) {
+                execute(TC_SEC_ITSS_RCV_DENM_01_04_BV());
+            }
+            if (PICS_USE_IDENTIFIED_REGION) {
+                execute(TC_SEC_ITSS_RCV_DENM_01_05_BV());
+            }
+            execute(TC_SEC_ITSS_RCV_DENM_02_01_BO());
+            execute(TC_SEC_ITSS_RCV_DENM_02_02_BO());
+            execute(TC_SEC_ITSS_RCV_DENM_07_01_BO());
+            execute(TC_SEC_ITSS_RCV_DENM_08_01_BO());
+            execute(TC_SEC_ITSS_RCV_DENM_08_02_BO());
+	    execute(TC_SEC_ITSS_RCV_DENM_08_03_BO());
+            execute(TC_SEC_ITSS_RCV_DENM_08_04_BO());
+            
+            execute(TC_SEC_SND_CERT_01_01());
+            execute(TC_SEC_SND_CERT_01_02());
+            execute(TC_SEC_SND_CERT_02_01());
+            if (PICS_CERTIFICATE_SELECTION) {
+                if (PICS_USE_RECTANGULAR_REGION) {
+                    execute(TC_SEC_SND_CERT_04_01());
+                    execute(TC_SEC_SND_CERT_04_02());
+                }
+                if (PICS_USE_POLYGONAL_REGION) {
+                    execute(TC_SEC_SND_CERT_05_01());
+                    execute(TC_SEC_SND_CERT_05_02());
+                }
+                if (PICS_USE_IDENTIFIED_REGION) {
+                    execute(TC_SEC_SND_CERT_06_01());
+                    execute(TC_SEC_SND_CERT_06_02());
+                    execute(TC_SEC_SND_CERT_06_03());
+                    execute(TC_SEC_SND_CERT_06_04());
+                }
+            }
+            execute(TC_SEC_SND_CERT_07_01());
+            execute(TC_SEC_SND_CERT_08_01());
+            execute(TC_SEC_SND_CERT_09_01());
+            execute(TC_SEC_SND_CERT_09_02());
+            
+            execute(TC_SEC_SND_CERT_AA_01_01());
+            execute(TC_SEC_SND_CERT_AA_02_01());
+            execute(TC_SEC_SND_CERT_AA_04_01());
+            execute(TC_SEC_SND_CERT_AA_05_01());
+            execute(TC_SEC_SND_CERT_AA_06_01());
+            execute(TC_SEC_SND_CERT_AA_08_01());
+            execute(TC_SEC_SND_CERT_AT_01_01());
+            if (PICS_CERTIFICATE_SELECTION) {
+                execute(TC_SEC_SND_CERT_AT_02_01());
+                execute(TC_SEC_SND_CERT_AT_03_01());
+                execute(TC_SEC_SND_CERT_AT_04_01());
+                execute(TC_SEC_SND_CERT_AT_05_01());
+                execute(TC_SEC_SND_CERT_AT_07_01());
+                execute(TC_SEC_SND_CERT_AT_08_01());
+                execute(TC_SEC_SND_CERT_AT_09_01());
+            }
+            
+        }
+        
+    } // End of 'control' statement
+    
+} // End of module ItsSecurity_TestControl

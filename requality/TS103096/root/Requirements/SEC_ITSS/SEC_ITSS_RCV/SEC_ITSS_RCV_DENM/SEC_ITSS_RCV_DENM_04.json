@@ -1,0 +1,38 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "a115fcd3-46c3-494a-af0f-581cd67bdc97",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured DENM containing wrong elements of the header fields\r\nCheck that optinal header fields are allowed"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "a115fcd3-46c3-494a-af0f-581cd67bdc97",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/799453d2-bd40-419c-8aaa-44324115ffa4",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/7cde7fb9-8e4b-422b-8f40-c77527b6898a",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/3ada8c64-2b8f-4fd7-a8c9-2a3bf53330f9",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/cb8d49a9-9491-4b08-99e8-cd61f76a52aa"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "a115fcd3-46c3-494a-af0f-581cd67bdc97",
+            "type": "STRING",
+            "value": "04. Check header fields"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "a115fcd3-46c3-494a-af0f-581cd67bdc97",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "a115fcd3-46c3-494a-af0f-581cd67bdc97"
+}

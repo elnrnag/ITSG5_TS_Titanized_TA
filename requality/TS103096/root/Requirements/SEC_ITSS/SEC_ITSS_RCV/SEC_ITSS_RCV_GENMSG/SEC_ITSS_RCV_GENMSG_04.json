@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "6062f0fd-4788-4309-8511-a8e98e95a07b",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured GN Beacon containing wrong elements of the header fields\r\nCheck that optinal header fields are allowed"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "6062f0fd-4788-4309-8511-a8e98e95a07b",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/655df553-f2cc-481a-b3f1-8954c2a2f19b",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/88ac51be-1b12-4ec0-be8a-8a064ef12c6a",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/ffd67c7f-db67-406e-83ce-f1140efe0f63"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "6062f0fd-4788-4309-8511-a8e98e95a07b",
+            "type": "STRING",
+            "value": "04. Check header fields"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "6062f0fd-4788-4309-8511-a8e98e95a07b",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "6062f0fd-4788-4309-8511-a8e98e95a07b"
+}

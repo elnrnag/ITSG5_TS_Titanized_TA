@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "13c840f6-0cc4-4bcd-8ffe-757952190d26",
+            "type": "STRING",
+            "value": "Check the acceptance of payloads of Secured DENM\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "13c840f6-0cc4-4bcd-8ffe-757952190d26",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/59de9c30-dcf8-4767-bc49-171e85998a37",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/3277f67d-8198-4426-af7f-209a9a15fb4d"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "13c840f6-0cc4-4bcd-8ffe-757952190d26",
+            "type": "STRING",
+            "value": "09. Check Payload"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "13c840f6-0cc4-4bcd-8ffe-757952190d26",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "13c840f6-0cc4-4bcd-8ffe-757952190d26"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_ec223c71-ab7b-4b9c-9942-739771862633\"><a name=\"ec223c71-ab7b-4b9c-9942-739771862633\" id=\"id_ec223c71-ab7b-4b9c-9942-739771862633\" class=\"requality_id\"><\/a>The <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_ec223c71-ab7b-4b9c-9942-739771862633\">generation_time<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_ec223c71-ab7b-4b9c-9942-739771862633\"> is valid, if it is in the validity period of the certificate referenced by the <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_ec223c71-ab7b-4b9c-9942-739771862633\">signer_info<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_ec223c71-ab7b-4b9c-9942-739771862633\">.<\/span><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "ec223c71-ab7b-4b9c-9942-739771862633"
+}

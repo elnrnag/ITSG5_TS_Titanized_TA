@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "0a709aa7-7fba-4d2b-87d3-5ec8021458b8",
+            "type": "STRING",
+            "value": "Check that the certificate verification key contains ECC point of type other then x_coordinate_only\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "0a709aa7-7fba-4d2b-87d3-5ec8021458b8",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a50e886a-4b76-432c-b084-49c6aa9e93db"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "0a709aa7-7fba-4d2b-87d3-5ec8021458b8",
+            "type": "STRING",
+            "value": "07. Check ECC point type of the certificate signature"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "0a709aa7-7fba-4d2b-87d3-5ec8021458b8",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "0a709aa7-7fba-4d2b-87d3-5ec8021458b8"
+}

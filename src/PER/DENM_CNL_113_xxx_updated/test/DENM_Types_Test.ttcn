@@ -1,0 +1,214 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2015 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     DENM_Types_Test.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2015-10-20
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module DENM_Types_Test
+{
+  import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+  import from ITS_Container language "ASN.1:1997" all;
+  import from DENM_Types all;
+
+
+  type component Empty_CT {
+  
+  }
+
+  const ReferencePosition p_referencePosition := { 
+        latitude := 99,
+        longitude := 2432,
+        positionConfidenceEllipse := {
+                semiMajorConfidence := 578,
+                semiMinorConfidence := 88,
+                semiMajorOrientation := 2800
+        },
+        altitude := {
+                altitudeValue := 888,
+                altitudeConfidence := outOfRange
+        }
+  };
+
+  const DENM d := {
+        header := {
+                protocolVersion := 3,
+                messageID := 10,
+                stationID := 99
+            },
+	denm := {
+		management := {
+			actionID := {
+				originatingStationID := 456464,
+				sequenceNumber := 1213
+			},
+			detectionTime := 444444,
+			referenceTime := 47946,
+			termination := isCancellation,
+			eventPosition := p_referencePosition,
+			relevanceDistance := lessThan200m,
+			relevanceTrafficDirection := upstreamTraffic,
+			validityDuration := 13213,
+			transmissionInterval := 4444,
+            stationType := 3
+		},
+		situation := {
+			informationQuality := 6,
+			eventType := {
+				causeCode := 44,
+				subCauseCode := 100
+			},
+			linkedCause :=  {
+				causeCode := 49,
+				subCauseCode := 174
+			},
+            eventHistory := {
+                {
+                    eventPosition := {
+                        deltaLatitude := 1324,
+                        deltaLongitude := 7601,
+                        deltaAltitude := 1349
+                    }, 
+                    eventDeltaTime := 49130,
+                    informationQuality := 4
+                }
+            }
+		},
+		location := {
+			eventSpeed := {
+				speedValue := 10111,
+				speedConfidence := 41
+			},
+			eventPositionHeading := {
+                                headingValue := 101,
+                                headingConfidence := 33
+                        },
+			traces := {{}},
+			roadType := nonUrban_NoStructuralSeparationToOppositeLanes
+		},
+		alacarte := {
+			lanePosition := 10,
+			impactReduction := {
+				heightLonCarrLeft := 100,
+				heightLonCarrRight := 40,
+				posLonCarrLeft := 101,
+				posLonCarrRight := 11,
+				positionOfPillars := { 2, 10 },
+				posCentMass := 34,
+				wheelBaseVehicle := 124,
+				turningRadius := 240,
+				posFrontAx := 10,
+				positionOfOccupants := '10111100101101010111'B,
+				vehicleMass := 1001,
+				requestResponseIndication := request
+			},
+			externalTemperature := 60,
+			roadWorks := {
+				lightBarSirenInUse := '10'B,
+				closedLanes := {
+					hardShoulderStatus := availableForStopping,
+					drivingLaneStatus := '101010'B
+				},
+				restriction := {4,5,2},
+				speedLimit := 200,
+				incidentIndication := {
+					causeCode := 40,
+					subCauseCode := 75
+				},
+				recommendedPath := {
+                    {
+                        latitude := 4646,
+                        longitude := 49431,
+                        positionConfidenceEllipse := {
+                            semiMajorConfidence := 1001,
+                            semiMinorConfidence := 512,
+                            semiMajorOrientation := 2012
+                        },
+                        altitude := {
+                            altitudeValue := 74153,
+                            altitudeConfidence := outOfRange
+                        }
+                    },
+                    {
+                        latitude := 1212,
+                        longitude := 4931,
+                        positionConfidenceEllipse := {
+                            semiMajorConfidence := 1011,
+                            semiMinorConfidence := 2058,
+                            semiMajorOrientation := 101
+                        },
+                        altitude := {
+                            altitudeValue := 11,
+                            altitudeConfidence := outOfRange
+                        }
+                    }
+                },
+                startingPointSpeedLimit := {
+                    deltaLatitude := 131072,
+                    deltaLongitude := -1231,
+                    deltaAltitude := 0
+                },
+                trafficFlowRule := passToRight,
+                referenceDenms := {
+                    {
+                        originatingStationID := 4294967295,
+                        sequenceNumber := 64101
+                    },
+                    {
+                        originatingStationID := 0,
+                        sequenceNumber := 0
+                    }
+                }
+			},
+			positioningSolution := sGNSS,
+			stationaryVehicle := {
+				stationarySince := lessThan15Minutes,
+				stationaryCause := {
+					causeCode := 30,
+					subCauseCode := 10
+				},
+				carryingDangerousGoods := {
+					dangerousGoodsType := explosives5,
+					unNumber := 1011,
+					elevatedTemperature := false,
+					tunnelsRestricted := true,
+					limitedQuantity := false,
+					emergencyActionCode := "asd",
+					phoneNumber := "asda",
+					companyName := "valami"
+				},
+				numberOfOccupants := 20,
+				vehicleIdentification := {
+					wMInumber := "aaa",
+					vDS := "abcdef"
+				},
+				energyStorageType := '1010110'B
+			}
+		}
+	}
+	};
+
+
+  testcase tc_encdec() runs on Empty_CT {
+    if(d == dec_DENM_PDU(enc_DENM_PDU(d))){
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+  
+  control{
+    execute(tc_encdec());
+  }
+  
+}
+
+

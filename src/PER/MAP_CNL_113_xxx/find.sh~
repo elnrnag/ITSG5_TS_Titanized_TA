@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for FOUND in $(ls -1 ./*)
+do
+  if [ -z `grep $FOUND` ]
+  then
+    echo $FOUND
+  fi
+done

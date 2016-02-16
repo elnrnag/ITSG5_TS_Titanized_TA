@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "1936b42a-5156-495c-9338-d7abcfcb042c",
+            "type": "STRING",
+            "value": "Check that verification key is exist and can be used to check signature\r\nDo not required TP. Fully covered by ITS-S_CERT_AT_08"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "1936b42a-5156-495c-9338-d7abcfcb042c",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/6c666f70-ff2e-4d9b-b25e-45bdd0b88099"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "1936b42a-5156-495c-9338-d7abcfcb042c",
+            "type": "STRING",
+            "value": "07. Check verification key validity"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "1936b42a-5156-495c-9338-d7abcfcb042c",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "1936b42a-5156-495c-9338-d7abcfcb042c"
+}

@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "f6ad2bce-abe0-4134-a12b-21e7bd405083",
+            "type": "STRING",
+            "value": "If ITS-S sends a secured CAM check that the sent SecuredMessage contains only the TrailerField signature.\r\nFully covered by ITS-S_CAM_16_T01. Does not need special TP"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "f6ad2bce-abe0-4134-a12b-21e7bd405083",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2e99c742-b3c7-497d-ad35-af859d7e351d"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "f6ad2bce-abe0-4134-a12b-21e7bd405083",
+            "type": "STRING",
+            "value": "15. Check presence of traieler field"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "f6ad2bce-abe0-4134-a12b-21e7bd405083",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "f6ad2bce-abe0-4134-a12b-21e7bd405083"
+}

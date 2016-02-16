@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "b67b9bc7-410c-4caa-bf8a-45f1cad36b9a",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "b67b9bc7-410c-4caa-bf8a-45f1cad36b9a",
+            "type": "STRING",
+            "value": "Check that message generation time is inside the validity period of the signing certificate\r\nCheck that message generation time value is realistic (according to values proposed in C2C SEC12)"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "b67b9bc7-410c-4caa-bf8a-45f1cad36b9a",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a Beacon\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tcontaining exacly one header_fields['generation_time'] {\r\n\t\t\t\tcontaining generation_time\r\n\t\t\t\t\tindicating TIME_1 (CUR_TIME - 10min <= TIME_1 <= CUR_TIME + 5min)\r\n\t\t\t}\r\n\t\t\tcontaining header_fields['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate {\r\n\t\t\t\t\t\tcontaining validity_restrictions['time_start_and_end'] {\r\n\t\t\t\t\t\t\tcontaining start_validity\r\n\t\t\t\t\t\t\t\tindicating value <= TIME_1\r\n\t\t\t\t\t\t\tcontaining end_validity\r\n\t\t\t\t\t\t\t\tindicating value > TIME_1\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tor not containing validity_restrictions['time_start_and_end']\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "b67b9bc7-410c-4caa-bf8a-45f1cad36b9a",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "b67b9bc7-410c-4caa-bf8a-45f1cad36b9a",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b67b9bc7-410c-4caa-bf8a-45f1cad36b9a"
+}

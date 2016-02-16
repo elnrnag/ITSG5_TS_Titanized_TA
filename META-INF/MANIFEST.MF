@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: org.eclipse.titan.trimapper.TitanTriMapperMain
+Class-Path: tt3plugins/EclipseTitan/TRI.jar tt3plugins/EclipseTitan/java-json.jar tt3plugins/EtsiItsAdapter/jnetpcap-1.3.0/jnetpcap.jar tt3plugins/EtsiItsAdapter/jnetpcap-1.4.r1425/jnetpcap.jar tt3plugins/EtsiItsAdapter/JSon/gson-2.3.jar tt3plugins/EtsiItsAdapter/Preserve/de.fraunhofer.sit.c2x.pki.ca.jar tt3plugins/EtsiItsAdapter/Preserve/de.fraunhofer.sit.c2x.pki.etsi_ts103097v1114.jar tt3plugins/EtsiItsAdapter/Preserve/de.fraunhofer.sit.c2x.pki.libs.custom-guice.jar
+

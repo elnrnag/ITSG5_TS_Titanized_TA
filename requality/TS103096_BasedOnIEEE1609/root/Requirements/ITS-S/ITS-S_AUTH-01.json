@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/3811efdb-3ac9-41a0-832f-1177a303f964"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "05-Authorization NB"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "f8fba4f2-4663-409d-9fd7-331b80199c0a"
+}

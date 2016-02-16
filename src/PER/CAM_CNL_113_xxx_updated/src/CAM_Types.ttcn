@@ -1,0 +1,70 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2016 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     CAM_Types.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2016-02-08
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module CAM_Types
+{
+  import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+  import from ITS_Container language "ASN.1:1997" all;
+  import from LibItsCam_TestSystem all;
+  import from TTCN_EncDec all;
+
+
+  external function enc_CAM_PDU( in CAM pdu) return octetstring;
+  external function dec_CAM_PDU( in octetstring stream) return CAM;
+
+function f_enc_CamReq(in CamReq pdu) return octetstring {
+  return enc_CAM_PDU(pdu.msgOut)
+}
+
+function f_dec_CamReq(in octetstring stream) return CamReq {
+  var CamReq v_CamReq;
+  v_CamReq.msgOut:=dec_CAM_PDU(stream);
+  return v_CamReq;
+
+}
+
+//function f_enc_CamInd(in CamInd pdu) return octetstring{}
+
+function f_dec_CamInd(in octetstring stream) return CamInd {
+  var CamInd v_CamInd;
+  var ExtCamInd v_ExtCamInd;
+  var octetstring v_os_per,v_os_raw;
+
+  var integer v_lengthof_ExtCamInd := 12;
+
+  var integer v_start_of_raw := lengthof(stream) - v_lengthof_ExtCamInd;
+  
+  v_os_per:=substr(stream, 0, v_start_of_raw);
+  v_os_raw:=substr(stream, v_start_of_raw, v_lengthof_ExtCamInd);
+
+  v_ExtCamInd:=f_dec_ExtCamInd(v_os_raw);
+
+  v_CamInd.msgIn:=dec_CAM_PDU(v_os_per);
+
+  v_CamInd.gnNextHeader:=v_ExtCamInd.gnNextHeader;
+  v_CamInd.gnHeaderType:=v_ExtCamInd.gnHeaderType;
+  v_CamInd.gnHeaderSubtype:=v_ExtCamInd.gnHeaderSubtype;
+  v_CamInd.gnLifetime:=v_ExtCamInd.gnLifetime;
+  v_CamInd.gnTrafficClass:=v_ExtCamInd.gnTrafficClass;
+  v_CamInd.btpDestinationPort:=v_ExtCamInd.btpDestinationPort;
+  v_CamInd.btpInfo:=v_ExtCamInd.btpInfo;
+
+  return v_CamInd;
+
+}
+
+}
+
+

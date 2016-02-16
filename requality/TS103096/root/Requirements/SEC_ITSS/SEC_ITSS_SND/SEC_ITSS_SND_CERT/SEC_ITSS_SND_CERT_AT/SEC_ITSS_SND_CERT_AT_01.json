@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "0be535c7-1e1c-4526-a028-d747fe92b451",
+            "type": "STRING",
+            "value": "If ITS-S sends an AT certificate check that the subject_type is set to 'authorization_ticket' (1)"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "0be535c7-1e1c-4526-a028-d747fe92b451",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a05f0d1f-4faa-41a2-a745-8c95fb4779a1"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "0be535c7-1e1c-4526-a028-d747fe92b451",
+            "type": "STRING",
+            "value": "01. Check subject type"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "0be535c7-1e1c-4526-a028-d747fe92b451",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "0be535c7-1e1c-4526-a028-d747fe92b451"
+}

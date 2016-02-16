@@ -1,0 +1,46 @@
+/**
+ *  @author   ETSI / STF481
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Security/LibItsSecurity_Pixits.ttcn3 $
+ *            $Id: LibItsSecurity_Pixits.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Module containing Pixits for Security Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsSecurity_Pixits {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    
+    /**
+     * @desc Root path to access certificate stored in files, identified by certficate ID
+     */
+    modulepar charstring PX_CERTIFICATE_POOL_PATH := "data/certificates";
+    
+    /**
+     * @descConfiguration sub-directory to access certificate stored in files
+     */
+    modulepar charstring PX_IUT_SEC_CONFIG_NAME := "cfg01";
+    
+    /**
+     * @desc The certficate the IUT should use. Default: CERT_IUT_A_AT
+     * @remark If the IUT cannot use the test certificates, set this PIXIT to CERT_NONE
+     */
+    modulepar charstring PX_IUT_DEFAULT_CERTIFICATE := "CERT_IUT_A_AT";
+    
+    /**
+     * @desc ITS-AID value for other profile. Default: 38
+     */
+    modulepar IntX PX_OTHER_ITS_AID := 38; 
+    
+    /**
+     * @desc Invalid protocol version. Default: 1
+     */
+    modulepar UInt8 PX_WRONG_PROTOCOL_VERSION := 1;
+    
+} // End of module LibItsSecurity_Pixits
+

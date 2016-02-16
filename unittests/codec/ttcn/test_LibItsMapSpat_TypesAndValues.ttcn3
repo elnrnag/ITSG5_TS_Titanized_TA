@@ -1,0 +1,119 @@
+module test_LibItsMapSpat_TypesAndValues {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DSRC language "ASN.1:1997" all;
+    import from REG_D language "ASN.1:1997" all;
+    import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    
+    // LibItsMapSpat
+    import from LibItsMapSpat_TypesAndValues all;
+    import from LibItsMapSpat_Templates all;
+    import from LibItsMapSpat_TestSystem all;
+    
+    import from test_CommonCodec all;
+    
+    group LibItsMapSpat_testCases {
+        
+        group utPrimitives {
+            
+            testcase tc_UtInitialize() runs on TCType system TCType {
+                test_PDU<UtInitialize>(m_mapSpatInitialize, false);
+            }
+            
+            testcase tc_UtInitializeResult() runs on TCType system TCType {
+                test_decodePDU<UtInitializeResult>(UtInitializeResult:true, '0101'O);
+            }
+            
+            testcase tc_UtMapSpatTrigger_01() runs on TCType system TCType {
+                test_PDU<UtMapSpatTrigger>(
+                    m_utTriggerEvent(
+                        spatMsg
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtMapSpatTrigger_02() runs on TCType system TCType {
+                test_PDU<UtMapSpatTrigger>(
+                    m_utTriggerEvent(
+                        mapNewContent 
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtMapSpatTriggerResult() runs on TCType system TCType {
+                test_decodePDU<UtMapSpatTriggerResult>(UtMapSpatTriggerResult:?, 'A10105'O);
+            }
+            
+        } // End of group utPrimitives 
+        
+        group testMapSpatPrimitiveMessages {
+            
+            testcase tc_MapSpatReq_01() runs on TCType system TCType {
+                var MapReq v_mapReq;
+                
+                v_mapReq := valueof(
+                    m_mapReq(
+                        m_mapPdu(
+                            m_map
+                )));
+                log("v_mapReq=", v_mapReq);
+                test_PDU<MapReq>(
+                    v_mapReq, 
+                    false
+                );
+                test_decodePDU<MapReq>(
+                    v_mapReq, 
+                    '01050001B2074004800500FFFFFFFFFFFFFFFFFFFFFFFF'O
+                )
+            }
+            
+            testcase tc_MapSpatReq_02() runs on TCType system TCType {
+                var SpatReq v_spatReq;
+                
+                v_spatReq := valueof(
+                    m_spatReq(
+                        m_spatPdu(
+                            m_spat
+                )));
+                log("v_spatReq=", v_spatReq);
+                test_PDU<SpatReq>(
+                    v_spatReq, 
+                    false
+                );
+                test_decodePDU<SpatReq>(
+                    v_spatReq, 
+                    '01040001B2074130000000BB8520000002000080FFFFFFFFFFFFFFFFFFFFFFFF'O
+                )
+            }
+            
+            testcase tc_MapSpatInd_01() runs on TCType system TCType {
+                
+                test_decodePDU<MapInd>(
+                    mw_mapInd(mw_mapPdu), 
+                    '01050001B2074004800500FFFFFFFFFFFFFFFFFFFFFFFF'O
+                );
+            }
+            
+            testcase tc_MapSpatInd_02() runs on TCType system TCType {
+                
+                test_decodePDU<SpatInd>(
+                    mw_spatInd(mw_spatPdu), 
+                    '01040001B2074130000000BB8520000002000080FFFFFFFFFFFFFFFFFFFFFFFF'O
+                );
+            }
+            
+        } // End of group testMapSpatPrimitiveMessages
+        
+    } // End of group LibItsMapSpat_testCases 
+    
+} // End of module test_LibItsMapSpat_TypesAndValues 

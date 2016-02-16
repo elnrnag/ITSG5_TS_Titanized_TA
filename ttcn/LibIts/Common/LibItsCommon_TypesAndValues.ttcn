@@ -1,0 +1,137 @@
+/**
+ *  @author      ETSI / STF405 / STF449
+ *  @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Common/LibItsCommon_TypesAndValues.ttcn $
+ *               $Id: LibItsCommon_TypesAndValues.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc        Module containing common types and values for ITS Protocols
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCommon_TypesAndValues {
+    
+    // LibCommon
+    import from LibCommon_DataStrings all;
+    
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+
+    group utPrimitives {
+        
+        /**
+         * @desc Upper Tester message to initialize IUT 
+         * @member hashedId8 In case of secured mode set, hashedId8 indicate which certificate the IUT shall use
+         */
+        type record UtInitialize {
+            Oct8 hashedId8 
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester result message of the initialization request 
+         */
+		type record UtInitializeResult {
+			boolean utInitializeResult
+		} with { variant (utInitializeResult) "FIELDLENGTH(8)" };
+        
+        /**
+         * @desc Upper Tester message to change the position of IUT. Values a relatives 
+         */
+        type record UtChangePosition {
+            integer latitude,
+            integer longitude,
+            integer elevation
+        } with { variant (latitude) "FIELDLENGTH(32)";
+				 variant (longitude) "FIELDLENGTH(32)";
+				 variant (elevation) "FIELDLENGTH(8)"; };
+        
+        /**
+         * @desc Upper Tester result message of change position request of IUT 
+         */
+		type record UtChangePositionResult {
+			boolean utChangePositionResult
+		} with { variant (utChangePositionResult) "FIELDLENGTH(8)" };
+        
+        /**
+         * @desc Upper Tester message to change the pseudonym of the DENM IUT 
+         */
+        type record UtChangePseudonym {
+            // empty on purpose
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester result message of the change pseudonym request 
+         */
+		type record UtChangePseudonymResult {
+			boolean utChangePseudonymResult
+		} with { variant (utChangePseudonymResult) "FIELDLENGTH(8)" };
+    }
+
+group commonConstants {
+       
+        const SemiAxisLength c_semiAxisLengthOneCentimeter := 1;
+        const SemiAxisLength c_semiAxisLengthUnavailable := 4095;
+
+        // DENM
+        const HeadingConfidence c_headingConfidence_withinZeroPointOneDegree := 1;        
+        const HeadingValue c_headingValue_wgs84North := 0;
+       
+        // CAM
+        const AltitudeValue c_altitudeValue_seaLevel := 0;
+        const StationType c_stationType_passengerCar := 5;
+        const LongitudinalAccelerationValue c_longitudinalAccelerationValue_unavailable := 161;
+        const AccelerationConfidence c_accelerationConfidence_unavailable := 102;
+        const CurvatureValue c_curvatureValue_straight := 0;
+        const YawRateValue c_yawRateValue_straight := 0;
+       
+       
+       
+        /**
+         * @remark check this values
+         */
+        group causeCodes {
+           
+            const CauseCodeType c_causeReserved := 0;
+            const CauseCodeType c_causeTrafficCondition := 1;
+            const CauseCodeType c_causeAccident := 2;
+            const CauseCodeType c_causeRoadworks := 3;
+            const CauseCodeType c_causeAdverseWeatherCondition_Adhesion := 6;
+            const CauseCodeType c_causeHazardousLocation_SurfaceCondition := 9;
+            const CauseCodeType c_causeHazardousLocation_ObstacleOnTheRoad := 10;
+            const CauseCodeType c_causeHazardousLocation_AnimalOnTheRoad := 11;
+            const CauseCodeType c_causeHumanPresenceOnTheRoad := 12;
+            const CauseCodeType c_causeWrongWayDriving := 14;
+            const CauseCodeType c_causeRescueAndRecoveryWorkInProgress := 15;
+            const CauseCodeType c_causeAdverseWeatherCondition_ExtremeWeatherCondition := 17;
+            const CauseCodeType c_causeAdverseWeatherCondition_Visibility := 18;
+            const CauseCodeType c_causeAdverseWeatherCondition_Precipitation := 19;
+            const CauseCodeType c_causeSlowVehicle := 26;
+            const CauseCodeType c_causeDangerousEndOfQueue := 27;
+            const CauseCodeType c_causeVehicleBreakdown := 91;
+            const CauseCodeType c_causePostCrash := 92;
+            const CauseCodeType c_causeHumanProblem := 93;
+            const CauseCodeType c_causeStationaryVehicle := 94;
+            const CauseCodeType c_causeEmergencyVehicleApproaching := 95;
+            const CauseCodeType c_causeHazardousLocation_DangerousCurve := 96;
+            const CauseCodeType c_causeCollisionRisk := 97;
+            const CauseCodeType c_causeSignalViolation := 98;
+            const CauseCodeType c_causeDangerousSituation := 99;
+           
+        } // end group causeCodes
+       
+        /**
+         * @remark check this values
+         */
+        group subCauseCodes {
+           
+            const SubCauseCodeType c_subCauseCode_Unavailable := 0;
+            const VehicleBreakdownSubCauseCode c_vehicleBreakDownSubCauseCode_engineProblem := 3;
+            const SlowVehicleSubCauseCode c_slowVehicleSubCauseCode_convoy := 5;
+           
+        } // end group subCauseCodes
+       
+       
+    } // end commonConstants
+    
+}
+with { encode "RAW" };
+

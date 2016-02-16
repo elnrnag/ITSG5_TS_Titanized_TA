@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/29b3e6e6-b206-46f7-b2b9-3dd0ea7757b0"]
+        },
+        "_name": {
+            "key": "_name",
+            "type": "STRING",
+            "value": "01. Enrolment Request verification"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "47404747-e507-472e-8f54-595d425edd51"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6be5db96-3b1e-4d71-a27e-2361c7422876\"><a name=\"6be5db96-3b1e-4d71-a27e-2361c7422876\" id=\"id_6be5db96-3b1e-4d71-a27e-2361c7422876\" class=\"requality_id\"><\/a>The <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_6be5db96-3b1e-4d71-a27e-2361c7422876\">generation_location<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6be5db96-3b1e-4d71-a27e-2361c7422876\"> is valid, either if there is no geographic validity restriction in the certificate referenced by the <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_6be5db96-3b1e-4d71-a27e-2361c7422876\">signer_info<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_6be5db96-3b1e-4d71-a27e-2361c7422876\">, or if it is inside the geographic validity restriction of this certificate.<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "6be5db96-3b1e-4d71-a27e-2361c7422876"
+}

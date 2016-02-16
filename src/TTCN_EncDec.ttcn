@@ -1,0 +1,1301 @@
+/******************************************************************************
+* Copyright (c) 2004, 2016  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+******************************************************************************/
+
+module TTCN_EncDec {
+
+
+//------------------------------------------------------------------------------
+import from LibCommon_BasicTypesAndValues all;
+import from LibCommon_DataStrings all;
+import from LibItsCommon_TypesAndValues all;
+import from LibItsBtp_TypesAndValues all;
+import from LibItsBtp_TestSystem all;
+import from LibItsCam_TypesAndValues all;
+import from LibItsCam_TestSystem all;
+import from LibItsDenm_TypesAndValues all;
+import from LibItsDenm_TestSystem all;
+import from LibItsMapSpat_TypesAndValues all;
+import from LibItsMapSpat_TestSystem all;
+import from LibItsIpv6OverGeoNetworking_TestSystem all;
+import from LibItsGeoNetworking_TestSystem all;
+import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+import from LibItsGeoNetworking_TypesAndValues all;
+import from CAM_Types all;
+import from DENM_Types all;
+import from MAP_Types all;
+import from SPAT_Types all;
+import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+import from ITS_Container language "ASN.1:1997" all;
+import from LibItsExternal_TypesAndValues all;
+import from General_Types all;   
+import from LibItsSecurity_TypesAndValues all;
+
+
+//UT-Common------------------------------------------------------------------------------
+
+
+external function f_enc_UtInitialize(in UtInitialize pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_UtInitialize(in octetstring stream) return UtInitialize
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_UtChangePosition(in UtChangePosition pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_UtChangePosition(in octetstring stream) return UtChangePosition
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_UtChangePositionResult(in UtChangePositionResult pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_UtChangePositionResult(in octetstring stream) return UtChangePositionResult
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_UtChangePseudonym(in UtChangePseudonym pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_UtChangePseudonym(in octetstring stream) return UtChangePseudonym
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_UtChangePseudonymResult(in UtChangePseudonymResult pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_UtChangePseudonymResult(in octetstring stream) return UtChangePseudonymResult
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+
+
+
+
+//UT-BTP------------------------------------------------------------------------
+/*       
+
+encoding-decoding is done in the test port
+*/
+//UT-GN------------------------------------------------------------------------
+
+/*MTC@elx1pjld12-hz: 
+f_enc_Ut_Gn_GenerateGeoBroadcastMessage(): 
+Encoding @LibItsGeoNetworking_TypesAndValues.GenerateGeoBroadcastMessage: 
+
+{ shape := e_geoCircle (0), 
+lifetime := 10000, 
+trafficClass := { scf := e_scfEnable (1), 
+channelOffload := e_choffDisabled (0), 
+tcId := 0 },
+reserved := 0, 
+area := { geoAreaPosLatitude := 10256, 
+geoAreaPosLongitude := 0, 
+distanceA := 0, 
+distanceB := 0, 
+angle := 0 }, 
+payload := { decodedPayload := omit, 
+rawPayload := ''O } }
+*/
+
+
+type bitstring BIT1 length(1) with { variant "FIELDLENGTH(1)" };
+type bitstring BIT6 length(6) with { variant "FIELDLENGTH(6)" };
+
+type record ExtTrafficClass {
+  BIT1   scf,
+  BIT1   channelOffload,
+  BIT6   tcId
+} with { variant "" };
+
+type record ExtGnPayload {
+  //DecodedPayload decodedPayload optional, //TODO: Not yet implemented
+  octetstring rawPayload
+} with { variant "" };
+
+
+external function f_enc_Ut_Gn_GenerateGeoUnicastMessage(in GenerateGeoUnicastMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_Ut_Gn_GenerateGeoUnicastMessage(in octetstring stream) return GenerateGeoUnicastMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+type record ExtGenerateGeoBroadcastMessage {
+  UInt8  shape,
+  UInt16 lifetime,
+  ExtTrafficClass trafficClass,
+  UInt24 reserved,
+  Area area,
+  UInt16 payloadLength,
+  ExtGnPayload payload 
+} with { variant(payloadLength) "LENGTHTO(payload)" };
+
+
+external function f_enc_Ext_UtGnGenerateGeoBroadcastMessage(in ExtGenerateGeoBroadcastMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+function f_enc_Ut_Gn_GenerateGeoBroadcastMessage(in GenerateGeoBroadcastMessage pdu) return octetstring {
+  var ExtGenerateGeoBroadcastMessage ext;
+
+  ext.shape := enum2int(pdu.shape);
+  ext.lifetime := pdu.lifetime;
+
+  ext.trafficClass.scf := int2bit(enum2int(pdu.trafficClass.scf),1);
+  ext.trafficClass.channelOffload := int2bit(enum2int(pdu.trafficClass.channelOffload),1);
+  ext.trafficClass.tcId := int2bit(pdu.trafficClass.tcId,6);
+
+  ext.reserved := 0;
+
+  ext.area := pdu.area;
+
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+
+  //TODO: decodedPayload 
+  /*if (ispresent(pdu.payload.decodedPayload)) {
+  ext.payloadLength := ext.payloadLength + lengthof(pdu.payload.DecodedPayload);
+  ext.payload.DecodedPayload := pdu.payload.DecodedPayload
+  }
+  */
+
+  return f_enc_Ext_UtGnGenerateGeoBroadcastMessage(ext);
+}
+
+
+external function f_dec_Ut_Gn_GenerateGeoBroadcastMessage(in octetstring stream) return GenerateGeoBroadcastMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+
+external function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_Ut_Gn_GenerateGeoAnycastMessage(in octetstring stream) return GenerateGeoAnycastMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_Ut_Gn_GenerateSHBMessage(in GenerateSHBMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_Ut_Gn_GenerateSHBMessage(in octetstring stream) return GenerateSHBMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_Ut_Gn_GenerateTSBMessage(in octetstring stream) return GenerateTSBMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_enc_UtGnTrigger(in UtGnTrigger pdu) return octetstring
+{
+
+  var octetstring ret_os;
+  if (ischosen(pdu.geoUnicast)) { ret_os:='50'O&f_enc_Ut_Gn_GenerateGeoUnicastMessage(pdu.geoUnicast); }
+  else if (ischosen(pdu.geoBroadcast))  { ret_os:='51'O&f_enc_Ut_Gn_GenerateGeoBroadcastMessage(pdu.geoBroadcast); }
+  else if (ischosen(pdu.geoAnycast))  { ret_os:='52'O&f_enc_Ut_Gn_GenerateGeoAnycastMessage(pdu.geoAnycast); }
+  else if (ischosen(pdu.shb))  { ret_os:='53'O&f_enc_Ut_Gn_GenerateSHBMessage(pdu.shb); }
+  else if (ischosen(pdu.tsb))  { ret_os:='54'O&f_enc_Ut_Gn_GenerateTSBMessage(pdu.tsb); }
+
+  return ret_os;
+}
+
+
+
+
+
+//UT-CAM------------------------------------------------------------------------
+
+type bitstring BIT8 length(8) with { variant "FIELDLENGTH(8)" };
+
+type record ExtPtActivation {
+  UInt8 		ptActivationType,
+  UInt8 		ptActivationDataLength,
+  octetstring   	ptActivationData
+
+}with { variant(ptActivationDataLength) "LENGTHTO(ptActivationData)" };
+
+
+type union ExtUtCamTrigger {
+  Int16 changeCurvature,
+  Int16 changeSpeed,
+  BIT8  setAccelerationControlStatus,
+  BIT8  setExteriorLightsStatus,
+  UInt16  changeHeading,
+  UInt8  setDriveDirection,
+  Int16  changeYawRate,
+  UInt8 setStationType,
+  UInt8 setVehicleRole,
+  UInt8 setEmbarkationStatus,
+  ExtPtActivation setPtActivation,
+  UInt8 setDangerousGoods,
+  UInt8 setLightBarSirene
+} with { variant "" };
+
+
+
+external function f_enc_ExtUt_Cam_Trigger(in ExtUtCamTrigger pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_ExtUt_Cam_Trigger(in octetstring stream) return ExtUtCamTrigger
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_enc_UtCAmTrigger(in UtCamTrigger pdu) return octetstring
+{
+
+  var ExtUtCamTrigger v_ExtUtCamTrigger;
+  var octetstring ret_os;
+
+  if (ischosen(pdu.changeCurvature)){
+    v_ExtUtCamTrigger.changeCurvature:=pdu.changeCurvature;
+  } else if (ischosen(pdu.changeSpeed)){
+    v_ExtUtCamTrigger.changeSpeed:=pdu.changeSpeed;
+  } else if (ischosen(pdu.setAccelerationControlStatus)){
+    v_ExtUtCamTrigger.setAccelerationControlStatus:=pdu.setAccelerationControlStatus&'1'B;
+  } else if (ischosen(pdu.setExteriorLightsStatus)){
+    v_ExtUtCamTrigger.setExteriorLightsStatus:=pdu.setExteriorLightsStatus;
+  } else if (ischosen(pdu.changeHeading)){
+    v_ExtUtCamTrigger.changeHeading:=pdu.changeHeading;
+  } else if (ischosen(pdu.setDriveDirection)){
+    v_ExtUtCamTrigger.setDriveDirection:=enum2int(pdu.setDriveDirection);
+  } else if (ischosen(pdu.changeYawRate)){
+    v_ExtUtCamTrigger.changeYawRate:=pdu.changeYawRate;
+  } else if (ischosen(pdu.setStationType)){
+    v_ExtUtCamTrigger.setStationType:=pdu.setStationType;
+  } else if (ischosen(pdu.setVehicleRole)){
+    v_ExtUtCamTrigger.setVehicleRole:=enum2int(pdu.setVehicleRole);
+  } else if (ischosen(pdu.setEmbarkationStatus)){
+    if(pdu.setEmbarkationStatus) {
+      v_ExtUtCamTrigger.setEmbarkationStatus:=255
+    } else {
+      v_ExtUtCamTrigger.setEmbarkationStatus:=0
+    }
+  } else if (ischosen(pdu.setPtActivation)){
+    v_ExtUtCamTrigger.setPtActivation.ptActivationType:=pdu.setPtActivation.ptActivationType;
+    v_ExtUtCamTrigger.setPtActivation.ptActivationDataLength:=0;
+    v_ExtUtCamTrigger.setPtActivation.ptActivationData:=pdu.setPtActivation.ptActivationData;
+  } else if (ischosen(pdu.setDangerousGoods)){
+    v_ExtUtCamTrigger.setDangerousGoods:=enum2int(pdu.setDangerousGoods);
+  } else if (ischosen(pdu.setLightBarSirene)){
+    v_ExtUtCamTrigger.setLightBarSirene:=bit2int(pdu.setLightBarSirene);
+  }
+
+  ret_os:=f_enc_ExtUt_Cam_Trigger(v_ExtUtCamTrigger);
+
+  return ret_os;
+}
+
+type record ExtUtCamEventInd {
+  UInt16      camPduLength,
+  octetstring camMsg
+} with { variant(camPduLength) "LENGTHTO(camMsg)" };
+
+
+
+external function f_dec_ExtUt_Cam_EventInd(in octetstring stream) return ExtUtCamEventInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_dec_Ut_Cam_EventInd(in octetstring stream) return UtCamEventInd
+{
+
+  var ExtUtCamEventInd v_ExtUtCamEventInd:=f_dec_ExtUt_Cam_EventInd(stream)
+  var UtCamEventInd v_UtCamEventInd;
+
+  v_UtCamEventInd.camMsg:= dec_CAM_PDU(v_ExtUtCamEventInd.camMsg);
+
+  return v_UtCamEventInd;
+}
+/*
+UtCamTriggerResult--decoded in the test port
+*/
+
+
+//UT-DENM------------------------------------------------------------------------
+
+type record ExtSituationContainer {
+  UInt8 informationQuality,
+  UInt8 causeCode,
+  UInt8 subCauseCode
+} with { variant "" };
+
+type record ExtAlacarteContainer {
+  UInt8 TODO
+} with { variant "" };
+
+
+type record ExtUtDenmTrigger {
+  UInt8 bitmask,
+  UInt48 detectionTime,
+  UInt24 validityDuration optional,
+  UInt24 repetitionDuration optional,
+  ExtSituationContainer situation,
+  UInt8 relevanceDistance,
+  UInt8 relevanceTrafficDirection,
+  UInt16 transmissionInterval optional,
+  UInt16 repetitionInterval optional,
+  UInt8 alacarteLength optional,
+  ExtAlacarteContainer alacarte optional
+} with { variant (bitmask) "FIELDLENGTH(8)";
+  variant (detectionTime) "FIELDLENGTH(48)";
+  variant (validityDuration) "FIELDLENGTH(24)";
+  variant (repetitionDuration) "FIELDLENGTH(24)";
+  variant (relevanceDistance) "FIELDLENGTH(8)";
+  variant (relevanceTrafficDirection) "FIELDLENGTH(8)";
+  variant (transmissionInterval) "FIELDLENGTH(16)";
+  variant (repetitionInterval) "FIELDLENGTH(16)";
+  variant (alacarteLength) "FIELDLENGTH(8)" };
+
+
+
+external function f_enc_ExtUt_Denm_Trigger(in ExtUtDenmTrigger pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtUt_Denm_Trigger(in octetstring stream) return ExtUtDenmTrigger
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+function f_enc_UtDenmTrigger(in UtDenmTrigger pdu) return octetstring
+{
+
+  var ExtUtDenmTrigger v_ExtUtDenmTrigger;
+  var octetstring ret_os;
+
+  v_ExtUtDenmTrigger.bitmask := 0;
+
+  v_ExtUtDenmTrigger.detectionTime := pdu.detectionTime;
+
+
+  if (ispresent(pdu.validityDuration)) {
+    v_ExtUtDenmTrigger.bitmask := 1;
+    v_ExtUtDenmTrigger.validityDuration := pdu.validityDuration;
+  } else {
+    v_ExtUtDenmTrigger.validityDuration := 0;
+  }
+  if (ispresent(pdu.repetitionDuration)) {
+    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 2;
+    v_ExtUtDenmTrigger.repetitionDuration := pdu.repetitionDuration;
+  } else {
+    v_ExtUtDenmTrigger.repetitionDuration := 0; //omit;
+  }
+
+  v_ExtUtDenmTrigger.situation.informationQuality := pdu.situation.informationQuality;
+  v_ExtUtDenmTrigger.situation.causeCode := pdu.situation.eventType.causeCode;
+  v_ExtUtDenmTrigger.situation.subCauseCode := pdu.situation.eventType.subCauseCode;
+
+  v_ExtUtDenmTrigger.relevanceDistance := enum2int(pdu.relevanceDistance);
+
+  v_ExtUtDenmTrigger.relevanceTrafficDirection := enum2int(pdu.relevanceTrafficDirection);
+  if (ispresent(pdu.transmissionInterval)) {
+    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 8;
+    v_ExtUtDenmTrigger.transmissionInterval := pdu.transmissionInterval;
+  } else {
+    v_ExtUtDenmTrigger.transmissionInterval := 0; //omit;
+  }
+  if (ispresent(pdu.repetitionInterval)) {
+    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 32;
+    v_ExtUtDenmTrigger.repetitionInterval := pdu.repetitionInterval;
+  } else {
+    v_ExtUtDenmTrigger.repetitionInterval := 0; //omit;
+  }
+  if (ispresent(pdu.alacarte)) {
+    v_ExtUtDenmTrigger.alacarteLength := 1;
+    var ExtAlacarteContainer v_ExtAlacarteContainer := {0};
+    v_ExtUtDenmTrigger.alacarte := v_ExtAlacarteContainer;
+  } else {
+    v_ExtUtDenmTrigger.alacarteLength := 0; //omit;
+    v_ExtUtDenmTrigger.alacarte := omit;
+  }
+
+  ret_os:=f_enc_ExtUt_Denm_Trigger(v_ExtUtDenmTrigger);
+  return ret_os;
+}
+
+//UtDenmUpdate
+type record ExtActionID {
+  UInt32 originatingStationID,
+  UInt16 sequenceNumber
+} with { variant "" };
+
+type record ExtUtDenmUpdate {
+  UInt8                 bitmask,
+  ExtActionID           actionID,
+  UInt48                detectionTime,
+  UInt24                validityDuration          optional,
+  ExtSituationContainer situation 		   optional,
+  UInt8                 relevanceDistance         optional,
+  UInt8 		 relevanceTrafficDirection optional,
+  UInt16 		 transmissionInterval 	   optional,
+  UInt16 		 repetitionInterval 	   optional,
+  UInt8 		 alacarteLength 	   optional,
+  ExtAlacarteContainer  alacarte 		   optional
+} with { variant (bitmask) "FIELDLENGTH(8)";
+  variant (detectionTime) "FIELDLENGTH(48)";
+  variant (validityDuration) "FIELDLENGTH(24)";
+  variant (relevanceDistance) "FIELDLENGTH(8)";
+  variant (relevanceTrafficDirection) "FIELDLENGTH(8)";
+  variant (transmissionInterval) "FIELDLENGTH(16)";
+  variant (repetitionInterval) "FIELDLENGTH(16)";
+  variant (alacarteLength) "FIELDLENGTH(8)" };
+
+
+
+external function f_enc_ExtUt_Denm_Update(in ExtUtDenmUpdate pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtUt_Denm_Update(in octetstring stream) return ExtUtDenmUpdate
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+function f_enc_UtDenmUpdate(in UtDenmUpdate pdu) return octetstring
+{
+
+  var ExtUtDenmUpdate v_ExtUtDenmUpdate;
+  var octetstring ret_os;
+
+  v_ExtUtDenmUpdate.bitmask := 0;
+
+  v_ExtUtDenmUpdate.actionID.originatingStationID := pdu.actionId.originatingStationID;
+  v_ExtUtDenmUpdate.actionID.sequenceNumber := pdu.actionId.sequenceNumber;
+
+  v_ExtUtDenmUpdate.detectionTime := pdu.detectionTime;
+
+
+  if (ispresent(pdu.validityDuration)) {
+    v_ExtUtDenmUpdate.bitmask := 1;
+    v_ExtUtDenmUpdate.validityDuration := pdu.validityDuration;
+  } else {
+    v_ExtUtDenmUpdate.validityDuration := 0;
+  }
+  if (ispresent(pdu.situation)) {
+    v_ExtUtDenmUpdate.bitmask := 2;
+    v_ExtUtDenmUpdate.situation.informationQuality := pdu.situation.informationQuality;
+    v_ExtUtDenmUpdate.situation.causeCode := pdu.situation.eventType.causeCode;
+    v_ExtUtDenmUpdate.situation.subCauseCode := pdu.situation.eventType.subCauseCode;
+  } else {
+    v_ExtUtDenmUpdate.situation.informationQuality := 0;
+    v_ExtUtDenmUpdate.situation.causeCode := 0;
+    v_ExtUtDenmUpdate.situation.subCauseCode := 0;
+  }
+
+  if (ispresent(pdu.relevanceDistance)) {
+    v_ExtUtDenmUpdate.bitmask := v_ExtUtDenmUpdate.bitmask + 4;
+    v_ExtUtDenmUpdate.relevanceDistance := enum2int(pdu.relevanceDistance);
+  } else {
+    v_ExtUtDenmUpdate.relevanceDistance := 0;
+  }
+
+  if (ispresent(pdu.relevanceTrafficDirection)) {
+    v_ExtUtDenmUpdate.bitmask := v_ExtUtDenmUpdate.bitmask + 8;
+    v_ExtUtDenmUpdate.relevanceTrafficDirection := enum2int(pdu.relevanceTrafficDirection);
+  } else {
+    v_ExtUtDenmUpdate.relevanceTrafficDirection := 0;
+  }
+  if (ispresent(pdu.transmissionInterval)) {
+    v_ExtUtDenmUpdate.bitmask := v_ExtUtDenmUpdate.bitmask + 32;
+    v_ExtUtDenmUpdate.transmissionInterval := pdu.transmissionInterval;
+  } else {
+    v_ExtUtDenmUpdate.transmissionInterval := 0; //omit;
+  }
+  if (ispresent(pdu.repetitionInterval)) {
+    v_ExtUtDenmUpdate.bitmask := v_ExtUtDenmUpdate.bitmask + 64;
+    v_ExtUtDenmUpdate.repetitionInterval := pdu.repetitionInterval;
+  } else {
+    v_ExtUtDenmUpdate.repetitionInterval := 0; //omit;
+  }
+  if (ispresent(pdu.alacarte)) {
+    //TODO: encode alacarte
+    v_ExtUtDenmUpdate.alacarteLength := 1;
+    var ExtAlacarteContainer v_ExtAlacarteContainer := {0};
+    v_ExtUtDenmUpdate.alacarte := v_ExtAlacarteContainer;
+  } else {
+    v_ExtUtDenmUpdate.alacarteLength := 0; //omit;
+    v_ExtUtDenmUpdate.alacarte := omit;
+  }
+
+  ret_os:=f_enc_ExtUt_Denm_Update(v_ExtUtDenmUpdate);
+  return ret_os;
+}
+
+
+
+//UtDenmInd
+type record ExtDenmInd {
+
+  UInt8   gnNextHeader,
+  UInt8   gnHeaderType,
+  UInt8   gnHeaderSubtype,
+  UInt32  gnLifetime,
+  UInt8   gnTrafficClass,
+  UInt16  btpDestinationPort,
+  UInt16  btpInfo
+} with { variant "" };
+
+
+external function f_enc_ExtDenmInd(in ExtDenmInd pdu) return octetstring
+
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtDenmInd(in octetstring stream) return ExtDenmInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+
+
+
+type record ExtUtDenmEventInd {
+  UInt16      denmPduLength,
+  octetstring denMsg
+} with { variant(denmPduLength) "LENGTHTO(denMsg)" };
+
+
+
+external function f_dec_ExtUt_Denm_EventInd(in octetstring stream) return ExtUtDenmEventInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_dec_Ut_Denm_EventInd(in octetstring stream) return UtDenmEventInd
+{
+
+  var ExtUtDenmEventInd v_ExtUtDenmEventInd:=f_dec_ExtUt_Denm_EventInd(stream)
+  var UtDenmEventInd v_UtDenmEventInd;
+
+  v_UtDenmEventInd.denMsg:= dec_DENM_PDU(v_ExtUtDenmEventInd.denMsg);
+
+  return v_UtDenmEventInd;
+
+
+}
+
+/*        
+type union PDU_UtDenm_Primitives
+{
+LibItsDenm_TypesAndValues.UtDenmTrigger       utDenmTrigger,
+LibItsDenm_TypesAndValues.UtDenmTriggerResult utDenmTriggerResult,
+LibItsDenm_TypesAndValues.UtDenmEventInd      utDenmEventInd,
+LibItsDenm_TypesAndValues.UtDenmUpdate		utDenmUpdate,
+LibItsDenm_TypesAndValues.UtDenmUpdateResult  utDenmUpdateResult,
+LibItsDenm_TypesAndValues.UtDenmTermination   utDenmTermination,
+LibItsDenm_TypesAndValues.UtDenmTerminationResult utDenmTerminationResult 
+} with { variant ""}  
+
+
+type record PDU_UtDenmPrimitives
+{
+OCT1                  messageType,
+PDU_UtDenm_Primitives  primitive
+} with { variant (primitive) "CROSSTAG( utDenmTrigger,           messageType = '10'O;
+utDenmTriggerResult, 	 messageType = '11'O;
+utDenmUpdate,	      	 messageType = '12'O;
+utDenmUpdateResult,  	 messageType = '13'O;
+utDenmTermination,   	 messageType = '14'O;
+utDenmTerminationResult, messageType = '15'O;
+utDenmEventInd,          messageType = '17'O;
+)" }
+
+external function f_enc_PDU_UtDenmPrimitives(in PDU_UtDenmPrimitives pdu) return octetstring
+with { extension "prototype(convert)"
+extension "encode(RAW)"
+};
+
+
+external function f_dec_PDU_UtDenmPrimitives(in octetstring stream) return PDU_UtDenmPrimitives
+with { extension "prototype(convert)"
+extension "decode(RAW)"
+};
+
+*/
+//UT-MAP -----------------------------------------------------------------------------
+
+type record ExtUtMapEventInd {
+  UInt16      mapPduLength,
+  octetstring mapMsg
+} with { variant(mapPduLength) "LENGTHTO(mapMsg)" };
+
+external function f_dec_ExtUt_Map_EventInd(in octetstring stream) return ExtUtMapEventInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_dec_Ut_Map_EventInd(in octetstring stream) return UtMapEventInd
+{
+
+  var ExtUtMapEventInd v_ExtUtMapEventInd:=f_dec_ExtUt_Map_EventInd(stream)
+  var UtMapEventInd v_UtMapEventInd;
+
+  v_UtMapEventInd.mapMsg:= dec_MAP_PDU(v_ExtUtMapEventInd.mapMsg);
+
+  return v_UtMapEventInd;
+}
+
+//UT-SPAT -----------------------------------------------------------------------------
+
+type record ExtUtSpatEventInd {
+  UInt16      spatPduLength,
+  octetstring spatMsg
+} with { variant(spatPduLength) "LENGTHTO(spatMsg)" };
+
+external function f_dec_ExtUt_Spat_EventInd(in octetstring stream) return ExtUtSpatEventInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_dec_Ut_Spat_EventInd(in octetstring stream) return UtSpatEventInd
+{
+
+  var ExtUtSpatEventInd v_ExtUtSpatEventInd:=f_dec_ExtUt_Spat_EventInd(stream)
+  var UtSpatEventInd v_UtSpatEventInd;
+
+  v_UtSpatEventInd.spatMsg:= dec_SPAT_PDU(v_ExtUtSpatEventInd.spatMsg);
+
+  return v_UtSpatEventInd;
+}
+
+
+
+//BTP-------------------------------------------------------------------------------
+//BTPRequest
+
+type record ExtBtpPayload {
+  //DecodedBtpPayload decodedPayload optional,
+  BtpRawPayload rawPayload
+} with { variant "" };
+
+type record ExtBtpReq {
+  OCT1           nextheader,
+  BtpHeader      header,
+  ExtBtpPayload  payload optional
+} with { variant (header)  "CROSSTAG( btpAHeader, nextheader = '01'O; 
+  btpBHeader, nextheader = '02'O; )"  };
+
+external function f_enc_ExtBtpReq(in ExtBtpReq pdu) return octetstring
+
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+function f_enc_BtpReq(in BtpReq pdu) return octetstring
+{
+
+  var ExtBtpReq v_ExtBtpReq
+
+  v_ExtBtpReq.nextheader:='00'O;
+  v_ExtBtpReq.header:=pdu.msgOut.header;
+  v_ExtBtpReq.payload.rawPayload:=pdu.msgOut.payload.rawPayload;
+
+  //Temporary hack 
+  //v_ExtBtpReq.payload.decodedPayload:=omit;
+
+
+  return f_enc_ExtBtpReq(v_ExtBtpReq);
+}
+
+
+
+//BtpIndication
+type record ExtBtpInd {
+  OCT1           nextheader,
+  BtpHeader      header,
+  octetstring    rawPayload optional
+} with { variant (header)  "CROSSTAG( btpAHeader, nextheader = '01'O; 
+  btpBHeader, nextheader = '02'O; )"  };
+
+external function f_dec_ExtBtpInd(in octetstring stream) return ExtBtpInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+  extension "errorbehavior(ALL:WARNING)"
+};
+
+function f_dec_BtpInd(in octetstring stream) return BtpInd {
+
+  var ExtBtpInd v_ExtBtpInd:=f_dec_ExtBtpInd(stream)
+
+  var BtpInd v_BtpInd
+
+  v_BtpInd.msgIn.header:=v_ExtBtpInd.header;
+  if (ispresent(v_ExtBtpInd.rawPayload)) {
+    v_BtpInd.msgIn.payload.rawPayload:=v_ExtBtpInd.rawPayload;
+
+    var DecodedBtpPayload v_decodedPayload;
+    if (v_ExtBtpInd.nextheader == '01'O) { //BTP A Header
+      if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2001) 
+      {
+        v_decodedPayload := 
+        { camPacket := 
+          dec_CAM_PDU(v_ExtBtpInd.rawPayload)}
+      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2002) {
+        v_decodedPayload := 
+        { denmPacket := 
+          dec_DENM_PDU(v_ExtBtpInd.rawPayload)}
+      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2003) {
+        v_decodedPayload := 
+        { mapPacket := 
+          dec_MAP_PDU(v_ExtBtpInd.rawPayload)}
+      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2004) {
+        v_decodedPayload := 
+        { spatPacket := 
+          dec_SPAT_PDU(v_ExtBtpInd.rawPayload)}
+      }  
+    } else if (v_ExtBtpInd.nextheader == '02'O) { //BTP B Header
+      if (v_ExtBtpInd.header.btpBHeader.destinationPort == 2001) 
+      {
+        v_decodedPayload := 
+        { camPacket := 
+          dec_CAM_PDU(v_ExtBtpInd.rawPayload)}
+      } else if (v_ExtBtpInd.header.btpBHeader.destinationPort == 2002) {
+        v_decodedPayload := 
+        { denmPacket := 
+          dec_DENM_PDU(v_ExtBtpInd.rawPayload)}
+      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2003) {
+        v_decodedPayload := 
+        { mapPacket := 
+          dec_MAP_PDU(v_ExtBtpInd.rawPayload)}
+      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2004) {
+        v_decodedPayload := 
+        { spatPacket := 
+          dec_SPAT_PDU(v_ExtBtpInd.rawPayload)}
+      }
+    }
+
+    if (isbound(v_decodedPayload)) {
+      v_BtpInd.msgIn.payload.decodedPayload := v_decodedPayload;
+    } else {
+      v_BtpInd.msgIn.payload.decodedPayload := omit;
+    }
+  } else
+  {
+    v_BtpInd.msgIn.payload := omit;
+  }
+
+  return v_BtpInd
+
+}
+
+//CAM------------------------------------------------------------------
+
+
+
+
+
+type record ExtCamInd {
+
+  UInt8   gnNextHeader,
+  UInt8   gnHeaderType,
+  UInt8   gnHeaderSubtype,
+  UInt32  gnLifetime,
+  UInt8   gnTrafficClass,
+  UInt16  btpDestinationPort,
+  UInt16  btpInfo
+} with { variant "" };
+
+
+external function f_enc_ExtCamInd(in ExtCamInd pdu) return octetstring
+
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtCamInd(in octetstring stream) return ExtCamInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+//MAP-SPAT --------------------------------------------------------
+
+type union MapSpatInd {
+  MapInd  mapInd,
+  SpatInd spatInd
+};// with {variant "" };
+
+
+type record ExtMapSpatInd {
+  //octetstring   msgIn,
+  UInt8         gnNextHeader,
+  UInt8         gnHeaderType,
+  UInt8    	   gnHeaderSubtype,
+  UInt32 	   gnLifetime,
+  UInt8   	   gnTrafficClass,
+  UInt16  	   btpDestinationPort,
+  UInt16  	   btpInfo
+} with {variant "" };
+
+external function f_dec_ExtMapSpatInd(in octetstring stream) return ExtMapSpatInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+function f_dec_MapSpatInd(in octetstring stream) return MapSpatInd {
+  var octetstring v_os_per,v_os_raw;
+  var integer v_lengthof_ExtMapSpatInd := 12;
+
+  var integer v_start_of_raw := lengthof(stream) - v_lengthof_ExtMapSpatInd;
+
+  v_os_per:=substr(stream, 0, v_start_of_raw);
+  v_os_raw:=substr(stream, v_start_of_raw, v_lengthof_ExtMapSpatInd);
+
+  var ExtMapSpatInd v_ExtMapSpatInd:=f_dec_ExtMapSpatInd(v_os_raw);
+
+  var MapSpatInd v_MapSpatInd;
+
+  if (v_ExtMapSpatInd.btpDestinationPort == (2003)) {        //MAP
+    v_MapSpatInd.mapInd.msgIn.msgMap	     := dec_MAP_PDU(v_os_per);
+    v_MapSpatInd.mapInd.gnNextHeader       := v_ExtMapSpatInd.gnNextHeader;
+    v_MapSpatInd.mapInd.gnHeaderType	     := v_ExtMapSpatInd.gnHeaderType;
+    v_MapSpatInd.mapInd.gnHeaderSubtype    := v_ExtMapSpatInd.gnHeaderSubtype;
+    v_MapSpatInd.mapInd.gnLifetime	     := v_ExtMapSpatInd.gnLifetime;
+    v_MapSpatInd.mapInd.gnTrafficClass     := v_ExtMapSpatInd.gnTrafficClass;
+    v_MapSpatInd.mapInd.btpDestinationPort := v_ExtMapSpatInd.btpDestinationPort;
+    v_MapSpatInd.mapInd.btpInfo	     := v_ExtMapSpatInd.btpInfo;
+
+  } else if (v_ExtMapSpatInd.btpDestinationPort == (2004)) { //SPAT
+    v_MapSpatInd.spatInd.msgIn.msgSpat      := dec_SPAT_PDU(v_os_per);
+    v_MapSpatInd.spatInd.gnNextHeader       := v_ExtMapSpatInd.gnNextHeader;
+    v_MapSpatInd.spatInd.gnHeaderType	      := v_ExtMapSpatInd.gnHeaderType;
+    v_MapSpatInd.spatInd.gnHeaderSubtype    := v_ExtMapSpatInd.gnHeaderSubtype;
+    v_MapSpatInd.spatInd.gnLifetime	      := v_ExtMapSpatInd.gnLifetime;
+    v_MapSpatInd.spatInd.gnTrafficClass     := v_ExtMapSpatInd.gnTrafficClass;
+    v_MapSpatInd.spatInd.btpDestinationPort := v_ExtMapSpatInd.btpDestinationPort;
+    v_MapSpatInd.spatInd.btpInfo	      := v_ExtMapSpatInd.btpInfo;
+  }
+
+  return v_MapSpatInd;
+
+}
+
+
+
+
+
+
+//GeoNetworking--------------------------------------------------------
+external function f_enc_GeoNetworkingPdu(in GeoNetworkingPdu pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_GeoNetworkingPdu(in octetstring stream) return GeoNetworkingPdu
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+external function f_enc_BeaconHeader(in BeaconHeader pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_BeaconHeader(in octetstring stream) return BeaconHeader
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+external function f_enc_GN_Address(in GN_Address pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_GN_Address(in octetstring stream) return GN_Address
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+external function f_enc_GeoNetworkingReq(in GeoNetworkingReq pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtGeoNetworkingInd(in octetstring stream) return ExtGeoNetworkingInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+type record ExtGnNonSecuredPacket {
+  NextHeader         nextHeader,
+  UInt4              reserved,
+  UInt8              headerTST,
+  TrafficClass       trafficClass,
+  Bit8               flags,
+  UInt16             plLength,
+  UInt8              maxHopLimit,
+  UInt8              reserved2,
+  ExtendedHeader     extendedHeader,//  optional,
+  Ipv6Packet         ipv6Packet       optional,
+  BtpHeader          btpHeader        optional,
+  octetstring        btpPayload       optional,
+  GnRawPayload       rawPayload
+} with { variant 	            "FIELDORDER(msb)";
+  variant(plLength)       "LENGTHTO(ipv6Packet, 
+  btpHeader, 
+  btpPayload, 
+  rawPayload)";
+
+  variant(extendedHeader) "CROSSTAG(anyHeader,           headerTST = 0;
+  beaconHeader,        headerTST = 16;
+  geoUnicastHeader,    headerTST = 32;
+  geoAnycastHeader,   {headerTST = 48,
+  headerTST = 49,
+  headerTST = 50};
+  geoBroadcastHeader, {headerTST = 64,
+  headerTST = 65,
+  headerTST = 66};
+  shbHeader, 	   headerTST = 80;
+  tsbHeader, 	   headerTST = 81;
+  lsRequestHeader, 	   headerTST = 96;
+  lsReplyHeader, 	   headerTST = 97)";
+
+  variant(ipv6Packet)     "PRESENCE(nextHeader = e_ipv6;)";
+
+  variant(btpHeader)      "PRESENCE(nextHeader = e_btpA;)";
+
+  variant(btpHeader)      "PRESENCE(nextHeader = e_btpB;)";
+
+  variant(btpHeader)      "CROSSTAG(btpAHeader, nextHeader = e_btpA;
+  btpBHeader, nextHeader = e_btpB;)";
+
+  variant(btpPayload)     "PRESENCE(nextHeader = e_btpA;)";
+  variant(btpPayload)     "PRESENCE(nextHeader = e_btpB;)";
+
+};
+
+type record ExtGeoNetworkingPdu {
+  UInt4                 version,
+  BasicNextHeader       nextHeader,
+  UInt8                 reserved,
+  Lifetime              lifeTime,
+  UInt8                 routerHopLimit,
+  ExtGnNonSecuredPacket packet     optional,
+  SecuredMessage        securedMsg optional
+} with { variant 	      "FIELDORDER(msb)";
+  variant (packet)     "PRESENCE(nextHeader = e_commonHeader)";
+  variant (securedMsg) "PRESENCE(nextHeader = e_securedPacket)";
+};
+
+type record ExtGeoNetworkingInd {
+  ExtGeoNetworkingPdu msgIn,
+  MacAddress          macDestinationAddress
+} with { variant (msgIn) "FIELDORDER(msb)" };
+
+function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
+  var ExtGeoNetworkingInd EGNI := f_dec_ExtGeoNetworkingInd(stream);
+  var GeoNetworkingInd    GNI;
+
+  GNI.msgIn.basicHeader.version        := EGNI.msgIn.version;
+  GNI.msgIn.basicHeader.nextHeader     := EGNI.msgIn.nextHeader;
+  GNI.msgIn.basicHeader.reserved       := EGNI.msgIn.reserved;
+  GNI.msgIn.basicHeader.lifeTime       := EGNI.msgIn.lifeTime;
+  GNI.msgIn.basicHeader.routerHopLimit := EGNI.msgIn.routerHopLimit;
+
+  if (ispresent(EGNI.msgIn.packet)) {
+    GNI.msgIn.gnPacket.packet.commonHeader.nextHeader := 
+    EGNI.msgIn.packet.nextHeader;
+    GNI.msgIn.gnPacket.packet.commonHeader.reserved := 
+    EGNI.msgIn.packet.reserved;
+
+    select (EGNI.msgIn.packet.headerTST) {
+      case (0) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {anyHdr := {headerType := e_any, 
+            headerSubType := 0}};
+      }
+      case (16) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {beaconHdr := {headerType := e_beacon, 
+            headerSubType := 0}};
+      }
+      case (32) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoUnicastHdr := {headerType := e_geoUnicast, 
+            headerSubType := 0}};
+      }
+      case (48) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoAnycastHdr := {headerType := e_geoAnycast, 
+            headerSubType := e_geoAnycastCircle}};
+      }
+      case (49) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoAnycastHdr := {headerType := e_geoAnycast, 
+            headerSubType := e_geoAnycastRect}};
+      }
+      case (50) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoAnycastHdr := {headerType := e_geoAnycast, 
+            headerSubType := e_geoAnycastElip}};
+      }
+      case (64) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoBroadcastHdr := {headerType := e_geoBroadcast, 
+            headerSubType := e_geoBroadcastCircle}};
+      }
+      case (65) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoBroadcastHdr := {headerType := e_geoBroadcast, 
+            headerSubType := e_geoBroadcastRect}};
+      }
+      case (66) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {geoBroadcastHdr := {headerType := e_geoBroadcast, 
+            headerSubType := e_geoBroadcastElip}};
+      }
+      case (80) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
+            headerSubType := e_singleHop}};
+      }
+      case (81) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
+            headerSubType := e_multiHop}};
+      }
+      case (96) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {lsHdr := {headerType := e_locationService, 
+            headerSubType := e_lsRequest}};
+      }
+      case (97) {
+        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
+        {lsHdr := {headerType := e_locationService, 
+            headerSubType := e_lsReply}};
+      }
+    } 
+    //TODO saHdr???
+
+
+    GNI.msgIn.gnPacket.packet.commonHeader.trafficClass := 
+    EGNI.msgIn.packet.trafficClass;
+    GNI.msgIn.gnPacket.packet.commonHeader.flags := 
+    EGNI.msgIn.packet.flags;
+    GNI.msgIn.gnPacket.packet.commonHeader.plLength := 
+    EGNI.msgIn.packet.plLength;
+    GNI.msgIn.gnPacket.packet.commonHeader.maxHopLimit := 
+    EGNI.msgIn.packet.maxHopLimit;
+    GNI.msgIn.gnPacket.packet.commonHeader.reserved2 := 
+    EGNI.msgIn.packet.reserved2;
+
+    GNI.msgIn.gnPacket.packet.extendedHeader := EGNI.msgIn.packet.extendedHeader;
+
+    if (ispresent(EGNI.msgIn.packet.btpHeader)) {       
+      if (EGNI.msgIn.packet.nextHeader == e_btpA) {
+        var BtpPacket v_btpPacket;
+
+        if (ispresent(EGNI.msgIn.packet.btpPayload)) 
+        {
+          var DecodedBtpPayload v_decodedPayload;
+          if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2001) {
+            v_decodedPayload := 
+            { camPacket := 
+              dec_CAM_PDU(EGNI.msgIn.packet.btpPayload)}
+          } else if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2002) {
+            v_decodedPayload := 
+            { denmPacket := 
+              dec_DENM_PDU(EGNI.msgIn.packet.btpPayload)}
+          } else if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2003) {
+            v_decodedPayload := 
+            { mapPacket := 
+              dec_MAP_PDU(EGNI.msgIn.packet.btpPayload)}
+          } else if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2004) {
+            v_decodedPayload := 
+            { spatPacket := 
+              dec_SPAT_PDU(EGNI.msgIn.packet.btpPayload)}
+          }
+          if (isbound(v_decodedPayload)) {
+            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+              payload := {decodedPayload := v_decodedPayload,
+                rawPayload := EGNI.msgIn.packet.btpPayload}};
+          } else {
+            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+              payload := {decodedPayload := omit,
+                rawPayload := EGNI.msgIn.packet.btpPayload}};
+          }
+
+        } else {
+          v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+            payload := omit};
+        }
+
+        GNI.msgIn.gnPacket.packet.payload.decodedPayload := {btpPacket := v_btpPacket};
+        GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;   
+      }
+      else if (EGNI.msgIn.packet.nextHeader == e_btpB)
+      {
+        var BtpPacket v_btpPacket;
+        if (ispresent(EGNI.msgIn.packet.btpPayload)) 
+        {
+          var DecodedBtpPayload v_decodedPayload;
+          if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2001) 
+          {
+            v_decodedPayload := 
+            { camPacket := 
+              dec_CAM_PDU(EGNI.msgIn.packet.btpPayload)}
+          } else if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2002) 
+          {
+            v_decodedPayload := 
+            { denmPacket := 
+              dec_DENM_PDU(EGNI.msgIn.packet.btpPayload)}
+          } else if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2003) 
+          {
+            v_decodedPayload := 
+            { mapPacket := 
+              dec_MAP_PDU(EGNI.msgIn.packet.btpPayload)}
+          } else if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2004) 
+          {
+            v_decodedPayload := 
+            { spatPacket := 
+              dec_SPAT_PDU(EGNI.msgIn.packet.btpPayload)}
+          } 
+
+          if (isbound(v_decodedPayload)) {
+            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+              payload := {decodedPayload := v_decodedPayload,
+                rawPayload := EGNI.msgIn.packet.btpPayload}};
+          } else {
+            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+              payload := {decodedPayload := omit,
+                rawPayload := EGNI.msgIn.packet.btpPayload}};	         
+          }
+        } else {
+          v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+            payload := omit};
+        }
+
+        GNI.msgIn.gnPacket.packet.payload.decodedPayload := {btpPacket := v_btpPacket};
+        GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
+
+      } else if (EGNI.msgIn.packet.nextHeader == e_ipv6) {
+
+        //TODO Handle Ipv6
+        GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
+        GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
+
+      } else if (EGNI.msgIn.packet.nextHeader == e_any) {
+        GNI.msgIn.gnPacket.packet.payload := omit;
+      }
+    }
+  }//End of ExtGnNonSecuredPacket
+
+  GNI.msgIn.gnPacket.securedMsg := EGNI.msgIn.securedMsg;
+  GNI.macDestinationAddress := EGNI.macDestinationAddress;
+
+  log(GNI);
+
+  return GNI;	 
+}
+
+
+
+
+//IPv6OverGeoNetworking--------------------------------------------------------
+
+external function f_enc_IPv6OverGeoNetworkingReq(in IPv6OverGeoNetworkingReq pdu) return octetstring
+
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_IPv6OverGeoNetworkingInd(in octetstring stream) return IPv6OverGeoNetworkingInd
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+
+//AdapterControlPort--------------------------------------------------------
+
+external function f_enc_LongPosVector(in LongPosVector pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+external function f_dec_LongPosVector(in octetstring stream) return LongPosVector
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+
+
+
+
+} //endmodule

@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "b14d29f1-439f-4671-9998-3a8e4a7d735c",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "b14d29f1-439f-4671-9998-3a8e4a7d735c",
+            "type": "STRING",
+            "value": "Check that generic secured message contains the certificate as a signer_info"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "b14d29f1-439f-4671-9998-3a8e4a7d735c",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a Beacon\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tcontaining exactly one header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "b14d29f1-439f-4671-9998-3a8e4a7d735c",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "b14d29f1-439f-4671-9998-3a8e4a7d735c",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b14d29f1-439f-4671-9998-3a8e4a7d735c"
+}

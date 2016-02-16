@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "ba411f15-e584-4189-8aa1-9c725ba7706f",
+            "type": "STRING",
+            "value": "If ITS-S sends an AT certificate check that only the ValidityRestriction time_start_and_end is included\r\nTime validity restrictions should be conformed to the AA certificate restrictions"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "ba411f15-e584-4189-8aa1-9c725ba7706f",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/cb021a09-729d-4a2a-8b11-17717bbeaf73"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "ba411f15-e584-4189-8aa1-9c725ba7706f",
+            "type": "STRING",
+            "value": "05. Check presence of  time_start_and_end shall"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "ba411f15-e584-4189-8aa1-9c725ba7706f",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "ba411f15-e584-4189-8aa1-9c725ba7706f"
+}

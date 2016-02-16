@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "fbdf1fdb-5f59-4931-b644-1120fb36abce",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "fbdf1fdb-5f59-4931-b644-1120fb36abce",
+            "type": "STRING",
+            "value": "Check that the IUT discards a message when the region validity restriction of the signing certificate is not fully covered by the validity region of the issuing certificate.\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "18b9f2c3-9500-47a3-a62f-330d3c319beb",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_08_06_BO_AT) {\r\n\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\tindicating 'polygon'\r\n\t\t\t\t\t\t\tcontaining polygonal_region\r\n\t\t\t\t\t\t\t\tindicating POLYGON_REGION_AT\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\t\t\treferencing to a CERT_TS_08_06_BO_AA\r\n\t\t\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\t\tindicating 'polygon'\r\n\t\t\t\t\t\t\t\t\tcontaining polygonal_region\r\n\t\t\t\t\t\t\t\t\t\tindicating POLYGON_REGION_AA_INTERSECT\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "fbdf1fdb-5f59-4931-b644-1120fb36abce",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "fbdf1fdb-5f59-4931-b644-1120fb36abce",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "18b9f2c3-9500-47a3-a62f-330d3c319beb"
+}

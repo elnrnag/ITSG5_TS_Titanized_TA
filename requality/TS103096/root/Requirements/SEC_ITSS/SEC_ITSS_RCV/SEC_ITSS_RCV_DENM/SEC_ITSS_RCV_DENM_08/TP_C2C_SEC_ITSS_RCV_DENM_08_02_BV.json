@@ -1,0 +1,35 @@
+{
+    "attributes": {
+        "PICS_C2C": {
+            "key": "PICS_C2C",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that IUT accepts Secured DENM if the distance between the current position of IUT and the value of optional HeaderField generation_location is 29.9 km"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields ['generation_location']\r\n\t\t\t\tcontaining generation_location\r\n\t\t\t\t\tindicating position in 29.9 km from the current position of IUT\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_DENM'\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b4732a45-3e9a-4f91-9b31-c1c45169a845"
+}

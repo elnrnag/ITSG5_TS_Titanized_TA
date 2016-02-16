@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "94e45a78-fbf4-46ae-a725-110dd3f23c59",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "94e45a78-fbf4-46ae-a725-110dd3f23c59",
+            "type": "STRING",
+            "value": "Check that IUT discards a SecuredMessage if the issuer certificate of the authorization ticket certificate contains the subject type \"enrolment_credential\""
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "94e45a78-fbf4-46ae-a725-110dd3f23c59",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_02_01_BO_AT) {\r\n\t\t\t\t\t\tcontaining signer_info.type\r\n\t\t\t\t\t\t\tindicating 'certificate_digest_with_sha256'\r\n\t\t\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\t\t\treferencing to certificate (CERT_TS_A_EC)\r\n\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "94e45a78-fbf4-46ae-a725-110dd3f23c59",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "94e45a78-fbf4-46ae-a725-110dd3f23c59",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "94e45a78-fbf4-46ae-a725-110dd3f23c59"
+}

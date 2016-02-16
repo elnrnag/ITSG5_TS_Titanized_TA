@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_4d1be56a-6392-4bb5-aee0-608ca40f1dd5\"><a name=\"4d1be56a-6392-4bb5-aee0-608ca40f1dd5\" id=\"id_4d1be56a-6392-4bb5-aee0-608ca40f1dd5\" class=\"requality_id\"><\/a>The elements in the<\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"> validity_restrictions<font style=\"font-family: Times New Roman;\"> array shall be encoded in ascending numerical order of their <font style=\"font-family: Courier New;\">type<font style=\"font-family: Times New Roman;\"> value, unless this is specifically overridden by a security profile. <font style=\"font-family: Courier New;\">validity_restrictions<font style=\"font-family: Times New Roman;\"> shall not contain two entries with the same <font style=\"font-family: Courier New;\">type<font style=\"font-family: Times New Roman;\"> value.<\/font><\/font><\/font><\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "4d1be56a-6392-4bb5-aee0-608ca40f1dd5"
+}

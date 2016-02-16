@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "PICS_ITS_AID_OTHER_PROFILE": {
+            "isGenerated": false,
+            "key": "PICS_ITS_AID_OTHER_PROFILE",
+            "origin": "bd8fcd9c-a8d3-4b53-8417-a9eebb8c78cf",
+            "type": "STRING",
+            "value": "non-zero"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "bd8fcd9c-a8d3-4b53-8417-a9eebb8c78cf",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/dc173140-21db-4c79-93a8-7f24aff8cea0"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "bd8fcd9c-a8d3-4b53-8417-a9eebb8c78cf",
+            "type": "STRING",
+            "value": "Generic signed message profile"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "bd8fcd9c-a8d3-4b53-8417-a9eebb8c78cf",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "bd8fcd9c-a8d3-4b53-8417-a9eebb8c78cf"
+}

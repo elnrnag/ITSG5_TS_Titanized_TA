@@ -1,0 +1,2543 @@
+/**
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Security/LibItsSecurity_Templates.ttcn3 $
+ *            $Id: LibItsSecurity_Templates.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Module containing templates for Security Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsSecurity_Templates {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Pixits all;
+    
+    /**
+     * @desc Constants declaration
+     */
+    group constants {
+        
+        /**
+         * @desc Protocol version
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.1 SecuredMessage
+         */
+        const UInt8 c_protocol_version := 2;
+        
+        /**
+         * @desc Certificate version
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.1 Certificate
+         */
+        const UInt8 c_certificate_version := 2;
+        
+        /**
+         * @desc Its AID for CAM
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.1 Security profile for CAMs
+         */
+        const IntX c_its_aid_CAM := 36;
+        
+        /**
+         * @desc Its AID for DENM
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.2 Security profile for DENMs
+         */
+        const IntX c_its_aid_DENM := 37;
+        
+        /**
+         * @desc Its AID for Other
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.3 Security profile for DENMs
+         */
+        //TODO const IntX c_its_aid_Other := PX_OTHER_ITS_AID;
+		const IntX c_its_aid_Other := 38;
+        
+        /**
+         * @desc Minimal value of Longitude
+         */
+        const Int32 c_minLongitude := -1800000000;
+        
+        /**
+         * @desc Maximal value of Longitude
+         */
+        const Int32 c_maxLongitude :=  1800000000;
+        
+        /**
+         * @desc Minimal value of Latitude
+         */
+        const Int32 c_minLatitude  := -900000000; 
+        
+        /**
+         * @desc Maximal value of Latitude
+         */
+        const Int32 c_maxLatitude  :=  900000000;
+        
+        /**
+         * @desc List of ISO-3166 country codes
+         */
+        const RegionIdentifiers c_iso3166Codes := {
+            4,   8,  10,  12,  16,  20,  24,  28,  31,  32,  36,  40,  44,  48,  50,  51,  52,  56,
+           60,  64,  68,  70,  72,  74,  76,  84,  86,  90,  92,  96, 100, 104, 108, 112, 116, 120,
+          124, 132, 136, 140, 144, 148, 152, 156, 158, 162, 166, 170, 174, 175, 178, 180, 184, 188,
+          191, 192, 196, 203, 204, 208, 212, 214, 218, 222, 226, 231, 232, 233, 234, 238, 239, 242,
+          246, 248, 250, 254, 258, 260, 262, 266, 268, 270, 275, 276, 288, 292, 296, 300, 304, 308,
+          312, 316, 320, 324, 328, 332, 334, 336, 340, 344, 348, 352, 356, 360, 364, 368, 372, 376,
+          380, 384, 388, 392, 398, 400, 404, 408, 410, 414, 417, 418, 422, 426, 428, 430, 434, 438,
+          440, 442, 446, 450, 454, 458, 462, 466, 470, 474, 478, 480, 484, 492, 496, 498, 499, 500,
+          504, 508, 512, 516, 520, 524, 528, 531, 533, 534, 535, 540, 548, 554, 558, 562, 566, 570,
+          574, 578, 580, 581, 583, 584, 585, 586, 591, 598, 600, 604, 608, 612, 616, 620, 624, 626,
+          630, 634, 638, 642, 643, 646, 652, 654, 659, 660, 662, 663, 666, 670, 674, 678, 682, 686,
+          688, 690, 694, 702, 703, 704, 705, 706, 710, 716, 724, 728, 729, 732, 740, 744, 748, 752,
+          756, 760, 762, 764, 768, 772, 776, 780, 784, 788, 792, 795, 796, 798, 800, 804, 807, 810,
+          818, 826, 831, 832, 833, 834, 840, 850, 854, 858, 860, 862, 876, 882, 887, 894 
+        };
+        
+        /**
+         * @desc List of United Nations Statistics Division country codes
+         */
+        const RegionIdentifiers c_unStatsAdditionalCodes := {
+            1,   2,   5,   9,  11,  13,  14,  15,  17,  18,  19,  21,  29,  30,  34,  35,  39,  53,
+           54,  57,  61, 142, 143, 145, 150, 151, 154, 155, 199, 419, 432, 680, 722, 830
+       };
+        
+    } // End of group constants
+    
+    /**
+     * @desc Dummy send/receive templates for security headers
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 4   Basic format elements
+     */
+    group dummyBasicFormatElements {
+        
+        /**
+         * @desc Dummy send templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2    Specification of basic format elements
+         */
+        group dummyBasicFormatElementsSend {
+            
+            /**
+             * @desc Generic Send/Receive templates for security algorithm descriptions
+             */
+            group dummyAlgorithms {
+                
+            } // End of group dummyAlgorithms
+            
+        } // End of group dummyBasicFormatElementsSend 
+        
+        /**
+         * @desc Dummy receive templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2    Specification of basic format elements
+         */
+        group dummyBasicFormatElementsRecv {
+            
+            /**
+             * @desc Dummy receive template for PublicKey/EccPoint
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+             */
+            template (present) PublicKey mw_publicKey_eccPoint_dummy := {
+                algorithm   := e_ecdsa_nistp256_with_sha256,
+                public_key  := {
+                    eccPoint := ?
+                } // End of field public_key
+            } // End of template mw_publicKey_eccPoint_dummy
+            
+            /**
+             * @desc Dummy send template for PublicKey/AES CCM
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+             */
+            template (present) PublicKey mw_publicKey_aesccm_dummy := {
+                algorithm   := e_ecies_nistp256,
+                public_key  := {
+                    aesCcm := ?
+                } // End of field public_key
+            } // End of template mw_publicKey_aesccm_dummy
+            
+            /**
+             * @desc Dummy receive template for Time64WithStandardDeviation
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.17    Time64WithStandardDeviation
+             */
+            template (present) Time64WithStandardDeviation mw_time64WithStandardDeviation_dummy := {
+                time        := ?,
+                log_std_dev := ?
+            } // End of template mw_time64WithStandardDeviation_dummy
+            
+            /**
+             * @desc Dummy receive template for TwoDLocation
+             * @param p_latitude    Latitude range from  900 000 000 to +900 000 000
+             * @param p_longitude   Longitude range from  1 800 000 000 to +1 800 000 000
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.19    TwoDLocation
+             */
+            template (present) TwoDLocation mw_twoDLocation_dummy := {
+                latitude    := ?,
+                longitude   := ?
+            } // End of template mw_twoDLocation_dummy
+            
+            /**
+             * @desc Dummy send template for ThreeDLocation
+             * @param p_latitude    Latitude range from  900 000 000 to +900 000 000
+             * @param p_longitude   Longitude range from  1 800 000 000 to +1 800 000 000
+             * @param p_elevation   Elevation relative to the WGS-84 ellipsoid in decimetres
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.20    ThreeDLocation
+             */
+            template (present) ThreeDLocation mdw_threeDLocation_dummy := {
+                latitude    := ?,
+                longitude   := ?,
+                elevation   := ?
+            } // End of template mdw_threeDLocation_dummy
+            
+        } // End of group dummyBasicFormatElementsRecv
+        
+    } // End of group dummyBasicFormatElements 
+    
+    /**
+     * @desc Send/receive templates for security headers
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 4   Basic format elements
+     */
+    group basicFormatElements {
+        
+        /**
+         * @desc Send templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2    Specification of basic format elements
+         */
+        group basicFormatElementsSend {
+            
+            /**
+             * @desc Send templates for security algorithm descriptions
+             */
+            group algorithms {
+                
+                /**
+                 * @desc Send template for EccPoint description based on x_coordinate_only type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (value) EccPoint m_eccPointecdsa_nistp256_with_sha256_x_coordinate_only(
+                                                                                                  in template (value) octetstring p_x
+                ) := { 
+                    type_           := e_x_coordinate_only,
+                    x               := p_x,
+                    y               := omit
+                } // End of template m_eccPointecdsa_nistp256_with_sha256_x_coordinate_only
+                
+                /**
+                 * @desc Send template for EccPoint description based on y_coordinate_only type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (value) EccPoint m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only(
+                                                                                                  in template (value) octetstring p_x
+                ) := { 
+                    type_           := e_compressed_lsb_y_0,
+                    x               := p_x,
+                    y               := omit
+                } // End of template m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only
+                
+                /**
+                 * @desc Send template for EccPoint description based on uncompressed type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (value) EccPoint m_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                                                                            in template (value) octetstring p_x,
+                                                                                            in template (value) octetstring p_y
+                ) := {
+                    type_           := e_uncompressed,
+                    x               := p_x,
+                    y               := {
+                        y := p_y
+                    }
+                } // End of template m_eccPointecdsa_nistp256_with_sha256_uncompressed
+                
+                /**
+                 * @desc Information regarding AES CCM encryption
+                 * @param p_eccPoint   The EccPoint used in the PublicKey
+                 */
+                template (value) AesCcm m_aesccm(
+                                                 in template (value) EccPoint p_eccPoint
+                ) := {
+                    supported_symm_alg  := e_aes_128_ccm,
+                    eccPoint            := p_eccPoint
+                } // End of template m_aesccm
+                
+                /**
+                 * @desc Send template for AES CCM encryption parameters
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.7    EncryptionParameters
+                 */
+                template (value) EncryptionParameters m_encryptionParameters_aes_128_ccm(
+                                                                                         in template (value) Oct12 p_nonce
+                ) := {
+                    symm_algorithm := e_aes_128_ccm,
+                    public_key := {
+                        nonce := p_nonce
+                    }
+                } // End of template m_encryptionParameters_aes_128_ccm
+                
+            } // End of group algorithms
+            
+            /**
+             * @desc Send template for PublicKey/EccPoint
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+             */
+            template (value) PublicKey m_publicKey_eccPoint(
+                                                            in template (value) EccPoint p_eccPoint
+            ) := {
+                algorithm   := e_ecdsa_nistp256_with_sha256,
+                public_key  := {
+                    eccPoint := p_eccPoint
+                } // End of field public_key
+            } // End of template m_publicKey_eccPoint
+            
+            /**
+             * @desc Send template for PublicKey/AES CCM
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+             */
+            template (value) PublicKey m_publicKey_aesccm(
+                                                          in template (value) AesCcm p_aesCcm
+            ) := {
+                algorithm   := e_ecies_nistp256,
+                public_key  := {
+                    aesCcm := p_aesCcm
+                } // End of field public_key
+            } // End of template m_publicKey_aesccm
+            
+            /**
+             * @desc Send templates for Signature description
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.9   Signature
+             * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+             */
+            group signatures {
+                
+                /**
+                 * @desc Send template for signatures based on ECDSA algorithm
+                 * @member p_ecdsaSignature The ECDSA based signature
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.9   Signature
+                 */
+                template (value) Signature m_signature(
+                                                       in template (value) EcdsaSignature p_ecdsaSignature
+                ):= {
+                    algorithm   := e_ecdsa_nistp256_with_sha256,
+                    signature_  := {
+                        ecdsa_signature := p_ecdsaSignature
+                    } // End of field signature_
+                } // End of template m_signature_ecdsa
+                
+                /**
+                 * @desc Send template for ECDSA based signature
+                 * @member p_r          The coordinate of the elliptic curve point resulting from multiplying the generator element by the ephemeral private key
+                 * @member p_s          The signature
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.10   EcdsaSignature
+                 */
+                template (value) EcdsaSignature m_ecdsaSignature(
+                                                                 in template (value) EccPoint p_r,
+                                                                 in template (value) octetstring p_s
+                ) := {
+                    r           := p_r,
+                    s           := p_s
+                } // End of template m_ecdsaSignature
+                
+            } // End of group signatures 
+            
+            group signerInfos {
+                
+                /**
+                 * @desc Send template for self signed message
+                 */
+                template (value) SignerInfo m_signerInfo_self := {
+                    type_         := e_self,
+                    signerInfo    := omit
+                } // End of template m_signerInfo_self
+                
+                /**
+                 * @desc Send template for self signed message
+                 */
+                template (value) SignerInfo m_signerInfo_digest(
+                                                                in template (value) HashedId8 p_digest
+                ) := {
+                    type_         := e_certificate_digest_with_sha256,
+                    signerInfo    := {
+                        digest := p_digest
+                    } // End of field signerInfo 
+                } // End of template m_signerInfo_digest
+                
+                template (value) SignerInfo m_signerInfo_certificate(
+                                                                     in template (value) Certificate p_certificate
+                ) := {
+                    type_         := e_certificate,
+                    signerInfo    := {
+                        certificate := p_certificate
+                    } // End of field signerInfo 
+                } // End of template m_signerInfo_certificate
+                
+                template (value) SignerInfo m_signerInfo_certificates(
+                                                                      in template (value) CertificateChain p_certificates
+                ) := {
+                    type_         := e_certificate_chain,
+                    signerInfo    := {
+                        certificates := p_certificates
+                    } // End of field signerInfo
+                } // End of template m_signerInfo_certificates
+                
+            } // End of group signerInfos
+            
+            /**
+             * @desc Send template for Time64WithStandardDeviation
+             * @param p_time        TODO
+             * @param p_log_std_dev TODO
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.17    Time64WithStandardDeviation
+             */
+            template (value) Time64WithStandardDeviation m_time64WithStandardDeviation(
+                                                                                       in template (value) Time64 p_time,
+                                                                                       in template (value) UInt8 p_log_std_dev
+            ) := {
+                time        := p_time,
+                log_std_dev := p_log_std_dev
+            } // End of template m_time64WithStandardDeviation
+            
+            /**
+             * @desc Send template for Duration (in seconds)
+             * @param p_duration    The duration value
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.18  Duration
+             */
+            template (value) Duration m_duration_in_seconds(
+                                                            in template (value) Int13 p_duration
+            ) := {
+                unit        := e_seconds,
+                duration    := p_duration
+            } // End of template m_duration_in_seconds
+            
+            /**
+             * @desc Send template for TwoDLocation
+             * @param p_latitude    Latitude range from  900 000 000 to +900 000 000
+             * @param p_longitude   Longitude range from  1 800 000 000 to +1 800 000 000
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.19    TwoDLocation
+             */
+            template (value) TwoDLocation m_twoDLocation(
+                                                         in template (value) WGSLatitude p_latitude,
+                                                         in template (value) WGSLongitude p_longitude
+            ) := {
+                latitude    := p_latitude,
+                longitude   := p_longitude
+            } // End of template m_twoDLocation
+            
+            /**
+             * @desc Send template for ThreeDLocation
+             * @param p_latitude    Latitude range from  900 000 000 to +900 000 000
+             * @param p_longitude   Longitude range from  1 800 000 000 to +1 800 000 000
+             * @param p_elevation   Elevation relative to the WGS-84 ellipsoid in decimetres
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.20    ThreeDLocation
+             */
+            template (value) ThreeDLocation m_threeDLocation(
+                                                             in template (value) WGSLatitude p_latitude,
+                                                             in template (value) WGSLongitude p_longitude,
+                                                             in template (value) Oct2 p_elevation
+            ) := {
+                latitude    := p_latitude,
+                longitude   := p_longitude,
+                elevation := p_elevation
+            } // End of template m_threeDLocation
+            
+            /**
+             * @desc Send template circular geographic region
+             * @param p_center  Circle center 
+             * @param p_radius  Circle radius
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (value) GeographicRegion m_geographicRegion_circle(
+                                                                        in template (value) TwoDLocation p_center,
+                                                                        in template (value) UInt16 p_radius
+            ) := {
+                region_type := e_circle,
+                region := {
+                    circular_region := {
+                        center := p_center,
+                        radius := p_radius 
+                    } // End of field circular_region
+                } // End of field region
+            } // End of template m_geographicRegion_circle
+            
+            /**
+             * @desc Send template rectangular geographic region
+             * @param p_northwest  Upper left corner 
+             * @param p_southeast  Lower rigth corner
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (value) GeographicRegion m_geographicRegion_rectangle(
+                                                                           in template (value) TwoDLocation p_northwest,
+                                                                           in template (value) TwoDLocation p_southeast
+            ) := {
+                region_type := e_rectangle,
+                region := {
+                    rectangular_region := {
+                        {
+                            northwest := p_northwest,
+                            southeast := p_southeast 
+                        }
+                    } // End of field rectangular_region
+                } // End of field region
+            } // End of template m_geographicRegion_rectangle
+            
+            /**
+             * @desc Send template polygonial geographic region
+             * @param p_polygonal_region  Polygonial region description
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (value) GeographicRegion m_geographicRegion_polygonial(
+                                                                            in template (value) PolygonalRegion p_polygonal_region
+            ) := {
+                region_type := e_polygon,
+                region := {
+                    polygonal_region := p_polygonal_region
+                } // End of field region
+            } // End of template m_geographicRegion_polygonial
+            
+            /**
+             * @desc Send template for geographic identified region
+             * @param p_id_region  Indentified region
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (value) GeographicRegion m_geographicRegion_identifiedRegion(
+                                                                                  in template (value) IdentifiedRegion p_id_region
+            ) := {
+                region_type := e_id,
+                region := {
+                    id_region := p_id_region
+                } // End of field region
+            } // End of template m_geographicRegion_identifiedRegion
+            
+            /**
+             * @desc Send template for not specified geographic region
+             * @param p_id_region  Indentified region
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (value) GeographicRegion m_geographicRegion_nonce := {
+                region_type := e_none,
+                region := omit
+            } // End of template m_geographicRegion_nonce
+            
+        } // End of group basicFormatElementsSend 
+        
+        /**
+         * @desc Receive templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2    Specification of basic format elements
+         */
+        group basicFormatElementsRecv {
+            
+            /**
+             * @desc Receive templates for security algorithm descriptions
+             */
+            group algorithms {
+                
+                /**
+                 * @desc Receive template for EccPoint description based on x_coordinate_only type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (present) EccPoint mw_eccPointecdsa_nistp256_with_sha256_x_coordinate_only(
+                                                                                                    in template (present) octetstring p_x := ?
+                ) := { 
+                    type_           := e_x_coordinate_only,
+                    x               := p_x,
+                    y               := omit
+                } // End of template mw_eccPointecdsa_nistp256_with_sha256_x_coordinate_only
+                
+                /**
+                 * @desc Receive template for EccPoint description based on y_coordinate_only type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (present) EccPoint mw_eccPointecdsa_nistp256_with_sha256_y0_coordinate_only(
+                                                                                                     in template (present) octetstring p_x := ? 
+                ) := { 
+                    type_           := e_compressed_lsb_y_0,
+                    x               := p_x,
+                    y               := omit
+                } // End of template mw_eccPointecdsa_nistp256_with_sha256_y0_coordinate_only
+                
+                /**
+                 * @desc Receive template for EccPoint description based on y_coordinate_only type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (present) EccPoint mw_eccPointecdsa_nistp256_with_sha256_y1_coordinate_only(
+                                                                                                     in template (present) octetstring p_x := ? 
+                ) := { 
+                    type_           := e_compressed_lsb_y_1,
+                    x               := p_x,
+                    y               := omit
+                } // End of template mw_eccPointecdsa_nistp256_with_sha256_y1_coordinate_only
+                
+                /**
+                 * @desc Receive template for EccPoint description based on uncompressed type
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.5   EccPoint
+                 * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+                 */
+                template (present) EccPoint mw_eccPointecdsa_nistp256_with_sha256_uncompressed(
+                                                                                               in template (present) octetstring p_x := ?,
+                                                                                               in template (present) octetstring p_y := ?
+                ) := { 
+                    type_           := e_uncompressed,
+                    x               := p_x,
+                    y               := {
+                    	y := p_y
+                    }
+                } // End of template mw_eccPointecdsa_nistp256_with_sha256_uncompressed
+                
+            } // End of group algorithms
+            
+            group signerInfos {
+                
+                /**
+                 * @desc Recv template for message signed with digest 
+                 */
+                template (present) SignerInfo mw_signerInfo_digest(
+                                                                   in template (present) HashedId8 p_digest  := ?
+                ) := {
+                    type_         := e_certificate_digest_with_sha256,
+                    signerInfo    := {
+                        digest := p_digest
+                    } // End of field signerInfo 
+                } // End of template mw_signerInfo_digest
+                
+                template (present) SignerInfo mw_signerInfo_certificate(
+                                                                        in template (present) Certificate p_certificate  := ?
+                ) := {
+                    type_         := e_certificate,
+                    signerInfo    := {
+                        certificate := p_certificate
+                    } // End of field signerInfo 
+                } // End of template m_signerInfo_certificate
+                
+                template (present) SignerInfo mw_signerInfo_certificates(
+                                                                         in template (present) CertificateChain p_certificates := ?
+                ) := {
+                    type_         := e_certificate_chain,
+                    signerInfo    := {
+                        certificates := p_certificates
+                    } // End of field signerInfo
+                } // End of template m_signerInfo_certificates
+                
+            } // End of group signerInfos
+            
+            
+            /**
+             * @desc Receive templates for Signature description
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.9   Signature
+             * @see Draft ETSI TS 103 097 V1.1.14 Table 2: Derivation of field sizes depending on the used algorithm
+             */
+            group signatures {
+                
+                /**
+                 * @desc Receive template for signatures based on ECDSA algorithm
+                 * @member p_ecdsaSignature The ECDSA based signature
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.9   Signature
+                 */
+                template (present) Signature mw_signature(
+                                                          in template (present) EcdsaSignature p_ecdsaSignature := ?
+                ):= {
+                    algorithm   := e_ecdsa_nistp256_with_sha256,
+                    signature_  := {
+                        ecdsa_signature := p_ecdsaSignature
+                    } // End of field signature_
+                } // End of template mw_signature
+                
+                /**
+                 * @desc Receive template for ECDSA based signature
+                 * @member p_r          The coordinate of the elliptic curve point resulting from multiplying the generator element by the ephemeral private key
+                 * @member p_s          The signature
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.10   EcdsaSignature
+                 */
+                template (present) EcdsaSignature mw_ecdsaSignature(
+                                                                    in template (present) EccPoint p_r := ?,
+                                                                    in template (present) octetstring p_s := ?
+                ) := {
+                    r           := p_r,
+                    s           := p_s
+                } // End of template mw_ecdsaSignature
+                
+            } // End of group signatures 
+            
+            /**
+             * @desc Receive template for Time64WithStandardDeviation
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.17    Time64WithStandardDeviation
+             */
+            template (present) Time64WithStandardDeviation mw_time64WithStandardDeviation(
+                                                                                          in template (present) Time64 p_time,
+                                                                                          in template (present) UInt8 p_log_std_dev
+            ) := {
+                time        := p_time,
+                log_std_dev := p_log_std_dev
+            } // End of template mw_time64WithStandardDeviation
+            
+            /**
+             * @desc Receive template for Duration (in seconds)
+             * @param p_duration    The duration value
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.18  Duration
+             */
+            template (present) Duration mw_duration_in_seconds(
+                                                               in template (present) Int13 p_duration
+            ) := {
+                unit        := e_seconds,
+                duration    := p_duration
+            } // End of template mw_duration_in_seconds
+            
+            /**
+             * @desc Receive template for TwoDLocation
+             * @param p_latitude    Latitude range from  900 000 000 to +900 000 000
+             * @param p_longitude   Longitude range from  1 800 000 000 to +1 800 000 000
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.19    TwoDLocation
+             */
+            template (present) TwoDLocation mw_twoDLocation(
+                                                            in template (present) WGSLatitude p_latitude,
+                                                            in template (present) WGSLongitude p_longitude
+            ) := {
+                latitude    := p_latitude,
+                longitude   := p_longitude
+            } // End of template mw_twoDLocation
+            
+            /**
+             * @desc Receive template for ThreeDLocation
+             * @param p_latitude    Latitude range from  900 000 000 to +900 000 000
+             * @param p_longitude   Longitude range from  1 800 000 000 to +1 800 000 000
+             * @param p_elevation   Elevation relative to the WGS-84 ellipsoid in decimetres
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.20    ThreeDLocation
+             */
+            template (present) ThreeDLocation mw_threeDLocation(
+                                                                in template (present) WGSLatitude p_latitude,
+                                                                in template (present) WGSLongitude p_longitude,
+                                                                in template (present) Oct2 p_elevation
+            ) := {
+                latitude    := p_latitude,
+                longitude   := p_longitude,
+                elevation   := p_elevation
+            } // End of template mw_threeDLocation
+            
+            /**
+             * @desc Receive template circular geographic region
+             * @param p_center  Circle center 
+             * @param p_radius  Circle radius
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (present) GeographicRegion mw_geographicRegion_circle(
+                                                                           in template (present) TwoDLocation p_center := ?,
+                                                                           in template (present) UInt16 p_radius := ?
+            ) := {
+                region_type := e_circle,
+                region := {
+                    circular_region := {
+                        center := p_center,
+                        radius := p_radius 
+                    } // End of field circular_region
+                } // End of field region
+            } // End of template mw_geographicRegion_circle
+            
+            /**
+             * @desc Basic receive template rectangular geographic region
+             * @param p_northwest  Upper left corner 
+             * @param p_southeast  Lower rigth corner
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (present) GeographicRegion mw_geographicRegion_rectangular(
+                                                                                in template (present) TwoDLocation p_northwest := ?,
+                                                                                in template (present) TwoDLocation p_southeast := ?
+            ) := {
+                region_type := e_rectangle,
+                region := {
+                    rectangular_region := {
+                        {
+                            northwest := p_northwest,
+                            southeast := p_southeast 
+                        }
+                    } // End of field rectangular_region
+                } // End of field region
+            } // End of template mw_geographicRegion_rectangular
+            
+            /**
+             * @desc Receive template polygonial geographic region
+             * @param p_polygonal_region  Polygonial region description
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (present) GeographicRegion mw_geographicRegion_polygonal(
+                                                                              in template (present) PolygonalRegion p_polygonal_region := ?
+            ) := {
+                region_type := e_polygon,
+                region := {
+                    polygonal_region := p_polygonal_region
+                } // End of field region
+            } // End of template mw_geographicRegion_polygonial
+            
+            /**
+             * @desc Receive template for geographic identified region
+             * @param p_id_region  Indentified region
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (present) GeographicRegion mw_geographicRegion_identified(
+                                                                               in template (present) IdentifiedRegion p_id_region := ?
+            ) := {
+                region_type := e_id,
+                region := {
+                    id_region := p_id_region
+                } // End of field region
+            } // End of template mw_geographicRegion_identifiedRegion
+            
+            /**
+             * @desc Receive template for not specified geographic region
+             * @param p_id_region  Indentified region
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.21  GeographicRegion
+             */
+            template (present) GeographicRegion mw_geographicRegion_none := {
+                region_type := e_none,
+                region := omit
+            } // End of template mw_geographicRegion_nonce
+
+            template (present) IdentifiedRegion mw_identifiedRegion_iso3166_any
+            := {
+                region_dictionary := e_iso_3166_1,
+                region_identifier := (all from c_iso3166Codes),
+                local_region := ?
+            }
+            
+            template (present) IdentifiedRegion mw_identifiedRegion_un_stats_any
+            := {
+                region_dictionary := e_un_stats,
+                region_identifier := ((all from c_iso3166Codes), (all from c_unStatsAdditionalCodes)),
+                local_region := ?
+            }
+            
+        } // End of group basicFormatElementsRecv
+        
+    } // End of group dummyBasicFormatElements 
+    
+    
+    /**
+     * @desc Dummy send/receive templates for security headers
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 5   Specification of security header
+     */
+    group dummyMessages {
+        
+        /**
+         * @desc Dummy send templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5   Specification of security header
+         */
+        group dummyMessagesSend {
+
+			/**
+                 * @desc Send template for 'signed_external' Payload 
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+                 */
+                template (value) SecPayload m_payload_signed_external(
+                                                                      in template (omit) octetstring p_data := omit
+                ) := {
+                    type_   := e_signed_external,
+                    data    := p_data
+                } // End of template m_payload_signed_external
+            
+            /**
+             * @desc Generic send template for Security profile for other messages
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.3    Generic security profile for other signed messages
+             */
+            template (value) SecuredMessage m_secureMessage_dummy := {
+                protocol_version     := c_protocol_version,
+                header_fields        := { 
+                    m_header_field_signer_info(
+                        m_signerInfo_self
+                    )
+                },
+                payload_field        := m_payload_signed_external,
+                trailer_fields       := { }
+            } // End of template m_secureMessage_dummy
+            
+        } // End of group dummyMessagesSend
+        
+        /**
+         * @desc Dummy receive templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5   Specification of security header
+         */
+        group dummyMessagesRecv {
+            
+            /**
+             * @desc Generic received template for SecuredMessage
+             */
+            template (present) SecuredMessage mdw_securedMessage_dummy := {
+                protocol_version    := c_protocol_version, 
+                header_fields       := ?,
+                payload_field       := ?,
+                trailer_fields      := ?
+            } // End of template mdw_securedMessage_dummy
+            
+        } // End of group dummyMessagesRecv 
+        
+        group dummyPayloads {
+            
+            /**
+             * @desc Generic received template for unsecured payload
+             */
+            template (present) SecPayload mw_unsecuredPayload_dummy := {
+                type_   := e_unsecured, 
+                data    := ?
+            } // End of template mw_unsecuredPayload_dummy
+            
+            /**
+             * @desc Generic received template for SecuredMessage
+             */
+            template (present) SecPayload mw_signedPayload_dummy := {
+                type_   := e_signed, 
+                data    := ?
+            } // End of template mw_signedPayload_dummy
+            
+        } // End of group payloads
+        
+        group dummyEciesEncryptedKey {
+            
+            group dummyEciesEncryptedKeyRecv {
+                
+                /**
+                 * @desc Basic receive template for an ECIES-encrypted symmetric key as defined in IEEE Std 1363a 2004 
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.9 EciesEncryptedKey
+                 */
+                template (present) EciesEncryptedKey mw_eciesEncryptedKey_dummy := {
+                    v               := ?,
+                    c               := ?,
+                    t               := ?
+                } // End of template mw_eciesEncryptedKey_dummy
+                
+            } // End of group dummyEciesEncryptedKeyRecv
+            
+        } // End of group dummyEciesEncryptedKey
+        
+    } // End of group dummyMessages
+    
+    /**
+     * @desc Send/receive templates for security headers
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 5   Specification of security header
+     */
+    group messages {
+        
+        /**
+         * @desc Send templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5   Specification of security header
+         */
+        group messagesSend {
+            
+            /**
+             * @desc Generic send template for secured message
+             */
+            template (value) SecuredMessage m_securedMessage(
+                                                             in template (value) HeaderFields p_header_fields,
+                                                             in template (value) SecPayload p_payload_field,
+                                                             in template (value) TrailerFields p_trailer_fields
+            ) := {
+                protocol_version    := c_protocol_version,
+                header_fields       := p_header_fields,
+                payload_field       := p_payload_field,
+                trailer_fields      := p_trailer_fields
+            } // End of template m_securedMessage
+
+        } // End of group messagesSend
+        
+        /**
+         * @desc Receive templates for security headers
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5   Specification of security header
+         */
+        group messagesRecv {
+
+            /**
+             * @desc Generic received template for SecuredMessage
+             */
+            template (present) SecuredMessage mdw_securedMessage(
+                                                                 in template (present) HeaderFields p_header := ?,
+                                                                 in template (present) SecPayload p_payload := ?, 
+                                                                 in template (present) TrailerFields p_trailer := ? 
+            ) modifies mdw_securedMessage_dummy := {
+                header_fields       := p_header,
+                payload_field       := p_payload,
+                trailer_fields      := p_trailer
+            } // End of template mdw_securedMessage
+            
+            template (present) SecuredMessage mdw_securedMessage_CAMs_headers(
+                                                                              in template (present) HeaderField p_header := ?,
+                                                                              in template (present) SecPayload p_payload := ?, 
+                                                                              in template (present) TrailerFields p_trailer := ? 
+            ) modifies mdw_securedMessage_dummy := {
+                header_fields       := superset(mw_header_field_its_aid_CAM, p_header),
+                payload_field       := p_payload,
+                trailer_fields      := p_trailer
+            } // End of template mdw_securedMessage_CAMs
+            
+            template (present) SecuredMessage mdw_securedMessage_CAMs(
+                                                                      in template (present) HeaderField p_header := ?,
+                                                                      in template (present) SecPayload p_payload := ?, 
+                                                                      in template (present) TrailerFields p_trailer := ? 
+            ) modifies mdw_securedMessage_dummy := {
+                header_fields       := superset(mw_header_field_its_aid_CAM, p_header),
+                payload_field       := p_payload,
+                trailer_fields      := p_trailer
+            } // End of template mdw_securedMessage_CAMs
+            
+            template (present) SecuredMessage mdw_securedMessage_DENMs(
+                                                                       in template (present) HeaderField p_header := ?,
+                                                                       in template (present) SecPayload p_payload := ?, 
+                                                                       in template (present) TrailerFields p_trailer := ? 
+            ) modifies mdw_securedMessage_dummy := {
+                header_fields       := superset(mw_header_field_its_aid_DENM, p_header),
+                payload_field       := p_payload,
+                trailer_fields      := p_trailer
+            } // End of template mdw_securedMessage_DENMs
+            
+            template SecuredMessage mdw_securedMessage_Others(
+                                                              in template (present) HeaderField p_header := ?,
+                                                              in template (present) SecPayload p_payload := ?, 
+                                                              in template (present) TrailerFields p_trailer := ? 
+            ) := {
+                protocol_version    := c_protocol_version, 
+                header_fields       := superset(
+                    mw_header_field_its_aid_Other,
+                    p_header
+                ),
+                payload_field       := p_payload,
+                trailer_fields      := p_trailer
+            } // End of template mdw_securedMessage_Others
+            
+        } // End of group messagesRecv 
+        
+        /**
+         * @desc Send/Receive templates for Payload
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+         */
+        group payloads {
+                
+            /**
+             * @desc Send templates for Payload
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+             */
+            group payloadsSend {
+                
+                /**
+                 * @desc Send template for 'unsecured' Payload 
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+                 */
+                template (value) SecPayload m_payload_unsecured(
+                                                                in template (value) octetstring p_data
+                ) := {
+                    type_   := e_unsecured,
+                    data    := p_data
+                } // End of template m_payload_unsecured
+                
+                /**
+                 * @desc Send template for 'signed' Payload 
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+                 */
+                template (value) SecPayload m_payload_signed(
+                                                             in template (value) octetstring p_data
+                ) := {
+                    type_   := e_signed,
+                    data    := p_data
+                } // End of template m_payload_signed
+                
+                
+                /**
+                 * @desc Send template for 'encrypted' Payload 
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+                 */
+                template (value) SecPayload m_payload_encrypted(
+                                                                in template (value) octetstring p_data
+                ) := {
+                    type_   := e_encrypted,
+                    data    := p_data
+                } // End of template m_payload_encrypted
+                
+                /**
+                 * @desc Send template for 'signed_external' Payload 
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+                 */
+                template (value) SecPayload m_payload_signed_and_encrypted(
+                                                                           in template (value) octetstring p_data
+                ) := {
+                    type_   := e_signed_and_encrypted,
+                    data    := p_data
+                } // End of template m_payload_signed_and_encrypted
+                
+            } // End of group payloadsSend 
+            
+            /**
+             * @desc Receive templates for Payload
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+             */
+            group payloadsRecv {
+            /**
+             * @desc Receive template for SecPayload 
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.2 Payload
+             */
+            template (present) SecPayload mw_payload (
+                                                      in template (present) SecPayloadType p_type := ?,
+                                                      in template (present) octetstring p_data := ?
+            ):= {
+                type_   := p_type,
+                data    := p_data
+            } // End of template mw_payload
+            
+                
+            } // End of group payloadsRecv 
+            
+        } // End of group payloads
+        
+        /**
+         * @desc Send/Receive templates for HeaderField
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4 HeaderField
+         */
+        group headerFields {
+            
+            /**
+             * @desc Send templates for HeaderField
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4 HeaderField
+             */
+            group headerFieldsSend {
+                
+                /**
+                 * @desc Send template for HeaderField with generation time information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_generation_time(
+                                                                            in template (value) Time64 p_generation_time
+                ) := {
+                    type_       := e_generation_time,
+                    headerField := {
+                        generation_time := p_generation_time
+                    }
+                } // End of template m_header_field_generation_time
+                
+                /**
+                 * @desc Send template for HeaderField with generation time and standard deviation information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_generation_time_with_standard_deviation(
+                                                                                                    in template (value) Time64WithStandardDeviation p_generation_time_with_standard_deviation
+                ) := {
+                    type_       := e_generation_time_standard_deviation,
+                    headerField := {
+                        generation_time_with_standard_deviation := p_generation_time_with_standard_deviation
+                    }
+                } // End of template m_header_field_generation_time_with_standard_deviation
+                
+                /**
+                 * @desc Send template for HeaderField with expiration time information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_expiry_time(
+                                                                        in template (value) Time32 p_expiry_time
+                ) := {
+                    type_       := e_expiration,
+                    headerField := {
+                        expiry_time := p_expiry_time
+                    }
+                } // End of template m_header_field_expiry_time
+                
+                /**
+                 * @desc Send template for HeaderField with generation location information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_generation_location(
+                                                                                in template (value) ThreeDLocation p_generation_location
+                ) := {
+                    type_       := e_generation_location,
+                    headerField := {
+                        generation_location := p_generation_location
+                    }
+                } // End of template m_header_field_generation_location
+                
+                /**
+                 * @desc Send template for HeaderField with generation location information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_unrecognised_certificate(
+                                                                   in template (value) HashedId3 p_digest
+                ) := {
+                    type_       := e_request_unrecognized_certificate,
+                    headerField := {
+                        digests := { p_digest }
+                    }
+                } // End of template m_header_field_digest
+                
+                /**
+                 * @desc Send template for HeaderField with generation location information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_unrecognised_certificates(
+                                                                                      in template (value) HashedId3s p_digests
+                ) := {
+                    type_       := e_request_unrecognized_certificate,
+                    headerField := {
+                        digests := p_digests
+                    }
+                } // End of template m_header_field_multiple_digests
+                
+                /**
+                 * @desc Send template for HeaderField with ItsAid information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_its_aid(
+                                                                    in template (value) IntX p_its_aid
+                ) := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := p_its_aid
+                    }
+                } // End of template m_header_field_its_aid
+                
+                /**
+                 * @desc Send template for HeaderField with CAM ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_its_aid_CAM := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := c_its_aid_CAM
+                    }
+                } // End of template m_header_field_its_aid_CAM
+                
+                /**
+                 * @desc Send template for HeaderField with CAM ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_its_aid_DENM := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := c_its_aid_DENM
+                    }
+                } // End of template m_header_field_its_aid_DENM
+                
+                /**
+                 * @desc Send template for HeaderField with CAM ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_its_aid_Other := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := c_its_aid_Other
+                    }
+                } // End of template m_header_field_its_aid_Other
+                
+                /**
+                 * @desc Send template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_signer_info(
+                                                                        in template (value) SignerInfo p_signer
+                ) := {
+                    type_       := e_signer_info,
+                    headerField := {
+                        signer := p_signer
+                    }
+                } // End of template m_header_field_signerInfo_signer_info
+                
+                /**
+                 * @desc Send template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_recipient(
+                                                                      in template (value) RecipientInfo p_recipient
+                ) := {
+                    type_       := e_recipient_info,
+                    headerField := {
+                        recipients := { p_recipient }
+                    }
+                } // End of template m_header_field_recipient
+                
+                /**
+                 * @desc Send template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_multiple_recipients(
+                                                                                in template (value) RecipientInfos p_recipients
+                ) := {
+                    type_       := e_recipient_info,
+                    headerField := {
+                        recipients := p_recipients
+                    }
+                } // End of template m_header_field_multiple_recipients
+                
+                /**
+                 * @desc Send template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField m_header_field_enc_params(
+                                                                       in template (value) EncryptionParameters p_enc_params
+                ) := {
+                    type_       := e_encryption_parameters,
+                    headerField := {
+                        enc_params := p_enc_params
+                    }
+                } // End of template m_header_field_enc_params
+                
+            } // End of group headerFieldsSend
+        
+            /**
+             * @desc Receive templates for HeaderField
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4 HeaderField
+             */
+            group headerFieldsRecv {
+                
+                /**
+                 * @desc Receive template for HeaderField with generation time information
+                 * @param p_headerType  Type id of the Header field
+                 */
+                template (present) HeaderField mw_header_field(
+                                                               in HeaderFieldType p_headerType
+                ) := {
+                    type_       := p_headerType,
+                    headerField := ?
+                } // End of template mw_header_field_generation_time
+                
+                /**
+                 * @desc Receive template for HeaderField with generation time information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_generation_time(
+                                                                               in template (present) Time64 p_generation_time := ?
+                ) := {
+                    type_       := e_generation_time,
+                    headerField := {
+                        generation_time := p_generation_time
+                    }
+                } // End of template mw_header_field_generation_time
+                
+                /**
+                 * @desc Receive template for HeaderField with generation time and standard deviation information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_generation_time_with_standard_deviation(
+                                                                                                       in template (present) Time64WithStandardDeviation p_generation_time_with_standard_deviation
+                ) := {
+                    type_       := e_generation_time_standard_deviation,
+                    headerField := {
+                        generation_time_with_standard_deviation := p_generation_time_with_standard_deviation
+                    }
+                } // End of template mw_header_field_generation_time_with_standard_deviation
+                
+                /**
+                 * @desc Receive template for HeaderField with expiration time information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_expiry_time(
+                                                                           in template (present) Time32 p_expiry_time
+                ) := {
+                    type_       := e_expiration,
+                    headerField := {
+                        expiry_time := p_expiry_time
+                    }
+                } // End of template mw_header_field_expiry_time
+                
+                /**
+                 * @desc Receive template for HeaderField with generation location information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_generation_location(
+                                                                                   in template (present) ThreeDLocation p_generation_location
+                ) := {
+                    type_       := e_generation_location,
+                    headerField := {
+                        generation_location := p_generation_location
+                    }
+                } // End of template mw_header_field_generation_location
+                
+                /**
+                 * @desc Receive template for HeaderField with generation location information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_multiple_digests(
+                                                                                in template (present) HashedId3s p_digests
+                ) := {
+                    type_       := e_request_unrecognized_certificate,
+                    headerField := {
+                        digests := p_digests
+                    }
+                } // End of template mw_header_field_multiple_digests
+                
+                /**
+                 * @desc Receive template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_signer_info(
+                                                                           in template (present) SignerInfo p_signer
+                ) := {
+                    type_       := e_signer_info,
+                    headerField := {
+                        signer := p_signer
+                    }
+                } // End of template mw_header_field_signerInfo_signer_info
+                
+                /**
+                 * @desc Receive template for HeaderField with signer information
+                 *       containing certificate
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_signer_info_certificate (
+                                                                                        in template (present) Certificate p_cert := ?
+                ) := {
+                    type_       := e_signer_info,
+                    headerField := {
+                        signer := mw_signerInfo_certificate(p_cert)
+                    }
+                } // End of template mw_header_field_signer_info_certificate
+                
+                /**
+                 * @desc Receive template for HeaderField with signer information
+                 *       containing certificate digest
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_signer_info_digest (
+                                                                                   in template (present) HashedId8 p_digest := ?
+                ) := {
+                    type_       := e_signer_info,
+                    headerField := {
+                        signer := mw_signerInfo_digest(p_digest)
+                    }
+                } // End of template mw_header_field_signer_info_digest
+                
+                /**
+                 * @desc Receive template for HeaderField with signer information
+                 *       containing certificate chain
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_signer_info_certificate_chain (
+                                                                                              in template (present) CertificateChain p_certs := ?
+                ) := {
+                    type_       := e_signer_info,
+                    headerField := {
+                        signer := mw_signerInfo_certificates(p_certs)
+                    }
+                } // End of template mw_header_field_signer_info_certificate_chain
+                
+                /**
+                 * @desc Receive template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField mw_header_field_multiple_recipients(
+                                                                                 in template (value) RecipientInfos p_recipients
+                ) := {
+                    type_       := e_recipient_info,
+                    headerField := {
+                        recipients := p_recipients
+                    }
+                } // End of template mw_header_field_multiple_recipients
+                
+                /**
+                 * @desc Receive template for HeaderField with signer information
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_enc_params(
+                                                                          in template (present) EncryptionParameters p_enc_params
+                ) := {
+                    type_       := e_encryption_parameters,
+                    headerField := {
+                        enc_params := p_enc_params
+                    }
+                } // End of template mw_header_field_enc_params
+                
+                /**
+                 * @desc Receive template for HeaderField with request for unrecognized certificate
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_request_unrecognized_certificate(
+                                                                                                in template (present) HashedId3s p_digests := ?
+                
+                ) := {
+                    type_       := e_request_unrecognized_certificate,
+                    headerField := {
+                        digests := p_digests
+                    }
+                } // End of template mw_header_field_signer_info_digest
+                
+                /**
+                 * @desc Receive template for HeaderField with ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (present) HeaderField mw_header_field_its_aid(
+                                                                     in template (present) IntX p_its_aid := ?
+                ) := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := p_its_aid
+                    }
+                } // End of template mw_header_field_its_aid
+                
+                /**
+                 * @desc Receive template for HeaderField with CAM ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField mw_header_field_its_aid_CAM := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := c_its_aid_CAM
+                    }
+                } // End of template mw_header_field_its_aid_CAM
+                
+                /**
+                 * @desc Receive template for HeaderField with DENM ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField mw_header_field_its_aid_DENM := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := c_its_aid_DENM
+                    }
+                } // End of template mw_header_field_its_aid_DENM
+                
+                /**
+                 * @desc Receive template for HeaderField with Other ItsAid identifier
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.4    HeaderField
+                 */
+                template (value) HeaderField mw_header_field_its_aid_Other := {
+                    type_       := e_its_aid,
+                    headerField := {
+                        its_aid := c_its_aid_Other
+                    }
+                } // End of template mw_header_field_its_aid_Other
+                
+            } // End of group headerFieldsRecv
+            
+        } // End of group headerFields
+        
+        /**
+         * @desc Send/Receive templates for TrailerField
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.6 TrailerField
+         */
+        group trailerFields {
+            
+            /**
+             * @desc Send template containing signature information used by the security layer after processing the payload
+             * @param p_signature   The signature information
+             */
+            template (value) TrailerField m_trailer_field_signature(
+                                                                    in template (value) Signature p_signature
+            ) := {
+                type_           := e_signature,
+                trailerField    := {
+                    signature_ := p_signature
+                }
+            } // End of template m_trailer_field_dummy
+            
+            /**
+             * @desc Receive template containing signature information used by the security layer after processing the payload
+             * @param p_signature   The signature information
+             */
+            template (present) TrailerField mw_trailer_field_signature(
+                                                                       in template (present) Signature p_signature := ?
+            ) := {
+                type_           := e_signature,
+                trailerField    := {
+                    signature_ := p_signature
+                }
+            } // End of template mw_trailer_field_dummy
+            
+        } // End of group trailerFields
+        
+        /**
+         * @desc Send/Receive templates for RecipientInfo
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.8 RecipientInfo
+         */
+        group recipientInfo {
+            
+            /**
+             * @desc Send template containing information for a message's recipient
+             * @param p_cert_id         The recipient's certificate identifier
+             * @param p_pk_encryption   The encryption type
+             * @param p_enc_key         The encrypted key contained in an EciesEncryptedKey structure 
+             */
+            template (value) RecipientInfo m_recipientInfo_ecies_enc_key(
+                                                                         in template (value) HashedId8 p_cert_id,
+                                                                         in template (value) PublicKeyAlgorithm p_pk_encryption,
+                                                                         in template (value) EciesEncryptedKey p_enc_key
+            ) := {
+                cert_id         := p_cert_id,
+                pk_encryption   := p_pk_encryption,
+                enc_key         := {
+                    enc_key := p_enc_key
+                } // End of field enc_key
+            } // End of template m_recipientInfo_ecies_enc_key
+            
+            template (value) RecipientInfo m_recipientInfo_other_enc_key(
+                                                                         in template (value) HashedId8 p_cert_id,
+                                                                         in template (value) PublicKeyAlgorithm p_pk_encryption,
+                                                                         in template (value) octetstring p_enc_key_other
+            ) := {
+                cert_id         := p_cert_id,
+                pk_encryption   := p_pk_encryption,
+                enc_key         := {
+                    enc_key_other := p_enc_key_other
+                } // End of field enc_key
+            } // End of template m_recipientInfo_other_enc_key
+            
+            /**
+             * @desc Receive template containing information for a message's recipient
+             * @param p_cert_id         The recipient's certificate identifier
+             * @param p_pk_encryption   The encryption type
+             * @param p_enc_key         The encrypted key contained in an EciesEncryptedKey structure 
+             */
+            template (present) RecipientInfo mw_recipientInfo_ecies_enc_key(
+                                                                            in template (present) HashedId8 p_cert_id,
+                                                                            in template (present) PublicKeyAlgorithm p_pk_encryption,
+                                                                            in template (present) EciesEncryptedKey p_enc_key
+            ) := {
+                cert_id         := p_cert_id,
+                pk_encryption   := p_pk_encryption,
+                enc_key         := {
+                    enc_key := p_enc_key
+                } // End of field enc_key
+            } // End of template mw_recipientInfo_ecies_enc_key
+            
+        } // End of group recipientInfo
+        
+        /**
+         * @desc Send/Receive templates for EciesEncryptedKey
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.9 EciesEncryptedKey
+         */
+        group eciesEncryptedKey {
+            
+                /**
+                 * @desc Send template for an ECIES-encrypted symmetric key as defined in IEEE Std 1363a 2004 
+                 * @param p_ecc_key             The sender's EEC ephemeral key
+                 * @param p_encrypted_key       The encrypted (AES) key 
+                 * @param p_authentication_tag  The authentication tag vector
+                 * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.9 EciesEncryptedKey
+                 */
+                template (value) EciesEncryptedKey m_eciesEncryptedKey_aesccm(
+                                                                              in template (value) EccPoint p_ecc_key, 
+                                                                              in template (value) octetstring p_encrypted_key, 
+                                                                              in template (value) Oct16 p_authentication_tag
+                ) := {
+                    v               := p_ecc_key,
+                    c               := p_encrypted_key,
+                    t               := p_authentication_tag
+                } // End of template m_eciesEncryptedKey_aesccm
+                
+            /**
+             * @desc Receive template for an ECIES-encrypted symmetric key as defined in IEEE Std 1363a 2004 
+             * @param p_ecc_key             The sender's EEC ephemeral key
+             * @param p_encrypted_key       The encrypted (AES) key 
+             * @param p_authentication_tag  The authentication tag vector
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 5.9 EciesEncryptedKey
+             */
+            template (present) EciesEncryptedKey mw_eciesEncryptedKey_aesccm(
+                                                                             in template (present) EccPoint p_ecc_key, 
+                                                                             in template (present) octetstring p_encrypted_key, 
+                                                                             in template (present) Oct16 p_authentication_tag
+            ) := {
+                v               := p_ecc_key,
+                c               := p_encrypted_key,
+                t               := p_authentication_tag
+            } // End of template mw_eciesEncryptedKey_aesccm
+            
+        } // End of group eciesEncryptedKey
+        
+    } // End of group messages
+    
+    /**
+     * @desc Dummy send/receive templates for certificates
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 6   Specification of certificate format
+     */
+    group dummyCertifices {
+        
+        /**
+         * @desc Dummy send templates for certificates
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6   Specification of certificate format
+         */
+        group dummyCertificesSend {
+            
+        } // End of group dummyCertificesSend
+        
+        /**
+         * @desc Dummy receive templates for certificates
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6   Specification of certificate format
+         */
+        group dummyCertificesRecv {
+            
+            /**
+             * @desc Dummy receive certificate template
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.1    Certificate
+             */
+            template (present) Certificate mw_certificate_dummy := {
+                version                 := c_certificate_version,
+                signer_info             := ?,
+                subject_info            := ?,
+                subject_attributes      := ?,
+                validity_restrictions   := ?,
+                signature_              := ?
+            } // End of template mw_certificate_dummy
+            
+        } // End of group dummyCertificesRecv
+        
+    } // End of group dummyCertifices
+    
+    /**
+     * @desc Send/receive templates for certificates
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 6   Specification of certificate format
+     */
+    group certificates {
+        
+        /**
+         * @desc Send templates for certificates
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6   Specification of certificate format
+         */
+        group certificatesSend {
+            
+            /**
+             * @desc Send certificate template
+             * @member p_signer_info            Signer information
+             * @member p_subject_info           The subject information
+             * @member p_subject_attributes     List of subject attribute
+             * @member p_validity_restrictions  List of validity restriction
+             * @member p_signature              The signature
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.1    Certificate
+             */
+            template (value) Certificate m_certificate(
+                                                       in template (value) SignerInfo p_signer_info,
+                                                       in template (value) SubjectInfo p_subject_info,
+                                                       in template (value) SubjectAttributes p_subject_attributes,
+                                                       in template (value) ValidityRestrictions p_validity_restrictions,
+                                                       in template (value) Signature p_signature
+            ) := {
+                version                 := c_certificate_version,
+                signer_info             := p_signer_info,
+                subject_info            := p_subject_info,
+                subject_attributes      := p_subject_attributes,
+                validity_restrictions   := p_validity_restrictions,
+                signature_              := p_signature
+            } // End of template m_certificate
+            
+            /**
+             * @desc Send templates for certificates
+             * @see Draft ETSI TS 103 097 V1.1.14 Clause 6.2 SubjectInfo
+             */
+            group subjectInfo {
+                
+                template (value) SubjectInfo m_subject_info_root_ca(
+                                                                    in template (value) Oct0to31 p_subject_name
+                ) := {
+                    subject_type := e_root_ca,
+                    subject_name := p_subject_name
+                } // End of template m_subject_info_root_ca
+                
+                template (value) SubjectInfo m_subject_info_authorization_authority(
+                                                                                    in template (value) Oct0to31 p_subject_name
+                ) := {
+                    subject_type := e_authorization_authority,
+                    subject_name := p_subject_name
+                } // End of template m_subject_info_authorization_authority
+                
+                template (value) SubjectInfo m_subject_info_authorization_ticket := {
+                    subject_type := e_authorization_ticket,
+                    subject_name := ''O
+                } // End of template m_subject_info_authorization_ticket
+                
+                template (value) SubjectInfo m_subject_info_revocation(
+                                                                       in template (value) Oct0to31 p_subject_name
+                ) := {
+                    subject_type := e_crl_signer,
+                    subject_name := p_subject_name
+                } // End of template m_subject_info_revocation
+                
+            } // End of group subjectInfo
+            
+            group subjectAttribute {
+                
+                template (value) SubjectAttribute m_subject_attribute_verification_key(
+                                                                                       in template (value) PublicKey p_key
+                ) := {
+                    type_       := e_verification_key,
+                    attribute   := {
+                        key := p_key
+                    }
+                } // End of template m_subject_attribute_verification_key
+                
+                template (value) SubjectAttribute m_subject_attribute_encryption_key(
+                                                                                     in template (value) PublicKey p_key
+                ) := {
+                    type_       := e_encryption_key,
+                    attribute   := {
+                        key := p_key
+                    }
+                } // End of template m_subject_attribute_encryption_key
+                
+                template (value) SubjectAttribute m_subject_attribute_reconstruction_value(
+                                                                                     in template (value) EccPoint p_rv
+                ) := {
+                    type_       := e_reconstruction_value,
+                    attribute   := {
+                        rv := p_rv
+                    }
+                } // End of template m_subject_attribute_reconstruction_value
+                
+                template (value) SubjectAttribute m_subject_attribute_assurance_level(
+                                                                                      in template (value) SubjectAssurance p_assurance_level
+                ) := {
+                    type_       := e_assurance_level,
+                    attribute   := {
+                        assurance_level := p_assurance_level
+                    }
+                } // End of template m_subject_attribute_assurance_level
+                
+                template (value) SubjectAttribute m_subject_attribute_its_aid_list(
+                                                                                           in template (value) IntXs p_its_aid_list
+                ) := {
+                    type_       := e_its_aid_list,
+                    attribute   := {
+                        its_aid_list := p_its_aid_list
+                    }
+                } // End of template m_subject_attribute_its_aid_list
+                
+                template (value) SubjectAttribute m_subject_attribute_its_aid_ssp_list(
+                                                                                       in template (value) ItsAidSsps p_its_aid_ssp_list
+                ) := {
+                    type_       := e_its_aid_ssp_list,
+                    attribute   := {
+                        its_aid_ssp_list := p_its_aid_ssp_list
+                    }
+                } // End of template m_subject_attribute_its_aid_ssp_list
+                
+            } // End of group subjectAttribute
+            
+            group subjectAssurance {
+                
+                template (value) SubjectAssurance m_subjectAssurance(
+                                                                     in template (value) Bit3 p_levels,
+                                                                     in template (value) Bit2 p_confidence
+                ) := {
+                    levels      := p_levels,
+                    reserved    := '000'B,
+                    confidence  := p_confidence
+                } // End of template m_subjectAssurance
+                
+            } // End of group subjectAssurance
+            
+            group validityRestriction {
+                
+                template (value) ValidityRestriction m_validity_restriction_time_end(
+                                                                                     in template (value) Time32 p_end_validity
+                 ) := {
+                    type_       := e_time_end,
+                    validity    :=  {
+                        end_validity := p_end_validity
+                    } // End of field validity
+                } // End of template m_validity_restriction_time_end
+                
+                template (value) ValidityRestriction m_validity_restriction_time_start_and_end(
+                                                                                               in template (value) Time32 p_start_validity,
+                                                                                               in template (value) Time32 p_end_validity
+                ) := {
+                    type_       := e_time_start_and_end,
+                    validity    :=  {
+                        time_start_and_end := {
+                            start_validity  := p_start_validity,
+                            end_validity    := p_end_validity
+                        } // End of field time_start_and_end
+                    } // End of field validity
+                } // End of template m_validity_restriction_time_start_and_end
+                
+                template (value) ValidityRestriction m_validity_restriction_time_start_and_duration(
+                                                                                                    in template (value) Time32 p_start_validity,
+                                                                                                    in template (value) Duration p_duration
+                ) := {
+                    type_       := e_time_start_and_duration,
+                    validity    :=  {
+                        time_start_and_duration := {
+                            start_validity  := p_start_validity,
+                            duration        := p_duration
+                        } // End of field time_start_and_duration
+                    } // End of field validity
+                } // End of template m_validity_restriction_time_start_and_duration
+                
+                template (value) ValidityRestriction m_validity_restriction_region(
+                                                                                   in template (value) GeographicRegion p_region
+                ) := {
+                    type_       := e_region,
+                    validity    :=  {
+                        region := p_region
+                    } // End of field validity
+                } // End of template m_validity_restriction_region
+                
+                template (value) ValidityRestriction m_validity_restriction_unknown := {
+                    type_       := e_unknown,
+                    validity    :=  {
+                        data := ''O
+                    } // End of field validity
+                } // End of template m_validity_restriction_unknown
+                
+            } // End of group validityRestriction
+            
+        } // End of group certificatesSend
+        
+        /**
+         * @desc Receive templates for certificates
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 6   Specification of certificate format
+         */
+        group certificatesRecv {
+            
+            template (present) Certificate mw_certificate(
+                                                          in template (present) SignerInfo p_signer_info := ?,
+                                                          in template (present) SubjectInfo p_subject_info := ?,
+                                                          in template (present) SubjectAttributes p_subject_attributes := ?,
+                                                          in template (present) ValidityRestrictions p_validity_restrictions := ?,
+                                                          in template (present) Signature p_signature :=?
+            ) := {
+                version                 := c_certificate_version,
+                signer_info             := p_signer_info,
+                subject_info            := p_subject_info,
+                subject_attributes      := p_subject_attributes,
+                validity_restrictions   := p_validity_restrictions,
+                signature_              := p_signature
+            } // End of template m_certificate
+            
+            template (present) Certificate mw_aa_certificate(
+                                                          in template (present) SignerInfo p_signer_info := ?,
+                                                          in template (present) SubjectAttributes p_subject_attributes := ?,
+                                                          in template (present) ValidityRestrictions p_validity_restrictions := ?,
+                                                          in template (present) Signature p_signature :=?
+            ) := {
+                version                 := c_certificate_version,
+                signer_info             := p_signer_info,
+                subject_info            := {
+                    subject_type := e_authorization_authority,
+                    subject_name := ?
+                },
+                subject_attributes      := p_subject_attributes,
+                validity_restrictions   := p_validity_restrictions,
+                signature_              := p_signature
+            } // End of template m_aa_certificate
+            
+            template (present) Certificate mw_at_certificate(
+                                                          in template (present) SignerInfo p_signer_info := ?,
+                                                          in template (present) SubjectAttributes p_subject_attributes := ?,
+                                                          in template (present) ValidityRestrictions p_validity_restrictions := ?,
+                                                          in template (present) Signature p_signature :=?
+            ) := {
+                version                 := c_certificate_version,
+                signer_info             := p_signer_info,
+                subject_info            := {
+                    subject_type := e_authorization_ticket,
+                    subject_name := ?
+                },
+                subject_attributes      := p_subject_attributes,
+                validity_restrictions   := p_validity_restrictions,
+                signature_              := p_signature
+            } // End of template m_at_certificate
+            
+            group subjectInfo {
+                
+                template (present) SubjectInfo mw_subject_info_root_ca(
+                                                                       in template (present) Oct0to31 p_subject_name
+                ) := {
+                    subject_type := e_root_ca,
+                    subject_name := p_subject_name
+                } // End of template mw_subject_info_root_ca
+                
+                template (present) SubjectInfo mw_subject_info_revocation(
+                                                                          in template (present) Oct0to31 p_subject_name
+                ) := {
+                    subject_type := e_crl_signer,
+                    subject_name := p_subject_name
+                } // End of template mw_subject_info_revocation
+                
+            } // End of group subjectInfo
+            
+            group subjectAttribute {
+                
+                template (present) SubjectAttribute mw_subject_attribute_verification_key(
+                                                                                          in template (present) PublicKey p_key := ?
+                ) := {
+                    type_       := e_verification_key,
+                    attribute   := {
+                        key := p_key
+                    }
+                } // End of template mw_subject_attribute_verification_key
+                
+                group publicKeyRecv {
+                    
+                    /**
+                     * @desc Receive template for PublicKey/EccPoint/Compressed_lsb_y_0
+                     * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+                     */
+                    template (present) PublicKey mw_publicKey_eccPoint_compressed_lsb_y_0 
+                    modifies mw_publicKey_eccPoint_dummy := {
+                        public_key  := {
+                            eccPoint := mw_eccPointecdsa_nistp256_with_sha256_y0_coordinate_only
+                        } // End of field public_key
+                    } // End of template mw_publicKey_eccPoint_compressed_lsb_y_0
+                    
+                    /**
+                     * @desc Receive template for PublicKey/EccPoint/Compressed_lsb_y_1
+                     * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+                     */
+                    template (present) PublicKey mw_publicKey_eccPoint_compressed_lsb_y_1 
+                    modifies mw_publicKey_eccPoint_dummy := {
+                        public_key  := {
+                            eccPoint := mw_eccPointecdsa_nistp256_with_sha256_y1_coordinate_only
+                        } // End of field public_key
+                    } // End of template mw_publicKey_eccPoint_compressed_lsb_y_1
+                    
+                    /**
+                     * @desc Receive template for PublicKey/EccPoint/Uncompressed
+                     * @see Draft ETSI TS 103 097 V1.1.14 Clause 4.2.4    PublicKey
+                     */
+                    template (present) PublicKey mw_publicKey_eccPoint_uncompressed 
+                    modifies mw_publicKey_eccPoint_dummy := {
+                        public_key  := {
+                            eccPoint := mw_eccPointecdsa_nistp256_with_sha256_uncompressed
+                        } // End of field public_key
+                    } // End of template mw_publicKey_eccPoint_compressed_lsb_y_0
+                    
+                } // End of group publicKeyRecv 
+                
+                template (present) SubjectAttribute mw_subject_attribute_encryption_key(
+                                                                                        in template (present) EccPoint p_rv := ?
+                ) := {
+                    type_       := e_encryption_key,
+                    attribute   := {
+                        rv := p_rv
+                    }
+                } // End of template mw_subject_attribute_encryption_key
+                
+                template (present) SubjectAttribute mw_subject_attribute_assurance_level(
+                                                                                         in template (present) SubjectAssurance p_assurance_level := ?
+                ) := {
+                    type_       := e_assurance_level,
+                    attribute   := {
+                        assurance_level := p_assurance_level
+                    }
+                } // End of template mw_subject_attribute_assurance_level
+                
+                template (present) SubjectAttribute mw_subject_attribute_reconstruction_value(
+                                                                                              in template (present) IntXs p_its_aid_list := ?
+                ) := {
+                    type_       := e_reconstruction_value,
+                    attribute   := {
+                        its_aid_list := p_its_aid_list
+                    }
+                } // End of template mw_subject_attribute_reconstruction_value
+                
+                template (present) SubjectAttribute mw_subject_attribute_its_aid_list(
+                                                                                      in template (present) IntXs p_its_aid_list := ?
+                ) := {
+                    type_       := e_its_aid_list,
+                    attribute   := {
+                        its_aid_list := p_its_aid_list
+                    }
+                } // End of template mw_subject_attribute_its_aid_list
+                
+                template (present) SubjectAttribute mw_subject_attribute_its_aid_ssp_list(
+                                                                                              in template (present) ItsAidSsps p_its_aid_ssp_list := ?
+                ) := {
+                    type_       := e_its_aid_ssp_list,
+                    attribute   := {
+                        its_aid_ssp_list := p_its_aid_ssp_list
+                    }
+                } // End of template mw_subject_attribute_its_aid_ssp_list
+                
+            } // End of group subjectAttribute
+            
+            group subjectAssurance {
+                
+                template (present) SubjectAssurance mw_subjectAssurance(
+                                                                        in template (present) Bit3 p_levels,
+                                                                        in template (present) Bit2 p_confidence
+                ) := {
+                    levels      := p_levels,
+                    reserved    := '000'B,
+                    confidence  := p_confidence
+                } // End of template mw_subjectAssurance
+                
+            } // End of group subjectAssurance
+            
+            group validityRestriction {
+                
+                template (present) ValidityRestriction mw_validity_restriction_time_end(
+                                                                                        in template (present) Time32 p_end_validity := ?
+                 ) := {
+                    type_       := e_time_end,
+                    validity    :=  {
+                        end_validity := p_end_validity
+                    } // End of field validity
+                } // End of template mw_validity_restriction_time_end
+                
+                template (present) ValidityRestriction mw_validity_restriction_time_start_and_end(
+                                                                                                  in template (present) Time32 p_start_validity := ?,
+                                                                                                  in template (present) Time32 p_end_validity := ?
+                ) := {
+                    type_       := e_time_start_and_end,
+                    validity    :=  {
+                        time_start_and_end := {
+                            start_validity  := p_start_validity,
+                            end_validity    := p_end_validity
+                        } // End of field time_start_and_end
+                    } // End of field validity
+                } // End of template mw_validity_restriction_time_start_and_end
+                
+                template (present) ValidityRestriction mw_validity_restriction_time_start_and_duration(
+                                                                                                       in template (present) Time32 p_start_validity := ?,
+                                                                                                       in template (present) Duration p_duration := ?
+                ) := {
+                    type_       := e_time_start_and_duration,
+                    validity    :=  {
+                        time_start_and_duration := {
+                            start_validity  := p_start_validity,
+                            duration        := p_duration
+                        } // End of field time_start_and_duration
+                    } // End of field validity
+                } // End of template mw_validity_restriction_time_start_and_duration
+                
+                /**
+                 * @desc Receive template for any region excepted 'none'
+                 */
+                template (present) ValidityRestriction mw_validity_restriction_any_valid_region := {
+                    type_       := e_region,
+                    validity    :=  {
+                        region := {
+                            region_type  := complement(e_none),
+                            region       := *
+                        }
+                    } // End of field validity
+                } // End of template mw_validity_restriction_any_valid_region
+                
+                /**
+                 * @desc Receive template for specified region
+                 * @param p_region The expected region
+                 */
+                template (present) ValidityRestriction mw_validity_restriction_region(
+                                                                                      in template (present) GeographicRegion p_region := ?
+                ) := {
+                    type_       := e_region,
+                    validity    :=  {
+                        region := p_region
+                    } // End of field validity
+                } // End of template mw_validity_restriction_region
+                
+            } // End of group validityRestriction
+            
+        } // End of group certificatesRecv
+        
+        group ssp {
+            
+            group sspTest {
+                
+                template (present) ServiceSpecificPermissions m_sspTest := {
+                    version         := '00'O,
+                    sspContainer    := omit
+                } // End of template mw_sspTest
+                
+                template (present) ServiceSpecificPermissions mw_sspTest := {
+                    version         := '00'O,
+                    sspContainer    := *
+                } // End of template mw_sspTest
+                
+            } // End of group sspTest 
+            
+            group sspCam {
+                    
+                group sspCamSend {
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) SspCAM m_sspCAMContainer_sign_all := {
+                        cenDsrcTollingZone                      := '1'B,
+                        publicTransport                         := '1'B,
+                        specialTransport                        := '1'B,
+                        dangerousGoods                          := '1'B,
+                        roadwork                                := '1'B,
+                        rescue                                  := '1'B,
+                        emergency                               := '1'B,
+                        safetyCar                               := '1'B,
+                        closedLanes                             := '1'B,
+                        requestForRightOfWay                    := '1'B,
+                        requestForFreeCrossingAtATrafficLight   := '1'B,
+                        noPassing                               := '1'B,
+                        noPassingForTrucks                      := '1'B,
+                        speedLimit                              := '1'B,
+                        reserved1                               := '0'B,
+                        reserved2                               := '0'B
+                    } // End of template m_sspCAMContainer_sign_all
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) SspCAM m_sspCAMContainer_vehicle 
+                    modifies m_sspCAMContainer_sign_all := {
+                        cenDsrcTollingZone                      := '0'B,
+                        closedLanes                             := '0'B,
+                        noPassing                               := '0'B,
+                        noPassingForTrucks                      := '0'B,
+                        speedLimit                              := '0'B
+                    } // End of template m_sspCAMContainer_vehicle
+                    
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) ServiceSpecificPermissions m_sspCAM_sign_all := {
+                        version         := '01'O,
+                        sspContainer    := {
+                            sspCAM := m_sspCAMContainer_sign_all
+                        } // End of field sspContainer
+                    } // End of template m_sspCAM_sign_all
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) ServiceSpecificPermissions m_sspCAM_vehicle 
+                    modifies m_sspCAM_sign_all := {
+                        sspContainer    := {
+                            sspCAM := m_sspCAMContainer_vehicle
+                        } // End of field sspContainer
+                    } // End of template m_sspCAM_vehicle
+                    
+                } // End of group sspCamSend
+                
+                group sspCamRecv {
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) SspCAM mw_sspCAMContainer_dummy := {
+                        cenDsrcTollingZone                      := ?,
+                        publicTransport                         := ?,
+                        specialTransport                        := ?,
+                        dangerousGoods                          := ?,
+                        roadwork                                := ?,
+                        rescue                                  := ?,
+                        emergency                               := ?,
+                        safetyCar                               := ?,
+                        closedLanes                             := ?,
+                        requestForRightOfWay                    := ?,
+                        requestForFreeCrossingAtATrafficLight   := ?,
+                        noPassing                               := ?,
+                        noPassingForTrucks                      := ?,
+                        speedLimit                              := ?,
+                        reserved1                               := ?,
+                        reserved2                               := ?
+                    } // End of template mw_sspCAMContainer_dummy
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) ServiceSpecificPermissions mw_sspCAM_dummy := {
+                        version         := '01'O,
+                        sspContainer    := {
+                            sspCAM := mw_sspCAMContainer_dummy
+                        }
+                    } // End of template mw_sspCAM_dummy
+                    
+                } // End of group sspCamRecv
+                
+            } // End of group sspCam
+            
+            group sspDenm {
+                    
+                group sspDenmSend {
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) SspDENM m_sspDENMContainer_sign_all := {
+                        trafficCondition                                := '1'B,
+                        accident                                        := '1'B,
+                        roadworks                                       := '1'B,
+                        adverseWeatherCondition_Adhesion                := '1'B,
+                        hazardousLocation_SurfaceCondition              := '1'B,
+                        hazardousLocation_ObstacleOnTheRoad             := '1'B,
+                        hazardousLocation_AnimalOnTheRoad               := '1'B,
+                        humanPresenceOnTheRoad                          := '1'B,
+                        wrongWayDriving                                 := '1'B,
+                        rescueAndRecoveryWorkInProgress                 := '1'B,
+                        adverseWeatherCondition_ExtremeWeatherCondition := '1'B,
+                        adverseWeatherCondition_Visibility              := '1'B,
+                        adverseWeatherCondition_Precipitation           := '1'B,
+                        slowVehicle                                     := '1'B,
+                        dangerousEndOfQueue                             := '1'B,
+                        vehicleBreakdown                                := '1'B,
+                        postCrash                                       := '1'B,
+                        humanProblem                                    := '1'B,
+                        stationaryVehicle                               := '1'B,
+                        emergencyVehicleApproaching                     := '1'B,
+                        hazardousLocation_DangerousCurve                := '1'B,
+                        collisionRisk                                   := '1'B,
+                        signalViolation                                 := '1'B,
+                        dangerousSituation                              := '1'B
+                    } // End of template m_sspDENMContainer_sign_all
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) SspDENM m_sspDENMContainer_vehicle 
+                    modifies m_sspDENMContainer_sign_all:= {
+                        trafficCondition                                := '0'B,
+                        accident                                        := '0'B,
+                        roadworks                                       := '0'B,
+                        adverseWeatherCondition_Adhesion                := '0'B,
+                        hazardousLocation_SurfaceCondition              := '0'B,
+                        hazardousLocation_ObstacleOnTheRoad             := '0'B,
+                        hazardousLocation_AnimalOnTheRoad               := '0'B,
+                        slowVehicle                                     := '0'B,
+                        dangerousEndOfQueue                             := '0'B,
+                        vehicleBreakdown                                := '0'B,
+                        stationaryVehicle                               := '0'B
+                    } // End of template m_sspDENMContainer_sign_all
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) SspDENM m_sspDENMContainer_roadSideUnit 
+                    modifies m_sspDENMContainer_sign_all:= {
+                        trafficCondition                                := '0'B,
+                        accident                                        := '0'B,
+                        roadworks                                       := '0'B,
+                        adverseWeatherCondition_Adhesion                := '0'B,
+                        hazardousLocation_SurfaceCondition              := '0'B,
+                        hazardousLocation_ObstacleOnTheRoad             := '0'B,
+                        hazardousLocation_AnimalOnTheRoad               := '0'B,
+                        humanPresenceOnTheRoad                          := '0'B,
+                        wrongWayDriving                                 := '0'B,
+                        rescueAndRecoveryWorkInProgress                 := '0'B,
+                        adverseWeatherCondition_ExtremeWeatherCondition := '0'B,
+                        adverseWeatherCondition_Visibility              := '0'B,
+                        adverseWeatherCondition_Precipitation           := '0'B,
+                        postCrash                                       := '0'B,
+                        humanProblem                                    := '0'B,
+                        stationaryVehicle                               := '0'B,
+                        hazardousLocation_DangerousCurve                := '0'B,
+                        collisionRisk                                   := '0'B,
+                        dangerousSituation                              := '0'B
+                    } // End of template m_sspDENMContainer_roadSideUnit
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) ServiceSpecificPermissions m_sspDENM_sign_all := {
+                        version         := '01'O,
+                        sspContainer    := {
+                            sspDENM := m_sspDENMContainer_sign_all
+                        } // End of field sspContainer
+                    } // End of template m_sspDENM_sign_all
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) ServiceSpecificPermissions m_sspDENM_vehicle 
+                    modifies m_sspDENM_sign_all := {
+                        sspContainer    := {
+                            sspDENM := m_sspDENMContainer_vehicle
+                        } // End of field sspContainer
+                    } // End of template m_sspDENM_vehicle
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (value) ServiceSpecificPermissions m_sspDENM_roadSideUnit 
+                    modifies m_sspDENM_sign_all := {
+                        sspContainer    := {
+                            sspDENM := m_sspDENMContainer_vehicle
+                        } // End of field sspContainer
+                    } // End of template m_sspDENM_roadSideUnit
+                    
+                } // End of group sspDenmSend
+                
+                group sspDenmRecv {
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) SspDENM mw_sspDENMContainer_dummy := {
+                        trafficCondition                                := ?,
+                        accident                                        := ?,
+                        roadworks                                       := ?,
+                        adverseWeatherCondition_Adhesion                := ?,
+                        hazardousLocation_SurfaceCondition              := ?,
+                        hazardousLocation_ObstacleOnTheRoad             := ?,
+                        hazardousLocation_AnimalOnTheRoad               := ?,
+                        humanPresenceOnTheRoad                          := ?,
+                        wrongWayDriving                                 := ?,
+                        rescueAndRecoveryWorkInProgress                 := ?,
+                        adverseWeatherCondition_ExtremeWeatherCondition := ?,
+                        adverseWeatherCondition_Visibility              := ?,
+                        adverseWeatherCondition_Precipitation           := ?,
+                        slowVehicle                                     := ?,
+                        dangerousEndOfQueue                             := ?,
+                        vehicleBreakdown                                := ?,
+                        postCrash                                       := ?,
+                        humanProblem                                    := ?,
+                        stationaryVehicle                               := ?,
+                        emergencyVehicleApproaching                     := ?,
+                        hazardousLocation_DangerousCurve                := ?,
+                        collisionRisk                                   := ?,
+                        signalViolation                                 := ?,
+                        dangerousSituation                              := ?
+                    } // End of template mw_sspDENMContainer_dummy
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) SspDENM mw_sspDENMContainer_vehicle
+                    modifies mw_sspDENMContainer_dummy := {
+                        trafficCondition                                := '0'B,
+                        accident                                        := '0'B,
+                        roadworks                                       := '0'B,
+                        adverseWeatherCondition_Adhesion                := '0'B,
+                        hazardousLocation_SurfaceCondition              := '0'B,
+                        hazardousLocation_ObstacleOnTheRoad             := '0'B,
+                        hazardousLocation_AnimalOnTheRoad               := '0'B,
+                        slowVehicle                                     := '0'B,
+                        dangerousEndOfQueue                             := '0'B,
+                        vehicleBreakdown                                := '0'B,
+                        stationaryVehicle                               := '0'B
+                    } // End of template mw_sspDENMContainer_vehicle
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) SspDENM mw_sspDENMContainer_roadSideUnit
+                    modifies mw_sspDENMContainer_dummy := {
+                        trafficCondition                                := '0'B,
+                        accident                                        := '0'B,
+                        roadworks                                       := '0'B,
+                        adverseWeatherCondition_Adhesion                := '0'B,
+                        hazardousLocation_SurfaceCondition              := '0'B,
+                        hazardousLocation_ObstacleOnTheRoad             := '0'B,
+                        hazardousLocation_AnimalOnTheRoad               := '0'B,
+                        humanPresenceOnTheRoad                          := '0'B,
+                        wrongWayDriving                                 := '0'B,
+                        rescueAndRecoveryWorkInProgress                 := '0'B,
+                        adverseWeatherCondition_ExtremeWeatherCondition := '0'B,
+                        adverseWeatherCondition_Visibility              := '0'B,
+                        adverseWeatherCondition_Precipitation           := '0'B,
+                        postCrash                                       := '0'B,
+                        humanProblem                                    := '0'B,
+                        stationaryVehicle                               := '0'B,
+                        hazardousLocation_DangerousCurve                := '0'B,
+                        collisionRisk                                   := '0'B,
+                        dangerousSituation                              := '0'B
+                    } // End of template m_sspDENMContainer_roadSideUnit
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) ServiceSpecificPermissions mw_sspDENM_dummy := {
+                        version         := '01'O,
+                        sspContainer    := {
+                            sspDENM := mw_sspDENMContainer_dummy
+                        }
+                    } // End of template mw_sspDENM_dummy
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) ServiceSpecificPermissions mw_sspDENM_vehicle
+                    modifies mw_sspDENM_dummy := {
+                        sspContainer    := {
+                            sspDENM := mw_sspDENMContainer_vehicle
+                        }
+                    } // End of template mw_sspDENM_vehicle
+                    
+                    /**
+                     * @desc 
+                     */
+                    template (present) ServiceSpecificPermissions mw_sspDENM_roadSideUnit
+                    modifies mw_sspDENM_dummy := {
+                        sspContainer    := {
+                            sspDENM := mw_sspDENMContainer_roadSideUnit
+                        }
+                    } // End of template mw_sspDENM_roadSideUnit
+                    
+                } // End of group sspDenmRecv
+                
+            } // End of group sspDenm
+            
+        } // End of group ssp
+        
+    } // End of group certificates
+    
+    /**
+     * @desc Send/receive templates for profiles for certificates
+     * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.4    Profiles for certificate
+     */
+    group profileCertificates {
+        
+        /**
+         * @desc SecuredMesage payload to be signed
+         * @member p_security_profile   The secury profile 
+         * @member p_header_fields      The headers list
+         * @member p_payload_field     The payloads list 
+         * @member p_trailer_field_type The trailer type
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7    Security profiles 
+         */
+        template (value) ToBeSignedSecuredMessage m_toBeSignedSecuredMessage(
+            in template (value) HeaderFields p_header_fields,
+            in template (value) SecPayload p_payload_field,
+            in template (value) TrailerFieldType p_trailer_field_type
+        ) := {
+            protocol_version        := c_protocol_version,
+            header_fields           := p_header_fields,
+            payload_field           := p_payload_field,
+            trailer_fieldsLength    := 67, // 43h = lengthof(trailer_fields) // FIXME To be enhanced due to multiple signature
+            trailerFieldType        := p_trailer_field_type
+        } // End of template m_toBeSignedSecuredMessage
+        
+        // FIXME Replace c_protocol_version by a PIXIT
+        template (value) ToBeSignedSecuredMessage m_toBeSignedSecuredMessage_wrong_protocol(
+            in template (value) HeaderFields p_header_fields,
+            in template (value) SecPayload p_payload_field,
+            in template (value) TrailerFieldType p_trailer_field_type,
+            in template (value) UInt8 p_protocol_version := c_protocol_version,
+            in template (value) UInt8 p_trailer_fieldsLength := 67
+        ) modifies m_toBeSignedSecuredMessage := {
+            protocol_version        := p_protocol_version
+        } // End of template m_toBeSignedSecuredMessage
+        
+        /**
+         * @desc The certificate paylaod to be signed
+         * @member p_certificate    The signed certificate to be verified
+         * @see Draft ETSI TS 103 097 V1.1.14 Clause 7.4    Profiles for certificate
+         */
+        template (value) ToBeSignedCertificate m_toBeSignedCertificate(
+                                                                       in template (value) Certificate p_certificate
+        ) := {
+            version                 := p_certificate.version, 
+            signer_info             := p_certificate.signer_info,
+            subject_info            := p_certificate.subject_info,
+            subject_attributes      := p_certificate.subject_attributes,
+            validity_restrictions   := p_certificate.validity_restrictions
+        } // End of template m_toBeSignedCertificate
+        
+    } // End of group profileCertificates
+    
+    group taPrimitives {
+        
+        /**
+         * @desc Enable security support
+         */
+        template (value) AcEnableSecurity m_enableSecurity(
+                                                           in charstring p_certificateId 
+        ) := {
+            certificateId := p_certificateId
+        } // End of template m_enableSecurity
+        
+        /**
+         * @desc Disable security support
+         */
+        template (value) AcDisableSecurity m_disableSecurity := {
+            disable := true
+        } // End of template m_disableSecurity
+        
+    } // End of group taPrimitives
+    
+    group utPrimitives {
+        
+        template UtInitialize m_secGnInitialize(
+                                                in Oct8 p_hashedId8
+        ) := {
+            hashedId8 := p_hashedId8
+        } // End of template m_secGnInitialize
+        
+    } // End of group utPrimitives
+    
+} // End of module LibItsSecurity_Templates

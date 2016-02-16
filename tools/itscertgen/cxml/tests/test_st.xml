@@ -1,0 +1,28 @@
+<tag1>
+ <tag12/>
+text tag1 1
+ <tag12/>
+text tag1 2
+ <unknown1/>
+ <unknown2>
+text unknown
+  <tag12>
+text tag12
+   <tag23/>
+  </tag12>
+ </unknown2> 
+ <tag13>
+  <all/> <these/> tags <is/> <a text>
+ </tag13>
+</tag1>
+
+<tag2>
+ <root>
+     text root
+  <tag12/>
+ </root>
+ text tag2
+</tag2>
+ 
+
+ 

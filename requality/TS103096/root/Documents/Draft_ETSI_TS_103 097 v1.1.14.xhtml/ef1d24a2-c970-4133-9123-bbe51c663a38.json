@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_ef1d24a2-c970-4133-9123-bbe51c663a38\"><a name=\"ef1d24a2-c970-4133-9123-bbe51c663a38\" id=\"id_ef1d24a2-c970-4133-9123-bbe51c663a38\" class=\"requality_id\"><\/a>In the normal case, the <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Courier New'; font-size: 10pt;\">signer_info field of type <font style=\"font-family: 'Courier New'; font-size: 10pt;\">certificate_digest_with_sha256 shall be included.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "ef1d24a2-c970-4133-9123-bbe51c663a38"
+}

@@ -1,0 +1,114 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/MGT/LibItsMgt_TypesAndValues.ttcn3 $
+ *              $Id: LibItsMgt_TypesAndValues.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Types and constants definitions for ITS station management (ISO 24102-3)
+ */
+module LibItsMgt_TypesAndValues {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues {
+        type UInt8 
+    };
+    
+    // LibIts
+    
+    // LibItsCalm
+    import from CALMllsap language "ASN.1:1997" { 
+        type 
+            I_Param, I_ParamNo, Errors, Link_ID, EUI64 
+    };
+    import from CALMfntp language "ASN.1:1997" { 
+        type 
+            PortNumber 
+    }; 
+    
+    group asn1Constants {
+        
+        group medTypeConstants { // CALMllsap ASN.1 module 
+            
+            const UInt8 c_medType_unknown := 0;
+            const UInt8 c_medType_any := 1;
+            const UInt8 c_medType_iso21212 := 2; // 2G
+            const UInt8 c_medType_iso21213 := 3; // 3G
+            const UInt8 c_medType_iso21214 := 4; // IR
+            const UInt8 c_medType_iso21215 := 5; // M5
+            const UInt8 c_medType_iso21216 := 6; // MM
+            const UInt8 c_medType_iso25112 := 7; // 802.16e
+            const UInt8 c_medType_iso25113 := 8; // HC-SDMA
+            const UInt8 c_medType_iso29283 := 9; // 802.20
+            const UInt8 c_medType_iso17515 := 10; // LTE
+            const UInt8 c_medType_iso15628 := 128; // DSRC
+            const UInt8 c_medType_can := 254; 
+            const UInt8 c_medType_ethernet := 255; 
+            
+        } // End of group medTypeConstants 
+        
+        group cIaClassConstants { // CALMllsap ASN.1 module 
+            
+            const UInt8 c_cIaClass_unknown := 0;
+            const UInt8 c_cIaClass_ciac_1 := 1;
+            const UInt8 c_cIaClass_ciac_2 := 2;
+            const UInt8 c_cIaClass_ciac_3 := 3;
+        } // End of group cIcClassConstants 
+        
+        group cIClassConstants { // CALMllsap ASN.1 module 
+            
+            const UInt8 c_cIClass_unknown := 0;
+            const UInt8 c_cIClass_cic_l1 := 1;
+            const UInt8 c_cIClass_cic_l2 := 2;
+            const UInt8 c_cIClass_cic_l3 := 3;
+            const UInt8 c_cIClass_cic_l4 := 4;
+            const UInt8 c_cIClass_cic_l5 := 5;
+            const UInt8 c_cIClass_cic_il1 := 254;
+            const UInt8 c_cIClass_cic_il2 := 255;
+            
+        } // End of group cIcClassConstants 
+        
+        group dirModeConstants { // CALMllsap ASN.1 module 
+            
+            const UInt8 c_dirMode_fixed := 0;
+            const UInt8 c_dirMode_tracking := 255;
+        
+        } // End of group dirModeConstants 
+        
+    } // End of group asn1Constants 
+    
+    group constants {
+        
+        const PortNumber c_unknown_portLong := {
+            portLong := 32767
+        }
+        
+        /**
+         * @desc    Get the DNI CCID value
+         * @return  The DNI CCID value
+         * @verdict Unchanged
+         * @see ISO 21218 - Annex C.1 EUI-64 format
+         */
+        const EUI64 c_dniCiid := 'FFFFFFFFFFFFFFFF'O; 
+        
+        const Link_ID c_linkId_unknown := {
+            remoteCIID := c_dniCiid,
+            localCIID := c_dniCiid
+        }
+        
+    } // End of group constants 
+    
+    
+    /**
+     * Need to redefine ASN.1 type get-param-no SEQUENCE OF I-ParamNo
+     */
+    type record of I_ParamNo IParamNoList;
+    
+    /**
+     * Need to redefine ASN.1 type set-param SEQUENCE OF I-Param
+     */
+    type record of I_Param IParamList;
+	
+//	type record of Errors IErrorsList;
+        
+}
+with {
+    encode "LibItsMgt_TypesAndValues"
+} // End of module LibItsMgt_TypesAndValues

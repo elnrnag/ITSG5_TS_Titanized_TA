@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "e2e13427-57a9-4bf5-aad5-febc6550bec4",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured DENMs with wrong payloads\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "e2e13427-57a9-4bf5-aad5-febc6550bec4",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/cd97a713-fd01-4456-bab8-84aae963f48b"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "e2e13427-57a9-4bf5-aad5-febc6550bec4",
+            "type": "STRING",
+            "value": "10. Check presence of traieler field"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e2e13427-57a9-4bf5-aad5-febc6550bec4",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "e2e13427-57a9-4bf5-aad5-febc6550bec4"
+}

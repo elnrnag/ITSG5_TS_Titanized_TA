@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "af580e86-24de-4ec3-be41-ed2c5173f8c3",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "af580e86-24de-4ec3-be41-ed2c5173f8c3",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured GN Beacon if the header_fields contain no element of header field type: generation_location"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "af580e86-24de-4ec3-be41-ed2c5173f8c3",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'signer_info'\r\n\t\t\tand containing header_fields[1].type\r\n\t\t\t\tindicating 'generation_time'\r\n\t\t\tand containing header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "af580e86-24de-4ec3-be41-ed2c5173f8c3",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "af580e86-24de-4ec3-be41-ed2c5173f8c3",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "af580e86-24de-4ec3-be41-ed2c5173f8c3"
+}

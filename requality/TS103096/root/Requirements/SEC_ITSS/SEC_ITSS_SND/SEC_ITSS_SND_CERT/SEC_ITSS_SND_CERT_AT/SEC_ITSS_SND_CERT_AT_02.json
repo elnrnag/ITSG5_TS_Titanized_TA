@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "ab23c31e-b442-455f-8874-89544de9a00b",
+            "type": "STRING",
+            "value": "If ITS-S sends an AT certificate check that the signer_info contains only one element of type certificate_digest_with_ecdsa256"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "ab23c31e-b442-455f-8874-89544de9a00b",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a2e3634b-2d0b-4e80-8806-c75803dfa0ac",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/7a039646-e915-41da-b597-f99f5c9a6c2b",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/f19898f9-af2d-47ac-82cf-a71538b2e280"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "ab23c31e-b442-455f-8874-89544de9a00b",
+            "type": "STRING",
+            "value": "02. Check that signer info is a digest"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "ab23c31e-b442-455f-8874-89544de9a00b",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "ab23c31e-b442-455f-8874-89544de9a00b"
+}

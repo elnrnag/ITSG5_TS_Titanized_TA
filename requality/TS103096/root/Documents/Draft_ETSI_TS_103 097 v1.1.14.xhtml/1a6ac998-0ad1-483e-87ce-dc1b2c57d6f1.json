@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\"><a name=\"1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\" id=\"id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\" class=\"requality_id\"><\/a>A <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">Payload<\/span><\/font><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\"> element of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">signed<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">, <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">signed_external<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\"> or <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\">signed_and_encrypted<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1\"> shall be included.<\/span><\/font><\/font><\/font><\/font><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "1a6ac998-0ad1-483e-87ce-dc1b2c57d6f1"
+}

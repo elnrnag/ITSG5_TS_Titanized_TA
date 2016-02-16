@@ -1,0 +1,177 @@
+/**
+ *  @author   ETSI / STF405
+ *  @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/BTP/LibItsBtp_TypesAndValues.ttcn $
+ *            $Id: LibItsBtp_TypesAndValues.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc     Module containing types and values for Basic Transport Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsBtp_TypesAndValues {
+
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from CAM_PDU_Descriptions language "ASN.1:1997" {
+        type CAM
+    };
+    import from DENM_PDU_Descriptions language "ASN.1:1997" {
+        type DENM
+    };
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DSRC language "ASN.1:1997" all;
+    import from REG_D language "ASN.1:1997" all;
+    import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+    
+    group btpPdus {
+     
+        /**
+         * @desc BTP Packet
+         * @see ETSI TS 102 636-5-1 chapter 6
+         * @member header
+         * @member payload
+         */
+        type record BtpPacket {
+            BtpHeader      header,
+            BtpPayload     payload optional
+        } with { variant "" };
+        
+    } // end btpPdus
+    
+    group btpHeaders {
+        
+        /**
+         * @desc BTP Header
+         * @see ETSI TS 102 636-5-1 chapter 7.1
+         * @member btpAHeader
+         * @member btpBHeader
+         */
+        type union BtpHeader {
+            BtpAHeader btpAHeader,
+            BtpBHeader btpBHeader 
+        } with { variant "" };
+
+        /**
+         * @desc BTP-A Header
+         * @see ETSI TS 102 636-5-1 chapter 7.2
+         * @member destinationPort
+         * @member sourcePort
+         */        
+        type record BtpAHeader {
+            BtpPortId destinationPort,
+            BtpPortId sourcePort   
+        } with { variant "" };
+
+        /**
+         * @desc BTP-B Header
+         * @see ETSI TS 102 636-5-1 chapter 7.3
+         * @member destinationPort
+         * @member destinationPortInfo
+         */        
+        type record BtpBHeader {
+            BtpPortId destinationPort,
+            BtpPortInfo destinationPortInfo   
+        } with { variant "" };
+        
+        /**
+         * @desc BTP Port ID
+         * @see ETSI TS 102 636-5-1 chapter 7.3.2
+         */ 
+        type UInt16 BtpPortId with { variant "FIELDLENGTH(16)"
+//          							 variant "BYTEORDER(first)"
+          							 variant "BITORDER(lsb)"
+         };
+
+        /**
+         * @desc BTP-B Port info
+         * @see ETSI TS 102 636-5-1 chapter 7.3.2
+         */ 
+        type UInt16 BtpPortInfo with { variant "FIELDLENGTH(16)" 
+//          							   variant "BYTEORDER(first)"
+          							   variant "BITORDER(lsb)"
+        };
+        
+    } // end btpHeaders
+
+    group btpPayload {
+        
+        type octetstring BtpRawPayload with { variant "" };
+        
+        /**
+         * @desc The payload of the BTP packet
+         * @member decodedPayload The decoded payload
+         * @member rawPayload Raw payload as it is received
+         */
+        type record BtpPayload {
+            DecodedBtpPayload decodedPayload optional,
+            BtpRawPayload rawPayload
+        } //with { variant "" };
+        
+        /**
+         * @desc The decoded payload of the BTP packet
+         * @member camPacket  The CAM packet
+         * @member denmPacket The DENM packet
+         * @member mapPacket  The MAP packet
+         * @member spatPacket The SPAT packet
+         * @member
+         */
+//         type universal charstring DecodedBtpPayload;
+        type union DecodedBtpPayload {
+            CAM      camPacket, 
+            DENM     denmPacket,
+	    MAP_PDU  mapPacket,
+	    SPAT_PDU spatPacket
+        } //with { variant "" };
+        
+    } //end btpPayload
+
+    group utPrimitives {
+        
+        group utCommonPrimitives {
+            
+            /**
+             * @desc    UT primitives for BTP
+             * @member  btpA      -
+             * @member  btpB    -
+             */
+            type union UtBtpTrigger {
+                GenerateBtpA btpA,
+                GenerateBtpB btpB
+            } with { variant "" };
+    
+			type record UtBtpTriggerResult {
+				boolean utBtpTriggerResult
+			} with { variant (utBtpTriggerResult) "FIELDLENGTH(8)" };
+            
+            /**
+             * @desc Upper Tester message to request triggering of an BTPA message at IUT 
+             */
+            type record GenerateBtpA {
+                BtpAHeader btpAHeader
+            } with { variant "" };
+                    
+            /**
+             * @desc Upper Tester message to request triggering of an BTPB message at IUT 
+             */
+            type record GenerateBtpB {
+                BtpBHeader btpBHeader
+            } with { variant "" };
+            
+            /**
+             * @desc Upper Tester message to check event/status on BTP IUT 
+             */    
+            type record UtBtpEventInd {
+                BtpRawPayload rawPayload
+            } with { variant "" };
+            
+            /**
+             * @desc List of Upper Tester messages to check event/status on CAM IUT 
+             */    
+            type record of UtBtpEventInd UtBtpEventIndList with { variant "" };
+        }
+
+	}
+    
+} with { encode "RAW" };

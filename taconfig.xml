@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testadapter>
+  <codec encode="LibItsCam_asn1">
+    <plugin id="org.etsi.its.codec.tool.testingtech.LibItsCam_asn1">
+      <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsCam_asn1.LibItsCam_asn1PERCanonicalUnalignedCodecProvider"/>
+    </plugin>
+  </codec>
+  <codec encode="LibItsDenm_asn1">
+    <plugin id="org.etsi.its.codec.tool.testingtech.LibItsDenm_asn1">
+      <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsDenm_asn1.LibItsDenm_asn1PERCanonicalUnalignedCodecProvider"/>
+    </plugin>
+  </codec>
+  <codec encode="LibItsCdd_asn1">
+    <plugin id="org.etsi.its.codec.tool.testingtech.LibItsCdd_asn1">
+      <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsCdd_asn1.LibItsCdd_asn1PERCanonicalUnalignedCodecProvider"/>
+    </plugin>
+  </codec>
+  <codec encode="LibItsMapSpat_asn1">
+    <plugin id="org.etsi.its.codec.tool.testingtech.LibItsMapSpat_asn1">
+      <parameter id="class" value="org.etsi.its.codec.tool.testingtech.LibItsMapSpat_asn1.LibItsMapSpat_asn1PERCanonicalUnalignedCodecProvider"/>
+    </plugin>
+  </codec>
+  <codec encode="">
+    <plugin id="com.testingtech.ttworkbench">
+      <parameter id="class" value="org.etsi.its.tool.testingtech.Its_CodecProvider"/>
+    </plugin>
+    <parameter id="default" value="true"/>
+  </codec>
+  <extfunc>
+    <plugin id="com.testingtech.ttworkbench">
+      <parameter id="class" value="org.etsi.its.tool.testingtech.ExternalFunctionsPluginProvider"/>
+    </plugin>
+  </extfunc>
+  <port>
+    <plugin id="com.testingtech.ttworkbench">
+      <parameter id="class" value="org.etsi.its.tool.testingtech.PluginAdapter"/>
+    </plugin>
+    <parameter id="taParams">
+      <parameter id="DEBUG_ENABLED">
+        <value>
+          <Values:charstring xmlns:Values="Values.xsd" type="charstring">
+            <Values:value>ALL</Values:value>
+          </Values:charstring>
+        </value>
+      </parameter>
+      <parameter id="camPort" value="BTP/GN/ETH"/>
+      <parameter id="denmPort" value="BTP/GN/ETH"/>
+      <parameter id="mapSpatPort" value="BTP/GN/ETH"/>
+      <parameter id="btpPort" value="GN/ETH"/>
+      <parameter id="geoNetworkingPort" value="ETH"/>
+      <parameter id="ipv6OverGeoNetworkingPort" value="Debug"/>
+      <parameter id="UpperTesterSettings" value="127.0.0.1:12345"/>
+      <parameter id="LocalEthernetMAC" value="D4BED91269BD"/>
+      <parameter id="IutEthernetTypeValue" value="0x8947"/>
+      <parameter id="TsBeaconInterval" value="1000"/>
+      <parameter id="TsLatitude" value="43616929"/>
+      <parameter id="TsLongitude" value="7052907"/>
+      <parameter id="LinkLayer_MTC" value="BABEBABE0000"/>
+      <parameter id="LinkLayer_NodeA" value="BABEBABE0001"/>
+      <parameter id="LinkLayer_NodeB" value="BABEBABE0002"/>
+      <parameter id="LinkLayer_NodeC" value="BABEBABE0003"/>
+      <parameter id="LinkLayer_NodeD" value="BABEBABE0004"/>
+      <parameter id="LinkLayer_NodeE" value="BABEBABE0005"/>
+      <parameter id="LinkLayer_NodeF" value="BABEBABE0006"/>
+      <parameter id="Gn6RemoteAdapterIp" value="10.7.6.80"/>
+      <parameter id="Gn6RemoteAdapterPort" value="42000"/>
+      <parameter id="UtSecuredMode" value="false"/>
+      <parameter id="TsSecuredMode" value="true"/>
+      <parameter id="TsSecuredRootPath" value="data/certificates"/>
+      <parameter id="TsSecuredConfiId">
+        <value>
+          <Values:charstring xmlns:Values="Values.xsd" type="charstring">
+            <Values:value>ts</Values:value>
+          </Values:charstring>
+        </value>
+      </parameter>
+    </parameter>
+    <parameter id="default" value="true"/>
+  </port>
+</testadapter>

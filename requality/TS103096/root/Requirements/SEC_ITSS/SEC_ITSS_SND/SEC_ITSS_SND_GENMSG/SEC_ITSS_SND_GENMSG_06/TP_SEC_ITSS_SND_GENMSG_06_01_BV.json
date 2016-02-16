@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "6505ab12-d08a-4e23-b0f5-d72e549352cf",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "6505ab12-d08a-4e23-b0f5-d72e549352cf",
+            "type": "STRING",
+            "value": "Check that the secured message contains the Payload element of type signed, signed_external or signed_and_encrypted"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "6505ab12-d08a-4e23-b0f5-d72e549352cf",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a Beacon\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand containing payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed' or 'signed_external' or 'signed_and_encrypted'\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "6505ab12-d08a-4e23-b0f5-d72e549352cf",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "6505ab12-d08a-4e23-b0f5-d72e549352cf",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "6505ab12-d08a-4e23-b0f5-d72e549352cf"
+}

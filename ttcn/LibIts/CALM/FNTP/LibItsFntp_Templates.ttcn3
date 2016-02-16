@@ -1,0 +1,1204 @@
+/**
+ *  @author     ETSI / STF455
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FNTP/LibItsFntp_Templates.ttcn3 $
+ *              $Id: LibItsFntp_Templates.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Templates definitions for FAST networking & transport layer protocol (ISO 29281-1)
+ */
+module LibItsFntp_Templates {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues {
+        type 
+            UInt8, UInt16;
+    };
+    import from LibCommon_DataStrings { 
+        type Oct1 
+    };
+    
+    // LibIts 
+
+    // LibItsCalm 
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+            IN_SAPaddress, EUI64, LLserviceAddr, Link_ID, INdata, AccessParameters, 
+            INsapPrimitivesDown, INsapPrimitivesUp, 
+            IN_UNITDATA_request, IN_UNITDATA_indication
+    };
+    import from CALMmsap language "ASN.1:1997" { 
+        type 
+            CommandRef, ErrStatus, 
+            MN_Command_confirm, 
+            MN_Request_request, 
+            SimNUTcmd, SimNLTcmd 
+    }; 
+    import from CALMmanagement language "ASN.1:1997" { 
+        type 
+            StationID, ITS_scuId 
+    }; 
+    import from CALMiitsscu language "ASN.1:1997" { 
+        type 
+            McmdRs, TestConfigIICP, 
+            PduCounter 
+    }; 
+    import from CITSapplReq language "ASN.1:1997" { 
+        type ServiceRef 
+    }; 
+    import from CALMfntp language "ASN.1:1997" all; 
+    import from LibItsCalm_Pixits { 
+        modulepar 
+            PX_LOC_ITS_FNTP_ACCESS_SETTINGS_MX_SAP_SET, PX_LOC_ITS_FNTP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+            PX_IUT_LOWER_LAYER_USED, PX_IUT_LOWER_LAYER_UNUSED, 
+            PX_IUT_TEST_MODE_ON 
+    }; 
+    import from LibItsFntp_TypesAndValues { 
+        group fntpPortsValues; 
+        type 
+            UtFntpEvent, UtFntpEventInd, 
+            CfFntpEventInd 
+    };
+    import from LibItsFntp_Pixits all;
+    import from LibItsMgt_Functions { 
+        function 
+            f_getNextCommandRef, 
+            f_getIutDestItsScuId, f_getIutOtherItsScuId, 
+            f_getNextPduCounter 
+    }; 
+    import from LibItsCalm_Interface {
+        type 
+            FntpReq, FntpInd, 
+            UtInitialize, CfInitialize 
+    }; 
+    
+	/**
+	 * @desc constants definitions
+	 */
+    group csapCstes { 
+        
+        /**
+         * @desc CSAP value
+         * @see ISO 21218 - Table 5 — Addresses for the Link Service Access Point (IN-SAP)
+         */
+        const IN_SAPaddress c_fntpInSapAddress := 186; //oct2int('BA'O);
+        
+    } // group csapCstes 
+    
+	/**
+	 * @desc ASN.1 error status definitions
+	 */
+    group errorStatusCstes { 
+        
+		/**
+		 * @desc Success code
+		 */
+        const FNTPerrorStatus c_errStatus_success := 0; 
+        
+		/**
+		 * @desc Unexpected failure code
+		 */
+        const FNTPerrorStatus c_errStatus_unspecFailure := 1; 
+        
+    } // group errorStatusCstes 
+    
+	/**
+	 * @descFNTP templates definitions
+	 */
+    group fntpPrimitives {
+        
+        /**
+         * @desc    Send template for IN-SAP Message (FntpPort Primitive)
+         * @param   p_inSapPrimitivesUp IN-SAP message to be sent to the IUT
+         */
+        template (value) FntpReq m_fntpReq(
+            template (value) INsapPrimitivesUp p_inSapPrimitivesUp
+        ) := {
+            msgOut := p_inSapPrimitivesUp
+        }
+        
+        /**
+         * @desc    Receive template for IN-SAP message (FntpPort Primitive)
+         * @param   p_inSapPrimitivesDown Expected IN-SAP message generqted by the IUT
+         */
+        template FntpInd mw_fntpInd(
+            template (present) INsapPrimitivesDown p_inSapPrimitivesDown
+        ) := {
+            msgIn := p_inSapPrimitivesDown,
+            receptionTime := ?
+        }
+        
+        /**
+         * @desc    Primitive on IN-SAP interface
+         * @see     ISO 21218 - Clause 8.3
+         * @see     ISO 29281-2 - Clause 7.1.2
+         */
+        group inSapPrimitives {
+            
+            group sendOperation {
+                
+                /**
+                 * @desc Generate a FNTP NPDU through IN-SAP
+                 * @param p_insapSourceAddress    Source linkId
+                 * @param p_insapDestAddress      Destination linkId
+                 * @param p_inData                The FNTP NPDU in octetstring format
+                 * @see   ISO 21218 - Clause 8.3.3
+                 */
+                template (value) IN_UNITDATA_indication m_inUnitDataInd( 
+                    in template (value) LLserviceAddr p_insapSourceAddress, 
+                    in template (value) LLserviceAddr p_insapDestAddress, 
+                    in template (value) INdata p_inData 
+                ) := { 
+                    source_addr    := p_insapSourceAddress,
+                    dest_addr := p_insapDestAddress,
+                    data := p_inData,
+                    priority := 0,
+                    accessParams := { 
+                        apRef := 0,
+                        aParameter := { NullType:= NULL } 
+                    } 
+                } // End of template m_inUnitDataInd
+                
+                /**
+                 * @desc    Send template for IN-SAP source and destination address
+                 * @param   p_linkId    Link identifier of the CI
+                 * @see     ISO 21218 - Clause 8.2.2
+                 */
+                template (value) LLserviceAddr m_llServiceAddr(
+                    in template (value) Link_ID p_linkId
+                ) := {
+                    csap := c_fntpInSapAddress,
+                    linkID := p_linkId
+                } //  // End of template m_llServiceAddr
+                
+                /**
+                 * @desc    Send template for link-ID
+                 * @param   p_remoteLinkId  Remote link ID
+                 * @param   p_localLinkId   Local link ID
+                 * @see     ISO 21218 - Clause 8.2.2
+                 */
+                template (value) Link_ID m_linkId(
+                    in template (value) EUI64 p_remoteLinkId,
+                    in template (value) EUI64 p_localLinkId
+                ) := {
+                    remoteCIID := p_remoteLinkId,
+                    localCIID := p_localLinkId
+                } // End of template m_linkID
+                
+            } // End of group sendOperation
+            
+            group recvOperation {
+                
+                /**
+                 * @desc    Receive template for a SAP primitive message on IN-SAP interface
+                 * @param   p_inUnitdataRq  The IN-DATA.request SAP primitive message
+                 * @see     ISO 21218 - Clause 8.3.1
+                 * @see     ISO 29281-2 - Clause 7.1.2
+                 */
+                template INsapPrimitivesDown mw_fntpInSapPrimitiveReq(
+                    in template (present) IN_UNITDATA_request p_inUnitdataRq
+                ) := {
+                    spRef := 0, 
+                    servPrimitive := { IN_UNITDATA_request := p_inUnitdataRq } 
+                } // End of template m_fntpImPrimitiveReq
+                
+                /**
+                 * @desc  Generic receive template for IN-UNITDATA.request SAP primitive
+                 * @see   ISO 21218 - Clause 8.2.2
+                 */
+                template IN_UNITDATA_request mw_inUnitDataReq_any := { 
+                    source_addr := { 
+                        csap := c_fntpInSapAddress, 
+                        linkID := ? 
+                    }, 
+                    dest_addr := { 
+                        csap := c_fntpInSapAddress, 
+                        linkID := ? 
+                    }, 
+                    data := ?, 
+                    priority := PX_USER_PRIORITY, 
+                    accessParams := { 
+                        apRef := ?, 
+                        aParameter := ?
+                    }
+                } // End of template mw_inUnitDataReq_any
+                
+                /**
+                 * @desc    Receive template for IN-UNITDATA.request SAP primitive
+                 * @param   p_sourceLinkId   Source linkId
+                 * @param   p_destLinkId     Destination linkId
+                 * @see     ISO 21218 - Clause 8.2.2
+                 */
+                template IN_UNITDATA_request mdw_inUnitDataReq( 
+                    in template (present) Link_ID p_sourceLinkId, 
+                    in template (present) Link_ID p_destLinkId 
+                ) modifies mw_inUnitDataReq_any := { 
+                    source_addr := { 
+                        csap := c_fntpInSapAddress, 
+                        linkID := p_sourceLinkId 
+                    }, 
+                    dest_addr := { 
+                        csap := c_fntpInSapAddress, 
+                        linkID := p_destLinkId 
+                    }
+                } // End of template mdw_inUnitDataReq
+                
+                /**
+                 * @desc    Receive template for IN-UNITDATA.request SAP primitive
+                 * @param   p_sourceLinkId Source linkId
+                 * @param   p_destLinkId   Destination linkId
+                 * @param   p_accessParams Access parameters
+                 * @see     ISO 21218 - Clause 8.2.2
+                 */
+                template IN_UNITDATA_request mdw_inUnitDataReqCip( 
+                    in template (present) Link_ID p_sourceLinkId, 
+                    in template (present) Link_ID p_destLinkId, 
+                    in template (present) AccessParameters p_accessParams 
+                ) modifies mdw_inUnitDataReq := { 
+                    accessParams := p_accessParams 
+                } // End of template mdw_inUnitDataReqCip
+                
+                /**
+                 * @desc    Receive template for link-ID
+                 * @param   p_remoteLinkId  Remote link Id
+                 * @param   p_localLinkId   Source link Id
+                 * @see     ISO 21218 - Clause 8.2.2
+                 */
+                template Link_ID mw_linkId(
+                    in template (present) EUI64 p_remoteLinkId,
+                    in template (present) EUI64 p_localLinkId
+                ) := {
+                    remoteCIID := p_remoteLinkId,
+                    localCIID := p_localLinkId
+                } // End of template mw_linkID
+                
+                /**
+                 * @desc    Receive template for IN-SAP source and destination address
+                 * @param   p_linkId     Link identifier of the CI
+                 * @see     ISO 21218 - Clause 8.2.2
+                 */
+                template LLserviceAddr mw_llServiceAddr(
+                    in template (present) Link_ID p_linkId
+                ) := {
+                    csap := c_fntpInSapAddress,
+                    linkID := p_linkId
+                } // End of template mw_llServiceAddr
+                
+            } // End of group recvOperation
+            
+        } // End of group inSapPrimitives
+        
+        /**
+         * @desc Fntp NPUD templates
+         */
+        group fntpBasicNpdu {
+            
+            /**
+             * @desc    Send template for basic NPDU for UC/BC transmission- N/single hop
+             * For basic FNTPNPDU, S-Hop is required (see ISO 29281-1 Clause 5.1.2 Basic mode of operation)
+             * @param   p_sourcePort        Source port
+             * @param   p_destinationPort   Destination port
+             */
+            template FNTPNPDU m_fntpBasicNpdu( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort 
+            ) := { 
+                header := { 
+                    sourcePort := p_sourcePort, 
+                    destinationPort := p_destinationPort, 
+                    options := { 
+                        intForw := omit, 
+                        sec := omit, 
+                        hops := omit, // It means single-hop
+                        lpp := omit, 
+                        cip := omit, 
+                        opt5 := omit, 
+                        opt6 := omit, 
+                        opt7 := omit 
+                    } // End of 'options' field
+                }, // End of 'header' field
+                body := PX_ITS_FPDU 
+            } // End of template m_fntpBasicNpdu
+            
+            /**
+             * @desc    Send template for basic NPDU for UC/BC transmission- N/single hop
+             * @param   p_sourcePort        Source port
+             * @param   p_destinationPort   Destination port
+             * @param   p_hops              N-hops value
+             */
+            template FNTPNPDU m_fntpExtendedNpdu( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (omit) FNTPhopCount p_hops 
+            ) := { 
+                header := { 
+                    sourcePort := p_sourcePort, 
+                    destinationPort := p_destinationPort, 
+                    options := { 
+                        intForw := omit, 
+                        sec := omit, 
+                        hops := p_hops, 
+                        lpp := omit, 
+                        cip := omit, 
+                        opt5 := omit, 
+                        opt6 := omit, 
+                        opt7 := omit 
+                    } // End of 'options' field
+                }, // End of 'header' field
+                body := PX_ITS_FPDU 
+            } // End of template m_fntpExtendedNpdu
+            
+            /**
+             * @desc Generic receive template for FNTP basic NPDU
+             * Used for:
+             * <li>modifying restrictif template</li>
+             * <li>default altstep</li>
+             */
+            template FNTPNPDU mw_fntpBasicNpdu_any := {
+                header := {
+                    sourcePort := { portLong := complement((c_portReservedLow .. c_portReservedHigh)) }, // See ISO 29281-2 Table 1: FNTP endpoints identified by port numbers
+                    destinationPort := ?, 
+                    options := mw_noFntpOptions 
+                }, // End of 'header' field
+                body := ? 
+            } // End of template mw_fntpBasicNpdu_any
+            
+            /**
+             * @desc    Receive template for FNTP basic NPDU, specifying port values
+             * For basic FNTPNPDU, S-Hop is required (see ISO 29281-1 Clause 5.1.2 Basic mode of operation)
+             * @param   p_sourcePort        Source port number
+             * @param   p_destinationPort   Destination (or remote) port number
+             */
+            template (present) FNTPNPDU mdw_fntpBasicNpdu( 
+                in template (present) PortNumber p_sourcePort, 
+                in template (present) PortNumber p_destinationPort 
+            ) modifies mw_fntpBasicNpdu_any := { 
+                header := { 
+                    sourcePort := p_sourcePort, 
+                    destinationPort := p_destinationPort, 
+                    options := { 
+                        hops := 0 ifpresent 
+                    } // End of 'options' field 
+                }, // End of 'header' field
+                body := PX_ITS_FPDU
+            } // End of template mw_basicNpdu
+            
+        } // End of group fntpBasicNpdu
+        
+        group fntpExtendedNpdu {
+            
+            /**
+             * @desc    Send template for FNTP extended NPDU with an invalid control fields (lpp is set)
+             * @param   p_sourcePort        Broadcast source port
+             * @param   p_destinationPort   Broadcast destination port
+             * @param   p_hops              N-hops value
+             * @see     ISO 29281-2 - Table 3 — FNTP control field (implemented as OPTION selector in ASN.1)
+             */
+            template FNTPNPDU md_fntpExtendedNpdu_invalidCtrlField( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (omit) FNTPhopCount p_hops /* TODO this seems to be wrong */
+            ) modifies m_fntpBasicNpdu := { 
+                header := { 
+                    options := { 
+                        lpp := 'FFFFFFFF'O /* this is not an invalid control field */
+                    } 
+                } // End of 'header' field
+            } // End of template md_fntpExtendedNpdu_invalidCtrlField
+            
+            /**
+             * @desc    Send template for FNTP extended NPDU with an invalid control fields (lpp is set)
+             * @param   p_sourcePort        Broadcast source port
+             * @param   p_destinationPort   Broadcast destination port
+             * @param   p_hops              N-hops value
+             * @see     ISO 29281-2 - Table 3 — FNTP control field (implemented as OPTION selector in ASN.1)
+             */
+            template FNTPNPDU md_fntpExtendedNpdu_invalidBitSet( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (omit) FNTPhopCount p_hops 
+            ) modifies m_fntpBasicNpdu := { 
+                header := { 
+                    options := { 
+                        opt5 := NULL 
+                    } // End of 'options' field
+                } // End of 'header' field
+            } // End of template md_fntpExtendedNpdu_invalidBitSet
+            
+            /**
+             * @desc    Send template for FNTP extended NPDU with an invalid control fields (lpp is set)
+             * @param   p_sourcePort        Broadcast source port
+             * @param   p_destinationPort   Broadcast destination port
+             * @param   p_hops              N-hops value
+             * @param   p_rxCIP             Receive (RX) parameter settings
+             * @param   p_txCIP             Transmit (TX) parameters of a VCI
+             */
+            template FNTPNPDU md_fntpExtendedNpdu_cip( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (omit) FNTPhopCount p_hops, // Should be omitted
+                in template (value) RXcip p_rxCip, 
+                in template (value) TXcip p_txCip 
+            ) modifies m_fntpBasicNpdu := { 
+                header := { 
+                    options := { 
+                        hops := p_hops, 
+                        cip := {
+                            rxCIP := p_rxCip, 
+                            txCIP := p_txCip
+                        } // End of 'cip' field
+                    } // End of'options' field 
+                } // End of 'header' field
+            } // End of template md_fntpExtendedNpdu_cip
+            
+            /**
+             * @desc    Send template for FNTP extended NPDU for BC transmission-single/N-hops
+             * @param   p_sourcePort        Broadcast source port
+             * @param   p_destinationPort   Broadcast destination port
+             */
+            template (present) FNTPNPDU mdw_fntpExtendedNpdu(
+                in template (present) PortNumber p_sourcePort,
+                in template (present) PortNumber p_destinationPort
+            ) modifies mdw_fntpBasicNpdu := {
+                header := { 
+                    options := mdw_nHopNfFntpOptions(PX_NHOPS)
+                } // End of field 'header'
+            } // End of template mdw_fntpExtendedNPDU
+            
+            /**
+             * @desc    Send template for FNTP extended NPDU for BC transmission-single/N-hops
+             * @param   p_sourcePort        Broadcast source port
+             * @param   p_destinationPort   Broadcast destination port
+             */
+            template (present) FNTPNPDU mdw_fntpExtendedNpdu_portNumber(
+                in template (present) PortNumber p_sourcePort,
+                in template (present) PortNumber p_destinationPort, 
+                in template (omit) FNTPhopCount p_hops 
+            ) modifies mdw_fntpBasicNpdu := {
+                header := { 
+                    options := mdw_nHopNfFntpOptions(p_hops)
+                } // End of field 'header'
+            } // End of template mdw_fntpExtendedNpdu_portNumber
+            
+            /**
+             * @desc    Send template for FNTP extended NPDU for BC transmission-single/N-hops with CIP
+             * @param   p_rxCIP             Receive (RX) parameter settings
+             * @param   p_txCIP             Transmit (TX) parameters of a VCI
+             */
+            template (present) FNTPNPDU mw_fntpExtendedNpduCip( 
+                in template (present) RXcip p_rxCip, 
+                in template (present) TXcip p_txCip 
+            ) := {
+                header := { 
+                    sourcePort := { portLong := complement((c_portReservedLow .. c_portReservedHigh)) }, // See ISO 29281-2 Table 1: FNTP endpoints identified by port numbers
+                    destinationPort := ?, 
+                    options := mdw_nHopNfFntpOptions_cip(
+                        PX_NHOPS, 
+                        p_rxCip, 
+                        p_txCip 
+                    )
+                }, // End of field 'header'
+                body := ? 
+            } // End of template mdw_fntpExtendedNPDU
+            
+        } // End of group fntpExtendedNpdu
+        
+        group fntpForwardingNpdu {
+            
+            /**
+             * @desc    Send template for FNTP forwarding NPDU
+             * @param   p_sourcePort        Source port (c_portRtr or c_portHst)
+             * @param   p_destinationPort   Destination port (c_portRtr or c_portHst)
+             * @param   p_hops              N-hops value
+             * @param   p_fromPort          Forwarding source port
+             * @param   p_toPort            Forwarding destination port
+             * @param   p_counter           Expected value of FNTP packet counter counter field
+             */
+            template (value) FNTPNPDU md_fntpForwardingNpdu( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (value) FNTPhopCount p_hops, 
+                in template (value) PortNumber p_fromPort, 
+                in template (value) PortNumber p_toPort, 
+                in template (value) FNTPpacketCounter p_counter 
+            ) modifies m_fntpBasicNpdu := { 
+                header := { 
+                    options := { 
+                        intForw := { 
+                            hostITS_scuId := PX_HOST_SCU_ID,
+                            link := PX_WL_LINK_ID_UC,
+                            counter := p_counter, 
+                            sourcePort := p_fromPort, 
+                            destinationPort := p_toPort 
+                        } // End of field 'intForw' 
+                    } // End of field 'options' 
+                }  // End of field 'header' 
+            } // End of template md_fntpForwardingNpdu
+            
+            /**
+             * @desc    Send template for FNTP forwarding NPDU with an unknown ITS-SCU-ID
+             * @param   p_sourcePort        Source port (c_portRtr or c_portHst)
+             * @param   p_destinationPort   Destination port (c_portRtr or c_portHst)
+             * @param   p_hops              N-hops value
+             * @param   p_fromPort          Forwarding source port
+             * @param   p_toPort            Forwarding destination port
+             * @param   p_counter           Expected value of FNTP packet counter counter field
+             */
+            template (value) FNTPNPDU md_fntpForwardingNpdu_unknownItsScuId( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (value) FNTPhopCount p_hops, 
+                in template (value) PortNumber p_fromPort, 
+                in template (value) PortNumber p_toPort, 
+                in template (value) FNTPpacketCounter p_counter 
+            ) modifies md_fntpForwardingNpdu := { 
+                header := { 
+                    options := { 
+                        intForw := { 
+                            hostITS_scuId := PX_UNKNOWN_HOST_SCU_ID,
+                            link := PX_WL_LINK_ID_UC,
+                            counter := p_counter, 
+                            sourcePort := p_fromPort, 
+                            destinationPort := p_toPort 
+                        } // End of field 'intForw' 
+                    } // End of field 'options' 
+                }  // End of field 'header' 
+            } // End of template md_fntpForwardingNpdu_UnknownITtsScuId
+            
+            /**
+             * @desc    Send template for FNTP forwarding NPDU with CIPs
+             * @param   p_sourcePort        Source port (c_portRtr or c_portHst)
+             * @param   p_destinationPort   Destination port (c_portRtr or c_portHst)
+             * @param   p_hops              N-hops value
+             * @param   p_fromPort          Forwarding source port
+             * @param   p_toPort            Forwarding destination port
+             * @param   p_counter           Expected value of FNTP packet counter counter field
+             * @param   p_rxCIP             Receive (RX) parameter settings
+             * @param   p_txCIP             Transmit (TX) parameters of a VCI
+             */
+            template (value) FNTPNPDU md_fntpForwardingNpdu_cip( 
+                in template (value) PortNumber p_sourcePort, 
+                in template (value) PortNumber p_destinationPort, 
+                in template (value) FNTPhopCount p_hops, 
+                in template (value) PortNumber p_fromPort, 
+                in template (value) PortNumber p_toPort, 
+                in template (value) FNTPpacketCounter p_counter, 
+                in template (value) RXcip p_rxCip, 
+                in template (value) TXcip p_txCip 
+            ) modifies md_fntpForwardingNpdu := { 
+                header := { 
+                    options := { 
+                        intForw := { 
+                            hostITS_scuId := PX_HOST_SCU_ID,
+                            link := PX_WL_LINK_ID_UC,
+                            counter := p_counter, 
+                            sourcePort := p_fromPort, 
+                            destinationPort := p_toPort 
+                        }, // End of field 'intForw' 
+                        cip := { 
+                            rxCIP := p_rxCip, 
+                            txCIP := p_txCip 
+                        } // End of field 'cip'
+                    } // End of field 'options' 
+                }  // End of field 'header' 
+            } // End of template md_fntpForwardingNpdu_cip
+            
+            /**
+             * @desc Generic receive template for FNTP forwarding NPDU
+             */
+            template (present) FNTPNPDU mw_fntpForwardingNpdu_any := { 
+                header := { 
+                    sourcePort := ?, 
+                    destinationPort := ?, 
+                    options := { 
+                        intForw := { 
+                            hostITS_scuId := ?, 
+                            link := { 
+                                remoteCIID := ?, 
+                                localCIID := ? 
+                            }, 
+                            counter := ?, 
+                            sourcePort := ?, 
+                            destinationPort := ? 
+                        }, 
+                        sec := omit, 
+                        hops := ?,
+                        lpp := omit, 
+                        cip := omit, 
+                        opt5 := omit, 
+                        opt6 := omit, 
+                        opt7 := omit 
+                    } 
+                }, 
+                body := ? 
+            } // End of template mw_fntpForwardingNpdu_any
+            
+            /**
+             * @desc    Receive template for FNTP forwarding NPDU
+             * @param   p_sourcePort        Source port
+             * @param   p_destinationPort   Destination port
+             * @param   p_fromPort          Forwarding source port
+             * @param   p_toPort            Forwarding destination port
+             * @param   p_hops              N-hops value
+             * @param   p_counter           Expected value of FNTP packet counter counter field
+             */
+            template (present) FNTPNPDU mdw_fntpForwardingNpdu( 
+                in template (present) UInt16 p_sourcePort,      // FIXME Change it into PortNumber 
+                in template (present) UInt16 p_destinationPort, // FIXME Change it into PortNumber  
+                in template (present) PortNumber p_fromPort, 
+                in template (present) PortNumber p_toPort,
+                in template (present) FNTPpacketCounter p_counter, 
+                in template (present) FNTPhopCount p_hops 
+            ) modifies mw_fntpForwardingNpdu_any := { 
+                header := { 
+                    sourcePort := { portLong := p_sourcePort }, 
+                    destinationPort := { portLong := p_destinationPort }, 
+                    options := { 
+                        intForw := { 
+                            counter := p_counter, 
+                            sourcePort := p_fromPort, 
+                            destinationPort := p_toPort 
+                        }, // End of field 'intForw' 
+                        hops := p_hops 
+                    } // End of field 'options' 
+                },  // End of field 'header' 
+                body := PX_ITS_FPDU 
+            } // End of template mdw_fntpForwardingNpdu
+            
+            /**
+             * @desc    Receive template for FNTP forwarding NPDU with CIP
+             * @param   p_sourcePort        Source port
+             * @param   p_destinationPort   Destination port
+             * @param   p_fromPort          Forwarding source port
+             * @param   p_toPort            Forwarding destination port
+             * @param   p_hops              N-hops value
+             * @param   p_counter           Expected value of FNTP packet counter counter field
+             * @param   p_rxCIP             Receive (RX) parameter settings
+             * @param   p_txCIP             Transmit (TX) parameters of a VCI
+             */
+            template (present) FNTPNPDU mdw_fntpForwardingNpduCip( 
+                in template (present) UInt16 p_sourcePort, 
+                in template (present) UInt16 p_destinationPort, 
+                in template (present) PortNumber p_fromPort, 
+                in template (present) PortNumber p_toPort,
+                in template (present) FNTPpacketCounter p_counter, 
+                in template (present) FNTPhopCount p_hops, 
+                in template (present) RXcip p_rxCip, 
+                in template (present) TXcip p_txCip 
+            ) modifies mdw_fntpForwardingNpdu := { 
+                header := { 
+                    sourcePort := { portLong := c_portRtr }, 
+                    destinationPort := { portLong := c_portHst }, 
+                    options := { 
+                        intForw := { 
+                            counter := p_counter, 
+                            sourcePort := p_fromPort, 
+                            destinationPort := p_toPort 
+                        }, // End of field 'intForw' 
+                        hops := p_hops, 
+                        cip := {
+                            rxCIP := p_rxCip, 
+                            txCIP := p_txCip
+                        } // End of field 'cip'
+                    } // End of field 'options' 
+                } // End of field 'header' 
+            } // End of template mdw_fntpForwardingNpduCip
+            
+        } // End of group fntpForwardingNpdu
+        
+        group fntpManagement { 
+            
+            /**
+             * @desc    Generic receive template for UpdateNotFNTP
+             */
+            template UpdateNotFNTP mw_updateNotFNTP_any := { 
+                fill := '0'B, 
+                reference := ?, 
+                remotePort := *, 
+                linkID := *, 
+                ciStatus := *, 
+                linkPort := *, 
+                serviceInfo := *, 
+                priority := *, 
+                timeout_ := * 
+            } // End of template mw_updateNotFNTP_any 
+            
+            /**
+             * @desc    Receive template for UpdateNotFNTP
+             * @param p_remotePort   Remote port value
+             */
+            template (present) UpdateNotFNTP mdw_updateNotFNTP_port( 
+                in template (present) PortNumber p_remotePort 
+            ) modifies mw_updateNotFNTP_any := { 
+                remotePort := p_remotePort 
+            } // End of template mdw_updateNotFNTP_port 
+            
+        } // End of group fntpManagement 
+        
+        /**
+         * @desc template used to trigger message on Lower Tester
+         */
+        group taPrimitives {
+            
+            /**
+             * @desc   Generate a FNTP NPDU through IN-SAP
+             * @param p_insapSourceAddress   Source linkId
+             * @param p_insapDestAddress     Destination linkId
+             * @param p_inData            The FNTP NPDU in octetstring format
+             * @see   ISO 21218 - Clause 8.3.3
+             */
+            template (value) INsapPrimitivesUp m_generateFntpNpdu(
+                in template (value) LLserviceAddr p_insapSourceAddress, 
+                in template (value) LLserviceAddr p_insapDestAddress, 
+                in template (value) INdata p_inData 
+            ) := { 
+                spRef := 0, 
+                servPrimitive := {
+                    IN_UNITDATA_indication :=  
+                        m_inUnitDataInd( 
+                            p_insapSourceAddress, 
+                            p_insapDestAddress, 
+                            p_inData 
+                        ) 
+                }
+            } // End of template m_generateFntpNpdu1
+            
+            /**
+             * @desc   Generate a FNTP NPDU through IN-SAP
+             * @param p_insapSourceAddress       Source linkId
+             * @param p_insapDestAddress         Destination linkId
+             * @param p_inData                    The FNTP NPDU in octetstring format
+             * @param p_accessParams            access_parameters parameter
+             * @see   ISO 21218 - Clause 8.3.3 & Clause 8.5 
+             * @see   ISO 29281-2 - Clause 7.10.1
+             */
+            template (value) INsapPrimitivesUp md_generateFntpNpduCip( 
+                in template (value) LLserviceAddr p_insapSourceAddress, 
+                in template (value) LLserviceAddr p_insapDestAddress, 
+                in template (value) INdata p_inData, 
+                in template (present) AccessParameters p_accessParams 
+            ) modifies m_generateFntpNpdu := { 
+                servPrimitive := { 
+                    IN_UNITDATA_indication := { 
+                        accessParams := p_accessParams 
+                    } // End of field 'inUnitdataInd'
+                }  // End of field 'servPrimitive'
+            } // End of template m_generateFntpNpduCip
+            
+        } // End of group taPrimitives 
+        
+        /**
+         * @desc Templates used to 
+         * <li>trigger message on Upper Tester</li>
+         * <li>capture indication message sent by the IUT</li>
+         */
+        group utPrimitives {
+        
+            /**
+             * @desc Initializes the FNTP IUT including support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) UtInitialize m_utFntpInitialize_with_management := { 
+                utFntpInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_FNTP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_UNUSED, // PX_IUT_LOWER_LAYER_USED
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utFntpInitialize' 
+            } // End of template m_utFntpInitialize_with_management 
+            
+            /**
+             * @desc Initializes the FNTP IUT without support notification to the Management entity
+             * See Test System Configuration Access to SUT
+             */
+            template (value) UtInitialize m_utFntpInitialize_without_management := { 
+                utFntpInitialize := { 
+                    mcmdRq := { 
+                        mCmdRef := 255, 
+                        mcmd := { 
+                            TestConfigIICP := { 
+                                location := PX_LOC_ITS_FNTP_ACCESS_SETTINGS_MX_SAP_UNSET, 
+                                lowerLayers := PX_IUT_LOWER_LAYER_UNUSED, // PX_IUT_LOWER_LAYER_USED
+                                testMode := PX_IUT_TEST_MODE_ON 
+                            } 
+                        } // End of field 'mcmd' 
+                    } // End of field 'mcmdRq'
+                } // End of field 'utFntpInitialize' 
+            } // End of template m_utFntpInitialize_without_management 
+            
+            /**
+             * @desc    Receive template to generate a NFsapPrimitivesUp message
+             * @param   p_nfSapPrimitivesUp The NFsapPrimitivesUp message
+             */
+            template (present) UtFntpEventInd mw_utFntpEventInd( 
+                in template (present) NFsapPrimitivesUp p_nfSapPrimitivesUp 
+            ) := { 
+                nfSapPrimitivesUp := p_nfSapPrimitivesUp 
+            } // End of template mw_utFntpEventInd 
+            
+            group fntpNfPort {
+                
+                /**
+                 * @desc  Send template to request creation or modification of a socket for an endpoint
+                 * @param p_serviceRef    Number uniquely identifying the endpoint at this host in an implementation specific way
+                 * @param p_portNumber    Contains either the value PORT_NON in order to indicate dynamic assignment of a port number by the port number manager, or a valid value of a well-known static port PORT_REG
+                 * @see ISO 29281-2 Clause 8.2.1
+                 */
+                template (value) UtFntpEvent m_generateNfFntpPortCreationRequest(
+                    in template (value) ServiceRef p_serviceRef,
+                    in template (value) PortNumber p_portNumber
+                ) := {
+                    nfSapPrimitivesDown := { 
+                        spRef := 0, 
+                        servPrimitive := { 
+                            NFfntpPortRequest := { 
+                                serviceRef := p_serviceRef, 
+                                operation := 255, // FIXME Change to constant 
+                                portno := p_portNumber, 
+                                priority := PX_USER_PRIORITY 
+                            } // End of field 'NFfntpPortRequest' 
+                        } // End of field 'servPrimitive' 
+                    } // End of field 'nfSapPrimitivesDown' 
+                } // End of template m_generateNfFntpPortCreationRequest
+                
+                /**
+                 * @desc  Send template to request deletion of a socket for an endpoint
+                 * @param p_serviceRef    Number uniquely identifying the endpoint at this host in an implementation specific way
+                 * @param p_portNumber    Contains the port to be deleted
+                 * @see ISO 29281-2 Clause 8.2.1
+                 */
+                template (value) UtFntpEvent m_generateNfFntpPortDeletionRequest(
+                    in template (value) ServiceRef p_serviceRef,
+                    in template (value) PortNumber p_portNumber
+                ) := {
+                    nfSapPrimitivesDown := { 
+                        spRef := 0,
+                        servPrimitive := {
+                            NFfntpPortRequest := {
+                                serviceRef := p_serviceRef,
+                                operation := 0, // Deletion requested FIXME Change to constant
+                                portno := p_portNumber,
+                                priority := PX_USER_PRIORITY
+                            } // End of field 'NFfntpPortRequest'
+                        } // End of field 'servPrimitive'
+                    } // End of field 'nfSapPrimitivesDown' 
+                } // End of template m_generateNfFntpPortDeletionRequest
+                
+                /**
+                 * @desc  Receive template used by the FNTP to acknowledge a previous NF-FNTP-PORT.request
+                 * @param p_serviceRef  Contains the same value provided in parameter "serviceRef" in the related NF-FNTP-SOCKET.request
+                 * @param p_servicePort Contains the Service port number assigned by the FNTP
+                 * @see ISO 29281-2 Clause 8.2.2
+                 */
+                template NFsapPrimitivesUp mw_fntpPortConfirm( 
+                    in template (present) ServiceRef p_serviceRef,
+                    in template (present) PortNumber p_servicePort
+                ) := {
+                    spRef := 0, 
+                    servPrimitive := { 
+                        NFfntpPortConfirm := {
+                            serviceRef := p_serviceRef,
+                            servicePort := p_servicePort
+                        } // End of field 'NFfntpPortConfirm'
+                    } // End of field 'servPrimitive'
+                } // End of template mw_fntpPortConfirm
+                
+            } // End of group fntpNfPort
+            
+            /**
+             * @desc Receive a succesful COMMAND.confirm primitive
+             * @see ISO 29281-2 Clause 8.2.1    NF-FNTP-PORT.request
+             */
+            template (present) UtFntpEventInd mw_fntpCommConfirm_success := { //FIXME To be renamed
+                nfSapPrimitivesUp := { 
+                    spRef := 1,
+                    servPrimitive := {
+                        NFfntpCommConfirm := {
+                            commRef := ?,
+                            servicePort := ?,
+                            errStatus := c_errStatus_success 
+                        } // End of field 'NFfntpCommConfirm'
+                    } // End of field 'servPrimitive' 
+                } // End of field 'nfSapPrimitivesUp' 
+            } // End of template mw_fntpCommConfirm_success
+            
+            /**
+             * @desc Receive a succesful COMMAND.confirm primitive
+             * @see ISO 29281-2 Clause 8.2.1    NF-FNTP-PORT.request
+             */
+            template (present) UtFntpEventInd mdw_fntpCommConfirm_success( 
+                in template (value) PortNumber p_port 
+            ) modifies mw_fntpCommConfirm_success := { //FIXME To be renamed
+                nfSapPrimitivesUp := { 
+                    servPrimitive := {
+                        NFfntpCommConfirm := {
+                            servicePort := p_port,
+                            errStatus := c_errStatus_success 
+                        } // End of field 'NFfntpCommConfirm'
+                    } // End of field 'servPrimitive'
+                } // End of field 'nfSapPrimitivesUp' 
+            } // End of template mw_fntpCommConfirm_success
+            
+            /**
+             * @desc Receive a succesful COMMAND.confirm primitive
+             * @see ISO 29281-2 Clause 8.2.1    NF-FNTP-PORT.request
+             */
+            template (present) UtFntpEventInd mdw_fntpCommConfirm_anyError( 
+                in template (present) PortNumber p_port 
+            ) modifies mw_fntpCommConfirm_success := {
+                nfSapPrimitivesUp := { 
+                    servPrimitive := { 
+                        NFfntpCommConfirm := {
+                            servicePort := p_port,
+                            errStatus := complement(c_errStatus_success) 
+                        } // End of field 'NFfntpCommConfirm'
+                    } // End of field 'servPrimitive'
+                } // End of field 'nfSapPrimitivesUp' 
+            } // End of template mdw_fntpCommConfirm_anyError
+            
+            /**
+             * @desc    Receive an unsuccesful COMMAND.confirm primitive
+             * @see     ISO/WD 29281-2 Clause 8.3.2
+             */
+            template (present) UtFntpEventInd mdw_fntpCommConfirm_unspecFailure( 
+                in template (present) PortNumber p_port 
+            ) modifies mdw_fntpCommConfirm_anyError := {
+                nfSapPrimitivesUp := { 
+                    servPrimitive := {
+                        NFfntpCommConfirm := {
+                            errStatus := c_errStatus_unspecFailure 
+                        } // End of field 'NFfntpCommConfirm'
+                    } // End of field 'servPrimitive'
+                } // End of field 'nfSapPrimitivesUp' 
+            } // End of template mdw_fntpCommConfirm_fail
+            
+            /**
+             * @desc  Send template for a NF-SAP command request
+             * @param p_commRef       Unique cyclic reference number of command
+             * @param p_servicePort   Port number allocated by FN-FNTP-SOCKECT.create operation
+             * @param p_linkID        Identifies the VCI to be used to transmit the packet
+             * @param p_data          Contains the ITS-SP payload EPDU
+             * @param p_controlField  Content of the FNTP control field in the FNTP extended header
+             * @see ISO 29281-2 Clause 8.3.1
+             */
+            template (value) UtFntpEvent m_generateNfFntpCommRequest(
+                in template (value) CommandRef p_commRef,
+                in template (value) PortNumber p_servicePort,
+                in template (value) Link_ID p_linkId,
+                in template (value) ITSfpdu p_data,
+                in template (value) FntpOptions p_controlField
+            ) := {
+                nfSapPrimitivesDown := { 
+                    spRef := 1,
+                    servPrimitive := {
+                        NFfntpCommRequest := { 
+                            commRef := p_commRef, 
+                            servicePort := p_servicePort, 
+                            remotePort := PX_REMOTE_PORT_NUMBER, 
+                            linkID := p_linkId, 
+                            data := p_data, 
+                            priority := PX_USER_PRIORITY, 
+                            controlField := p_controlField 
+                        } // End of field 'NFfntpCommRequest'
+                    } // End of field 'servPrimitive'
+                } // End of field 'nfSapPrimitivesDown' 
+            } // End of template m_generateNfFntpCommRequest
+            
+            /**
+             * @desc    Receive an COMMAND.indication primitive
+             * @see     ISO 29281-2 Clause 8.3.3
+             */
+            template (present) NFsapPrimitivesUp mw_checkNfFntpCommIndication_any := { 
+                spRef := 2,
+                servPrimitive := {
+                    NFfntpCommIndication := { 
+                        servicePort := ?, 
+                        remotePort := ?, 
+                        linkID := ?, 
+                        data := PX_ITS_FPDU, 
+                        priority := PX_USER_PRIORITY, 
+                        controlField := mw_noFntpOptions
+                    } // End of field 'NFfntpCommIndication' 
+                } // End of field 'servPrimitive' 
+            } // End of template mw_checkNfFntpCommIndication_any 
+            
+            /**
+             * @desc  Receive an COMMAND.indication primitive
+             * @param p_servicePort Set equal to "destinationPort" given in the NPDU
+             * @param p_port        Set equal to "sourcePort" given in the NPDU
+             * @param p_linkID      Identify the VCI associated with the peer station
+             */
+            template (present) NFsapPrimitivesUp mdw_checkNfFntpCommIndication(
+                in template (present) PortNumber p_servicePort,
+                in template (present) PortNumber p_remotePort,
+                in template (present) Link_ID p_linkId
+            ) modifies mw_checkNfFntpCommIndication_any := {
+                servPrimitive := {
+                    NFfntpCommIndication := { 
+                        servicePort := p_servicePort,
+                        remotePort := p_remotePort,
+                        linkID := p_linkId
+                    } // End of field 'NFfntpCommIndication'
+                } // End of field 'servPrimitive'
+            } // End of template mw_checkNfFntpCommIndication
+            
+            /**
+             * @desc  Receive an COMMAND.indication primitive with Access parameters
+             * @param p_servicePort             Set equal to "destinationPort" given in the NPDU
+             * @param p_port                    Set equal to "sourcePort" given in the NPDU
+             * @param p_linkID                  Identify the VCI associated with the peer station
+             * @param p_nHopNfFntpOptionsCip   FNTP options with Access parameters
+             * @see ISO/WD 29281-2 Clause 6.2.2.3.6 CIP management
+             */
+            template (present) NFsapPrimitivesUp mdw_checkNfFntpCommIndicationCip(
+                in template (present) PortNumber p_servicePort,
+                in template (present) PortNumber p_remotePort,
+                in template (present) Link_ID p_linkId, 
+                in template (present) FntpOptions p_nHopNfFntpOptionsCip
+            ) modifies mw_checkNfFntpCommIndication_any := {
+                        servPrimitive := { 
+                            NFfntpCommIndication := { 
+                                servicePort := p_servicePort,
+                                remotePort := p_remotePort,
+                                linkID := p_linkId, 
+                                controlField := p_nHopNfFntpOptionsCip
+                            } // End of field 'NFfntpCommIndication'
+                        } // End of field 'servPrimitive'
+            } // End of template mdw_checkNfFntpCommIndicationCip
+            
+            /**
+             * @desc Templates for FNTP control fields
+             * @see ISO 29281-2 Clause 6.2.2.3
+             */
+            group fntpControlFields {
+                
+                /**
+                 * @desc Send template for no FNTP control fields set, meaning "Basic procedure" (ISO 29281-2 Clause 7.6.1)
+                 * @see ISO 29281-2 Clause 6.2.2.3.1
+                 */
+                template (value) FntpOptions m_noFntpOptions := { 
+                    intForw := omit, 
+                    sec := omit, 
+                    hops := omit, 
+                    lpp := omit, 
+                    cip := omit, 
+                    opt5 := omit, 
+                    opt6 := omit, 
+                    opt7 := omit 
+                } // End of template m_noFntpOptions
+                
+                /**
+                 * @desc Send template for a S/N-hops communications
+                 * @param p_hops Number of hops. This parameter shall be set to zero for single hop
+                 * @see ISO 29281-2 Clause 6.2.2.3.1
+                 */
+                template (value) FntpOptions md_nHopNfFntpOptions( 
+                    in template (value) FNTPhopCount p_hops 
+                ) modifies m_noFntpOptions := { 
+                    hops := p_hops 
+                } // End of template md_nHopNfFntpOptions
+                
+                /**
+                 * @desc Receive template for no FNTP control fields set, meaning "Basic procedure" (ISO 29281-2 Clause 7.6.1)
+                 * @see ISO 29281-2 Clause 6.2.2.3.1
+                 */
+                template FntpOptions mw_noFntpOptions := { 
+                    intForw := omit, 
+                    sec := omit, 
+                    hops := omit, 
+                    lpp := omit, 
+                    cip := omit, 
+                    opt5 := omit, 
+                    opt6 := omit, 
+                    opt7 := omit 
+                } // End of template mw_noFntpOptions
+                
+                /**
+                 * @desc Receive template for a S/N-hops communications
+                 * @param p_hops Number of hops. This parameter shall be set to zero for single hop
+                 * @see ISO 29281-2 Clause 6.2.2.3.1
+                 */
+                template (present) FntpOptions mdw_nHopNfFntpOptions(
+                    in template (present) FNTPhopCount p_hops 
+                ) modifies mw_noFntpOptions := { 
+                    hops := p_hops
+                } // End of template mdw_nHopNfFntpOptions
+                
+                /**
+                 * @desc Send template for unsupported control fiel
+                 * @see ISO 29281-2 Clause 6.2.6
+                 */
+                template (value) FntpOptions md_nonSupportedFntpControlField
+                modifies m_noFntpOptions := {
+                    opt5 := NULL 
+                } // End of template md_nonSupportedFntpControlField
+                
+                /**
+                 * @desc Send template for with CIP required
+                 * @param p_hops Number of hops. This parameter shall be set to zero for single hop
+                 * @param p_rxCIP Receive (RX) parameter settings
+                 * @param p_txCIP Transmit (TX) parameters of a VCI
+                 * @see ISO 29281-2 Clause 7.10
+                 */
+                template (value) FntpOptions md_cipNfFntpOptions(
+                    in template (value) FNTPhopCount p_hops, 
+                    in template (value) RXcip p_rxCip, 
+                    in template (value) TXcip p_txCip 
+                ) modifies md_nHopNfFntpOptions := { 
+                    cip := { 
+                        rxCIP := p_rxCip, 
+                        txCIP := p_txCip 
+                    } // End of field 'cip'
+                } // End of template md_cipNfFntpOptions
+                
+                /**
+                 * @desc Receive template for a S/N-hops communications with CIP
+                 * @param p_hops Number of hops. This parameter shall be set to zero for single hop
+                 * @param p_rxCIP Receive (RX) parameter settings
+                 * @param p_txCIP Transmit (TX) parameters of a VCI
+                 * @see ISO 29281-2 Clause 6.2.2.3.1
+                 */
+                template FntpOptions mdw_nHopNfFntpOptions_cip(
+                    in template (present) FNTPhopCount p_hops, 
+                    in template RXcip p_rxCip, 
+                    in template TXcip p_txCip 
+                ) modifies mw_noFntpOptions := { 
+                    hops := p_hops, 
+                    cip := { 
+                        rxCIP := p_rxCip, 
+                        txCIP := p_txCip 
+                    }  // End of field 'cip'
+                } // End of template mdw_nHopNfFntpOptions_cip
+                
+            } // End of group fntpControlFields
+            
+        } // End of group utPrimitives
+        
+        group cfPrimitives { 
+            
+            /**
+             * @desc Initializes the Configuration tester
+             */
+            template (value) CfInitialize m_cfFntpInitialize := { 
+                cfFntpInitialize := { 
+                } // End of field 'cfFntpInitialize' 
+            } // End of template m_cfFntpInitialize 
+            
+            /**
+             * @desc    Receive template for configuration message (CfPort Primitive)
+             * @param   p_mnRequestRequest Expected MN_Request_rquest message
+             */
+            template (present) CfFntpEventInd mw_cfFntpEventInd(
+                template (present) MN_Request_request p_mnRequestRequest
+            ) := {
+                mnRequestRequest := p_mnRequestRequest
+            } // End of template mw_cfFntpEventInd
+            
+        } // End of group cfPrimitives 
+        
+    } // End of group fntpPrimitives
+    
+} // End of module LibItsFntp_Templates

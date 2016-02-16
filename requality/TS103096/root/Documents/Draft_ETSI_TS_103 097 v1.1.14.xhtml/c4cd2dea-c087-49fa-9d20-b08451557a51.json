@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_c4cd2dea-c087-49fa-9d20-b08451557a51\"><a name=\"c4cd2dea-c087-49fa-9d20-b08451557a51\" id=\"id_c4cd2dea-c087-49fa-9d20-b08451557a51\" class=\"requality_id\"><\/a>The <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">version<font style=\"font-family: Times New Roman;\"> field of a certificate shall be set according to clause 6.1.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "3ae13306-ec12-49f7-ad70-cabeb597e213"
+}

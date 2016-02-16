@@ -1,0 +1,155 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2015 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     SPAT_Types_Test.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2015-11-03
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module SPAT_Types_Test
+{
+  import from ITS_Container language "ASN.1:1997" all;
+  import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+  import from SPAT_Types all;
+
+  type component Empty_CT {
+  
+  }
+
+  const SPAT_PDU spat_pdu := {
+        header := {
+                protocolVersion := 3,
+                messageID := 10,
+                stationID := 99
+            },
+	spatData := {
+		msgID := 132,
+		msgSubID := 11,
+		name := "name",
+		intersections := {
+			{
+				name := "name name",
+				id := {
+					region := 4654,
+					id := 7894
+				},
+				revision := 40,
+				status := '1010010000111110'B,
+				moy := 132451,
+				timeStamp := 61513,
+				enabledLanes := {123,3,51,2},
+				states := {
+					{
+						movementName := "movement",
+						signalGroup := 213,
+						state_time_speed := {
+							{
+								eventState := dark,
+								timing := {
+									startTime := 31325,
+									minEndTime := 641,
+									maxEndTime := 35121,
+									likelyTime := 35000,
+									confidence := 10,
+									nextTime := 36000
+								},
+								speeds := {
+									{
+										type_ := greenwave,
+										speed := 250,
+										confidence := 100,
+										distance := 5121,
+										class := 201,
+										regional := {}
+									}
+								},
+								regional := {}
+							}
+						},
+						maneuverAssistList := {
+							{
+								connectionID := 101,
+								queueLength := 500,
+								availableStorageLength := 1011,
+								waitOnStop := true,
+								pedBicycleDetect := true,
+								regional := {
+									vehicleToLanePositions := {
+										{
+											stationID := 10,
+											laneID := 30
+										}
+									},
+									rsuDistanceFromAnchor := {
+										node_XY3 := {
+											x := 234,
+											y := 345
+										}
+									}
+								}
+							}
+						},
+						regional := {}
+					}
+				},
+				maneuverAssistList := {
+					{
+						connectionID := 31,
+						queueLength := 314,
+						availableStorageLength := 123,
+						waitOnStop := true,
+						pedBicycleDetect := true,
+						regional := {
+							vehicleToLanePositions := {
+								{
+									stationID := 14,
+									laneID := 44
+								}
+							},
+							rsuDistanceFromAnchor := {
+								node_XY3 := {
+									x := 144,
+									y := 121
+								}
+							}
+						}
+					}
+				},
+				priority := '3F'O,
+				preempt := '22'O,
+				regional := {
+					activePrioritizations := {
+						{
+							stationID := 3,
+							priorState := processing,
+							signalGroup := 12
+						}
+					}
+				}
+			}
+		},
+		regional := {}
+	}				
+};
+
+
+  testcase tc_encdec() runs on Empty_CT {
+    if(spat_pdu == dec_SPAT_PDU(enc_SPAT_PDU(spat_pdu))){
+      setverdict(pass);
+    } else {
+      setverdict(fail);
+    }
+  }
+  
+  control{
+    execute(tc_encdec());
+  }
+
+}

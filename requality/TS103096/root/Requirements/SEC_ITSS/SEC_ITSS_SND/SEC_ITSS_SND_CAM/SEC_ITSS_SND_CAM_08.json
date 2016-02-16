@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "9b71d8fc-61ed-4efe-abee-487ae07f7946",
+            "type": "STRING",
+            "value": "Check that the sent secured CAM contains the signer_info of type certificate when the ITS-S received a CAM that contains a request of unrecognized certificate that matches with its currently used AT certificate ID."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "9b71d8fc-61ed-4efe-abee-487ae07f7946",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/ebb640a8-dfe7-4c52-96c8-c6f3f52452c5"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "9b71d8fc-61ed-4efe-abee-487ae07f7946",
+            "type": "STRING",
+            "value": "08. Check that IUT sends certificate when requested"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "9b71d8fc-61ed-4efe-abee-487ae07f7946",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9b71d8fc-61ed-4efe-abee-487ae07f7946"
+}

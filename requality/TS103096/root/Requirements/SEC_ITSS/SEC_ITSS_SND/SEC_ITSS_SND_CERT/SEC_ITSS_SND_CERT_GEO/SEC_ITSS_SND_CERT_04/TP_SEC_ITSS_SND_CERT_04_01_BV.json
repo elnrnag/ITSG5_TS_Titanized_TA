@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "69aa17da-fc04-4037-bdb2-be39d960220e",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "69aa17da-fc04-4037-bdb2-be39d960220e",
+            "type": "STRING",
+            "value": "Check that the length of the vector of rectangles is less then 6.\r\nCheck that region is continuous and does not contain any holes.\r\nCheck that the rectangles are valid"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "69aa17da-fc04-4037-bdb2-be39d960220e",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\tcontaining certificate {\r\n\t\t\t\t\tcontaining no validity restriction or validity_restrictions['region']{\r\n\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\tindicating 'rectangle'\r\n\t\t\t\t\t\tcontaining rectangular_region {\r\n\t\t\t\t\t\t\tindicating length <= 6\r\n\t\t\t\t\t\t\tcontaining elements of type RectangularRegion\r\n\t\t\t\t\t\t\t\tindicating continuous region without holes\r\n\t\t\t\t\t\t\t\tcontaining northwest and southeast\r\n\t\t\t\t\t\t\t\t\tindicating northwest is on the north from southeast\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "69aa17da-fc04-4037-bdb2-be39d960220e",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "69aa17da-fc04-4037-bdb2-be39d960220e",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "69aa17da-fc04-4037-bdb2-be39d960220e"
+}

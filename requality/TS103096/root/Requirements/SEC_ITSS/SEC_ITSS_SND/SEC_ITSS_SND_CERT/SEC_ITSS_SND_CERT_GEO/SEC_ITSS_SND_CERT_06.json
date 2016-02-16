@@ -1,0 +1,43 @@
+{
+    "attributes": {
+        "PICS_USE_IDENTIFIED_REGION": {
+            "isGenerated": false,
+            "key": "PICS_USE_IDENTIFIED_REGION",
+            "origin": "4ccff361-8db5-4ad1-b3dd-273acd27f4bc",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "4ccff361-8db5-4ad1-b3dd-273acd27f4bc",
+            "type": "STRING",
+            "value": "Check IdentifiedRegion:\r\nCheck that region identifier indicating valid value according to specified dictionary."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "4ccff361-8db5-4ad1-b3dd-273acd27f4bc",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/7f3a6b4c-ea1c-4d17-bfc9-1a6338be1b9d",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/2089e412-fa5c-4dc3-937e-0c5a7d7d8a07"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "4ccff361-8db5-4ad1-b3dd-273acd27f4bc",
+            "type": "STRING",
+            "value": "06. Check Identified Region"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "4ccff361-8db5-4ad1-b3dd-273acd27f4bc",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "4ccff361-8db5-4ad1-b3dd-273acd27f4bc"
+}

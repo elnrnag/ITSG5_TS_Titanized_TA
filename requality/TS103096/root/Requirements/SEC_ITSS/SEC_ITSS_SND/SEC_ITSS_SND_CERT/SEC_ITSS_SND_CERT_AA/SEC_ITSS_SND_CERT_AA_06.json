@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "df4ea89e-7e56-438d-bcf7-ed736081bd0d",
+            "type": "STRING",
+            "value": "If ITS-S sends an AA certificate check that only the ValidityRestriction time_start_and_end is included"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "df4ea89e-7e56-438d-bcf7-ed736081bd0d",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/29646d66-9184-45a3-a1e6-dc84c19a3a8a",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/05d797e2-9a7b-4b6f-a32f-e9bb0931628c",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/6651de8c-4325-4b42-a018-9ef5c927537d"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "df4ea89e-7e56-438d-bcf7-ed736081bd0d",
+            "type": "STRING",
+            "value": "06. Check the  time_start_and_end presence"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "df4ea89e-7e56-438d-bcf7-ed736081bd0d",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "df4ea89e-7e56-438d-bcf7-ed736081bd0d"
+}

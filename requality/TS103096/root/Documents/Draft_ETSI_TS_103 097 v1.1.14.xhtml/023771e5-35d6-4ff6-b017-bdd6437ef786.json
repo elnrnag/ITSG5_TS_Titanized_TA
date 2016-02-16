@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_023771e5-35d6-4ff6-b017-bdd6437ef786\"><a name=\"023771e5-35d6-4ff6-b017-bdd6437ef786\" id=\"id_023771e5-35d6-4ff6-b017-bdd6437ef786\" class=\"requality_id\"><\/a>All other <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_023771e5-35d6-4ff6-b017-bdd6437ef786\">HeaderField<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_023771e5-35d6-4ff6-b017-bdd6437ef786\"> types defined in clause 5 shall not be used.<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "023771e5-35d6-4ff6-b017-bdd6437ef786"
+}

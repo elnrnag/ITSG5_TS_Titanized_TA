@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "2d7486e0-cf9d-4e90-a9c0-708749f027f4",
+            "type": "STRING",
+            "value": "If ITS-S sends a signed message with general security profile check that the sent SecuredMessage contains exactly one HeaderField generation_time which is inside the validity time of the certificate referenced by the signer_info."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "2d7486e0-cf9d-4e90-a9c0-708749f027f4",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/e1c8b3e0-5da0-4e8d-8355-563039c7cdc7",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/6e2b18ef-2431-48ae-9a10-cae099d89969",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/ec223c71-ab7b-4b9c-9942-739771862633"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "2d7486e0-cf9d-4e90-a9c0-708749f027f4",
+            "type": "STRING",
+            "value": "04. Check generation time"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "2d7486e0-cf9d-4e90-a9c0-708749f027f4",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "2d7486e0-cf9d-4e90-a9c0-708749f027f4"
+}

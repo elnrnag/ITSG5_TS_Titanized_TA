@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a signed 1609.2 message if the latitude specified in the region associated with the signers certificate scope is outside the limits of ±90˚."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/6dba05c2-4e9d-4ada-bbb6-657be301a16e"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "c338f9f2-85b0-4a19-9b4a-ae5431d09ab0"
+}

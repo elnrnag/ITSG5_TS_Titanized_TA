@@ -1,0 +1,28 @@
+<!-- Authorization authority certificate without CAM AID in the AID list -->
+<certificate name="CERT_TS_13_01_BO_AA">
+	<version>2</version>
+	<signer type="digest" name="CERT_TEST_ROOT"/>
+	<subject type="AA" name="">
+		<!-- verification_key -->
+		<attribute type="verification_key">
+			<public_key algorythm="ecdsa_nistp256_with_sha256">
+				<ecc_point type="uncompressed"/>
+			</public_key>
+		</attribute>
+		<!-- assurance_level -->
+		<attribute type="assurance_level">
+			<assurance level="4" confidence="0"/>
+		</attribute>
+		<!-- its_aid_list -->
+		<attribute type="its_aid_list">
+			<aid value="37"/> <!--DENM-->
+		</attribute>
+	</subject>
+	<validity>
+		<restriction type="time" start="2015-01-01" end="2015-04-30"/>
+		<restriction type="region">
+			<none/>
+		</restriction>
+	</validity>
+	<signature algorithm="0"/>
+</certificate>

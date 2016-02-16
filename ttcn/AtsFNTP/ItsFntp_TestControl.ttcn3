@@ -1,0 +1,132 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL:$
+ *              $Id:$
+ *  @desc       test control file for Fast Networking & Transport layer Protocol (ISO 29281-2)
+ */
+module ItsFntp_TestControl {
+    
+    // LibCommon 
+    
+    // ATS FNTP
+    import from ItsFntp_TestCases {testcase all};
+    
+    // LibIts 
+    import from LibItsFntp_Pics all;
+    
+    // Test Execution
+    control {
+        
+        if (not PICS_ROLE_RONLY and not PICS_ROLE_HONLY and not PICS_ROLE_RH) {
+            log("ETSI TS 102 985-1 v1.1.2 A.2: It is mandatory to support at least one of these items");
+            stop;
+        }
+        
+//      6.1.1 Transmitting Packets
+//      6.1.1.1 Basic procedure - valid behavior
+        if (PICS_ROLE_RH) {
+            execute(TC_FNTP_TXP_BP_BV_01());
+            execute(TC_FNTP_TXP_BP_BV_02());
+        }
+        
+//      6.1.1.2 Basic procedure - invalid behavior
+//      Invalid test purposes will be defined in the next version of the present document once ISO has implemented the concept of flows in the architecture standard ISO 21217 [i.7], and subsequently in ISO 29281-1 [1]
+
+//      6.1.2.1 Extended procedure - valid behavior
+        if (PICS_EXT and PICS_ROLE_RH and PICS_NHOPBC) {
+            execute(TC_FNTP_TXP_EP_BV_01());
+        }
+        
+//      6.1.2.2 Extended procedure - invalid behavior
+        if (PICS_EXT and PICS_ROLE_RH and PICS_NHOPBC) {
+//            execute(TC_FNTP_TXP_EP_BI_01());
+            execute(TC_FNTP_TXP_EP_BI_02());
+        }
+        
+//        6.1.3.1 Forwarding procedure - valid behavior
+        if (PICS_ITS_S_INW and (PICS_ROLE_HONLY or PICS_ROLE_RH)) {
+            execute(TC_FNTP_TXP_FP_BV_01());
+            execute(TC_FNTP_TXP_FP_BV_02());
+            execute(TC_FNTP_TXP_FP_BV_03());
+        }
+        
+//        6.1.3.2 Forwarding procedure - invalid behavior
+        if (PICS_ITS_S_INW and (PICS_ROLE_HONLY or PICS_ROLE_RH)) {
+// FIXME Implementation shall be reviewed during ATS validation            execute(TC_FNTP_TXP_FP_BI_01());
+        }
+        
+//      6.2 Receiving Packets
+//      6.2.1.1 Basic procedure - valid behavior
+        if (PICS_ROLE_RH) {
+            execute(TC_FNTP_RXP_BP_BV_01());
+            execute(TC_FNTP_RXP_BP_BV_02());
+            execute(TC_FNTP_RXP_BP_BV_03());
+        }
+        
+//      6.2.1.2 Basic procedure - invalid behavior
+        if (PICS_ROLE_RH or PICS_ROLE_HONLY or PICS_ROLE_RONLY) {
+            execute(TC_FNTP_RXP_BP_BI_01());
+            execute(TC_FNTP_RXP_BP_BI_02());
+            execute(TC_FNTP_RXP_BP_BI_03());
+            execute(TC_FNTP_RXP_BP_BI_04());
+            execute(TC_FNTP_RXP_BP_BI_05());
+            execute(TC_FNTP_RXP_BP_BI_06());
+        }
+        
+//      6.2.2.1 Extended procedure - valid behavior
+        if (PICS_ROLE_RH and PICS_NHOPBC) {
+            execute(TC_FNTP_RXP_EP_BV_01());
+            execute(TC_FNTP_RXP_EP_BV_02());
+            execute(TC_FNTP_RXP_EP_BV_03());
+            execute(TC_FNTP_RXP_EP_BV_04());
+        }
+        
+//      6.2.2.2 Extended procedure - invalid behavior
+        if (PICS_ROLE_RH and PICS_NHOPBC) {
+            execute(TC_FNTP_RXP_EP_BI_01());
+        }
+        if (PICS_EXT and PICS_ROLE_RH) {
+            execute(TC_FNTP_RXP_EP_BI_02());
+        }
+/*******************************************************************************************************
+        
+//      6.3.1.1 Forwarded delivery procedure - valid behavior
+        if (PICS_ITS_S_INW and (PICS_ROLE_RONLY or PICS_ROLE_RH)) {
+            execute(TC_FNTP_RXP_FP_BV_01());
+            execute(TC_FNTP_RXP_FP_BV_02());
+            execute(TC_FNTP_RXP_FP_BV_03());
+            execute(TC_FNTP_RXP_FP_BV_04());
+        }
+        
+//      6.3.1.2 Forwarded delivery procedure - invalid behavior
+        if (PICS_ITS_S_INW and (PICS_ROLE_RONLY or PICS_ROLE_RH)) {
+            execute(TC_FNTP_RXP_FP_BI_01());
+        }
+        
+//      6.4 CI parameter management: Not applicable
+
+//      6.4.1.1 Extended procedure - valid behavior
+        if ((PICS_CIP and PICS_ROLE_RH)) {
+            execute(TC_FNTP_CIP_EP_BV_01());
+            execute(TC_FNTP_CIP_EP_BV_02());
+            execute(TC_FNTP_CIP_EP_BV_03());
+            execute(TC_FNTP_CIP_EP_BV_04());
+        }
+        
+//      6.4.1.2 Forwarded procedure - invalid behavior
+        if (PICS_CIP and PICS_ITS_S_INW and (PICS_ROLE_HONLY or PICS_ROLE_RH)) {
+            execute(TC_FNTP_CIP_FP_BV_01());
+            execute(TC_FNTP_CIP_FP_BV_02());
+            execute(TC_FNTP_CIP_FP_BV_03());
+            execute(TC_FNTP_CIP_FP_BV_04());
+            execute(TC_FNTP_CIP_FP_BV_05());
+            execute(TC_FNTP_CIP_FP_BV_06());
+        }
+        if (PICS_CIP and PICS_ITS_S_INW and PICS_ROLE_RH) {
+            execute(TC_FNTP_CIP_FP_BV_07());
+            execute(TC_FNTP_CIP_FP_BV_08());
+        }
+        
+*******************************************************************************************************/
+    } // End of control
+} // End of module ItsNt_TestControl

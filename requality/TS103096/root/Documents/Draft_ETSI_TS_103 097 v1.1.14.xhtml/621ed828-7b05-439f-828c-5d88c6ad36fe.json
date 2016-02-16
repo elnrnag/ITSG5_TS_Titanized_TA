@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "authorization_authority<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Times New Roman'; font-size: 10pt;\">, for authorization authorities, i.e. certificate authorities issuing authorization tickets.<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "a047ebc5-418e-4790-b555-f7ce3ae1b669"
+}

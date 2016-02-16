@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that if ITS-S generates correctly multiple signed messages containing the generation time."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/68efc865-bff1-450d-bebf-c0d4eb89285e"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "dd32ebf3-7f70-4d4d-a2f8-3cb38ed43591"
+}

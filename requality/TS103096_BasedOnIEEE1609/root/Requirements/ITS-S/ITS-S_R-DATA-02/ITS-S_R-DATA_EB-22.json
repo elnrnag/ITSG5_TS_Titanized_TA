@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a signed 1609.2 message if the permissions requested in the end-user certificate contains duplicate PSIDs."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/071e8e77-6437-445d-9192-6a55b26d1ac7"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "8c1918d7-6681-419a-822d-59f33db93b21"
+}

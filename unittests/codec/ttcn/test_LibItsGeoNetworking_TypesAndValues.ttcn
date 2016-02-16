@@ -1,0 +1,3582 @@
+module test_LibItsGeoNetworking_TypesAndValues /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997"all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsCommon_Functions all;
+    
+    // LibItsExternal
+    import from LibItsExternal_TypesAndValues all;
+    
+    // LibItsCam
+    import from LibItsCam_TypesAndValues all;
+    import from LibItsCam_TestSystem all;
+    import from LibItsCam_Templates all;
+    
+    // LibItsDenm
+    import from LibItsDenm_Templates all;
+    import from LibItsDenm_TestSystem all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_TestSystem all;
+    import from LibItsSecurity_Templates all;
+    import from LibItsSecurity_Functions all;
+    import from LibItsSecurity_Pixits all;
+    
+    // LibItsGeoNetworking
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsGeoNetworking_Templates all;
+    import from LibItsGeoNetworking_Functions all;
+    import from LibItsGeoNetworking_TestSystem all;
+    import from LibItsGeoNetworking_Pixits all;
+    import from LibItsGeoNetworking_Pics all;
+    
+    // AtsSecurity
+    import from AtsSecurity_Functions all;
+    
+//    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+//    import from LibItsIpv6OverGeoNetworking_Templates all;
+//    import from LibItsExternal_TypesAndValues all;
+
+    import from test_CommonCodec all;
+    
+    import from test_LibItsBtp_TypesAndValues {
+        template all 
+    };
+
+    group LibItsGeoNetworking_testCases {
+        
+        group LibItsGeoNetworking_DummyTemplates {
+            
+            /**
+             * @desc    Dummy template for GN_Address 
+             */
+            template (value) GN_Address m_dummyGnAddrIut := {
+                typeOfAddress := e_manual,
+                stationType := e_roadSideUnit,
+                stationCountryCode := 33,
+                mid := 'a4fedecabeef'O
+            }
+    
+            /**
+             * @desc    Dummy template for long position vector
+             */
+            template (value) LongPosVector m_dummyLongPosVectorIut := {
+                gnAddr := m_dummyGnAddrIut,
+                timestamp := 123456,
+                latitude := 4856,
+                longitude := 675,
+                pai := '1'B,
+                speed := 55,
+                heading := 9876
+            }
+            
+            template (value) GN_Address m_dummyGnAddrNodeA := {
+                typeOfAddress := e_manual,
+                stationType := e_pedestrian,
+                stationCountryCode := 49,
+                mid := 'a4fdea5ea5ed'O
+            }
+            
+            template (value) GN_Address m_dummyGnAddrNodeB := {
+                typeOfAddress := e_manual,
+                stationType := e_specialVehicle,
+                stationCountryCode := 50,
+                mid := 'a40102030405'O
+            }
+    
+            template (value) GN_Address m_dummyGnAddrNodeC := {
+                typeOfAddress := e_manual,
+                stationType := e_moped,
+                stationCountryCode := 42,
+                mid := 'deadbabebeef'O
+            }
+    
+            template (value) LongPosVector m_dummyLongPosVectorNodeA := {
+                gnAddr := m_dummyGnAddrNodeA,
+                timestamp := 875,
+                latitude := 265,
+                longitude := 789,
+                pai := '0'B,
+                speed := 80,
+                heading := 548
+            }
+    
+            template (value) LongPosVector m_dummyLongPosVectorNodeB := {
+                gnAddr := m_dummyGnAddrNodeB,
+                timestamp := 4585,
+                latitude := 126,
+                longitude := 123,
+                pai := '0'B,
+                speed := 45,
+                heading := 125
+            }
+            
+            template (value) LongPosVector m_dummyLongPosVectorNodeC := {
+                gnAddr := m_dummyGnAddrNodeC,
+                timestamp := 23644,
+                latitude := 23754,
+                longitude := 49645,
+                pai := '0'B,
+                speed := 110,
+                heading := 23
+            }
+            
+            template (value) Area m_dummyArea1 := {
+                geoAreaPosLatitude := 298376,
+                geoAreaPosLongitude := 32745,
+                distanceA := 1234,
+                distanceB := 6078,
+                angle := 9123
+            }
+    
+            template (value) Area m_dummyArea2 := {
+                geoAreaPosLatitude := 873548,
+                geoAreaPosLongitude := 2837,
+                distanceA := 8765,
+                distanceB := 4321,
+                angle := 4567
+            }
+    
+            template (value) GeoBroadcastArea m_dummyGeoBroadcastArea1 := {
+                geoBroadcastSubType := e_geoBroadcastRect,
+                geoBroadcastArea := m_dummyArea1
+            }
+    
+            template (value) GeoBroadcastArea m_dummyGeoBroadcastArea2 := {
+                geoBroadcastSubType := e_geoBroadcastElip,
+                geoBroadcastArea := m_dummyArea2
+            }
+    
+            template (value) GeoAnycastArea m_dummyGeoAnycastArea1 := {
+                geoAnycastSubType := e_geoAnycastCircle,
+                geoAnycastArea := m_dummyArea1
+            }
+    
+            template (value) GeoAnycastArea m_dummyGeoAnycastArea2 := {
+                geoAnycastSubType := e_geoAnycastRect,
+                geoAnycastArea := m_dummyArea2
+            }
+    
+            /**
+             * @desc    Send template for GeoUnicast header
+             * @param   p_sourceLongPosVec      Long position vector of source 
+             * @param   p_destinationLongPosVec Long position vector of destination 
+             * @param   p_senderLongPosVec      Long position vector of sender
+             * @param   p_seqNumber             Sequence number of GeoUnicast packet
+             */
+            template (value) ExtendedHeader m_geoUnicastHeaderBtp(
+                in template (value) LongPosVector p_sourceLongPosVec,
+                in template (value) ShortPosVector p_dstPosVector,
+                in template (value) UInt16 p_seqNumber
+            ) := {
+                geoUnicastHeader := {
+                    seqNumber := p_seqNumber,
+                    reserved := c_uInt8Zero,
+                    srcPosVector := p_sourceLongPosVec,
+                    dstPosVector := p_dstPosVector
+                }
+            }
+            
+        } // End of group LibItsGeoNetworking_DummyTemplates
+        
+        group camTemplates {
+            
+            template (value) CAM m_camMsg(
+                StationID p_stationId,
+                GenerationDeltaTime p_generationTime
+            ) := {
+                header := {
+                    protocolVersion := 1,
+                    messageID := 2,
+                    stationID := p_stationId
+                },
+                cam := {
+                    generationDeltaTime := p_generationTime,
+                    camParameters := {
+                        basicContainer := {
+                            stationType := StationType_passengerCar_,
+                            referencePosition := {
+                                latitude := f_integer2Latitude(f_getTsLatitude()),
+                                longitude := f_integer2Longitude(f_getTsLongitude()),
+                                positionConfidenceEllipse := {
+                                    semiMajorConfidence   := SemiAxisLength_oneCentimeter_,
+                                    semiMinorConfidence   := SemiAxisLength_oneCentimeter_,
+                                    semiMajorOrientation  := HeadingValue_wgs84North_
+                                },
+                                altitude := {
+                                    altitudeValue := AltitudeValue_referenceEllipsoidSurface_,
+                                    altitudeConfidence := unavailable
+                                }
+                            }
+                        },
+                        highFrequencyContainer := {
+                            basicVehicleContainerHighFrequency := {
+                                heading := {
+                                    headingValue := HeadingValue_wgs84North_, //0
+                                    headingConfidence := 10
+                                },
+                                speed := {
+                                    speedValue := 45,
+                                    speedConfidence := 5
+                                },
+                                driveDirection := forward,
+                                vehicleLength := {
+                                    vehicleLengthValue := 50,
+                                    vehicleLengthConfidenceIndication := noTrailerPresent
+                                },
+                                vehicleWidth := 21,
+                                longitudinalAcceleration := {
+                                    longitudinalAccelerationValue := LongitudinalAccelerationValue_unavailable_,
+                                    longitudinalAccelerationConfidence := AccelerationConfidence_unavailable_
+                                },
+                                curvature := {
+                                    curvatureValue := CurvatureValue_straight_,
+                                    curvatureConfidence := unavailable
+                                },
+                                curvatureCalculationMode := yawRateUsed,
+                                yawRate := {
+                                    yawRateValue := YawRateValue_straight_,
+                                    yawRateConfidence := unavailable
+                                },
+                                accelerationControl := omit,
+                                lanePosition := omit,
+                                steeringWheelAngle := omit,
+                                lateralAcceleration := omit,
+                                verticalAcceleration := omit, 
+                                performanceClass := omit,
+                                cenDsrcTollingZone := omit
+                                
+                            }
+                        },
+                        lowFrequencyContainer := omit,
+                        specialVehicleContainer := omit
+                    }
+                }
+            };
+            
+        } // End of group camTemplates
+        
+        group testAcPrimitives {
+
+//            /**
+//             * 
+//             * @desc validate StartBeaconing primitive
+//             * @verdict Pass on success, Fail otherwise
+//             */
+//            testcase tc_startBeaconing() runs on TCType system TCType {
+//                test_PDU<AcGnPrimitive>(
+//                    m_startBeaconing(
+//                        m_beaconHeader(m_dummyLongPosVectorIut).beaconHeader), 
+//                    true,
+//                    oct2bit('010027050024001000000000000a9421a4fedecabeef0001e240000012f8000002a300372694020e6248'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//                );
+//            }
+//
+//            /**
+//             * 
+//             * @desc validate StartBeaconing primitive for roadside equipment
+//             * @verdict Pass on success, Fail otherwise
+//             */
+//            testcase tc_startBeaconingRoadside() runs on TCType system TCType {
+//                test_PDU<AcGnPrimitive>(
+//                    m_startBeaconingRoadSide, 
+//                    true,
+//                    oct2bit('010027050024001000000000000a4c00deadbeef00030000000017d75cf005f5e10003e8000000140000'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//                );
+//            }
+//            testcase tc_startBeaconingRoadside_NEC() runs on TCType system TCType {
+//                test_PDU<AcGnPrimitive>(
+//                    m_startBeaconingRoadSide_NEC, 
+//                    true,
+//                    oct2bit('010027050024101000000000000a4c00deadbeef0002c90c152800004e20000000000000000000000000'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//                );
+//            }
+//            testcase tc_startBeaconingRoadside_NEC_1() runs on TCType system TCType {
+//                test_PDU<AcGnPrimitive>(
+//                    m_startBeaconingRoadSide_NEC_1, 
+//                    true,
+//                    oct2bit('010027050024101000000000000a4c00deadbeef0003c926268affffd8f0000000000000000000000000'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//                );
+//            }
+//
+//            /**
+//             * @desc validate StartPassBeaconing primitive
+//             * @verdict Pass on success, Fail otherwise
+//             */
+//            testcase tc_startPassBeaconing() runs on TCType system TCType {
+//                test_PDU<AcGnPrimitive>(
+//                    m_startPassBeaconing(
+//                        m_beaconHeader(m_dummyLongPosVectorIut).beaconHeader), 
+//                    true,
+//                    oct2bit('010027070024001000000000000a9421a4fedecabeef0001e240000012f8000002a300372694020e6248'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//                );
+//            }
+//
+//            /**
+//             * @desc validate StartBeaconingMultipleNeighbour primitive
+//             * @verdict Pass on success, Fail otherwise
+//             */
+//            testcase tc_startBeaconingMultipleNeighbour() runs on TCType system TCType {
+//                test_PDU<AcGnPrimitive>(
+//                    m_startBeaconingMultipleNeighbour(
+//                        m_beaconHeader(m_dummyLongPosVectorIut).beaconHeader,
+//                        3), 
+//                    true,
+//                    oct2bit('01002b090028001000000000000a9421a4fedecabeef0001e240000012f8000002a300372694020e624800000003'O) // Check for 'LibItsGeoNetworking_TypesAndValues.encode:' output in codec traces to get the dump
+//                );
+//            }
+//
+            /**
+             * @desc validate StopBeaconing primitive
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_stopBeaconing() runs on TCType system TCType {
+                test_PDU<AcGnPrimitive>(m_stopBeaconing, true, oct2bit('0001'O));
+            }
+
+            /**
+             * @desc validate StopPassBeaconing primitive
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_stopPassBeaconing() runs on TCType system TCType {
+                test_PDU<AcGnPrimitive>(m_stopPassBeaconing, true, oct2bit('0003'O));
+            }
+
+            /**
+             * @desc validate StopBeaconingMultipleNeighbour
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_stopBeaconingMultipleNeighbour() runs on TCType system TCType {
+                test_PDU<AcGnPrimitive>(m_stopBeaconingMultipleNeighbour, true, oct2bit('0005'O));
+            }
+
+            /**
+             * @desc validate AcGetLongPosVector
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_getLongPosVector() runs on TCType system TCType {
+                test_PDU<AcGnPrimitive>(m_getLongPosVector(m_dummyGnAddrIut), true, oct2bit('0006BC21A4FEDECABEEF'O)); // Check log for TC_GEONW_FDV_COH_BV_01 TC to retrieve the frame
+            }
+
+//            /**
+//             * @desc validate AcGnResponse
+//             * @verdict Pass on success, Fail otherwise
+//             */
+//            testcase tc_longPosVector() runs on TCType system TCType {
+//                test_decodePDU<AcGnResponse>(mw_getLongPosVectorAny(m_dummyGnAddrIut), '0300270c00249421a4fedecabeef000030aa000030aa000030aa000030aa000030aa000030aa000030aa'O); // Check log for TC_GEONW_FDV_COH_BV_01 TC to retrieve the frame
+//            }
+//
+//            /**
+//             * @desc validate AcGnResponse with a NULL LongPosVector
+//             * @verdict Pass on success, Fail otherwise
+//             */
+//            testcase tc_longPosVectorWithNullLongPosVector() runs on TCType system TCType {
+//                test_decodePDU<AcGnResponse>(mw_getLongPosVectorAny(m_dummyGnAddrIut), '03000b0c00088400000000000001FFFFFFFFFFFF'O); // Check log for TC_GEONW_PON_LPV_BV_01 TC to retrieve the frame
+//            }
+//
+            /**
+             * @desc validate AcEnableSecurity
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_enableSecurity() runs on TCType system TCType {
+                if (f_loadCertificates("dummy") == true) {
+                    setverdict(fail);
+                    stop;
+                }
+                
+                // Setup certificates memory cache
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_PDU<AcGnPrimitive>(
+                    AcGnPrimitive:{ acEnableSecurity := m_enableSecurity(
+                        "TA_CERT_A"
+                    ) }, 
+                    false
+                ); 
+            }
+            
+            /**
+             * @desc validate AcDisableSecurity
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_disableSecurity() runs on TCType system TCType {
+                test_PDU<AcGnPrimitive>(
+                    AcGnPrimitive:{ acDisableSecurity := m_disableSecurity }, 
+                    false
+                ); 
+            }
+
+        } // End of group testAcPrimitives
+        
+        group testDeviceSigning {
+            
+            /**
+             * @desc This function build and sign the SecureMessage part covered by the signature process
+             * @param p_securedMessage      The signed  SecureMessage part
+             * @param p_unsecuredPayload    The unsigned payload (e.g. a beacon)
+             * @param p_threeDLocation      The ThreeDLocation value
+             * @param p_headerFileds        Additional HeaderFields
+             * @return true on success, false otherwise
+             * @verdict Unchanged
+             */
+            function f_buildGnSecuredOtherMessageWithDeviceCertificate(
+                                                                       out template (value) SecuredMessage p_securedMessage, 
+                                                                       in octetstring p_signedPayload, 
+                                                                       in ThreeDLocation p_threeDLocation, 
+                                                                       in template (value) Certificate p_deviceCertificate,
+                                                                       in Oct32 p_devicePrivateKey,
+                                                                       in template (omit) HeaderFields p_hearderFields := omit
+            ) return boolean {
+                
+                // Local variables
+                var octetstring v_secPayload, v_signature;
+                var Oct32 v_hash;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                 
+                // Create SecuredMessage payload to be signed
+                v_toBeSignedSecuredMessage := m_toBeSignedSecuredMessage(
+                    { // Field HeaderFields
+                        m_header_field_signer_info(
+                            m_signerInfo_certificate(
+                                p_deviceCertificate
+                            ) // End of template m_signerInfo_certificate
+                        ), // End of template m_header_field_signer_info
+                        m_header_field_generation_time(1000 * f_getCurrentTime()), // In us
+                        m_header_field_generation_location(
+                            p_threeDLocation
+                        )
+                    }, // End of field HeaderFields
+                    m_payload_signed(
+                        p_signedPayload
+                    ),
+                    e_signature
+                );
+                v_secPayload := bit2oct(encvalue(v_toBeSignedSecuredMessage));
+                log("f_buildGnSecuredOtherMessageWithDeviceCertificate:ithDeviceCertificate v_toBeSignedSecuredMessage: ", v_secPayload);
+                
+                // FIXME BUG Framework already compute the hash
+//                // Calculate the hash of the SecuredMessage payload to be signed
+//                v_hash := f_hashWithSha256(v_secPayload);
+//                log("f_buildGnSecuredOtherMessageWithDeviceCertificate: v_hash: ", v_hash);
+                
+                // Signed payload
+                v_signature := fx_signWithEcdsaNistp256WithSha256(
+                    v_secPayload, 
+                    p_devicePrivateKey
+                );
+                log("f_buildGnSecuredOtherMessageWithDeviceCertificate: v_signature: ", v_signature);
+                
+                p_securedMessage := m_securedMessage( // See Clause 7.3   Generic security profile for other signed messages
+                    v_toBeSignedSecuredMessage.header_fields,
+                    v_toBeSignedSecuredMessage.payload_field,
+                    {
+                        m_trailer_field_signature(
+                            m_signature(
+                                m_ecdsaSignature(
+                                    m_eccPointecdsa_nistp256_with_sha256_y_coordinate_only(
+                                        substr(v_signature, 2, 32)
+                                    ),
+                                    substr(v_signature, 34, 32)
+                                )
+                            )
+                        )
+                    }
+                ); // End of template md_securedMessage_profileOther
+                
+                return true;
+            } // End of function f_buildGnSecuredOtherMessageWithDeviceCertificate
+            
+            testcase tc_checkDeviceSignature_01() runs on TCType system TCType {
+                // Local variables
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload;
+                var template (value) SecuredMessage v_securedMessage;
+                var Certificate v_aaCertificate, v_atCertificate;
+                var HeaderFields v_mandatoryHeaders := {};
+                var HeaderField v_signerInfo;
+                var template (value) SecPayload p_payloadField := m_payload_signed(v_gnPayload);
+                var template (omit) SignerInfoType p_signerInfoType := e_certificate;
+                var template (omit) HeaderFields p_headerFields := {
+                    m_header_field_generation_time(1000 * f_getCurrentTime()), // In us
+                    m_header_field_its_aid_CAM
+                };
+                var template (omit) charstring p_certificateName := cc_taCert_EC;
+                var boolean p_addMissingHeaders := true;
+                
+                f_loadCertificates(PX_IUT_SEC_CONFIG_NAME);
+                
+                // Build signed SecuredMessage
+                 v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := valueof(
+                    f_adaptPayload_m(
+                        bit2oct(
+                            encvalue(
+                                m_camReq(
+                                    m_camMsg_vehicle_HF_BV(
+                                        f_getTsStationId(),
+                                        f_getCurrentTime() mod 65536, // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                                        LibItsCam_Templates.m_tsPosition
+                ))))));
+                log("v_gnNonSecuredPacket=", v_gnNonSecuredPacket);
+                
+                // Encode it
+                v_gnPayload := bit2oct(
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload=", v_gnPayload);
+                
+                // Load certificates if required
+                if (f_prepareCertificates(p_certificateName, v_aaCertificate, v_atCertificate) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                log("v_aaCertificate=", v_aaCertificate);
+                log("v_atCertificate=", v_atCertificate);
+                
+                if (p_addMissingHeaders == true) {
+                    // Prepare mandatory headers
+                    if (valueof(p_signerInfoType) == e_certificate) { // Add the AT certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificate(
+                                    v_atCertificate
+                        )));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_chain) { // Add the AT certificate + AA Certificate
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_certificates(
+                                    {
+                                        v_aaCertificate,
+                                        v_atCertificate
+                                    }
+                                )
+                        ));
+                    }
+                    if (valueof(p_signerInfoType) == e_certificate_digest_with_sha256) { // Add the AT certificate digest
+                        v_signerInfo := valueof(
+                            m_header_field_signer_info(
+                                m_signerInfo_digest(
+                                    f_calculateDigestFromCertificate(v_atCertificate)
+                        )));
+                    }
+                    v_mandatoryHeaders := {
+                        v_signerInfo,
+                        valueof(m_header_field_generation_time(1000 * f_getCurrentTime())), // In us
+                        valueof(m_header_field_its_aid(c_its_aid_CAM))
+                    }
+                }
+                log("v_mandatoryHeaders=", v_mandatoryHeaders);
+                
+                log("v_securedMessage=", v_securedMessage);
+                
+                setverdict(pass);
+            }
+            
+            testcase tc_checkDeviceSignature_02() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                f_loadCertificates(PX_IUT_SEC_CONFIG_NAME);
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwBeaconPacket( // Non secured GN beacon
+                            m_dummyLongPosVectorIut
+                        )
+                    )
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                log("vc_atCertificate= ", vc_atCertificate);
+                log("vc_signingPrivateKey= ", vc_signingPrivateKey);
+                f_buildGnSecuredOtherMessageWithDeviceCertificate(
+                    v_securedMessageBeacon,
+                    v_gnPayload, 
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    ),
+                    vc_atCertificate,
+                    vc_signingPrivateKey
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwBeaconPacket(
+                            m_dummyLongPosVectorIut
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwBeaconPacket
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                log("Secured beacon: ", v_encMsg);
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_securedMessageBeacon, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+        } // End of group testSecurityFunctions
+        
+        group testGeoNetPrimitiveMessages {
+            
+            /**
+             * @desc validate GeoNetworkingReq/Beacon
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_Beacon() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A0010800000000100BC21A4FEDECABEEF0001E240000012F8000002A380372694FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwBeaconPacket(
+                            m_dummyLongPosVectorIut
+                    )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    true, 
+                    oct2bit(v_buffer)
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Beacon with certificate digest in header fields
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredBeacon_digest() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwBeaconPacket( // Non secured GN beacon
+                            m_dummyLongPosVectorIut
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwBeaconPacket(
+                            m_dummyLongPosVectorIut
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwBeaconPacket
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                log("Secured beacon: ", v_encMsg);
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Beacon with certificate in header fields
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredBeacon_certificate() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwBeaconPacket( // Non secured GN beacon
+                            m_dummyLongPosVectorIut
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwBeaconPacket(
+                            m_dummyLongPosVectorIut
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwBeaconPacket
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                log("Secured beacon: ", v_encMsg);
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Beacon
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredBeacon_WithAdditionalHeaders() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                log("vc_signingPrivateKey=", vc_signingPrivateKey);
+                log("vc_encryptPrivateKey=", vc_encryptPrivateKey);
+                log("vc_aaCertificate=", vc_aaCertificate);
+                log("vc_atCertificate=", vc_atCertificate);
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwBeaconPacket( // Non secured GN beacon
+                            m_dummyLongPosVectorIut
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    ),
+                    {
+                        {
+                            type_ := e_request_unrecognized_certificate,
+                            headerField := {
+                                digests := { '00CAFE'O }
+                            }
+                        }
+                    }
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwBeaconPacket(
+                            m_dummyLongPosVectorIut
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwBeaconPacket
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                log("Secured beacon: ", v_encMsg);
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured digest GeoNetworkingReq/LsRequest
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_LsRequestPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A0060800000000A0030390000BC21A4FEDECABEEF0001E240000012F8000002A380372694BC21A4FEDECABEEFFFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwLsRequestPacket(
+                            m_dummyLongPosVectorIut,
+                            12345,
+                            m_dummyGnAddrIut
+                    )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer)
+                );
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured digest GeoNetworkingReq/LsRequest
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestLsRequestPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwLsRequestPacket(
+                            m_dummyLongPosVectorIut,
+                            12345,
+                            m_dummyGnAddrIut
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwLsRequestPacket(
+                            m_dummyLongPosVectorIut,
+                            12345,
+                            m_dummyGnAddrIut
+                        ), // End of template m_geoNwLsRequestPacket
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("Secured beacon: ", v_encMsg);
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/LsReply
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_LsReplyPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A0061800000000A0030390000BC21A4FEDECABEEF0001E240000012F8000002A3803726948431A4FDEA5EA5ED0000036B0000010900000315FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwLsReplyPacket(
+                            m_dummyLongPosVectorIut,
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorNodeA),
+                            12345
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer)
+                );
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/LsReply
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredLsReplyPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwLsReplyPacket(
+                            m_dummyLongPosVectorIut,
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorNodeA),
+                            12345
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwLsReplyPacket(
+                            m_dummyLongPosVectorIut,
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorNodeA),
+                            12345
+                        ), // End of template m_geoNwLsReplyPacket
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("Secured beacon: ", v_encMsg);
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/NwShb
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_NwShbPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A00508000000F0A00BC21A4FEDECABEEF0001E240000012F8000002A3803726940000000044454641554C545F5041594C4F4144FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwShbPacket(
+                            m_dummyLongPosVectorIut
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false
+                );
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/NwShb with a CAM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_NwShbPacketWithBtpPayloadCam() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A10508000002E0A00BC21A4FEDECABEEF0001E240000012F8000002A380372694000000000000000001020001B20788B80059F48D95CDEFC8C5E0020020002461A83C000004805A100C4528399D4C387FFF80FFFFFFFFFFFF'O;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwShbPacket(
+                            m_dummyLongPosVectorIut
+                )));
+                v_gnReq.msgOut.gnPacket.packet.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false
+                );
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 46;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/NwShb with a DENM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_NwShbPacketWithBtpPayloadDenm() runs on TCType system TCType {
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A20508000003C0A00BC21A4FEDECABEEF0001E240000012F8000002A3803726940000000007D2000001010001B207C70000D90380000A0843ABBBE28210EAF534FA46CAE6F7E4630001001000186A000009600C05B00000DFFFF7FFFD8CE40400FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_btpB) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwShbPacket(
+                            m_dummyLongPosVectorIut
+                )));
+                v_gnReq.msgOut.gnPacket.packet.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+                                    )
+                               )
+                           )
+                        )
+                    )
+                );
+                
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false
+                );
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 60;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/NwShb
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredNwShbPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwShbPacket( 
+                            m_dummyLongPosVectorIut
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwShbPacket(
+                            m_dummyLongPosVectorIut
+                        ), // End of template m_geoNwLsReplyPacket
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with digest GeoNetworkingReq/NwShb with a CAM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestNwShbPacketWithBtpPayloadCam() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredCam(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload)
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 45;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with digest GeoNetworkingReq/NwShb with a CAM payload and one additional header field
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestNwShbPacketWithBtpPayloadCam_withMoreHeaders_1() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredCam(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    {
+                        m_header_field_unrecognised_certificate(
+                            f_HashedId3FromHashedId8(
+                                vc_aaCertificate.signer_info.signerInfo.digest
+                            )
+                        )
+                     }
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 45;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with digest GeoNetworkingReq/NwShb with a CAM payload and two additional header field
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestNwShbPacketWithBtpPayloadCam_withMoreHeaders_2() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredCam(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    {
+                        m_header_field_generation_location(
+                            vc_location
+                        ),
+                        m_header_field_unrecognised_certificate(
+                            f_HashedId3FromHashedId8(
+                                vc_aaCertificate.signer_info.signerInfo.digest
+                            )
+                        )
+                     }
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 45;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with digest GeoNetworkingReq/NwShb with a CAM payload and three additional header field
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestNwShbPacketWithBtpPayloadCam_withMoreHeaders_3() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredCam(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    {
+                        m_header_field_signer_info(
+                            m_signerInfo_certificate(
+                                vc_aaCertificate
+                        )),
+                        m_header_field_generation_location(
+                            vc_location
+                        ),
+                        m_header_field_unrecognised_certificate(
+                            f_HashedId3FromHashedId8(
+                                vc_aaCertificate.signer_info.signerInfo.digest
+                            )
+                        )
+                     }
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 45;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with certificate GeoNetworkingReq/NwShb with a CAM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredCertificateNwShbPacketWithBtpPayloadCam() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredCam(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 45;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with certificate chain GeoNetworkingReq/NwShb with a CAM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredCertCertificateNwShbPacketWithBtpPayloadCam() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_camReq(
+                                m_camMsg(
+                                    f_getTsStationId(),
+                                    35000
+                                )
+                            )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredCam(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_chain
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 45;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured with digest GeoNetworkingReq/NwShb with a DENM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestNwShbPacketWithBtpPayloadDenm() runs on TCType system TCType {
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_btpB) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwShbPacket(
+                    m_dummyLongPosVectorIut
+                );
+                // Add DENM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+                                    )
+                               )
+                           )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Encode it
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                
+                f_buildGnSecuredDenm(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                log("v_gnReq= ", v_gnReq);
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 60;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/TSB ExtendedHeader
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_TsbHeaderPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var octetstring v_payload := 'CAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECA'O;
+                var octetstring v_buffer := '01002B0A0051800000480A00269400008431A4FDEA5EA5ED0000036B000001090000031500500224CAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECAFFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                v_geoNetworkingPacket := m_geoNwPacketWithOctetstringPayload(
+                    m_commonHeader(
+                        PX_GN_UPPER_LAYER,
+                        m_tsbHeaderType,
+                        m_trafficClass,
+                        c_defaultHopLimit
+                    ),
+                    m_tsbHeader(
+                        9876, 
+                        m_dummyLongPosVectorNodeA
+                    ),
+                    v_payload
+                );
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        v_geoNetworkingPacket.packet
+                ));
+                log("v_gnReq :", v_gnReq);
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer)
+                );
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := lengthof(v_payload);
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/TSB ExtendedHeader
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredTsbHeaderPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var octetstring v_payload := 'CAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECA'O;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_geoNetworkingPacket := m_geoNwPacketWithOctetstringPayload(
+                    m_commonHeader(
+                        PX_GN_UPPER_LAYER,
+                        m_tsbHeaderType,
+                        m_trafficClass,
+                        c_defaultHopLimit
+                    ),
+                    m_tsbHeader(
+                        9876, 
+                        m_dummyLongPosVectorNodeA
+                    ),
+                    v_payload
+                );
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        v_geoNetworkingPacket.packet
+                ));
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        v_gnReq.msgOut.gnPacket.packet 
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnReq.msgOut.gnPacket.packet,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := lengthof(v_payload);
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Anycast
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_AnycastPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_buffer := '01002B0A00308000000F0A001DE60000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D217BE23A3000044454641554C545F5041594C4F4144FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwAnycastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            7654, 
+                            m_dummyGeoAnycastArea1
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Anycast
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredAnycastPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwAnycastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            7654, 
+                            m_dummyGeoAnycastArea1
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwAnycastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            7654, 
+                            m_dummyGeoAnycastArea1
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Anycast with hop limit
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_AnycastPacketWithHopLimit() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var ExtendedHeader v_header := null;
+                var octetstring v_buffer := '01002B0A00308000000F05001DE60000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D217BE23A3000044454641554C545F5041594C4F4144FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwAnycastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            7654, 
+                            m_dummyGeoAnycastArea1,
+                            c_defaultHopLimit / 2
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Anycast with hop limit
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredAnycastPacketWithHopLimit() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwAnycastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            7654, 
+                            m_dummyGeoAnycastArea1,
+                            c_defaultHopLimit / 2
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwAnycastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            7654, 
+                            m_dummyGeoAnycastArea1,
+                            c_defaultHopLimit / 2
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Unicast
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_UnicastPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var ExtendedHeader v_header := null;
+                var octetstring v_buffer := '01002B0A00208000000F0A001DE60000A832A40102030405000011E90000007E0000007B002D007DBC21A4FEDECABEEF0001E240000012F8000002A344454641554C545F5041594C4F4144FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwUnicastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorIut), 
+                            7654
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Anycast
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestUnicastPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwUnicastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorIut), 
+                            7654
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwUnicastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorIut), 
+                            7654
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                log("SecuredMsg=", v_encMsg);
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Unicast with hop limit
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_UnicastPacketWithHopLimit() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var ExtendedHeader v_header := null;
+                var octetstring v_buffer := '01002B0A00208000000F01001DE60000A832A40102030405000011E90000007E0000007B002D007DBC21A4FEDECABEEF0001E240000012F8000002A344454641554C545F5041594C4F4144FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwUnicastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorIut), 
+                            7654,
+                            1
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Anycast with hop limit
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredUnicastPacketWithHopLimit() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwUnicastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorIut), 
+                            7654,
+                            1
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwUnicastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            f_longPosVector2ShortPosVector(m_dummyLongPosVectorIut), 
+                            7654,
+                            1
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Broadcast
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_BroadcastPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var ExtendedHeader v_header := null;
+                var octetstring v_buffer := '01002B0A00418000000F0A000D800000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D217BE23A3000044454641554C545F5041594C4F4144FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwBroadcastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            3456, 
+                            m_dummyGeoBroadcastArea1
+                )));
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Broadcast
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredBroadcastPacket() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        m_geoNwBroadcastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            3456, 
+                            m_dummyGeoBroadcastArea1
+                        )
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        m_geoNwBroadcastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            3456, 
+                            m_dummyGeoBroadcastArea1
+                        ),
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 15;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Broadcast with payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_BroadcastPacketWithBtpPayload() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var octetstring v_payload := 'CAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECA'O;
+                var octetstring v_buffer := '01002B0A0041800000480A000D800000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D2162E23A30000CAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECAFFFFFFFFFFFF'O;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                v_gnNonSecuredPacket := m_geoNwBroadcastPacket(
+                    m_dummyLongPosVectorNodeB, 
+                    3456, 
+                    m_dummyGeoBroadcastArea1
+                );
+                v_geoNetworkingPacket := m_geoNwPacketWithOctetstringPayload(
+                    v_gnNonSecuredPacket.commonHeader,
+                    v_gnNonSecuredPacket.extendedHeader,
+                    v_payload
+                );
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        v_geoNetworkingPacket.packet
+                ));
+                log("v_gnReq :", v_gnReq);
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := lengthof(v_payload);
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate GeoNetworkingReq/Broadcast with payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_BroadcastPacketWithPayloadDenm() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                var octetstring v_buffer := '01002B0A20418000003C0A000D800000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D217BE23A3000007D2000001010001B207C70000D90380000A0843F2F2828210FCBCACFA46CAE6F7E4630001001000186A000009600C05B00000DFFFF7FFFD8CE40400FFFFFFFFFFFF'O; 
+                
+                if (PX_GN_UPPER_LAYER != e_btpB) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpB");
+                    stop;
+                }
+                
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwBroadcastPacket(
+                            m_dummyLongPosVectorNodeB, 
+                            3456, 
+                            m_dummyGeoBroadcastArea1
+                )));
+                v_gnReq.msgOut.gnPacket.packet.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+                                    )
+                               )
+                           )
+                        )
+                    )
+                );
+                log("v_gnReq :", v_gnReq);
+                test_PDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    false, 
+                    oct2bit(v_buffer));
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 60;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_buffer
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingReq/Broadcast with payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredBroadcastPacketWithBtpPayload() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var octetstring v_payload := 'CAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECACAFEDECA'O;
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwBroadcastPacket(
+                    m_dummyLongPosVectorNodeB, 
+                    3456, 
+                    m_dummyGeoBroadcastArea1
+                );
+                v_geoNetworkingPacket := m_geoNwPacketWithOctetstringPayload(
+                    v_gnNonSecuredPacket.commonHeader,
+                    v_gnNonSecuredPacket.extendedHeader,
+                    v_payload
+                );
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        v_geoNetworkingPacket.packet
+                ));
+                v_gnPayload := bit2oct( // Create GN payload
+                    encvalue(
+                        v_gnReq.msgOut.gnPacket.packet 
+                    )
+                );
+                f_buildGnSecuredOtherMessage(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnReq.msgOut.gnPacket.packet,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg=", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := lengthof(v_payload);
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured digest GeoNetworkingReq/Broadcast with DENM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredDigestBroadcastPacketWithBtpDenm() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                var octetstring v_buffer := '01002B0A2041800000390A000D800000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D2162E23A300000000000001010001B207C0000D903800000000006072000000188593E91B2B9BDF918BC00400400000C35000C16C0010E0000800018CE00000FFFFFFFFFFFF'O; 
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_btpB) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpB");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwBroadcastPacket(
+                    m_dummyLongPosVectorNodeB, 
+                    3456, 
+                    m_dummyGeoBroadcastArea1
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add DENM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+                                    )
+                               )
+                           )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredDenm(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate_digest_with_sha256,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 60;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate secured dcertificate GeoNetworkingReq/Broadcast with DENM payload
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetReq_SecuredCertificateBroadcastPacketWithBtpDenm() runs on TCType system TCType {
+                var GeoNetworkingReq v_gnReq;
+                var GnNonSecuredPacket v_gnNonSecuredPacket;
+                var GeoNetworkingPacket v_geoNetworkingPacket;
+                var octetstring v_gnPayload, v_encMsg;
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+                var template (value) SecuredMessage v_securedMessageBeacon;
+                
+                if (PX_GN_UPPER_LAYER != e_btpB) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpB");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                // Build signed SecuredMessage
+                v_gnNonSecuredPacket := m_geoNwBroadcastPacket(
+                    m_dummyLongPosVectorNodeB, 
+                    3456, 
+                    m_dummyGeoBroadcastArea1
+                );
+                log("v_gnNonSecuredPacket= ", v_gnNonSecuredPacket);
+                // Add CAM payload
+                v_gnNonSecuredPacket.payload := f_adaptPayload_m(
+                    bit2oct(
+                        encvalue(
+                            m_denmReq(
+                                m_denmPdu(
+                                    m_denm(
+                                        m_denmMgmtCon(
+                                            m_tsActionId
+                                        ),
+                                        v_situation,
+                                        m_denmLocation_zeroDelta
+                                    )
+                               )
+                           )
+                        )
+                    )
+                );
+                log("v_gnNonSecuredPacket.payload= ", v_gnNonSecuredPacket.payload);
+                // Encode it
+                v_gnPayload := bit2oct( 
+                    encvalue(
+                        v_gnNonSecuredPacket
+                    )
+                );
+                log("v_gnPayload= ", v_gnPayload);
+                f_buildGnSecuredDenm(
+                    v_securedMessageBeacon,
+                    m_payload_signed(v_gnPayload),
+                    e_certificate,
+                    m_threeDLocation(
+                        1234,
+                        5678,
+                        '002F'O
+                    )
+                );
+                log("v_securedMessageBeacon= ", v_securedMessageBeacon);
+                
+                // Build secured Gn packet
+                v_gnReq := m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwSecPdu(
+                        v_gnNonSecuredPacket,
+                        v_securedMessageBeacon
+                    ) // End of template m_geoNwSecPdu
+                ); // End of template m_geoNwReq_linkLayerBroadcast
+                
+                // Encode it
+                v_encMsg := bit2oct(encvalue(v_gnReq));
+                log("v_encMsg= ", v_encMsg);
+                if (not isbound(v_encMsg)) {
+                    setverdict(fail, "Encoding failed!");
+                    stop;
+                }
+                setverdict(pass, "Encoding passed.");
+                // Decode it
+                v_gnReq.msgOut.gnPacket.packet.commonHeader.plLength := 60;
+                test_decodePDU<GeoNetworkingReq>(
+                    v_gnReq, 
+                    v_encMsg
+                );
+                log("v_gnReq: ", v_gnReq);
+                
+                if (decvalue(oct2bit(v_encMsg), v_gnReq) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnReq.msgOut.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingInd/Beacon
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetInd_Beacon() runs on TCType system TCType {
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd_withLinkLayerDestination( 
+                        mw_geoNwPdu(
+                            mw_geoNwBeaconPacket(
+                                ?
+                            )
+                        ), 
+                        'FFFFFFFFFFFF'O
+                    ), 
+                    '01002B0A0010800000000100BC21A4FEDECABEEF0001E240000012F8000002A380372694FFFFFFFFFFFF'O
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingInd/Beacon
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetInd_SecuredBeacon() runs on TCType system TCType {
+                var GeoNetworkingInd v_gnInd;
+                var octetstring v_decMsg := '02002B0A021E80015024A224729A4C800000013981FD42941003000004D20000162E002F01200010800000000100BC21A4FEDECABEEF0001E240000012F8000002A380372694430100027714B9A92AC942E36C0B8A87C516770251A24AB00394FBD2C01A9105CA677A95968A816454027D23D26F0CD335C12D111D8FD7D02A85DA45FB2F3E6C99BFE0EAFFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd(
+                        mw_geoNwSecPdu(
+                            mdw_securedMessage,
+                            mw_geoNwBeaconPacket(
+                                ?
+                            )
+                        )
+                    ), 
+                    v_decMsg
+                );
+                
+                // Check signature
+                if (decvalue(oct2bit(v_decMsg), v_gnInd) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnInd.msgIn.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            /**
+             * @desc validate GeoNetworkingInd/LsReply
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetInd_LsRequestPacket() runs on TCType system TCType {
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd_withLinkLayerDestination( 
+                        mw_geoNwPdu(
+                            mw_geoNwLsRequestPacket(
+                                12345,
+                                ?
+                            )
+                        ), 
+                        'FFFFFFFFFFFF'O
+                    ), 
+                    '01002B0A0060800000000A0030390000BC21A4FEDECABEEF0001E240000012F8000002A380372694BC21A4FEDECABEEFFFFFFFFFFFFF'O
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingInd/LsReply
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetInd_SecuredLsRequestPacket() runs on TCType system TCType {
+                var GeoNetworkingInd v_gnInd;
+                var octetstring v_decMsg := '02002B0A021E80015024A224729A4C800000013981FF5C67A803000004D20000162E002F012C0060800000000A0030390000BC21A4FEDECABEEF0001E240000012F8000002A380372694BC21A4FEDECABEEF430100027C8D3FE7CCA30FFBE6CC7D3C7C31F06EDB8976268F584052C4112C9D9FA1180DF3F389DB64926D40C9A4EB72BCB81A41641018A980703C3CB1BD1BF7482B58E6FFFFFFFFFFFF'O;
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd_withLinkLayerDestination( 
+                        mw_geoNwSecPdu(
+                            mdw_securedMessage,
+                            mw_geoNwLsRequestPacket(
+                                12345,
+                                ?
+                            )
+                        ), 
+                        'FFFFFFFFFFFF'O
+                    ), 
+                    v_decMsg
+                );
+                
+                
+                // Check signature
+                if (decvalue(oct2bit(v_decMsg), v_gnInd) == 0) {
+                    if (f_verifyGnSecuredMessageSignatureWithCertificate(v_gnInd.msgIn.gnPacket.securedMsg, vc_atCertificate) == true) {
+                        setverdict(pass, "Signature check succeed.");
+                    } else {
+                        setverdict(fail, "Signature check failed.");
+                    } 
+                } else {
+                    setverdict(fail, "Decoding failed.");
+                }
+            }
+            
+            testcase tc_GeoNetInd_ShbHeaderPacket() runs on TCType system TCType {
+                
+                if (PX_GN_UPPER_LAYER != e_any) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_any");
+                    stop;
+                }
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd_withLinkLayerDestination( 
+                        mw_geoNwPdu(
+                            mw_geoNwShbPacket(
+                                ?,
+                                ?
+                            )
+                        ), 
+                        'FFFFFFFFFFFF'O
+                    ), 
+                    '01002B0A00508000000F0A00BC21A4FEDECABEEF0001E240000012F8000002A3803726940000000044454641554C545F5041594C4F4144FFFFFFFFFFFF'O
+                );
+            }
+            
+            testcase tc_GeoNetInd_SecuredDigest() runs on TCType system TCType {
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd(
+                        mw_geoNwSecPdu(
+                            mdw_securedMessage, 
+                            mw_geoNwAnyPacket_withPayload(
+                                ?
+                    ))), 
+                    '02002b0a0201168001b893358ab25faf640000000148c57ff5ec05000254005210508000002e0a00bc21a4fedecabeeff6c53234000012f8000002a3803726940000000007d1000001020001b20788b80059f48d95cdefc8c5e0020020002461a83c000004805a100c4528399d4c387fff80430100020000f9a888a78d9053507a828711deef7f38d470736fc07bbb7f4bf044ed0d80325b6d55af32e9aeaa69b281132ce3f596ef5eaf4281aa8c4f0398ab126d3f90b855ffffffffffff'O
+                );
+            }
+            
+            testcase tc_GeoNetInd_SecuredCertificate_DENM() runs on TCType system TCType {
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd(
+                        mw_geoNwSecPdu(
+                            mdw_securedMessage, 
+                            mw_geoNwAnyPacket_withPayload(
+                                ?
+                    ))), 
+                    '02002B0A028124800202015024A224729A4C80010080950000044D8F459AD7485EF21803B7CB9B6D857CCD721542BFE99FACFFB3DF44C34140593126362569F78A5169EBB0FC878B9AD07DDC2B36D01E83C02EABE71210C879DF010100046AE865F5E00290B2BE93D1F26D9857F7B19E53D213846B2C276247DCCED022AC244258C9D1ACF2E3F8BF750F952B02C81ACA013AC018C56F85C4A7E68E9587780220210AC040800100C0408101002401146B4B831A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D00527835000002E7F2FCB38E1418219A51808983988739DFDC649DA209EA6C59319117374E0ED4DBED15F51C6D3106883DCE308A9E6A8E314EA24E8322DDFB02971FDB8C22B26000001398255A96C2803000004D20000162E002F05C04081017020418000003C0A000D800000A832A40102030405000011E90000007E0000007B002D007D00048D8800007FE904D217BE23A3000007D2000001010001B207C70000D90380000A084446EB02821111BACCFA46CAE6F7E4630001001000186A000009600C05B00000DFFFF7FFFD8CE40400430100024AD9813B0BE1B67A8C1AB211D28C6BFC5FE3EA1A3AC5349DB6FF06FBAFF708C54466E608FEAE8AA565F4EA793CCC5D1726679CD59FFA6FD00FB5A61569D343E4FFFFFFFFFFFF'O
+                );
+            }
+            
+            testcase tc_GeoNetInd_SecuredCertificate_CAM() runs on TCType system TCType {
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd(
+                        mw_geoNwSecPdu(
+                            mdw_securedMessage, 
+                            mw_geoNwAnyPacket_withPayload(
+                                ?
+                    ))), 
+                    '02002B0A028119800202015024A224729A4C80010080950000044D8F459AD7485EF21803B7CB9B6D857CCD721542BFE99FACFFB3DF44C34140593126362569F78A5169EBB0FC878B9AD07DDC2B36D01E83C02EABE71210C879DF010100046AE865F5E00290B2BE93D1F26D9857F7B19E53D213846B2C276247DCCED022AC244258C9D1ACF2E3F8BF750F952B02C81ACA013AC018C56F85C4A7E68E9587780220210AC040800100C0408101002401146B4B831A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D00527835000002E7F2FCB38E1418219A51808983988739DFDC649DA209EA6C59319117374E0ED4DBED15F51C6D3106883DCE308A9E6A8E314EA24E8322DDFB02971FDB8C22B260000013981EF9678B805C04080015110508000002D0A00BC21A4FEDECABEEF0001E240000012F8000002A3803726940000000007D2000001020001B20788B80059F48D95CDEFC8C6000200200030D41E0000012016840310A50733A9870FFFD0430100022457F8BB0467B2C62318395A56BBF0004BE8E486D1186586CB385D332DDE83EA511F53431CE38F6F13835DEA3AF3F20D3FC84341EE87090992FC1E05AD6ECA2BFFFFFFFFFFFF'O
+                );
+            }
+            
+            /**
+             * @desc validate secured GeoNetworkingInd/SHB with certificates chain
+             * @verdict Pass on success, Fail otherwise
+             */
+            testcase tc_GeoNetInd_SecuredShbCAMWithCertificatesChain() runs on TCType system TCType {
+                var GeoNetworkingInd v_gnInd;
+                var octetstring v_decMsg := '02002B0A028231800382200201FABD6A8FA6CAB3740210455453495F506C7567746573745F41418091000004F4A81DE17B3BBFD8ABB276D9F1FF8290FCC5FF8863E8B251398E9DDB81A9FDC1268AED92B4B15099AB0BCE24378BE907D5EF0E7F3FB69C1A84C9FC5452A20A2C010100043288A11BE5A5781D7C206DAF3080FBEB52AE945F809CF266D029EA1CD57042303288A11BE5A5781D7C206DAF3080FBEB52AE945F809CF266D029EA1CD570423002202006C04080C040812401146B4B831A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D00527835000009C26B3AA8A670471D89ECD7DB76E907B5D7F5C519E6C2FCB362A7DC225172BD176E7AF6E54754D30B4F18F80B9130B80C99EAAAF65C2A9D8A587C9B7ED629F6202015024A224729A4C80010080950000044D8F459AD7485EF21803B7CB9B6D857CCD721542BFE99FACFFB3DF44C34140593126362569F78A5169EBB0FC878B9AD07DDC2B36D01E83C02EABE71210C879DF010100046AE865F5E00290B2BE93D1F26D9857F7B19E53D213846B2C276247DCCED022AC244258C9D1ACF2E3F8BF750F952B02C81ACA013AC018C56F85C4A7E68E9587780220210AC040800100C0408101002401146B4B831A5617030303181DB9CF7C052616001DB9566E0526872A1D53F0D00527835000002E7F2FCB38E1418219A51808983988739DFDC649DA209EA6C59319117374E0ED4DBED15F51C6D3106883DCE308A9E6A8E314EA24E8322DDFB02971FDB8C22B260000013981F04477B005C04080015110508000002D0A00BC21A4FEDECABEEF0001E240000012F8000002A3803726940000000007D2000001020001B20788B80059F48D95CDEFC8C6000200200030D41E0000012016840310A50733A9870FFFD043010002388DEF19AE517360CA2D84BF2CE360B6B65B553A2D21B8329DC9897DFD45117452EAD22250846919E58E0C7E28A25F69423A120491D17BEB08FD38C3A454E63CFFFFFFFFFFFF'O;
+                var bitstring v_decode;
+                
+                if ((PX_GN_UPPER_LAYER != e_btpA) and (PX_GN_UPPER_LAYER != e_btpB)) {
+                    log("PX_GN_UPPER_LAYER shall be set to e_btpA or e_btpB");
+                    setverdict(inconc);
+                    stop;
+                }
+                
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_decodePDU<GeoNetworkingInd>( 
+                    mw_geoNwInd(
+                        mw_geoNwSecPdu(
+                            mdw_securedMessage(
+                                superset(
+                                    mw_header_field_signer_info_certificate_chain(
+                                        ?
+                                    )
+                                )
+                            )
+                        )
+                    ), 
+                    v_decMsg
+                );
+                
+            }
+            
+        } // End of testGeoNetPrimitiveMessages
+        
+        group testUtEvent {
+            
+            testcase tc_UtGnInitialize() runs on TCType system TCType {
+                test_PDU<UtInitialize>(m_gnInitialize, false);
+            }
+            
+            testcase tc_UtSecGnInitialize() runs on TCType system TCType {
+                // Load certificates & keys
+                if (f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) == false) {
+                    setverdict(fail);
+                    stop;
+                }
+                f_setGenerationLocation(
+                    f_getTsLatitude(),
+                    f_getTsLongitude()
+                );
+                
+                test_PDU<UtInitialize>(m_secGnInitialize(f_calculateDigestFromCertificate(vc_atCertificate)), false);
+            }
+            
+            testcase tc_UtInitializeResult() runs on TCType system TCType {
+                test_decodePDU<UtInitializeResult>(UtInitializeResult:true, '0101'O);
+            }
+            
+            testcase tc_UtGnTrigger_01() runs on TCType system TCType {
+                test_PDU<UtGnTrigger>(
+                    m_generateShbMessageWithPayload(
+                        char2oct("PAYLOAD")
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtGnTrigger_02() runs on TCType system TCType {
+                test_PDU<UtGnTrigger>(
+                    m_generateTsbMessage, 
+                    false
+                );
+            }
+            
+            testcase tc_UtGnTrigger_03() runs on TCType system TCType {
+                test_PDU<UtGnTrigger>(
+                    m_generateTsbMessageWithLifetime(c_lifetime), 
+                    false
+                );
+            }
+            
+            testcase tc_UtGnTrigger_04() runs on TCType system TCType {
+                test_PDU<UtGnTrigger>(
+                    m_generateTsbMessageWithTrafficClass(
+                        valueof(
+                            m_trafficClass(
+                                e_scfDisabled
+                    ))), 
+                    false
+                );
+            }
+            
+            testcase tc_UtGnTrigger_05() runs on TCType system TCType {
+                test_PDU<UtGnTrigger>(
+                    m_generateTsbMessage, 
+                    false
+                );
+            }
+            
+            testcase tc_UtGnEventInd_01() runs on TCType system TCType {
+                var octetstring v_data := '55003007d1000001020001b20712244059f48d95cdefc8c6000200200030d41e0000012016840310a50733a9870fffd0004000'O;
+                test_decodePDU<UtGnEventInd>(UtGnEventInd:?, v_data);
+            }
+            
+        } // End of group testUtEvent
+
+    } // End of group LibItsGeoNetworking_testCases
+
+} // End of module test_LibItsGeoNetworking_TypesAndValues

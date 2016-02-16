@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a signed 1609.2 message if it contains a secured data exchange, identified not localized scope with zero PSID SSPs in its permissions list."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/8d201b66-5666-45dd-a3aa-6c99f0137a37"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "b60a6926-2b7f-47e8-ae62-349b370d59df"
+}

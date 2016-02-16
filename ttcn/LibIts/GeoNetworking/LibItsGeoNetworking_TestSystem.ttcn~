@@ -1,0 +1,213 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/GeoNetworking/LibItsGeoNetworking_TestSystem.ttcn $
+ *              $Id: LibItsGeoNetworking_TestSystem.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Test System module for ITS GeoNetworking
+ *
+ */
+
+//TODO: Adapter port!
+module LibItsGeoNetworking_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_Time {modulepar all};
+    import from LibCommon_Sync all;
+    import from LibCommon_BasicTypesAndValues {
+        type UInt16;
+        const c_uInt16Max
+    };
+    
+    // LibItsCommon
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsExternal_TypesAndValues all;
+    
+    // LibItsGeoNetworking
+    import from LibItsGeoNetworking_TypesAndValues all;
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TestSystem all;
+    
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+
+	//User
+	
+	import from General_Types all;
+	import from TTCN_EncDec all;
+    
+    group portDefinitions {
+        
+        /**
+         * @desc Adapter control port
+         */
+        type port AdapterControlPort message {
+            out
+                AcGnPrimitive, AcGn6Primitive;
+            in
+                AcGnResponse, AcGn6Response;
+        } with { extension "internal" }; // end AdapterControlPort
+        
+        /**
+         * @desc Upper Tester port
+         */
+        type port UpperTesterPort message {
+            out
+                UtInitialize, UtChangePosition, UtGnTrigger;
+            in
+                UtInitializeResult, UtChangePositionResult, UtGnTriggerResult, UtGnEventInd;
+        } with  {extension "internal" 
+/* with { extension "user UDPasp_PT 
+					out(
+						UtInitialize 		-> 	ASP_UDP_message: function(enc_UtInitialize);
+						UtGnTrigger 		-> 	ASP_UDP_message: function(enc_UtGnTrigger);
+						UtChangePosition 	-> 	ASP_UDP_message: function(enc_UtChangePosition) 
+					)
+					in(
+						ASP_UDP_open_result -> 	-: discard;
+						ASP_UDP				-> 	UtInitializeResult: function(dec_UtInitializeResult),
+												UtGnTriggerResult: function(dec_UtGnTriggerResult),
+												UtChangePositionResult: function(dec_UtChangePositionResult),
+												UtGnEventInd: function(dec_UtGnEventInd);
+						ASP_UDP_message		-> 	UtInitializeResult: function(dec_UtInitializeResult_message),
+												UtGnTriggerResult: function(dec_UtGnTriggerResult_message),
+												UtChangePositionResult: function(dec_UtChangePositionResult_message),
+												UtGnEventInd: function(dec_UtGnEventInd_message)
+					)" */
+
+		} // end UpperTesterPort
+        
+    } // end portDefinitions
+    
+    group interfacePorts {
+        
+        group networkAndTransportPorts {
+            
+            group nt2Ports {
+                
+                /**
+                 * @desc NT2 GeoNetworking Port (GeoNetworking/G5)
+                 */
+                type port GeoNetworkingPort message {
+                    in GeoNetworkingInd;
+                    out GeoNetworkingReq;
+                }  with  {extension "internal" 
+
+/* with { extension "user LANL2asp_PT
+						out(
+							GeoNetworkingReq -> ASP_LANL2: function(enc_GeoNetworkingReq) 
+						)
+						in(
+							ASP_LANL2				-> GeoNetworkingInd: function(dec_GeoNetworkingInd);
+							ASP_LANL2_Error			-> -: discard;
+							ASP_v2_LANL2			-> GeoNetworkingInd: function(dec_GeoNetworkingInd_v2);
+							ASP_LANL2_open_result	-> -: discard;
+							ASP_v2_LANL2_Error		-> -: discard
+						)" */
+				} // end GeoNetworkingPort
+                
+            } // End of group nt2Ports
+            
+        } // End of group networkAndTransportPorts
+    
+    } // End of group interfacePorts
+    
+    group componentDefinitions {
+        
+        /**
+         * @desc ITS Main Test Component
+         */
+        type component ItsMtc extends ItsBaseMtc, ServerSyncComp, ItsSecurityBaseComponent, ItsBaseGeoNetworking { // TODO Extend ItsBaseMtc with ItsSecurityBaseComponent? {
+            
+            /*port UpperTesterPort utPort;
+            port AdapterControlPort acPort;*/
+            
+            var ComponentTable vc_componentTable := {};
+            
+            // UT indications
+            //var UtGnEventIndList vc_utInds := {};
+            
+        } // end ItsMtc
+        
+        /**
+         * @desc ITS System Adapter
+         */
+        type component ItsGeoNetworkingSystem {
+            
+            port UpperTesterPort utPort;
+            port AdapterControlPort acPort;
+            
+            // NT2 ports
+            port GeoNetworkingPort geoNetworkingPort;
+            
+        } // end ItsGeoNetworkingSystem
+        
+    } // End of group componentDefinitions
+    
+    type component ItsBaseGeoNetworking extends ItsBaseComponent, ItsSecurityBaseComponent { // TODO Extend ItsBaseComponent with ItsSecurityBaseComponent?
+        
+        port UpperTesterPort utPort;
+        port AdapterControlPort acPort;
+        
+        // UT indications
+        var UtGnEventIndList vc_utInds := {};
+        
+    }
+    
+    /**
+     * @desc Test component for ITS Network and Transport layer
+     */
+    type component ItsGeoNetworking extends ItsBaseGeoNetworking {
+        
+        // NT2 ports
+        port GeoNetworkingPort geoNetworkingPort;
+        
+        //variables for Gn
+        var UInt16 vc_localSeqNumber := 0; 
+        var PositionTable vc_positionTable := {};
+        var GeoAreaTable vc_areaTable := {};
+        var charstring vc_componentName := "";
+        var default vc_neighbourDefault;
+        var integer vc_multipleMessagesCount := 0; 
+        
+    } // End of component ItsGeoNetworking
+    
+    group networkAndTransportPrimitives {
+        
+        group nt2Primitives {
+            
+            /**
+             * @desc NT2 GeoNetworking Indication Primitive
+             */
+            type record GeoNetworkingInd {
+                GeoNetworkingPdu    msgIn,
+                MacAddress          macDestinationAddress
+            } with { variant "" };
+            
+            /**
+             * @desc NT2 GeoNetworking Request Primitive
+             */
+            type record GeoNetworkingReq {
+                GeoNetworkingPdu    msgOut,
+                MacAddress          macDestinationAddress
+            } with { variant "" };
+            
+        } // end nt2Primitives
+        
+    } // End of group networkAndTransportPrimitives
+    
+    
+    group misc {
+        
+        type record ComponentEntry {
+           charstring          componentName,
+           ItsGeoNetworking    gnComponent optional
+        } with { variant "" };
+        
+        type record of ComponentEntry ComponentTable with { variant "" };
+        
+    } // end misc
+    
+} with { encode "RAW" };
+
+// End of module LibItsGeoNetworking_TestSystem
+

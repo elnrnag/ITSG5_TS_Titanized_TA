@@ -1,0 +1,172 @@
+module test_LibItsCam_TypesAndValues /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+    
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997"all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    
+    // AtsCam
+    import from LibItsCam_TestSystem all;
+    import from LibItsCam_Templates all;
+    import from LibItsCam_TypesAndValues all;
+    import from LibItsCam_Functions all;
+    import from LibItsCommon_Functions all;
+    
+    import from test_CommonCodec all;
+    
+    group LibItsCam_testCases {
+        
+        group camTemplates {
+            
+            template (value) CAM m_camMsg(
+                StationID p_stationId,
+                GenerationDeltaTime p_generationTime
+            ) := {
+                header := {
+                    protocolVersion := 1,
+                    messageID := 2,
+                    stationID := p_stationId
+                },
+                cam := {
+                    generationDeltaTime := p_generationTime,
+                    camParameters := {
+                        basicContainer := {
+                            stationType := StationType_passengerCar_,
+                            referencePosition := {
+                                latitude := f_integer2Latitude(f_getTsLatitude()),
+                                longitude := f_integer2Longitude(f_getTsLongitude()),
+                                positionConfidenceEllipse := {
+                                    semiMajorConfidence   := SemiAxisLength_oneCentimeter_,
+                                    semiMinorConfidence   := SemiAxisLength_oneCentimeter_,
+                                    semiMajorOrientation  := HeadingValue_wgs84North_
+                                },
+                                altitude := {
+                                    altitudeValue := AltitudeValue_referenceEllipsoidSurface_,
+                                    altitudeConfidence := unavailable
+                                }
+                            }
+                        },
+                        highFrequencyContainer := {
+                            basicVehicleContainerHighFrequency := {
+                                heading := {
+                                    headingValue := HeadingValue_wgs84North_, //0
+                                    headingConfidence := 10
+                                },
+                                speed := {
+                                    speedValue := 45,
+                                    speedConfidence := 5
+                                },
+                                driveDirection := forward,
+                                vehicleLength := {
+                                    vehicleLengthValue := 50,
+                                    vehicleLengthConfidenceIndication := noTrailerPresent
+                                },
+                                vehicleWidth := 21,
+                                longitudinalAcceleration := {
+                                    longitudinalAccelerationValue := LongitudinalAccelerationValue_unavailable_,
+                                    longitudinalAccelerationConfidence := AccelerationConfidence_unavailable_
+                                },
+                                curvature := {
+                                    curvatureValue := CurvatureValue_straight_,
+                                    curvatureConfidence := unavailable
+                                },
+                                curvatureCalculationMode := yawRateUsed,
+                                yawRate := {
+                                    yawRateValue := YawRateValue_straight_,
+                                    yawRateConfidence := unavailable
+                                },
+                                accelerationControl := omit,
+                                lanePosition := omit,
+                                steeringWheelAngle := omit,
+                                lateralAcceleration := omit,
+                                verticalAcceleration := omit, 
+                                performanceClass := omit,
+                                cenDsrcTollingZone := omit
+                            }
+                        },
+                        lowFrequencyContainer := omit,
+                        specialVehicleContainer := omit
+                    }
+                }
+            };
+            
+        } // End of group camTemplates
+        
+        group testUtEvent {
+            testcase tc_UtCamInitialize() runs on TCType system TCType {
+                test_PDU<UtInitialize>(m_camInitialize, false);
+            }
+            
+            testcase tc_changeHeading() runs on TCType system TCType {
+                test_PDU<UtCamTrigger>(m_changeHeading(5), false);
+            }
+            
+            testcase tc_changePosition() runs on TCType system TCType {
+                test_PDU<UtChangePosition>(
+                    UtChangePosition: {
+                        latitude := 49845,
+                        longitude := 631,
+                        elevation := 512
+                    }, 
+                    false
+                );
+            }
+            
+            testcase tc_changeSpeed() runs on TCType system TCType {
+                test_PDU<UtCamTrigger>(m_changeSpeed(2), false);
+            }
+            
+            testcase tc_UtCamEventInd_01() runs on TCType system TCType {
+                var octetstring v_data := '23002901020001b207b2f40056b49d200d693a40000200200030d41e0000012016840310a50733a9870fffd0'O;
+                test_decodePDU<UtCamEventInd>(UtCamEventInd:?, v_data);
+            }
+            
+        } // End of group testUtEvent
+        
+        group testCamPrimitiveMessages {
+            
+            testcase tc_CamReq() runs on TCType system TCType {
+                log("v_camReq=", m_camReq(
+                    m_camMsg(
+                        f_getTsStationId(),
+                        35000 // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                    )
+                ));
+                log("v_camReq=", bit2oct(encvalue(m_camReq(
+                    m_camMsg(
+                        f_getTsStationId(),
+                        35000 // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                    )
+                ))));
+                test_PDU<CamReq>(
+                    m_camReq(
+                        m_camMsg(
+                            f_getTsStationId(),
+                            35000 // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                        )
+                    ), 
+                    true,
+                    oct2bit('01020001B20788B80059F48D95CDEFC8C6000200200030D41E0000012016840310A50733A9870FFFD0'O)
+                );
+            }
+            
+            testcase tc_encodeCamTemplate() runs on TCType system TCType {
+                var template (value) CamReq v_camReq := m_camReq(
+                    m_camMsg_vehicle_HF_BV(
+                        f_getTsStationId(),
+                        f_getCurrentTime() mod 65536, // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                        m_tsPosition
+                    )
+                );
+                log("v_camReq=", v_camReq);
+                log("v_camReq=", bit2oct(encvalue(v_camReq)));
+                
+            }
+            
+        } // End of group testCamPrimitiveMessages
+        
+    } // End of group LibItsCam_testCases
+}

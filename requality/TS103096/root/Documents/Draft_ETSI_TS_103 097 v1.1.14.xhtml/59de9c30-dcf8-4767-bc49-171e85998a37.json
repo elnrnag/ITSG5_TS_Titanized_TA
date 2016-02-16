@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\"><a name=\"59de9c30-dcf8-4767-bc49-171e85998a37\" id=\"id_59de9c30-dcf8-4767-bc49-171e85998a37\" class=\"requality_id\"><\/a>A <\/span><a xmlns=\"http://www.w3.org/1999/xhtml\" href=\"type\"><span class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\">Payload<\/span><\/font><span class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\">\n<\/span><\/a><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\"> element shall be included for all DENMs. This element shall be of type <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\">signed<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_59de9c30-dcf8-4767-bc49-171e85998a37\"> and contain the DENM payload.<\/span><\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "d6489698-69ee-4bda-ae69-e89377fb1e73"
+}

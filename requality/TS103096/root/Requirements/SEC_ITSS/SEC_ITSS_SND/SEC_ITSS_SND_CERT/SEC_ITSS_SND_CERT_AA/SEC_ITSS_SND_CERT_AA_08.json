@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "54c370dc-b1c2-41ed-8a41-311db665d0d0",
+            "type": "STRING",
+            "value": "If ITS-S sends an AA certificate check that the AIDs in the its_aid_list are unique\r\nCheck that AID list contains not more than 31 item"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "54c370dc-b1c2-41ed-8a41-311db665d0d0",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/0ad16abb-f2b4-4764-9fdd-3ae0394e553f",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/8e9f84e1-3f43-4323-a3de-efed4d7e08ca"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "54c370dc-b1c2-41ed-8a41-311db665d0d0",
+            "type": "STRING",
+            "value": "08. Check ITS-AID"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "54c370dc-b1c2-41ed-8a41-311db665d0d0",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "54c370dc-b1c2-41ed-8a41-311db665d0d0"
+}

@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_39 b1+\"><li class=\"class_36\"><font style=\"font-family: Times New Roman; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\"><a name=\"12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\" id=\"id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\" class=\"requality_id\"><\/a>Root CAs, which sign certificates of other CAs, shall use the <\/span><a href=\"type\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">SubjectType<\/span><\/font><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><\/a><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\"> <\/span><font style=\"font-family: Courier New;\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">root_ca<\/span><font style=\"font-family: Times New Roman;\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">. <\/span><\/font><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><\/font><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><\/font><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><\/li><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><\/p><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><p xmlns=\"http://www.w3.org/1999/xhtml\" class=\"class_39 b1+\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\t<\/span><li class=\"class_36\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\">\n<\/span><font style=\"font-family: Times New Roman; font-size: 10pt; font-style: normal; font-weight: normal; text-decoration: none; vertical-align: baseline;\"><span class=\"requality_text id_12e35a8b-e0f5-44e6-a5f5-4fb3e932e835\"><\/span><\/font><\/li><\/p>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "12e35a8b-e0f5-44e6-a5f5-4fb3e932e835"
+}

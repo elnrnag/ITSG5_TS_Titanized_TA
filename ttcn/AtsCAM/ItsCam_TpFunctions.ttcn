@@ -1,0 +1,3050 @@
+/**
+ *    @author   ETSI STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsCAM/ItsCam_TpFunctions.ttcn $
+ *              $Id: ItsCam_TpFunctions.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *    @desc     CAM TP functions
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+
+module ItsCam_TpFunctions {
+    
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Time all;
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TypesAndValues {
+        type UtChangePosition
+    };
+    import from LibItsCam_TestSystem all;
+    import from LibItsCam_Functions all;
+    import from LibItsCam_Templates all;
+    import from LibItsCam_TypesAndValues all;
+    import from LibItsCam_Pics {modulepar all};
+    
+    import from ITS_Container language "ASN.1:1997" all;
+    import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+
+    // 5.2.1
+    group camMessageDissemination { 
+        
+        group camMessageFormat {
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_FMT_BV_01
+             */
+            function f_CAM_MSD_FMT_BV_01() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_FMT_BV_01
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_FMT_BV_02
+             */
+            function f_CAM_MSD_FMT_BV_02() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION or PICS_RSU) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_LF_any )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": FAIL: Expected CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_FMT_BV_02
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_FMT_BV_03
+             */
+            function f_CAM_MSD_FMT_BV_03() runs on ItsCam {
+                
+                // Local variables
+                timer t_minTransInterval := c_lowFrequencyGenerationTime * 1.10;
+                var SpeedValue v_speedValues[5] := { 1000, 2000, 3000, 4000, 5000 } //cm/s
+                var integer v_cntSpeed, v_cntTime;
+                var CamInd v_camInd;
+                var boolean v_nextCamWithLF := false;
+                const integer c_cntTimeLimit := 10;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION or PICS_RSU) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                     [] camPort.receive(mw_camInd ( mw_camMsg_LF_any )){ 
+                        tc_ac.stop;
+                        t_minTransInterval.start;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                
+                // Test Body
+                for (v_cntSpeed:=0; v_cntSpeed<lengthof(v_speedValues); v_cntSpeed:=v_cntSpeed + 1) {
+                    f_utTriggerEvent(m_changeSpeed(v_speedValues[v_cntSpeed]));
+                    v_cntTime := 0;
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_LF_any )) {
+                            tc_ac.stop; 
+                            v_cntTime := v_cntTime + 1;
+                            if (v_cntTime == c_cntTimeLimit) { // Exit message loop
+                                log("*** " & testcasename() & ": INFO: The subset of CAM messages including lowFrequencyContainer was received ***");
+                                t_minTransInterval.start;
+                                v_nextCamWithLF := false;                                
+                            }
+                            else {
+                                log("*** " & testcasename() & ": INFO: CAM retransmission with LowFrequency container ***"); 
+                                tc_ac.start;
+                                t_minTransInterval.start;
+                                v_nextCamWithLF := false;
+                                repeat;
+                            }
+                        }
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )) -> value v_camInd {
+                            tc_ac.stop;
+                            if(v_nextCamWithLF == true) {
+                                log("*** " & testcasename() & ": FAIL: No LowFrequency container in received CAM ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                            }
+                            else {
+                                log("*** " & testcasename() & ": INFO: CAM retransmission w/o LowFrequency container ***"); 
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] t_minTransInterval.timeout {
+                            v_nextCamWithLF := true;
+                            log("*** " & testcasename() & ": INFO: Next CAM shall contain LowFrequency container ***");
+                            repeat;  
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    } 
+                } 
+                log("*** " & testcasename() & ": PASS: Generation of CAM messages including lowFrequencyContainer was successful ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_FMT_BV_03
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_FMT_BV_04
+             */
+            function f_CAM_MSD_FMT_BV_04() runs on ItsCam {
+                
+                // Local variables
+                var VehicleRole v_vehicleRole := c_vehicleRole_roadWork;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION or PICS_RSU) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER) {
+                    testcase.stop(testcasename() & ": PICS_SPECIALVEHICLECONTAINER needs to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(v_vehicleRole));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC_any )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_FMT_BV_04
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_FMT_BV_05
+             */
+            function f_CAM_MSD_FMT_BV_05() runs on ItsCam {
+                
+                // Local variables
+                timer t_minTransInterval := c_specialVehicleGenerationTime * 1.10;
+                var VehicleRole v_vehicleRole := roadWork;
+                var SpeedValue v_speedValues[5] := { 1000, 2000, 3000, 4000, 5000 } //cm/s
+                var integer v_cntSpeed, v_cntTime;
+                var CamInd v_camInd;
+                var boolean v_nextCamWithSVC := false;
+                const integer c_cntTimeLimit := 10;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION or PICS_RSU) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER) {
+                    testcase.stop(testcasename() & ": PICS_SPECIALVEHICLECONTAINER needs to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(v_vehicleRole));
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                     [] camPort.receive(mw_camInd ( mw_camMsg_SVC_any )){ 
+                        tc_ac.stop;
+                        t_minTransInterval.start;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                
+                // Test Body
+                for (v_cntSpeed:=0; v_cntSpeed<lengthof(v_speedValues); v_cntSpeed:=v_cntSpeed + 1) {
+                    f_utTriggerEvent(m_changeSpeed(v_speedValues[v_cntSpeed]));
+                    v_cntTime := 0;
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_SVC_any )) {
+                            tc_ac.stop; 
+                            v_cntTime := v_cntTime + 1;
+                            if (v_cntTime == c_cntTimeLimit) { // Exit message loop
+                                log("*** " & testcasename() & ": INFO: The subset of CAM messages including specialVehicleContainer was received ***");
+                                t_minTransInterval.start;
+                                v_nextCamWithSVC := false;                                
+                            }
+                            else {
+                                log("*** " & testcasename() & ": INFO: CAM retransmission with SpecialVehicle container ***"); 
+                                tc_ac.start;
+                                t_minTransInterval.start;
+                                v_nextCamWithSVC := false;
+                                repeat;
+                            }
+                        }
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )) -> value v_camInd {
+                            tc_ac.stop;
+                            if(v_nextCamWithSVC == true) {
+                                log("*** " & testcasename() & ": FAIL: No SpecialVehicle container in received CAM ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                            }
+                            else {
+                                log("*** " & testcasename() & ": INFO: CAM retransmission w/o SpecialVehicle container ***"); 
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] t_minTransInterval.timeout {
+                            v_nextCamWithSVC := true;
+                            log("*** " & testcasename() & ": INFO: Next CAM shall contain SpecialVehicle container ***");
+                            repeat;  
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    } 
+                } 
+                log("*** " & testcasename() & ": PASS: Generation of CAM messages including SpecialVehicleContainer was successful ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_FMT_BV_05
+            
+        } // end group camMessageFormat
+        
+        group camInformationAdaptation {
+            
+            group camInVehicleData {
+                
+                type record of UtCamTrigger UtCamTriggers;
+                type record of CAM CamPdus;
+                
+                function f_CAM_MSD_INA_BV_01(in charstring p_INFO, in template (value) UtCamTriggers p_utTriggers, in template (present) CamPdus p_camPdus) runs on ItsCam {
+                    
+                    // Local variables
+                    var integer v_cnt;
+                    
+                    log("*** " & testcasename() & ": Checking INFO==" & p_INFO & " ***");
+                    
+                    if (lengthof(p_utTriggers) != lengthof(p_camPdus)) {
+                        log("*** " & testcasename() & ": INCONC: Invalid testcase configuration: Number of event triggers and expected CAM messages differs ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                    
+                    for (v_cnt:=0; v_cnt<lengthof(p_utTriggers); v_cnt:=v_cnt+1) {
+                        f_utTriggerEvent(p_utTriggers[v_cnt]);
+                        
+                        tc_ac.start;
+                        alt {
+                            [] camPort.receive( mw_camInd ( p_camPdus[v_cnt] )){ 
+                                tc_ac.stop;
+                                if (v_cnt==lengthof(p_utTriggers)-1) {
+                                    log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                                }
+                                else {
+                                    log("*** " & testcasename() & ": PRECONDITION: Expected CAM message received ***");
+                                }
+                            }
+                            [] tc_ac.timeout {
+                                log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                            }
+                        }
+                    }
+                }
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_01
+                 */
+                function f_CAM_MSD_INA_BV_01_01() runs on ItsCam {
+                    
+                    // Local variables
+                    var CamInd v_camInd;
+                    var template (present) CurvatureValue v_curVal := ?;
+                    var boolean v_initialReceived := false;
+                    const CurvatureValue c_curValOffset := 1;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & "c required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    log("*** " & testcasename() & ": Checking INFO==Curvature value ***");
+                    
+                    // change the curvature value to retrieve the current value
+                    f_utTriggerEvent(m_changeCurvature(c_curValOffset));
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive( mw_camInd ( mw_camMsg_HF_BV(mw_HF_BV_curvature(v_curVal)) )) -> value v_camInd {
+                            tc_ac.stop;
+                            if (v_initialReceived) {
+                                log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                            }
+                            else {
+                                log("*** " & testcasename() & ": PRECONDITION: Expected CAM message received ***");
+                                v_initialReceived := true;
+                                //change again the curvature value and set the expectation to the measured value
+                                if (v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.curvature.curvatureValue >= 0) {
+                                    v_curVal := (v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.curvature.curvatureValue + c_curValOffset) mod 30001;
+                                } else { // TODO Add negative value case
+                                    v_curVal := v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.curvature.curvatureValue - c_curValOffset;
+                                    if (valueof(v_curVal) < -30000) {
+                                        v_curVal := 0;
+                                    }
+                                }
+                                f_utTriggerEvent(m_changeCurvature(c_curValOffset));
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_01
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_02
+                 */
+                function f_CAM_MSD_INA_BV_01_02() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Brake pedal being activated", 
+                        { m_setAccelerationControlStatus(c_brakePedalEngaged) }, 
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_brakePedalActive_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_02
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_03
+                 */
+                function f_CAM_MSD_INA_BV_01_03() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Brake pedal being deactivated", 
+                        { m_setAccelerationControlStatus(c_brakePedalEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_brakePedalActive_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_brakePedalActive_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_03
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_04
+                 */
+                function f_CAM_MSD_INA_BV_01_04() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Gas pedal being activated", 
+                        { m_setAccelerationControlStatus(c_gasPedalEngaged) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_gasPedalActive_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_04
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_05
+                 */
+                function f_CAM_MSD_INA_BV_01_05() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Gas pedal being deactivated", 
+                        { m_setAccelerationControlStatus(c_gasPedalEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_gasPedalActive_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_gasPedalActive_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_05
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_06
+                 */
+                function f_CAM_MSD_INA_BV_01_06() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01( 
+                        "Emergency brake being activated", 
+                        { m_setAccelerationControlStatus(c_emergencyBrakeEngaged) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_emergencyBrakeActive_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_06
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_07
+                 */
+                function f_CAM_MSD_INA_BV_01_07() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Emergency brake being deactivated", 
+                        { m_setAccelerationControlStatus(c_emergencyBrakeEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_emergencyBrakeActive_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_emergencyBrakeActive_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_07
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_08
+                 */
+                function f_CAM_MSD_INA_BV_01_08() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Collision warning being activated", 
+                        { m_setAccelerationControlStatus(c_collisionWarningEngaged) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_collisionWarningActive_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_08
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_09
+                 */
+                function f_CAM_MSD_INA_BV_01_09() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Collision warning being deactivated",
+                        { m_setAccelerationControlStatus(c_collisionWarningEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_collisionWarningActive_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_collisionWarningActive_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_09
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_10
+                 */
+                function f_CAM_MSD_INA_BV_01_10() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "ACC being activated", 
+                        { m_setAccelerationControlStatus(c_accEngaged) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_accActive_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_10
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_11
+                 */
+                function f_CAM_MSD_INA_BV_01_11() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "ACC being deactivated",
+                        { m_setAccelerationControlStatus(c_accEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_accActive_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_accActive_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_11
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_12
+                 */
+                function f_CAM_MSD_INA_BV_01_12() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Cruise control being activated", 
+                        { m_setAccelerationControlStatus(c_cruiseControlEngaged) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_cruiseControl_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_12
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_13
+                 */
+                function f_CAM_MSD_INA_BV_01_13() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Cruise control being deactivated",
+                        { m_setAccelerationControlStatus(c_cruiseControlEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_cruiseControl_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_cruiseControl_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_13
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_14
+                 */
+                function f_CAM_MSD_INA_BV_01_14() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01( 
+                        "Speed limiter being activated", 
+                        { m_setAccelerationControlStatus(c_speedLimiterEngaged) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_speedLimiterActive_On)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_14
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_15
+                 */
+                function f_CAM_MSD_INA_BV_01_15() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01( 
+                        "Speed limiter control being deactivated", 
+                        { m_setAccelerationControlStatus(c_speedLimiterEngaged), m_setAccelerationControlStatus(c_accCtrlIdle) },
+                        { mw_camMsg_HF_BV(mw_HF_BV_accCtrl(mw_speedLimiterActive_On)), mw_camMsg_HF_BV(mw_HF_BV_accCtrl((omit, mw_speedLimiterActive_Off))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_15
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_16
+                 */
+                function f_CAM_MSD_INA_BV_01_16() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01( 
+                        "Low beam headlights being activated", 
+                        { m_setExteriorLightsStatus(c_lowBeamHeadlightsOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_lowBeamLightsOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_16
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_17
+                 */
+                function f_CAM_MSD_INA_BV_01_17() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Low beam headlights being deactivated", 
+                        { m_setExteriorLightsStatus(c_lowBeamHeadlightsOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_lowBeamLightsOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_lowBeamLightsOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_17
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_18
+                 */
+                function f_CAM_MSD_INA_BV_01_18() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "High beam headlights being activated", 
+                        { m_setExteriorLightsStatus(c_highBeamHeadlightsOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_highBeamLightsOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_18
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_19
+                 */
+                function f_CAM_MSD_INA_BV_01_19() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "High beam headlights being deactivated", 
+                        { m_setExteriorLightsStatus(c_highBeamHeadlightsOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_highBeamLightsOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_highBeamLightsOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_19
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_20
+                 */
+                function f_CAM_MSD_INA_BV_01_20() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Left turn signal being activated", 
+                        { m_setExteriorLightsStatus(c_leftTurnSignalOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_leftTurnSignalOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_20
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_21
+                 */
+                function f_CAM_MSD_INA_BV_01_21() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01( 
+                        "Left turn signal being deactivated", 
+                        { m_setExteriorLightsStatus(c_leftTurnSignalOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_leftTurnSignalOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_leftTurnSignalOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_21
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_22
+                 */
+                function f_CAM_MSD_INA_BV_01_22() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Right turn signal being activated", 
+                        { m_setExteriorLightsStatus(c_rightTurnSignalOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_rightTurnSignalOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_22
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_23
+                 */
+                function f_CAM_MSD_INA_BV_01_23() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Right turn signal being deactivated", 
+                        { m_setExteriorLightsStatus(c_rightTurnSignalOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_rightTurnSignalOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_rightTurnSignalOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_23
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_24
+                 */
+                function f_CAM_MSD_INA_BV_01_24() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01( 
+                        "Daytime running lights being activated", 
+                        { m_setExteriorLightsStatus(c_daytimeRunningLightsOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_daytimeRunningLightsOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_24
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_25
+                 */
+                function f_CAM_MSD_INA_BV_01_25() runs on ItsCam {
+                    
+                    // Local variables
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test control
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Daytime running lights being deactivated", 
+                        { m_setExteriorLightsStatus(c_daytimeRunningLightsOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_daytimeRunningLightsOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_daytimeRunningLightsOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_25
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_26
+                 */
+                function f_CAM_MSD_INA_BV_01_26() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Reverse light being activated", 
+                        { m_setExteriorLightsStatus(c_reverseLightOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_reverseLightOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_26
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_27
+                 */
+                function f_CAM_MSD_INA_BV_01_27() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Reverese light being deactivated", 
+                        { m_setExteriorLightsStatus(c_reverseLightOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_reverseLightOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_reverseLightOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_27
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_28
+                 */
+                function f_CAM_MSD_INA_BV_01_28() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Fog lights being activated", 
+                        { m_setExteriorLightsStatus(c_fogLightOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_fogLightOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_28
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_29
+                 */
+                function f_CAM_MSD_INA_BV_01_29() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Fog lights being deactivated", 
+                        { m_setExteriorLightsStatus(c_fogLightOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_fogLightOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_fogLightOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_29
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_30
+                 */
+                function f_CAM_MSD_INA_BV_01_30() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Parking lights being activated", 
+                        { m_setExteriorLightsStatus(c_parkingLightsOn) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_parkingLightsOn)) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_30
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_31
+                 */
+                function f_CAM_MSD_INA_BV_01_31() runs on ItsCam {
+                    
+                    // Local variables
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    f_CAM_MSD_INA_BV_01(
+                        "Parking lights being deactivated", 
+                        { m_setExteriorLightsStatus(c_parkingLightsOn), m_setExteriorLightsStatus(c_elAllLightsOff) },
+                        { mw_camMsg_LF_BV(mw_LF_BV_extLights(mw_parkingLightsOn)), mw_camMsg_LF_BV(mw_LF_BV_extLights((omit, mw_parkingLightsOff))) }
+                    );
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_31
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_32
+                 */
+                function f_CAM_MSD_INA_BV_01_32() runs on ItsCam {
+                    
+                    // Local variables
+                    var CamInd v_camInd;
+                    var template (present) HeadingValue v_headingVal := ?;
+                    var boolean v_initialReceived := false;
+                    const HeadingValue c_headingValOffset := 1;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    log("*** " & testcasename() & ": Checking INFO==Heading value ***");
+                    
+                    // change the heading value to retrieve the current value
+                    f_utTriggerEvent(m_changeHeading(c_headingValOffset));
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive( mw_camInd ( mw_camMsg_HF_BV(mw_HF_BV_heading(v_headingVal)) )) -> value v_camInd {
+                            tc_ac.stop;
+                            if (v_initialReceived) {
+                                log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                            }
+                            else {
+                                log("*** " & testcasename() & ": PRECONDITION: Expected CAM message received ***");
+                                v_initialReceived := true;
+                                //change again the heading value and set the expectation to the measured value
+                                v_headingVal := (v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.heading.headingValue+c_headingValOffset) mod 3601;
+                                f_utTriggerEvent(m_changeHeading(c_headingValOffset));
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_32
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_33
+                 */
+                function f_CAM_MSD_INA_BV_01_33() runs on ItsCam {
+                    
+                    // Local variables
+                    var CamInd v_camInd;
+                    var template (present) SpeedValue v_speedVal := ?;
+                    var boolean v_initialReceived := false;
+                    const SpeedValue c_speedValOffset := 100;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    log("*** " & testcasename() & ": Checking INFO==Speed value ***");
+                    
+                    // change the speed value to retrieve the current value
+                    f_utTriggerEvent(m_changeSpeed(c_speedValOffset));
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive( mw_camInd ( mw_camMsg_HF_BV(mw_HF_BV_speed(v_speedVal)) )) -> value v_camInd {
+                            tc_ac.stop;
+                            if (v_initialReceived) {
+                                log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                            }
+                            else {
+                                log("*** " & testcasename() & ": PRECONDITION: Expected CAM message received ***");
+                                v_initialReceived := true;
+                                //change again the speed value and set the expectation to the measured value
+                                v_speedVal := (v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.speed.speedValue+c_speedValOffset) mod 16384;
+                                f_utTriggerEvent(m_changeSpeed(c_speedValOffset));
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_33
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_34
+                 */
+                function f_CAM_MSD_INA_BV_01_34() runs on ItsCam {
+                    
+                    // Local variables
+                    var CamInd v_camInd;
+                    var DriveDirection v_driveVal := backward;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    log("*** " & testcasename() & ": Checking INFO==Drive direction value ***");
+                    
+                    // change the drive direction
+                    f_utTriggerEvent(m_setDriveDirection(v_driveVal));
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive( mw_camInd ( mw_camMsg_HF_BV(mw_HF_BV_driveDirection(v_driveVal)) )) -> value v_camInd {
+                            tc_ac.stop;
+                            if (v_driveVal==forward) {
+                                log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                            }
+                            else {
+                                log("*** " & testcasename() & ": PRECONDITION: Expected CAM message received ***");
+                                //change again the drive direction and set the expectation to the measured value
+                                v_driveVal := forward;
+                                f_utTriggerEvent(m_setDriveDirection(v_driveVal));
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_34
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_INA_BV_01_35
+                 */
+                function f_CAM_MSD_INA_BV_01_35() runs on ItsCam {
+                    
+                    // Local variables
+                    var CamInd v_camInd;
+                    var template (present) YawRateValue v_yawRateVal := ?;
+                    var boolean v_initialReceived := false;
+                    const YawRateValue c_yawRateValOffset := 1;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION or PICS_RSU) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION and not PICS_RSU required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    
+                    // Test Body
+                    log("*** " & testcasename() & ": Checking INFO==Yaw rate value ***");
+                    
+                    // change the yaw rate value to retrieve the current value
+                    f_utTriggerEvent(m_changeYawRate(c_yawRateValOffset));
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive( mw_camInd ( mw_camMsg_HF_BV(mw_HF_BV_yawRate(v_yawRateVal)) )) -> value v_camInd {
+                            tc_ac.stop;
+                            if (v_initialReceived) {
+                                log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_success); 
+                            }
+                            else {
+                                log("*** " & testcasename() & ": PRECONDITION: Expected CAM message received ***");
+                                v_initialReceived := true;
+                                //change again the yaw rate value and set the expectation to the measured value
+                               v_yawRateVal := v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.yawRate.yawRateValue;
+                                if (valueof(v_yawRateVal)>=32767) {
+                                    v_yawRateVal := -32766;
+                                }
+                                else {
+                                    v_yawRateVal := v_camInd.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.yawRate.yawRateValue+c_yawRateValOffset;
+                                }
+                                f_utTriggerEvent(m_changeYawRate(c_yawRateValOffset));
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_INA_BV_01_35
+                
+            } // end group camInVehicleData
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_02
+             */
+            function f_CAM_MSD_INA_BV_02() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_PUBLICTRANS) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_PUBLICTRANS need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_publicTransport));
+                
+                // Test Body
+                log("*** " & testcasename() & ": Expected template: ", mw_camInd ( mw_camMsg_SVC( mw_publicTransport_any )), " ***");
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_publicTransport_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_02
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_03
+             */
+            function f_CAM_MSD_INA_BV_03() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_SPECIALTRANS) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_SPECIALTRANS need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_specialTransport));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_specialTransport_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_03
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_04
+             */
+            function f_CAM_MSD_INA_BV_04() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_DANGEROUSGOODS) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_DANGEROUSGOODS need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_dangerousGoods));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_dangerousGoods_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_04
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_05
+             */
+            function f_CAM_MSD_INA_BV_05() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_ROADWORKS) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_ROADWORKS need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_roadWork));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_roadWorks_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_05
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_06
+             */
+            function f_CAM_MSD_INA_BV_06() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_RESCUE) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_RESCUE need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_rescue));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_rescue_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_06
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_07
+             */
+            function f_CAM_MSD_INA_BV_07() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_EMERGENCY) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_EMERGENCY need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_emergency));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_emergency_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_07
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_INA_BV_08
+             */
+            function f_CAM_MSD_INA_BV_08() runs on ItsCam {
+                
+                // Local variables
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                if (not PICS_SPECIALVEHICLECONTAINER and not PICS_SAFETY_CAR) {
+                    testcase.stop(testcasename() 
+                        & ": PICS_SPECIALVEHICLECONTAINER and PICS_SAFETY_CAR need to be set to true");
+                }
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Set vehicle role
+                f_utTriggerEvent(m_setVehicleRole(c_vehicleRole_safetyCar));
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_SVC( mw_safetyCar_any ))){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_INA_BV_08
+            
+        } // end group camInformationAdaptation
+        
+        group camGenerationFrequency {
+            
+            group CAM_MSD_GFQ_TI_01 {
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_GFQ_TI_01
+                 */
+                function f_CAM_MSD_GFQ_TI_01() runs on ItsCam {
+                    
+                    // Local variables
+                    timer t_minTransInterval := PICS_T_GENCAMMIN * 0.90;
+                    var SpeedValue v_speedValues[5] := { 1000, 2000, 3000, 4000, 5000 } //cm/s
+                    var integer v_cntSpeed, v_cntTime;
+                    var FncRetCode v_ret;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    camPort.clear;
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                            tc_ac.stop;
+                            t_minTransInterval.start;
+                            log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                        }
+                    }
+                    
+                    // Test Body
+                    for (v_cntSpeed:=0; v_cntSpeed<lengthof(v_speedValues); v_cntSpeed:=v_cntSpeed + 1) {
+                        for (v_cntTime:=0; v_cntTime<10; v_cntTime:=v_cntTime + 1) {
+                            v_ret := f_CAM_MSD_GFQ_TI_01_helper(t_minTransInterval);
+                            select (v_ret) {
+                                case (e_error) {
+                                    log("*** " & testcasename() & ": FAIL: CAM message received BEFORE expiry of the minimum generation timer interval ***");
+                                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                                }
+                                case (e_timeout) {
+                                    log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                                }
+                            }
+                            t_minTransInterval.start;
+                        }
+                        f_utTriggerEvent(m_changeSpeed(v_speedValues[v_cntSpeed]));
+                    }
+                    t_minTransInterval.stop;
+                    log("*** " & testcasename() & ": PASS: Generation of CAM messages was successful ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_GFQ_TI_01
+                
+                function f_CAM_MSD_GFQ_TI_01_helper(timer t_minTransInterval) runs on ItsCam return FncRetCode {
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )) {
+                            tc_ac.stop;
+                            if (t_minTransInterval.running) {
+                                return e_error;
+                            }
+                        }
+                        [] t_minTransInterval.timeout {
+                            repeat;
+                        }
+                        [] tc_ac.timeout {
+                            t_minTransInterval.stop;
+                            return e_timeout;
+                        }
+                    }
+                    
+                    return e_success;
+                } // end function f_CAM_MSD_GFQ_TI_01
+                
+            } // end group CAM_MSD_GFQ_TI_01
+            
+            group CAM_MSD_GFQ_TI_02 {
+                
+                /**
+                 * @desc    TP Function for TC_CAM_MSD_GFQ_TI_02
+                 */
+                function f_CAM_MSD_GFQ_TI_02() runs on ItsCam {
+                    
+                    // Local variables
+                    timer t_maxTransInterval := PICS_T_GENCAMMAX * 1.10;
+                    var integer v_cntSpeed, v_cntTime;
+                    var FncRetCode v_ret;
+                    
+                    // Test control
+                    if (not PICS_CAM_GENERATION) {
+                        log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                        setverdict(inconc);
+                        stop;
+                    }              
+                    
+                    // Test component configuration
+                    f_cfUp();
+                    
+                    // Test adapter configuration
+                    
+                    // Preamble
+                    f_prInitialState();
+                    camPort.clear;
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                            tc_ac.stop;
+                            t_maxTransInterval.start;
+                            log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                        }
+                    }
+                    
+                    // Test Body
+                    for (v_cntTime:=0; v_cntTime<10; v_cntTime:=v_cntTime + 1) {
+                        v_ret := f_CAM_MSD_GFQ_TI_02_helper(t_maxTransInterval);
+                        select (v_ret) {
+                            case (e_error) {
+                                log("*** " & testcasename() & ": FAIL: No CAM message received BEFORE expiry of the maximum generation timer interval ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                            }
+                            case (e_timeout) {
+                                log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                                f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                            }
+                        }
+                    }
+                    t_maxTransInterval.stop;
+                    log("*** " & testcasename() & ": PASS: Generation of CAM messages was successful ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    
+                    // Postamble
+                    f_poDefault();
+                    f_cfDown();
+                    
+                } // end f_CAM_MSD_GFQ_TI_02
+                
+                function f_CAM_MSD_GFQ_TI_02_helper(timer t_maxTransInterval) runs on ItsCam return FncRetCode {
+                    
+                    tc_ac.start;
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )) {
+                            tc_ac.stop;
+                            t_maxTransInterval.stop;
+                            t_maxTransInterval.start;
+                        }
+                        [] t_maxTransInterval.timeout {
+                            return e_error;
+                        }
+                        [] tc_ac.timeout {
+                            t_maxTransInterval.stop;
+                            return e_timeout;
+                        }
+                    }
+                    
+                    return e_success
+                } // end function f_CAM_MSD_GFQ_TI_02
+                
+            } //end group CAM_MSD_GFQ_TI_02
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_GFQ_TI_03
+             */
+            function f_CAM_MSD_GFQ_TI_03() runs on ItsCam {
+                
+                // Local variables
+                timer t_maxTransInterval_min := PICS_T_GENCAMMAX * 0.90;
+                timer t_maxTransInterval_max := PICS_T_GENCAMMAX * 1.10;
+                timer t_interval_1_measure := PX_TWAIT;
+                timer t_interval_1_min;
+                timer t_interval_1_max;
+                var float v_interval_1_min;
+                var float v_interval_1_max;
+                var integer v_N_GenCam := 3;
+                var integer v_i;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                              
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                        t_interval_1_measure.start;
+                        tc_ac.stop;                        
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                f_utTriggerEvent(m_changeSpeed(1000));
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){
+                        var float v_measured := t_interval_1_measure.read;
+                        log("Elapsed time since last CAM: ", v_measured);
+                        tc_ac.stop;
+                        v_interval_1_min := v_measured * 0.8;
+                        v_interval_1_max := v_measured * 1.2;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: Condition 1 CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions:  Condition 1 CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                for (v_i:=1; v_i <= v_N_GenCam; v_i:=v_i+1) {
+                    t_interval_1_min.start(v_interval_1_min);
+                    t_interval_1_max.start(v_interval_1_max);
+                    alt {
+                        [] camPort.receive(mw_camInd ( mw_camMsg_any )){
+                            if (t_interval_1_min.running) {
+                                log("*** " & testcasename() & ": INCONC: Initial conditions: Condition 2 CAM#", v_i, " message received BEFORE INTERVAL_1 expired ***");
+                                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                            }
+                            t_interval_1_max.stop;
+                            log("*** " & testcasename() & ": INFO: Initial conditions: Condition 2 CAM#", v_i, " message received ***");
+                        }
+                        [] t_interval_1_min.timeout {
+                            repeat;
+                        }
+                        [] t_interval_1_max.timeout {
+                            log("*** " & testcasename() & ": INCONC: Initial conditions: Condition 2 CAM#", v_i, " message not received ***");
+                            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                        }
+                    }
+                }
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                t_maxTransInterval_min.start;
+                t_maxTransInterval_max.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){
+                        if (t_maxTransInterval_min.running) {
+                            log("*** " & testcasename() & ": FAIL: Next CAM message received BEFORE T_GenCamMax expired ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                        }
+                        t_maxTransInterval_max.stop;
+                        log("*** " & testcasename() & ": PASS: Next CAM message received AFTER T_GenCamMax expired ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    [] t_maxTransInterval_min.timeout {
+                        repeat;
+                    }
+                    [] t_maxTransInterval_max.timeout {
+                        log("*** " & testcasename() & ": FAIL: Next CAM message not received AFTER T_GenCamMax expired ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_GFQ_TI_03
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_GFQ_BV_04
+             */
+            function f_CAM_MSD_GFQ_BV_04() runs on ItsCam {
+                
+                // Local variables
+                timer t_genCam_dcc := PICS_T_GENCAMDCC * 0.90;
+                timer t_genCam_min := PICS_T_GENCAMMIN * 1.10;
+                var CamInd v_camPdu;
+                var HeadingValue v_headingValue;
+                var HeadingValue v_changeHeadingValue := 50; // 4° == 40
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_heading( ? ) ) )) -> value v_camPdu {
+                        tc_ac.stop;
+                        v_headingValue := v_camPdu.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.heading.headingValue;
+                        t_genCam_dcc.start;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_utTriggerEvent(m_changeHeading(v_changeHeadingValue));
+                t_genCam_dcc.timeout;
+                t_genCam_min.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_heading( (v_headingValue + v_changeHeadingValue) mod 3600) ) )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    [] t_genCam_min.timeout {
+                        log("*** " & testcasename() & ": FAIL: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_GFQ_BV_04
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_GFQ_BV_05
+             */
+            function f_CAM_MSD_GFQ_BV_05() runs on ItsCam {
+                
+                // Local variables
+                timer t_genCam_dcc := PICS_T_GENCAMDCC * 0.90;
+                var CamInd v_camPdu;
+                var ReferencePosition v_referencePosition, v_expectedReferencePosition;
+                var integer v_changePosValue := 8; // 8 >> 4m
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any  )) -> value v_camPdu {
+                        tc_ac.stop;
+                        v_referencePosition := v_camPdu.msgIn.cam.camParameters.basicContainer.referencePosition;
+                        t_genCam_dcc.start;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_expectedReferencePosition := f_computePositionUsingDistance(v_referencePosition, v_changePosValue);
+                f_utChangePosition ( valueof ( UtChangePosition: {
+                            latitude := v_expectedReferencePosition.latitude - v_referencePosition.latitude,
+                            longitude := v_expectedReferencePosition.longitude - v_referencePosition.longitude,
+                            elevation := 0 } ) );
+                t_genCam_dcc.timeout;
+                t_genCam_dcc.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_BC_refPos ( v_expectedReferencePosition ) )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    [] t_genCam_dcc.timeout {
+                        log("*** " & testcasename() & ": FAIL: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_GFQ_BV_05
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_GFQ_BV_06
+             */
+            function f_CAM_MSD_GFQ_BV_06() runs on ItsCam {
+                
+                // Local variables
+                timer t_genCam_dcc := PICS_T_GENCAMDCC * 0.90;
+                timer t_genCam_min := PICS_T_GENCAMMIN * 1.10;
+                var CamInd v_camPdu;
+                var SpeedValue v_speedValue;
+                var SpeedValue v_changeSpeedValue := 60; // 0,5 m/s << 0,6 m/s == 60 cm/s
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_speed( ? ) ) )) -> value v_camPdu {
+                        tc_ac.stop;
+                        v_speedValue := v_camPdu.msgIn.cam.camParameters.highFrequencyContainer.basicVehicleContainerHighFrequency.speed.speedValue;
+                        t_genCam_dcc.start;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_utTriggerEvent(m_changeSpeed(v_changeSpeedValue));
+                t_genCam_dcc.timeout;
+                t_genCam_min.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_speed( (v_speedValue + v_changeSpeedValue) mod 16384 ) ) )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    [] t_genCam_min.timeout {
+                        log("*** " & testcasename() & ": FAIL: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_GFQ_BV_06
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_GFQ_TI_07
+             */
+            function f_CAM_MSD_GFQ_TI_07() runs on ItsCam {
+                
+                // Local variables
+                timer t_maxTransInterval_min := PICS_T_GENCAMMAX * 0.90;
+                timer t_maxTransInterval_max := PICS_T_GENCAMMAX * 1.10;
+                timer t_genCam_measure := PX_TWAIT;
+                timer t_genCam_min;
+                timer t_genCam_max;
+                var float v_genCam_min;
+                var float v_genCam_max;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                        tc_ac.stop;
+                        t_genCam_measure.start;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                f_utTriggerEvent(m_changeSpeed(1000));
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){
+                        var float v_measured := t_genCam_measure.read;
+                        tc_ac.stop;
+                        v_genCam_min := v_measured * 0.9;
+                        v_genCam_max := v_measured * 1.1;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: Anticipated CAM message received ***");
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: Anticipated CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                t_genCam_min.start(v_genCam_min);
+                t_genCam_max.start(v_genCam_max);
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){
+                        if (t_genCam_min.running) {
+                            log("*** " & testcasename() & ": FAIL: Anticipated CAM message received BEFORE T_GenCam expired ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                        }
+                        t_genCam_max.stop;
+                        log("*** " & testcasename() & ": PASS: Anticipated CAM message received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                    [] t_genCam_min.timeout {
+                        repeat;
+                    }
+                    [] t_genCam_max.timeout {
+                        log("*** " & testcasename() & ": FAIL: Anticipated CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_GFQ_TI_07
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_GFQ_TI_08
+             */
+            function f_CAM_MSD_GFQ_TI_08() runs on ItsCam {
+                
+                // Local constants
+                const float c_minTime := 0.90;
+                const float c_maxTime := 1.10;
+
+                // Local variables
+                if (not PICS_CAM_GENERATION or not PICS_RSU) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION amd PICS_RSU required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+
+                // Preamble
+                f_prInitialState();
+                camPort.clear;
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": INFO: Initial conditions: First CAM message received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: Initial conditions: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_timeout);
+                    }
+                }
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camInd ( mw_camMsg_any )){ 
+                        if ( ( tc_ac.read  > c_minTime )) {
+                            tc_ac.stop;
+                            log("*** " & testcasename() & ": PASS: CAM message received in time***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                        }
+                        else {
+                            tc_ac.stop;
+                            log("*** " & testcasename() & ": FAIL: CAM message not received in time***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                        }
+                    }
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": FAIL: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_GFQ_TI_08
+            
+        } // end group camGenerationFrequency
+
+        group camLowerLayerParameters {
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_PAR_BV_01
+             */
+            function f_CAM_MSD_PAR_BV_01() runs on ItsCam {
+                
+                // Local variables
+                const UInt8 c_gnNhBtpB := 2;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camIndWithGnParameters(mw_camMsg_any, c_gnNhBtpB)) { 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message encapsultated in BTP-B packet received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] camPort.receive(mw_camIndWithGnParameters(mw_camMsg_any, omit)) { 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": INCONC: no GN NH information in CamInd ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);  
+                    }                    
+                    [] camPort.receive(mw_camInd(mw_camMsg_any)) { 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": FAIL: Expected CAM message received, but not encapsulated in BTP-B packet ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                    }                    
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_PAR_BV_01
+
+            /**
+             * @desc    TP Function for TC_CAM_MSD_PAR_BV_02
+             */
+            function f_CAM_MSD_PAR_BV_02() runs on ItsCam {
+                
+                // Local variables
+                const UInt8 c_gnHtTsb := 5;
+                const UInt8 c_GnHstSingleHop := 0;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camIndWithGnParameters(mw_camMsg_any, -, c_gnHtTsb, c_GnHstSingleHop)) { 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: Expected CAM message encapsulated in SHB packet received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                    }
+                    [] camPort.receive(mw_camIndWithGnParameters(mw_camMsg_any, -, omit, omit)) { 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": INCONC: no GN HT/HST information in CamInd ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);  
+                    }                    
+                    [] camPort.receive(mw_camInd(mw_camMsg_any)) { 
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": FAIL: Expected CAM message received, but not encapsulated in SHB packet ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                    }                    
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_PAR_BV_02
+            
+            /**
+             * @desc    TP Function for TC_CAM_MSD_PAR_BV_03
+             */
+            function f_CAM_MSD_PAR_BV_03() runs on ItsCam {
+                
+                // Local variables
+                var CamInd v_camInd;
+                
+                // Test control
+                if (not PICS_CAM_GENERATION) {
+                    log("*** " & testcasename() & ": PICS_CAM_GENERATION required for executing the TC ***");
+                    setverdict(inconc);
+                    stop;
+                }              
+                
+                // Test component configuration
+                f_cfUp();
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prInitialState();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                tc_ac.start;
+                alt {
+                    [] camPort.receive(mw_camIndWithGnParameters(mw_camMsg_any)) -> value v_camInd { 
+                        tc_ac.stop;
+                        if(not ispresent(v_camInd.gnLifetime)) {
+                            log("*** " & testcasename() & ": INCONC: no GN lifetime information in CamInd ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);  
+                        }
+                        if(v_camInd.gnLifetime <= 1000) {
+                            log("*** " & testcasename() & ": PASS: Expected CAM message received encapsulted in GN packet with correct lifetime value ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                        }
+                        else {
+                            log("*** " & testcasename() & ": FAIL: Expected CAM message received encapsulted in GN packet with incorrect lifetime value ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_error);                            
+                        }  
+                    }                    
+                    [] tc_ac.timeout {
+                        log("*** " & testcasename() & ": INCONC: CAM message not received ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                }
+                
+                // Postamble
+                f_poDefault();
+                f_cfDown();
+                
+            } // end f_CAM_MSD_PAR_BV_03                        
+    
+        } // end group camLowerLayerParameters
+                    
+    } // end group camMessageDissemination
+      
+    group camMessageProcessing {
+        
+        /**
+         * @desc    TP Function for TC_CAM_MSP_BV_01
+         */
+        function f_CAM_MSP_BV_01() runs on ItsCam {
+            
+            // Local variables
+            var CamReq v_camReq;
+            var integer i;
+            
+            // Test control
+            if (not PICS_CAM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_CAM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+            }              
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_camReq := valueof(
+                            m_camReq(
+                                m_camMsg_vehicle(
+                                    f_getTsStationId(),
+                                    f_getCurrentTime() mod 65536, // See ETSI EN 302 637-2 V1.3.0 - Clause B.3 generationDelatTime
+                                    m_tsPosition
+                                )
+                            )
+                        );
+            camPort.send( v_camReq ) ;
+            
+            f_sleep(PX_TNOAC);
+            for(i:=0; i < lengthof(vc_utEvents) and not match(v_camReq.msgOut, vc_utEvents[i].camMsg); i:=i+1) {
+                // empty on purpose 
+            }
+            if(i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": PASS: CAM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: CAM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            
+            // Postamble
+            f_poDefault();
+            f_cfDown();
+            
+        } // end f_CAM_MSP_BV_01
+        
+    } // end group camMessageProcessing
+    
+} // end ItsCam_TpFunctions

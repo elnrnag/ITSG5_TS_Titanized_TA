@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "ba3f9bb4-561c-4974-9d16-16e6f763fe65",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "ba3f9bb4-561c-4974-9d16-16e6f763fe65",
+            "type": "STRING",
+            "value": "Check that IUT discards the Secured GN Message containing empty payload of type 'signed'."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "ba3f9bb4-561c-4974-9d16-16e6f763fe65",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_BEACON'\r\n\t\t\tand containing payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed'\r\n\t\t\t\tcontaining data\r\n\t\t\t\t\tindicating length 0\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "ba3f9bb4-561c-4974-9d16-16e6f763fe65",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "ba3f9bb4-561c-4974-9d16-16e6f763fe65",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "ba3f9bb4-561c-4974-9d16-16e6f763fe65"
+}

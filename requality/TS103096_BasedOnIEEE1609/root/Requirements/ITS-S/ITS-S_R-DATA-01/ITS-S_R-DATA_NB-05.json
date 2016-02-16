@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S accepts valid signed data from another ITS-S when the Signer Identifier is a Certificate containing list_size PSIDs"
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/33f934d7-95f1-441e-b649-04f962ac4118"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9837c691-f01f-4378-af7c-f5e3004e3d0d"
+}

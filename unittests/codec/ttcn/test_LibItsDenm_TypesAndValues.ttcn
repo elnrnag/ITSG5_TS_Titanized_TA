@@ -1,0 +1,129 @@
+module test_LibItsDenm_TypesAndValues /*language "TTCN-3:2009 Advanced Parameterization"*/ {
+    
+    // LibIts
+    import from ITS_Container language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+        
+    // LibItsCommon
+    import from LibItsCommon_TypesAndValues all;
+    
+    // AtsCam
+    import from LibItsDenm_TestSystem all;
+    import from LibItsDenm_Templates all;
+    import from LibItsDenm_TypesAndValues all;
+    
+    import from LibItsDenm_Functions all;
+    import from LibItsCommon_Functions all;
+
+    import from test_CommonCodec all;
+    
+    group LibItsDenm_testCases {
+        
+        group testDenmPrimitiveMessages {
+            
+            testcase tc_DenmReq() runs on TCType system TCType {
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                
+                test_PDU<DenmReq>(
+                    m_denmReq(
+                         m_denmPdu(
+                            m_denm(
+                                m_denmMgmtCon(
+                                    m_tsActionId
+                                ),
+                                v_situation,
+                                m_denmLocation_zeroDelta
+                            )
+                        )
+                    )
+                );
+            }
+            
+            testcase tc_DenmInd() runs on TCType system TCType {
+                
+                test_decodePDU<DenmInd>(
+                    mw_denmInd(?),
+                   '01010ac83c18c605641e0c00000a4fa98248e293ea60ef8d453481c6ea53ad7ffffffe11dbba1f00280b600cfdf0f9900003bedd4f073b19c0180e22699d7318ce01106fb8b3c300c6700aeeFFFFFFFFFFFFFFFFFFFFFFFF'O
+                );
+                
+            }
+            
+        } // End of group testDenmPrimitiveMessages
+        
+        group testUtEvent {
+            
+            testcase tc_UtDenmInitialize() runs on TCType system TCType {
+                test_PDU<UtInitialize>(m_denmInitialize, false);
+            }
+            
+            testcase tc_eventSituation() runs on TCType system TCType {
+                var template (value) SituationContainer v_situation := m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_);
+                
+                test_PDU<UtDenmTrigger>(
+                    m_utTriggerEvent(
+                        v_situation
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtDenmTrigger_01() runs on TCType system TCType {
+                test_PDU<UtDenmTrigger>(
+                    m_utTriggerEvent(
+                        m_situation(
+                            CauseCodeType_vehicleBreakdown_, 
+                            VehicleBreakdownSubCauseCode_unavailable_
+                        )
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtDenmTrigger_02() runs on TCType system TCType {
+              const TransmissionInterval    c_repetitionInterval    := c_interval_1sec;     // INTERVAL_1
+              const ValidityDuration        c_validityDuration      := c_duration_10sec;        // DURATION_2
+              const ValidityDuration        c_repetitionDuration    := c_validityDuration;              // DURATION_1
+              // Local variables
+              var template (value)  SituationContainer v_situation := m_situation ( CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_ );
+                test_PDU<UtDenmTrigger>(
+                    m_utTriggerEvent(
+                        m_situation(
+                            CauseCodeType_vehicleBreakdown_, 
+                            VehicleBreakdownSubCauseCode_unavailable_
+                        ), 
+                        c_validityDuration, 
+                        c_repetitionDuration, 
+                        c_repetitionInterval
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtDenmUpdate_01() runs on TCType system TCType {
+                test_PDU<UtDenmUpdate>(
+                    m_utUpdateEvent(
+                        m_tsActionId(10), 
+                        m_situation(CauseCodeType_vehicleBreakdown_, VehicleBreakdownSubCauseCode_unavailable_)
+                    ), 
+                    false
+                );
+            }
+            
+            testcase tc_UtDenmTriggerResult_01() runs on TCType system TCType {
+                test_decodePDU<UtDenmTriggerResult>(
+                    UtDenmTriggerResult:?, 
+                    '1101000082350001'O
+                );
+            }
+            
+            testcase tc_UtDenmUpdateResult_01() runs on TCType system TCType {
+                test_decodePDU<UtDenmUpdateResult>(
+                    UtDenmTriggerResult:?, 
+                    '1301000082350001'O
+                );
+            }
+            
+        } // End of group testUtEvent
+        
+    } // End of group LibItsDenm_testCases 
+}

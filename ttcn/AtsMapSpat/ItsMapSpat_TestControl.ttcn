@@ -1,0 +1,42 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsMapSpat/ItsMapSpat_TestControl.ttcn $
+ *              $Id: ItsMapSpat_TestControl.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *    @desc     Test Control file for MAP SPAT
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module ItsMapSpat_TestControl {
+    
+    // ATS MAPSpat
+    import from ItsMapSpat_TestCases {testcase all};
+    
+    // LibIts
+    import from LibItsMapSpat_Pics all;
+    
+    // Test Execution
+    control {
+
+        if ( PICS_RSU ) { 
+            execute(TC_MAP_SPAT_MSD_BV_01());
+            execute(TC_MAP_SPAT_MSD_BV_02());
+            execute(TC_MAP_SPAT_MSD_BV_05());
+            execute(TC_MAP_SPAT_MSD_BV_06());
+            execute(TC_MAP_SPAT_MSD_BV_08());
+            execute(TC_MAP_SPAT_MSD_BV_09());
+            execute(TC_MAP_SPAT_MSD_BV_10());
+            execute(TC_MAP_SPAT_MSD_BV_11());
+            execute(TC_MAP_SPAT_MSD_BV_12());
+            execute(TC_MAP_SPAT_MSD_BV_15());
+            execute(TC_MAP_SPAT_MSD_BV_16());
+        }
+       else { 
+            execute(TC_MAP_SPAT_MSP_BV_01());
+            execute(TC_MAP_SPAT_MSP_BV_02());
+        }
+
+    }
+    
+} // end ItsMapSpat_TestControl

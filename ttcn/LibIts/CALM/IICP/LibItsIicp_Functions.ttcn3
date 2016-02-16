@@ -1,0 +1,614 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/IICP/LibItsIicp_Functions.ttcn3 $
+ *              $Id: LibItsIicp_Functions.ttcn3 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Inter-ITS-SCU communications (ISO 24102-4) functions
+ */
+module LibItsIicp_Functions {
+    
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_Time {
+        function f_sleep, f_sleepIgnoreDef
+    };
+    import from LibCommon_BasicTypesAndValues {
+        const 
+            c_uInt8Max;
+    };
+    import from LibCommon_Sync {
+        function
+            f_selfOrClientSyncAndVerdict, f_selfOrClientSyncAndVerdictPreamble
+    };
+    import from LibCommon_VerdictControl all;
+    
+    // LibIts
+    
+    // LibItsCalm
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+            Link_ID, Errors 
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type 
+            MF_Request_confirm,
+            WakeUp, RegReq, StateCInotify, 
+            LDMregister 
+    };
+    import from CALMmanagement language "ASN.1:1997" {
+        type 
+            ITS_scuId, Talive
+    };
+    import from CALMiitsscu language "ASN.1:1997" {
+        type 
+            IIC_Request, IIC_Response, 
+            SimUt, 
+            ITS_SCUtype, ITS_SCUalive, 
+            VCI_Info, VCI_info_res, VCI_update_req 
+    };
+    import from CALMfntp language "ASN.1:1997" {
+        type SetNotFNTP, DeleteFNTP 
+    };
+    import from LibItsMgt_TypesAndValues {
+        type IParamNoList, IParamList 
+    };
+    import from LibItsMgt_Functions { 
+        function 
+            f_getIutSourceItsScuId, f_getIutDestItsScuId, 
+            f_getNextPduCounter 
+    };
+    import from LibItsIicp_TypesAndValues all;
+    import from LibItsIicp_Templates all;
+    import from LibItsIicp_Pics {
+        modulepar PICS_ITS_MGT_NOT
+    };
+    import from LibItsIicp_Pixits all;
+    import from LibItsCalm_Interface { 
+        type 
+            UtInitialize, CfInitialize, CfEventInd, 
+            UtResult, CfResult, 
+            ItsCalm 
+    }; 
+    
+    /**
+     * @desc Upper tester functions
+     */
+    group utFunctions {
+        
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_utInitialize The initialisation to trigger.
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utIicpInitializeIut(template (value) UtInitialize p_utInitialize) runs on ItsCalm {
+        
+            utPort.send(p_utInitialize);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtResult:true) {
+                    tc_wait.stop;
+                    log("*** f_utIicpInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utIicpInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utIicpInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat; 
+                }
+            } // End of 'alt' statement 
+        
+        } // End of function f_utIicpInitializeIut 
+        
+        /**
+         * @desc    Send a NFsapPrimitivesDown primitive and wait for the NFsapPrimitivesUp confirm response
+         * @param   p_utIicpEvent    The NFsapPrimitivesDown request
+         * @param   p_utIicpEventInd The NFsapPrimitivesDown response
+         * @param   p_discard        Set to true if responses shall be discard, otherwise the function failed 
+         * @param   p_result         The response value
+         * @verdict Unchanged on success, fail on error and inconc otherwise
+         */
+        function f_utIicpEventResponse( 
+            in template (value) UtIicpEvent p_utIicpEvent, 
+            in template (present) UtIicpEventInd p_utIicpEventInd, 
+            in boolean p_discard, 
+            out UtIicpEventInd p_result) 
+        runs on ItsCalm {
+            
+//            log("*** f_utIicpEventResponse: INFO: Send message: ", p_commandReq, " ***");
+            utPort.send(p_utIicpEvent);
+//            log("*** f_utIicpEventResponse: INFO: Expected UtCommandConfirm: ", p_commandConf, " ***");
+            tc_wait.start;
+            alt {
+                [] utPort.receive(p_utIicpEventInd) -> value p_result {
+//                    log("*** f_utIicpEventResponse: INFO: Receive expected confirm: message ***");
+                    tc_wait.stop;
+                }
+                [] utPort.receive(UtIicpEventInd:? ) -> value p_result {
+                    if (p_discard == false) { 
+                        tc_wait.stop; 
+                        log("*** f_utIicpEventResponse: ERROR: Event not correctly indicated at application layer ***", p_result);
+                        f_selfOrClientSyncAndVerdict("fail", e_error);
+                    }
+                    else {
+                        log("*** f_utIicpEventResponse: INFO: Another event indicated at application layer, repeating check ***");
+                        repeat;
+                    }
+                }
+                [] tc_wait.timeout {
+                    if (p_discard == false) {
+                        log("*** f_utIicpEventResponse: ERROR: Timeout while waiting for event check result ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                    else {
+                        log("*** f_utIicpEventResponse: INFO: Event not indicated at application layer ***");
+                        f_selfOrClientSyncAndVerdict("error", e_timeout);
+                    }
+                }
+            } // End of 'alt' statement
+            
+        } // End of function f_utIicpEventResponse
+        
+        /**
+         * @desc    Send a NFsapPrimitivesDown primitive and do not wait for the NFsapPrimitivesDown confirm response
+         * @param   p_utIicpEvent    The NFsapPrimitivesDown primitive
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_utIicpEvent( 
+            in template (value) UtIicpEvent p_utIicpEvent 
+        ) runs on ItsCalm { 
+            utPort.send(p_utIicpEvent);
+        } // End of function f_utIicpEvent
+        
+    } // End of group utFunctions
+
+    /**
+     * @desc Test trigger function
+     */
+    group whenFunctions { 
+        
+        /**
+         * @desc    Send a IIC-Request primitive
+         * @param   p_IIC_Request    The IIC-Request primitive
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_iicpEvent_IIC_Request( 
+                                         in template (value) IIC_Request p_IIC_Request 
+        ) runs on ItsCalm { 
+            iicpPort.send(
+                m_iicpReq(
+                    p_IIC_Request
+            ));
+        } // End of function f_iicpEvent_IIC_Request
+        
+        /**
+         * @desc    Send a IIC-Request primitive
+         * @param   p_IIC_Request    The IIC-Request primitive
+         * @verdict Unchanged on success, fail otherwise
+         */
+        function f_iicpEvent_IIC_Response( 
+                                          in template (value) IIC_Response p_IIC_Response 
+        ) runs on ItsCalm { 
+            iicpPort.send(
+                m_iicpResp(
+                    p_IIC_Response
+            ));
+        } // End of function f_iicpEvent_IIC_Response
+        
+    } // End of group whenFunctions
+    
+    /**
+     * @desc Test adapter setting functions
+     */
+    group iicpConfigurationFunctions {
+        
+        /**
+         * @desc This configuration features:
+         * <li>Host and Router are combined (see ISO/WD 29281-2 - Figure 1 - Implementation architecture I)</li>
+         * <li>MGT1 IISC Port (IISC/LAN) is used if specified</li>
+         */
+        function f_cf01Up() runs on ItsCalm {
+            
+            // Map
+            map(self:utPort, system:utPort);
+            map(self:iicpPort, system:iicpPort);
+            
+            // Connect
+            f_connect4SelfOrClientSync();
+            
+            // Set processing on shutdown
+            activate(a_cf01Down());
+            
+            // Initialize the component
+            f_initialiseComponent("cf01Up");
+
+            // Initialze the IUT
+            f_initialState();
+            
+        } // End of function f_cf01Up
+        
+        /**
+         * @desc    Deletes configuration cf01
+         */
+        function f_cf01Down() runs on ItsCalm {
+            
+            deactivate;
+            
+            // Unmap
+            unmap(self:utPort, system:utPort);
+            unmap(self:iicpPort, system:iicpPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // End of f_cf01Down
+        
+        /**
+         * @desc    Behavior function for initializing component's variables and tables
+         * @param   p_componentName Name of the component
+         * @param   p_iicpMGM Set to true if IISC port shall be used
+         */
+        function f_initialiseComponent(in charstring p_componentName) runs on ItsCalm {
+            
+            // Initialize variables
+            
+            // Set defaults
+            activate(a_iicpDefault()); 
+            
+        } // end f_initialiseComponent
+        
+    } // End of group iicpConfigurationFunctions
+    
+    group functions {
+        
+    } // End of group functions
+    
+    group messagesTriggering {
+        
+        /**
+         * @desc    Triggers a request command event in the test system adaptation.
+         * @param   p_rCmd The remote commad to trigger
+         * @return  FncRetCode
+         */
+        function f_sendAliveMessage( 
+            in ITS_scuId p_scuIdSource, 
+            in ITS_scuId p_scuIdDest, 
+            in template (value) ITS_SCUalive p_scuAlive
+        ) runs on ItsCalm {
+            iicpPort.send(
+                m_iicpReq(
+                    m_iicRequest(
+                        p_scuIdSource,      // The ITS SCU-ID of the sender
+                        p_scuIdDest, 
+                        f_getNextPduCounter(), 
+                        m_pduRequest_scuAlive(
+                            p_scuAlive
+                        )
+                    )
+                )
+            );
+
+        } // End of function f_sendAliveMessage
+        
+    } // End of group messagesTriggering
+    
+    group iicpAltsteps {
+        
+        /**
+         * @desc Trap for not processed IICP message.
+         * @verdict Set to fail on unknown message
+         */
+        altstep a_iicpDefault() runs on ItsCalm {
+            [] iicpPort.receive(
+                mw_iicpIndReq( 
+                    mdw_iicRequestTx_scuAlive(
+                        ?,
+                        65535,
+                        mw_scuAlive(
+                            ?,
+                            ? 
+            )))) {
+                log("*** a_iicpDefault: INFO: Broadcasted Alive message, skip it and repeat ***");
+                repeat;
+            }
+            [] iicpPort.receive(mw_iicpIndReq(mw_iicpRequest_any)) { // Receive any IIC-Request message
+                log("*** a_iicpDefault: INFO: Remote IIC-Request command service primitive received in default ***");
+                repeat;
+            }
+            [] iicpPort.receive(mw_iicpIndResp(mw_iicpResponse_any)) { // Receive any IIC-Response message
+                log("*** a_iicpDefault: INFO: Remote IIC-Response command service primitive received in default ***");
+                repeat;
+            }
+            [] iicpPort.receive { // Receive unknown message
+                log("*** a_iicpDefault: ERROR: event received on IICP port in default ***");
+                f_selfOrClientSyncAndVerdict("error", e_error);
+            }
+            [] tc_wait.timeout {
+                log("*** a_iicpDefault: ERROR: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout {
+                log("*** a_iicpDefault: ERROR: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] any timer.timeout {
+                log("*** a_iicpDefault: INCONC: An unknown timer has expired in default ***"); 
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                f_poDefault();
+                log("*** a_iicpDefault: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                if(self == mtc) {
+                    f_cf01Down();
+                }
+                stop;
+            }
+        } // End of altstep a_iicpDefault
+        
+        /**
+         * @desc Default handling cf01 de-initialisation.
+         */
+        altstep a_cf01Down() runs on ItsCalm {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf01Down();
+                log("*** a_cf01Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        } // End of altstep a_cf01Down()
+        
+    } // End of group iicpAltsteps
+    
+    group preamble {
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         */
+        function f_initialState() runs on ItsCalm {
+            
+            if (PICS_ITS_MGT_NOT == true) {
+                f_utIicpInitializeIut(m_utIicpInitialize_with_management);
+            } else { 
+                f_utIicpInitializeIut(m_utIicpInitialize_without_management);
+            } 
+//            f_cfIicpInitialize(m_cfIicpInitialize);
+            f_sleepIgnoreDef(PX_WAIT_FOR_IUT_READY); // Wait until the IUT is in a stable situation (beaconing...)
+            cfPort.clear; // Because TestConfigIICP should trigger management port deletion message 
+        } // End of function f_initialState
+        
+    } // End of group preamble
+    
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsCalm {
+            // Nothing to do
+        } // End of function f_poDefault
+        
+    } // End of group postambles
+    
+    group adapterControl {
+        
+    } // End of group adapterControl
+    
+    group testerFunctions {
+        
+        /**
+         * @desc matches a record of values if, and only if, the record of values contains at least all of the elements defined within the SuperSet, and may contain more.
+         * @param p_vciInfoRes      Received datas to be checked
+         * @param p_baseTemplate    Template to be matched
+         * @return true on matching, false otherwise
+         * @verdict Unchanged
+         * @see ETSI ES 201 873-1 V4.3.1 (2011-06)
+         */
+        function f_superset_VCI_Info(in VCI_info_res p_vciInfoRes, in template (present) VCI_Info p_baseTemplate) return boolean { 
+            var integer v_counter;
+            
+            for (v_counter := 0; v_counter < lengthof(p_vciInfoRes); v_counter := v_counter + 1) { 
+                if (match(p_vciInfoRes[v_counter], p_baseTemplate)) { 
+                    return true;
+                }
+            } // End of 'for' statement
+            
+            return false;
+        }
+        
+        /**
+         * @desc matches a record of values if, and only if, the record of values contains at least all of the elements defined within the SuperSet, and may contain more.
+         * @param p_vciInfoRes      Received datas to be checked
+         * @param p_baseTemplate    Template to be matched
+         * @return true on matching, false otherwise
+         * @verdict Unchanged
+         * @see ETSI ES 201 873-1 V4.3.1 (2011-06)
+         */
+        function f_superset_VCI_Update(in VCI_update_req p_vciUpdate, in template (present) VCI_Info p_baseTemplate) return boolean { 
+            var integer v_counter;
+            
+            for (v_counter := 0; v_counter < lengthof(p_vciUpdate); v_counter := v_counter + 1) { 
+                if (match(p_vciUpdate[v_counter], p_baseTemplate)) { 
+                    return true;
+                }
+            } // End of 'for' statement
+            
+            return false;
+        }
+        
+    } // End of group testerFunctions
+    
+    group iutFunctions {
+        
+        /**
+         * @desc Get the active VCI link identifier
+         * @return The active VCI link identifier
+         * @see PX_ACTIVE_VCI_LINK_ID
+         */
+        function f_getIutCiLinkId() return Link_ID {
+            return PX_ACTIVE_VCI_LINK_ID;
+        }
+        
+        /**
+         * @desc Gets the Local/source ITS scuID 
+         * @return  The Local/source ITS scuID 
+         * @see PX_LOCAL_ITS_SCU_ID 
+         * @see ISO/WD 24102-4 - Table 2 — ITS-SCU-ID value assignment
+         */
+        function f_getIutLocalItsScuId() return ITS_scuId {
+            return PX_LOCAL_ITS_SCU_ID;
+        }
+        
+        /**
+         * @desc    Get the type of ITS-SCU in the "Data" element
+         * @return  The type of ITS-SCU in the "Data" element
+         * @see     PX_SRC_ITS_SCU_TYPE
+         */
+        function f_getIutSourceItsScuType() return ITS_SCUtype {
+            return PX_SRC_ITS_SCU_TYPE;
+        }
+        
+        
+        /**
+         * @desc    Gets the type ITS scuID
+         * @return  The type ITS scuID
+         * @see PX_LOCAL_ITS_TYPE 
+         * @see ISO/WD 24102-4 - Table 2 — ITS-SCU-ID value assignment
+         */
+        function f_getIutLocalItsType() return ITS_SCUtype {
+            return PX_LOCAL_ITS_TYPE;
+        }
+        
+        /**
+         * @desc    Gets the Alive timer
+         * @return  The Alive timer
+         * @see PX_TALIVE 
+         */
+        function f_getIutTalive() return Talive {
+            return PX_TALIVE;
+        }
+        
+        /**
+         * @desc    Gets the Talive retransmit timer.
+         * @return  Talive retransmit timer 
+         * @see     PX_TALIVE
+         */
+        function f_getIutTaliveRetransmitTimer() return float {
+            return 0.9 * int2float(PX_TALIVE); // 90%;
+        }
+        
+        /**
+         * @desc    Gets the maximum Talive jitter.
+         * @return  Maximum Talive jitter
+         * @see     PICS_SAM_RETRANSMIT_TIMER
+         */
+        function f_getIutTaliveMaxJitter() return float {
+            return 1.1 * int2float(PX_TALIVE); // 110%;
+        }
+        
+        /**
+         * @desc    Get the MI-Command value used for remote command
+         * @return  The MI-Command value used for remote command
+         * @see     PX_MI_RCMD_STATECINOTIFY
+         */
+        function f_getIutRemoteCmdForMiCommand() return WakeUp {
+            return PX_MI_RCMD_STATECINOTIFY;
+        }
+        
+        /**
+         * @desc    Get the MI-Request value used for remote command
+         * @return  The MI-Request value used for remote command
+         * @see     PX_MI_RCMD_REGTYPE
+         */
+        function f_getIutRemoteCmdForMiRequest() return RegReq {
+            return PX_MI_RCMD_REGTYPE;
+        }
+        
+        /**
+         * @desc    Get the Link_ID value used for remote command
+         * @return  The MI-Request value used for remote command
+         * @see     PX_MI_RCMD_REGTYPE
+         */
+        function f_getIutRemoteCmdForMiRequestLinkID() return Link_ID {
+            return PX_MI_RCMD_LINKID;
+        }
+        
+        /**
+         * @desc    Get the MM-Command value used for remote command
+         * @return  The MM-Command value used for remote command
+         * @see     PX_MN_RCMD_STATECINOTIFY
+         */
+        function f_getIutRemoteCmdForMnCommand() return DeleteFNTP {
+            return PX_MN_RCMD_FWTDELETEFNTP;
+        }
+        
+        /**
+         * @desc    Get the MM-Request value used for remote command
+         * @return  The MN-Request value used for remote command
+         * @see     PX_MN_RCMD_FWYSETNOTIFY
+         */
+        function f_getIutRemoteCmdForMnRequest() return SetNotFNTP {
+            return PX_MN_RCMD_FWYSETNOTIFY;
+        }
+        
+        /**
+         * @desc    Get the MF-Command value used for remote command
+         * @return  The MF-Command value used for remote command
+         * @see     PX_MF_RCMD_STATECINOTIFY
+         */
+        function f_getIutRemoteCmdForMfCommand() return StateCInotify {
+            return PX_MF_RCMD_STATECINOTIFY;
+        }
+        
+        /**
+         * @desc    Get the MF-Request value used for remote command
+         * @return  The MF-Request value used for remote command
+         * @see     PX_MF_RCMD_LDM_REGISTER
+         */
+        function f_getIutRemoteCmdForMfRequest() return LDMregister {
+            return PX_MF_RCMD_LDM_REGISTER;
+        }
+        
+        /**
+         * @desc    Get the List of reference number of parameter to be monitored
+         * @return  The List of reference number of parameter to be monitored
+         * @see     PX_MI_IPARAMNOLIST
+         */
+        function f_getIutIparamNoList() return IParamNoList {
+            return PX_MI_IPARAMNOLIST;
+        }
+        
+        /**
+         * @desc    Get the list of error status for each parameter to be monitored
+         * @return  The list of error status for each parameter to be monitored
+         * @see     PX_MI_IPARAMNOLIST
+         */
+        function f_getIutIparamList() return IParamList {
+            return PX_MI_IPARAMLIST;
+        }
+        
+        /**
+         * @desc    Get the list of error status for each parameter to be monitored
+         * @return  The list of error status for each parameter to be monitored
+         * @see     PX_MI_ERRORSLIST
+         */
+        function f_getIutErrorsList() return Errors { 
+            return PX_MI_ERRORSLIST;
+        }
+        
+        /**
+         * @desc    Get a IIC-Response value
+         * @return  The IIC-Response value
+         * @see     PX_IIC_RESPONSE
+         */
+        function f_getIutIicResponse() return MF_Request_confirm { 
+            return PX_IIC_RESPONSE;
+        }
+        
+    } // End of group iutFunctions
+    
+} // End of module LibItsIicp_Functions

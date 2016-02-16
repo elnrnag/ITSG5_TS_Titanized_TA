@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "9005e079-442a-4f8f-a8ff-4d2e994c46a4",
+            "type": "STRING",
+            "value": "Enrolment process is out of scope of this test suite. "
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "9005e079-442a-4f8f-a8ff-4d2e994c46a4",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/755f6e01-92d3-4b98-90ad-1f37ec6d6980"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "9005e079-442a-4f8f-a8ff-4d2e994c46a4",
+            "type": "STRING",
+            "value": "02. Check that enrolment certificate is not used for sign other certificates."
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "9005e079-442a-4f8f-a8ff-4d2e994c46a4",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "9005e079-442a-4f8f-a8ff-4d2e994c46a4"
+}

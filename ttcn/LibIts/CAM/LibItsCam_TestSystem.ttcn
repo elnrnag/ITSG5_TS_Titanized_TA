@@ -1,0 +1,176 @@
+/**
+ *    @author   ETSI / STF405 / STF449
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CAM/LibItsCam_TestSystem.ttcn $
+ *              $Id: LibItsCam_TestSystem.ttcn 1088 2015-01-12 13:22:58Z berge $
+ *    @desc     Test System module for ITS CAM
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsCam_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_Time {modulepar all};
+    import from LibCommon_Sync all;
+    import from LibCommon_BasicTypesAndValues all;
+    
+    // LibIts
+    import from CAM_PDU_Descriptions language "ASN.1:1997" all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    
+    // LibItsCommon
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCommon_TypesAndValues all;    
+    
+    // LibItsCam
+    import from LibItsCam_TypesAndValues all;
+
+	//User ports
+	
+	import from General_Types all;
+	import from TTCN_EncDec all;
+    
+    group portDefinitions {
+    
+        /**
+         * @desc Upper Tester port
+         */
+        type port UpperTesterCAMPort message {
+            out 
+                UtInitialize, UtCamTrigger, UtChangePosition;
+            in 
+                UtInitializeResult, UtCamTriggerResult, UtChangePositionResult, UtCamEventInd;
+        //} with  {extension "internal" 
+
+/*with { extension "user UDPasp_PT 
+					out(
+						UtInitialize 		-> 	ASP_UDP_message: function(enc_UtInitialize);
+						UtCamTrigger 		-> 	ASP_UDP_message: function(enc_UtCamTrigger);
+						UtChangePosition 	-> 	ASP_UDP_message: function(enc_UtChangePosition) 
+					)
+					in(
+						ASP_UDP_open_result -> 	-: discard;
+						ASP_UDP				-> 	UtInitializeResult: function(dec_UtInitializeResult),
+												UtCamTriggerResult: function(dec_UtCamTriggerResult),
+												UtChangePositionResult: function(dec_UtChangePositionResult),
+												UtCamEventInd: function(dec_UtCamEventInd);
+						ASP_UDP_message		-> 	UtInitializeResult: function(dec_UtInitializeResult_message),
+												UtCamTriggerResult: function(dec_UtCamTriggerResult_message),
+												UtChangePositionResult: function(dec_UtChangePositionResult_message),
+												UtCamEventInd: function(dec_UtCamEventInd_message)
+					)" */
+
+		} // end UpperTesterCAMPort
+        
+    } // end portDefinitions
+
+    group interfacePorts {
+
+        group facilityPorts {
+            
+            group fa1Ports {
+    
+                /**
+                 * @desc FA1 CAM Port (CAM/BTP/GeoNet/G5) 
+                 */
+                type port CamPort message {
+                    in CamInd;
+                    out CamReq;
+                //} with  {extension "internal" 
+
+/*with { extension "user LANL2asp_PT
+						out(
+							CamReq -> ASP_LANL2: function(enc_CamReq) 
+						)
+						in(
+							ASP_LANL2				-> CamInd: function(dec_CamInd);
+							ASP_LANL2_Error			-> -: discard;
+							ASP_v2_LANL2			-> CamInd: function(dec_CamInd_v2);
+							ASP_LANL2_open_result	-> -: discard;
+							ASP_v2_LANL2_Error		-> -: discard
+						)" */
+				} // End of port CamPort
+                
+            } // end fa1Ports
+                
+        } // End of group facilityPorts
+    
+    } // End of group interfacePorts
+        
+    group componentDefinitions {
+
+        /**
+         * @desc ITS System Adapter
+         */
+        type component ItsCamSystem {
+            
+            port UpperTesterCAMPort utPort;
+            
+            // FA1 ports
+            port CamPort camPort;
+
+        } // end component ItsAdapter
+        
+    } // End of group componentDefinitions
+    
+    /**
+     * @desc Test component for ITS Facility layer 
+     */
+    type component ItsCam extends ItsBaseComponent {
+
+        port UpperTesterCAMPort utPort;
+        
+        // FA1 ports
+        port CamPort camPort;
+        //timers
+        
+        //component variables
+        var CamInd vc_camMsg;
+        
+        //default
+        var default vc_default := null;
+        
+        //global variables
+        var boolean vc_camReceived := false;
+
+        var UtCamEventIndList vc_utEvents := {};
+        
+    } // End of component ItsCam
+    
+    group facilityPrimitives {
+            
+        group fa1Primitives {
+            
+            /**
+             * @desc FA1 CAM Indication Primitive 
+             */
+            type record CamInd {
+                CAM     msgIn,
+                UInt8   gnNextHeader,
+                UInt8   gnHeaderType,
+                UInt8   gnHeaderSubtype,
+                UInt32  gnLifetime,
+                UInt8   gnTrafficClass,
+                UInt16  btpDestinationPort,
+                UInt16  btpInfo
+            } with { variant "" };
+            
+                
+            /**
+             * @desc FA1 CAM Request Primitive 
+             */
+            type record CamReq {
+                CAM msgOut
+            } with { variant "" };
+           
+            
+        } // end fa1Primitives
+            
+    } // End of group facilityPrimitives
+   
+     
+} with { encode "RAW" }; 
+
+// End of module LibIts_TestSystem
+

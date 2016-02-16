@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2016 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     SPAT_Types.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2015-02-08
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module SPAT_Types
+{
+  import from ITS_Container language "ASN.1:1997" all;
+  import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+  import from LibItsMapSpat_TestSystem all;
+
+  external function enc_SPAT_PDU( in SPAT_PDU pdu) return octetstring;
+  external function dec_SPAT_PDU( in octetstring stream) return SPAT_PDU;
+
+  function f_enc_SpatReq(in SpatReq pdu) return octetstring {
+  return enc_SPAT_PDU(pdu.msgOut)
+}
+
+}

@@ -1,0 +1,21 @@
+MAP-SPAT-ETSI DEFINITIONS AUTOMATIC TAGS ::= 
+
+BEGIN
+
+IMPORTS 
+   MapData, SPAT FROM DSRC
+   ItsPduHeader FROM ITS-Container;
+
+MAP-PDU ::= SEQUENCE
+{
+	header	ItsPduHeader,
+	mapData	MapData
+}
+
+SPAT-PDU ::= SEQUENCE
+{
+	header	ItsPduHeader,
+	spatData SPAT
+}
+
+END

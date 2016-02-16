@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_f7f89eb7-edc5-4238-8886-a3865780f88e\"><a name=\"f7f89eb7-edc5-4238-8886-a3865780f88e\" id=\"id_f7f89eb7-edc5-4238-8886-a3865780f88e\" class=\"requality_id\"><\/a>subject_attributes<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_f7f89eb7-edc5-4238-8886-a3865780f88e\"> shall not contain two entries with the same <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\"><span class=\"requality_text id_f7f89eb7-edc5-4238-8886-a3865780f88e\">type<\/span><\/font><span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_f7f89eb7-edc5-4238-8886-a3865780f88e\"> value.<\/span>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "f7f89eb7-edc5-4238-8886-a3865780f88e"
+}

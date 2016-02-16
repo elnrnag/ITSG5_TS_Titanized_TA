@@ -1,0 +1,274 @@
+/******************************************************************************
+* Copyright (c) 2004, 2015  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+******************************************************************************/
+
+module TTCN_EncDec {
+
+
+//------------------------------------------------------------------------------
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsBtp_TypesAndValues all;
+    import from LibItsBtp_TestSystem all;
+	import from LibItsCam_TypesAndValues all;
+	import from LibItsCam_TestSystem all;
+	import from LibItsDenm_TypesAndValues all;
+	import from LibItsDenm_TestSystem all;
+	import from LibItsIpv6OverGeoNetworking_TestSystem all;
+	import from LibItsGeoNetworking_TestSystem all;
+	import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+	import from LibItsGeoNetworking_TypesAndValues all;
+    
+    
+    import from General_Types all;   
+    import from ASN_EncDec all; 
+
+
+//UT-Common------------------------------------------------------------------------------
+
+type union PDU_Ut_Primitives
+{
+	LibItsCommon_TypesAndValues.UtInitialize              	utInitialize,
+	LibItsCommon_TypesAndValues.UtInitializeResult        	utInitializeResult,
+	LibItsCommon_TypesAndValues.UtChangePosition          	utChangePosition,
+	LibItsCommon_TypesAndValues.UtChangePositionResult    	utChangePositionResult,
+	LibItsCommon_TypesAndValues.UtChangePseudonym		  	utChangePseudonym,
+	LibItsCommon_TypesAndValues.UtChangePseudonymResult		utChangePseudonymResult
+ 
+} with { variant ""}
+
+
+type record ExtBtpInd {
+                OCT1           nextheader,
+                BtpHeader      header,
+                BtpPayload     payload optional
+            } with { variant (header)  "CROSSTAG( btpAHeader, nextheader = '01'O; 
+                                                  btpBHeader, nextheader = '02'O; )"  };
+        
+            type record ExtBtpReq {
+                OCT1           nextheader,
+                BtpHeader      header,
+                BtpPayload     payload optional
+            } with { variant (header)  "CROSSTAG( btpAHeader, nextheader = '01'O; 
+                                                  btpBHeader, nextheader = '02'O; )"  };
+
+type record PDU_UtPrimitives
+{
+OCT1                  messageType,
+PDU_Ut_Primitives     primitive
+ 
+} with { variant (primitive) "CROSSTAG( 
+                        utInitialize,                  messageType = '00'O;   
+                        utInitializeResult,            messageType = '01'O;
+                        utChangePosition,              messageType = '02'O;
+                        utChangePositionResult,        messageType = '03'O;             
+						utChangePseudonym,			   messageType = '04'O;
+						utChangePseudonymResult,       messageType = '05'O; )"}
+
+
+
+external function f_enc_PDU_UtPrimitives(in PDU_UtPrimitives pdu) return octetstring
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+       
+
+external function f_dec_PDU_UtPrimitives(in octetstring stream) return PDU_UtPrimitives
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+       };
+
+
+
+
+//UT-BTP------------------------------------------------------------------------
+        
+type union PDU_UtBtp_Primitives
+{ LibItsCommon_TypesAndValues.UtInitialize              	utInitialize,
+  LibItsCommon_TypesAndValues.UtInitializeResult        	utInitializeResult,
+  LibItsBtp_TypesAndValues.UtBtpTrigger       			utBtpTrigger,
+  LibItsBtp_TypesAndValues.UtBtpTriggerResult			utBtpTriggerResult,
+  LibItsBtp_TypesAndValues.UtBtpEventInd     			utBtpEventInd 
+} with { variant ""}  
+
+
+external function f_enc_PDU_UtBtpPrimitives(in PDU_UtBtpPrimitives pdu) return octetstring
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+       
+
+external function f_dec_PDU_UtBtpPrimitives(in octetstring stream) return PDU_UtBtpPrimitives
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+       };
+
+
+//UT-CAM------------------------------------------------------------------------
+        
+type union PDU_UtCam_Primitives
+{
+  LibItsCam_TypesAndValues.UtCamTrigger       	utCamTrigger,
+  LibItsCam_TypesAndValues.UtCamTriggerResult   utCamTriggerResult,
+  LibItsCam_TypesAndValues.UtCamEventInd      	utCamEventInd 
+} with { variant ""}  
+
+
+type record PDU_UtCamPrimitives
+{
+OCT1                  messageType,
+PDU_UtCam_Primitives  primitive
+} with { variant (primitive)  "CROSSTAG( 
+                        utCamTriggerResult,            messageType = '21'O;   
+                        utCamEventInd,                 messageType = '23'O; )"                        
+                        
+        variant (primitive.utCamTrigger)  "CROSSTAG( 
+                        changeCurvature,               messageType = '30'O;   
+                        changeSpeed,                   messageType = '31'O;  
+						setAccelerationControlStatus,  messageType = '32'O;
+						setExteriorLightsStatus,       messageType = '33'O;
+						changeHeading,				   messageType = '34'O;
+						setDriveDirection, 			   messageType = '35'O;
+						changeYawRate,				   messageType = '36'O;
+						setStationType, 			   messageType = '39'O;
+						setVehicleRole, 			   messageType = '3A'O;
+						setEmbarkationStatus, 		   messageType = '3B'O;
+						setPtActivation, 			   messageType = '3C'O;
+						setDangerousGoods, 			   messageType = '3D'O;
+						setLightBarSirene,			   messageType = '3F'O; )"                                        
+}
+
+
+external function f_enc_PDU_UtCamPrimitives(in PDU_UtCamPrimitives pdu) return octetstring
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+       
+
+external function f_dec_PDU_UtCamPrimitives(in octetstring stream) return PDU_UtCamPrimitives
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+       };
+
+
+//UT-DENM------------------------------------------------------------------------
+        
+type union PDU_UtDenm_Primitives
+{
+  LibItsDenm_TypesAndValues.UtDenmTrigger       utDenmTrigger,
+  LibItsDenm_TypesAndValues.UtDenmTriggerResult utDenmTriggerResult,
+  LibItsDenm_TypesAndValues.UtDenmEventInd      utDenmEventInd,
+  LibItsDenm_TypesAndValues.UtDenmUpdate		utDenmUpdate,
+  LibItsDenm_TypesAndValues.UtDenmUpdateResult  utDenmUpdateResult,
+  LibItsDenm_TypesAndValues.UtDenmTermination   utDenmTermination,
+  LibItsDenm_TypesAndValues.UtDenmTerminationResult utDenmTerminationResult 
+} with { variant ""}  
+
+
+type record PDU_UtDenmPrimitives
+{
+OCT1                  messageType,
+PDU_UtDenm_Primitives  primitive
+} with { variant (primitive)  "CROSSTAG( 
+						utDenmTrigger,				   messageType = '10'O;
+                        utDenmTriggerResult,           messageType = '11'O;
+						utDenmUpdate,				   messageType = '12'O;
+						utDenmUpdateResult,            messageType = '13'O;
+						utDenmTermination,   		   messageType = '14'O;
+						utDenmTerminationResult,	   messageType = '15'O;
+                        utDenmEventInd,                messageType = '17'O; )"                                                  
+}
+
+
+external function f_enc_PDU_UtDenmPrimitives(in PDU_UtDenmPrimitives pdu) return octetstring
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+       
+
+external function f_dec_PDU_UtDenmPrimitives(in octetstring stream) return PDU_UtDenmPrimitives
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+       };
+
+
+//BTP-----------------------------------------------------------------------------------
+external function f_enc_ExtBtpReq(in ExtBtpReq pdu) return octetstring
+
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+
+function f_enc_BtpReq(in BtpReq pdu) return octetstring
+{
+
+var ExtBtpReq v_ExtBtpReq
+
+
+v_ExtBtpReq.nextheader:='00'O;
+v_ExtBtpReq.header:=pdu.msgOut.header;
+v_ExtBtpReq.payload:=pdu.msgOut.payload; 
+
+return f_enc_ExtBtpReq(v_ExtBtpReq);
+}
+
+
+
+external function f_dec_ExtBtpInd(in octetstring stream) return ExtBtpInd
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+         extension "errorbehavior(ALL:WARNING)"
+       };
+
+function f_dec_BtpInd(in octetstring stream) return BtpInd
+
+{
+var ExtBtpInd v_ExtBtpInd:=f_dec_ExtBtpInd(stream)
+
+var BtpInd v_BtpInd
+
+v_BtpInd.msgIn.header:=v_ExtBtpInd.header;
+v_BtpInd.msgIn.payload:=v_ExtBtpInd.payload;
+
+return v_BtpInd
+
+}
+
+
+
+//GeoNetworking--------------------------------------------------------
+
+external function f_enc_GeoNetworkingReq(in GeoNetworkingReq pdu) return octetstring
+
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+
+external function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+       };
+
+
+
+//IPv6OverGeoNetworking--------------------------------------------------------
+
+external function f_enc_IPv6OverGeoNetworkingReq(in IPv6OverGeoNetworkingReq pdu) return octetstring
+
+  with { extension "prototype(convert)"
+         extension "encode(RAW)"
+       };
+
+external function f_dec_IPv6OverGeoNetworkingInd(in octetstring stream) return IPv6OverGeoNetworkingInd
+  with { extension "prototype(convert)"
+         extension "decode(RAW)"
+       };
+
+
+
+
+} //endmodule

@@ -1,0 +1,148 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/MapSpat/LibItsMapSpat_TestSystem.ttcn $
+ *              $Id: LibItsMapSpat_TestSystem.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *    @desc     Test System module for ITS MAP SPAT
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsMapSpat_TestSystem {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_Time {modulepar all};
+    import from LibCommon_Sync all;
+
+    // LibIts
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCommon_TypesAndValues all;    
+    import from LibItsMapSpat_TypesAndValues all;
+    
+    import from DSRC language "ASN.1:1997" all;
+    import from REG_D language "ASN.1:1997" all;
+    import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+
+    group portDefinitions {
+    
+        /**
+         * @desc Upper Tester port
+         */
+        type port UpperTesterMapSpatPort message {
+            out 
+                UtInitialize, UtMapSpatTrigger;
+            in 
+                UtInitializeResult, UtMapSpatTriggerResult, UtMapEventInd , UtSpatEventInd;
+        } // end UpperTesterPort
+
+    } //with { extension "internal"} // end portDefinitions  //FIXME!!!
+
+    group interfacePorts {
+
+        /**
+        * @desc Application MapSpat Port
+        */
+        type port MapSpatPort message { in MapInd , SpatInd ; out MapReq , SpatReq }
+    
+    } //with { extension "internal"}// End of group interfacePorts  //FIXME!!!
+
+    /**
+    * @desc ITS System Adapter
+    */
+    type component ItsMapSpatSystem {
+            
+        port UpperTesterMapSpatPort utPort;
+        port MapSpatPort mapSpatPort;
+
+    } // end component ITS System Adapter
+     
+    /**
+     * @desc Test component for ITS MAP-SPAT application layer 
+     */
+    type component ItsMapSpat extends ItsBaseComponent {
+
+        port UpperTesterMapSpatPort utPort;
+        port MapSpatPort mapSpatPort;
+        //timers
+        
+        //component variables
+        var MapInd vc_mapMsg;
+        var SpatInd vc_spatMsg;
+        var UtMapEventIndList vc_utMapEvents := {};
+        var UtSpatEventIndList vc_utSpatEvents := {};
+        
+        //default
+        var default vc_default := null;
+        
+        //global variables
+        var boolean vc_mapReceived := false;
+        var boolean vc_spatReceived := false;
+    } // End of component ItsMapSpat
+
+    group ApplPrimitives {
+        
+        type octetstring RawData;
+            
+        /**
+        * @desc Appl MAP and SPAT Indication Primitive 
+        */
+        type record MapMsg {
+            MAP_PDU    msgMap,
+            RawData    rawData
+        }
+        with {
+            encode (msgMap) "LibItsMapSpat_asn1"
+        }
+        
+        type record SpatMsg {
+            SPAT_PDU   msgSpat,
+            RawData    rawData
+        }
+        with {
+            encode (msgSpat) "LibItsMapSpat_asn1"
+        }
+        
+        type record MapInd {
+            MapMsg msgIn,
+            UInt8   gnNextHeader optional,
+            UInt8   gnHeaderType optional,
+            UInt8   gnHeaderSubtype optional,
+            UInt32  gnLifetime optional,
+            UInt8   gnTrafficClass optional,
+            UInt16  btpDestinationPort optional,
+            UInt16  btpInfo optional
+        };
+        
+        type record SpatInd {
+            SpatMsg msgIn,
+            UInt8   gnNextHeader optional,
+            UInt8   gnHeaderType optional,
+            UInt8   gnHeaderSubtype optional,
+            UInt32  gnLifetime optional,
+            UInt8   gnTrafficClass optional,
+            UInt16  btpDestinationPort optional,
+            UInt16  btpInfo optional
+        };
+        
+        /**
+        * @desc Appl MAP and SPAT Request Primitive 
+        */
+        type record MapReq { 
+            MAP_PDU msgOut 
+        }
+        with {
+            encode (msgOut) "LibItsMapSpat_asn1"
+        }
+        type record SpatReq { 
+            SPAT_PDU msgOut
+        }
+        with {
+            encode (msgOut) "LibItsMapSpat_asn1"
+        }
+            
+    } with { 
+        encode "LibIts_Interface" 
+    } // end ApplPrimitives
+    
+} // End of module LibItsMapSpat_TestSystem

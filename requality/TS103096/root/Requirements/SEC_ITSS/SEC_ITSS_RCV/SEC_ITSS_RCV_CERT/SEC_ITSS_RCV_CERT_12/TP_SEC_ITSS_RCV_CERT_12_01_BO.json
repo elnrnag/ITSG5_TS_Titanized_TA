@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "97a322e8-5634-4620-a958-b304f948cc00",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "daeddac9-d04b-487c-800a-9e204968a80e",
+            "type": "STRING",
+            "value": "Check that the IUT discards a message when its signing certificate does not contain the SSP-AID subject attribute\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "daeddac9-d04b-487c-800a-9e204968a80e",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_12_01_BO_AT)\r\n\t\t\t\t\t\tnot containing subject_attributes['its_aid_ssp_list']\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "97a322e8-5634-4620-a958-b304f948cc00",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "97a322e8-5634-4620-a958-b304f948cc00",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "daeddac9-d04b-487c-800a-9e204968a80e"
+}

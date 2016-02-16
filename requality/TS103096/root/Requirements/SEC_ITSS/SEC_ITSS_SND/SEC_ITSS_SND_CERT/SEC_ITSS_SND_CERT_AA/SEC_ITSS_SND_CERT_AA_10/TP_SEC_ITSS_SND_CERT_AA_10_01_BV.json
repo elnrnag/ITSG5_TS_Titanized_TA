@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "babc8123-7854-4dae-a063-d6b923f31602",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "babc8123-7854-4dae-a063-d6b923f31602",
+            "type": "STRING",
+            "value": "Check that all mandatory validity restrictions are present and arranged in accesing order"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "babc8123-7854-4dae-a063-d6b923f31602",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating certificate_chain\r\n\t\t\t\tcontaining certificates[last-1] {\r\n\t\t\t\t\tcontaining validity_restrictions\r\n\t\t\t\t\t\tindicating validity_restrictions[n].type\r\n\t\t\t\t\t\t\t\t\t< validity_restrictions[n+1].type\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}\r\n"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "babc8123-7854-4dae-a063-d6b923f31602",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "babc8123-7854-4dae-a063-d6b923f31602",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "babc8123-7854-4dae-a063-d6b923f31602"
+}

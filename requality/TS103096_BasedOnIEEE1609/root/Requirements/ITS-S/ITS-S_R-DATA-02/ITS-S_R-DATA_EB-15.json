@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards valid signed data when the signer is a certificate chain in which the validity period of a subordinate certificate is outside that of its issuing certificate."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/0956fd46-ddcc-494d-8df8-692e87efbbaa"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "a7fb1fa2-e553-44e0-87ea-8ea9264e9353"
+}

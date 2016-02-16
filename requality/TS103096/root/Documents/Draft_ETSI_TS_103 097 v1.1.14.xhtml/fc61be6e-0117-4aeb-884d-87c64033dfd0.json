@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_fc61be6e-0117-4aeb-884d-87c64033dfd0\"><a name=\"fc61be6e-0117-4aeb-884d-87c64033dfd0\" id=\"id_fc61be6e-0117-4aeb-884d-87c64033dfd0\" class=\"requality_id\"><\/a>The <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: Courier New;\">subject_name<font style=\"font-family: Times New Roman;\"> variable-length vector shall have a maximum length of 32 bytes.<\/font><\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "fc61be6e-0117-4aeb-884d-87c64033dfd0"
+}

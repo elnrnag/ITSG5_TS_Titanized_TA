@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "40f04e9e-2c26-412d-b58a-3a830fb13687",
+            "type": "STRING",
+            "value": "If ITS-S sends a secured CAM and has received a SecuredMessage from an unkown ITS-S that contains only the certificate_digest_with_ecdsa256 check that the sent SecuredMessage contains a HeaderField of type request_unrecognized_certificate with the HashedId3 of the missing AT certificate."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "40f04e9e-2c26-412d-b58a-3a830fb13687",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/081b1d3f-e665-472a-abdb-5aad84bc9237"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "40f04e9e-2c26-412d-b58a-3a830fb13687",
+            "type": "STRING",
+            "value": "12. Send certificate request to unknown station"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "40f04e9e-2c26-412d-b58a-3a830fb13687",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "40f04e9e-2c26-412d-b58a-3a830fb13687"
+}

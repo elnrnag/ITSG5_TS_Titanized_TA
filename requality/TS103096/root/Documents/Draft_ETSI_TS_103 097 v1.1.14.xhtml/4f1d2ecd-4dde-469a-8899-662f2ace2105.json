@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "<span xmlns=\"http://www.w3.org/1999/xhtml\" class=\"requality_text id_4f1d2ecd-4dde-469a-8899-662f2ace2105\"><a name=\"4f1d2ecd-4dde-469a-8899-662f2ace2105\" id=\"id_4f1d2ecd-4dde-469a-8899-662f2ace2105\" class=\"requality_id\"><\/a>None of the possible <\/span><font xmlns=\"http://www.w3.org/1999/xhtml\" style=\"font-family: 'Courier New'; font-size: 10pt;\">HeaderField cases shall be included more than once.<\/font>"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Location"
+        }
+    },
+    "uuid": "d23fc64d-c5b4-479d-8dc0-20cdd06a86d8"
+}

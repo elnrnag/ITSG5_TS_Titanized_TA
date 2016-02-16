@@ -1,0 +1,2414 @@
+/**
+ *  @author   ETSI / STF405 / STF449
+ *  @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsIPv6OverGeoNetworking/ItsIpv6OverGeoNetworking_TestCases.ttcn $
+ *            $Id: ItsIpv6OverGeoNetworking_TestCases.ttcn 1423 2014-05-22 13:59:50Z filatov $
+ *  @desc     Testcases for IPv6 over GeoNetworking Protocol (TP version: 0.0.4)
+ *
+ */
+module ItsIpv6OverGeoNetworking_TestCases {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_Sync all;
+    import from LibCommon_Time all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_Time {modulepar all;}
+    
+    // LibIts
+    import from LibItsGeoNetworking_Functions all; 
+    import from LibItsGeoNetworking_Templates all;
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsIpv6OverGeoNetworking_TestSystem all;
+    import from LibItsIpv6OverGeoNetworking_Functions all; 
+    import from LibItsIpv6OverGeoNetworking_Templates all; 
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues all;
+    import from LibItsIpv6OverGeoNetworking_Pixits all;
+    import from LibItsIpv6OverGeoNetworking_Pics all;
+    import from LibItsExternal_TypesAndValues all;
+    
+    //5.2.1
+    group messageGeneration {
+        
+        //5.2.1.1
+        group mgGvl {
+            
+            /**
+             * @desc    Checks that an IPv6 link-local multicast message is carried out over a GeoBroadcast message 
+             *          into the correct geographical area, when send over an SVGL
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured SGVL(SGVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with SGVL1 to send link-local multicast packets
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPv6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating a link-local multicast IPv6 address
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoNetworking GeoBroadcast message
+             *              containing the geographical Destination area corresponding to SGVL1
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '4'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/GVL/BV/01
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1 and 9.2.1
+             */
+            testcase TC_IPV6GEO_MG_GVL_BV_01() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var AddressTableEntry v_addressesIut;
+                var AddressTableEntry v_addressesNodeB;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_addressesNodeB := f_getAddresses(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1});
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesIut.lla, 
+                                    v_addressesNodeB.solNodeMca, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getGvlInterface(c_gvl1),
+                        v_addressesIut.macAddress,
+                        v_addressesNodeB.macSolNodeMca,
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwBroadcastPacketWithAreaWithNextHeader(
+                                        v_longPosVectorIut,
+                                        ?,
+                                        f_getGeoBroadcastArea(vc_gvlTable[c_gvl1].area),
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoBroadcast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_GVL_BV_01
+            
+            /**
+             * @desc    Checks that an IPv6 global-scoped unicast-prefix-based multicast message is carried out over 
+             *          a GeoBroadcast message into the correct geographical area, when sent over an SGVL 
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured SGVL (SGVL1)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPv6 packet from the Upper Layer
+             *              containing destination address
+             *                  containing a global-scoped unicast-prefix-based multicast IPv6 address
+             *                      indicating prefix associated with SGVL1
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoNetworking GeoBroadcast message
+             *              containing the geographical Destination area corresponding to SGVL1
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '4'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/GVL/BV/02
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1 and 9.2.1
+             */
+            testcase TC_IPV6GEO_MG_GVL_BV_02() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var AddressTableEntry v_addressesIut;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1});
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesIut.lla,
+                                    f_computeGlobalScopedUnicastPrefixBasedMulticastIpv6Address(
+                                        f_getPrefix(1),
+                                        f_getPrefixLength(1),
+                                        1
+                                    ),
+                                    c_noNextHdr,
+                                    omit
+                                );
+                
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getGvlInterface(c_gvl1),
+                        v_addressesIut.macAddress,
+                        c_macBroadcastAddr,
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwBroadcastPacketWithAreaWithNextHeader(
+                                        v_longPosVectorIut,
+                                        ?,
+                                        f_getGeoBroadcastArea(vc_gvlTable[c_gvl1].area),
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoBroadcast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_GVL_BV_02
+            
+            /**
+             * @desc    Checks that an IPv6 Geographic anycast message is carried out over a GeoAnycast message 
+             *          into the correct geographical area, when send over an SVGL
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured SGVL (SGVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with SGVL1 GVL1 to send Geographic anycast packets
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPV6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating a Geographic anycast IPv6 address
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoNetworking GeoAnycast message
+             *              containing the geographical Destination area corresponding to SGVL1
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '3'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/GVL/BV/03
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1 and 9.4
+             */
+            testcase TC_IPV6GEO_MG_GVL_BV_03() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var AddressTableEntry v_addressesIut;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1});
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    f_computeGlobalAddress(c_compIut, vc_gvlTable[c_gvl1].prefix, vc_gvlTable[c_gvl1].prefixLength),
+                                    f_computeGeographicAnycastIpv6Address(
+                                        f_getPrefix(1),
+                                        f_getPrefixLength(1)
+                                    ),
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                                
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getGvlInterface(c_gvl1),
+                        v_addressesIut.macAddress,
+                        c_macBroadcastAddr,
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwAnycastPacketWithAreaWithNextHeader(
+                                        v_longPosVectorIut,
+                                        ?,
+                                        f_getGeoAnycastArea(vc_gvlTable[c_gvl1].area),
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoAnycast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_GVL_BV_03
+            
+            /**
+             * @desc    Checks that an IPv6 unicast message is carried out over a GeoUnicast when using an SGVL 
+             *          associated to an Ethernet V2.0/IEEE 802.3 LAN type virtual interface with address resolution
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured SGVL (SGVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with SGVL1
+             *      the IUT being configured with MIB attribute itsgn6aslVIResolAddr set to true
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPV6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating unicast IPv6 address of the Tester
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoUnicast message
+             *              containing DEPV field
+             *                  containing GN_ADDR field
+             *                      indicating value derived from the unicast IPv6 address IID
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '2'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/GVL/BV/04
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1 and 10.3
+             */
+            testcase TC_IPV6GEO_MG_GVL_BV_04() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var LongPosVector v_longPosVectorNodeA;
+				var LongposVector v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                if(PICS_GN6_ASL_VI_RESOL_ADDR != true) {
+                    log("*** " & testcasename() & ": ERROR: PICS_GN6_ASL_VI_RESOL_ADDR == true required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1});
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    f_computeGlobalAddress(c_compIut, vc_gvlTable[c_gvl1].prefix, vc_gvlTable[c_gvl1].prefixLength),
+                                    f_computeGlobalAddress(c_compNodeA, vc_gvlTable[c_gvl1].prefix, vc_gvlTable[c_gvl1].prefixLength),
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                                     
+				v_longPosVectorNodeB := f_getPosition(c_compNodeB);   
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getGvlInterface(c_gvl1),
+                        v_addressesIut.macAddress,
+                        f_gnAddr2MacAddr(v_longPosVectorNodeB.gnAddr), // On purpose: IUT should not use this value
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        mw_shortPosVectorPosition(f_longPosVector2ShortPosVector(v_longPosVectorNodeA)), // On purpose: IUT should derive this value fron IPv6 address
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        ?, 
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received incorrect GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_GVL_BV_04
+            
+            /**
+             * @desc    Checks that an IPv6 unicast message is carried out over a GeoUnicast when using an SGVL 
+             *          associated to an Ethernet V2.0/IEEE 802.3 LAN type virtual interface without address 
+             *          resolution
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured SGVL (SGVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with SGVL1
+             *      the IUT being configured with MIB attribute itsgn6aslVIResolAddr set to false
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPV6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating unicast IPv6 address of the Tester
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoUnicast message
+             *              containing DEPV field
+             *                  containing GN_ADDR field
+             *                      indicating value derived from the GN6_SAP destination parameter
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '2'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/GVL/BV/05
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1 and 10.3
+             */
+            testcase TC_IPV6GEO_MG_GVL_BV_05() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var LongPosVector v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeB;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                if(PICS_GN6_ASL_VI_RESOL_ADDR != false) {
+                    log("*** " & testcasename() & ": ERROR: PICS_GN6_ASL_VI_RESOL_ADDR == false required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeB := f_getAddresses(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1});
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    f_computeGlobalAddress(c_compIut, vc_gvlTable[c_gvl1].prefix, vc_gvlTable[c_gvl1].prefixLength),
+                                    f_computeGlobalAddress(c_compNodeA, vc_gvlTable[c_gvl1].prefix, vc_gvlTable[c_gvl1].prefixLength),
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getGvlInterface(c_gvl1),
+                        v_addressesIut.macAddress,
+                        v_addressesNodeB.macAddress, // On purpose: IUT must use this value
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        mw_shortPosVectorPosition(f_longPosVector2ShortPosVector(v_longPosVectorNodeB)), // On purpose: IUT should derive this value from SAP dest mac 
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        ?, 
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received incorrect GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_GVL_BV_05
+            
+        } // end mgGvl
+        
+        // 5.2.1.2
+        group mgTvl {
+            
+            /**
+             * @desc    Checks that an IPv6 unicast message is carried out over a GeoUnicast when using a TVL 
+             *          virtual interface with address resolution
+             * <pre>    
+             * Pics Selection: PICS_TVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured TVL (TVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with TVL1
+             *      the IUT being configured with MIB attribute itsgn6aslVIResolAddr set to true
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPV6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating unicast IPv6 address of the Tester
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoUnicast message
+             *              containing DEPV field
+             *                  containing GN_ADDR field
+             *                      indicating value derived from the unicast IPv6 address IID
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '2'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/TVL/BV/01
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1
+             */
+            testcase TC_IPV6GEO_MG_TVL_BV_01() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var LongPosVector v_longPosVectorNodeA, v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA, v_addressesNodeB;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                if(PICS_GN6_ASL_VI_RESOL_ADDR != true) {
+                    log("*** " & testcasename() & ": ERROR: PICS_GN6_ASL_VI_RESOL_ADDR == true required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeB := f_getAddresses(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                
+                f_acUpdateInterfaces();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesIut.lla,
+                                    v_addressesNodeB.lla,
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);   
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getTvlInterface(),
+                        v_addressesIut.macAddress,
+                        f_gnAddr2MacAddr(v_longPosVectorNodeA.gnAddr), // On purpose: IUT should not use this value
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        mw_shortPosVectorPosition_withDelta(f_longPosVector2ShortPosVector(v_longPosVectorNodeB)), // On purpose: IUT should derive this value fron IPv6 address
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        ?,
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received incorrect GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_TVL_BV_01
+            
+            /**
+             * @desc    Checks that an IPv6 unicast message is carried out over a GeoUnicast when using a TVL 
+             *          virtual interface without address resolution
+             * <pre>    
+             * Pics Selection: PICS_TVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured TVL (TVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with TVL1
+             *      the IUT being configured with MIB attribute itsgn6aslVIResolAddr set to false
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPV6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating unicast IPv6 address of the Tester
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoUnicast message
+             *              containing DEPV field
+             *                  containing GN_ADDR field
+             *                      indicating value derived from the GN6_SAP destination parameter
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '2'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/TVL/BV/02
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1
+             */
+            testcase TC_IPV6GEO_MG_TVL_BV_02() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var LongPosVector v_longPosVectorNodeA;
+                var LongPosVector v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                if(PICS_GN6_ASL_VI_RESOL_ADDR != false) {
+                    log("*** " & testcasename() & ": ERROR: PICS_GN6_ASL_VI_RESOL_ADDR == false required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                
+                f_acUpdateInterfaces();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesIut.lla,
+                                    v_addressesNodeA.lla,
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                
+				v_addressesNodeB := f_getAddresses(c_compNodeB);   
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getTvlInterface(),
+                        v_addressesIut.macAddress,
+                        v_addressesNodeB.macAddress, // On purpose: IUT must use this value
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        mw_shortPosVectorPosition_withDelta(f_longPosVector2ShortPosVector(v_longPosVectorNodeB)), // On purpose: IUT should derive this value from SAP dest mac 
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithNextHeader(
+                                        ?, 
+                                        ?,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received incorrect GeoNetworking GeoUnicast ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_TVL_BV_02
+            
+            /**
+             * @desc    Checks that an IPv6 link-local multicast message is carried out over a GeoBroadcast message 
+             *          into the correct geographical area, when sent over a TVL 
+             * <pre>    
+             * Pics Selection: PICS_TVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured TVL (TVL1)
+             *      the IUT's Upper Layer being configured to use the virtual interface associated with TVL1 to send link-local multicast packets
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives an IPV6 packet from the Upper Layer
+             *              containing destination address
+             *                  indicating link-local multicast IPv6 address
+             *      }
+             *      then {
+             *          the IUT sends a valid GeoNetworking TSB message
+             *              containing NH field
+             *                  indicating value '3'
+             *              containing HT field
+             *                  indicating value '5'
+             *              carrying the IPv6 packet received from Upper Layer as payload
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MG/TVL/BV/03
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.1 and 9.2.1
+             */
+            testcase TC_IPV6GEO_MG_TVL_BV_03() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var template (present) LongPosVector v_longPosVectorIut;
+                var LongPosVector v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeB;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                if(PICS_GN6_ASL_VI_RESOL_ADDR != true) {
+                    log("*** " & testcasename() & ": ERROR: PICS_GN6_ASL_VI_RESOL_ADDR == true required for executing the TC ***");
+                    stop;
+                }
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := mw_longPosVectorPosition_withDelta(f_getPosition(c_compIut));
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeB := f_getAddresses(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                
+                f_acUpdateInterfaces();
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesIut.lla,
+                                    v_addressesNodeB.solNodeMca,
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                
+				v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                ipv6OverGeoNetworkingPort.send(
+                    m_ipv6OverGeoNwReq(
+                        f_getTvlInterface(),
+                        v_addressesIut.macAddress,
+                        f_gnAddr2MacAddr(v_longPosVectorNodeB.gnAddr),
+                        v_ipv6Packet
+                    )
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwTsbPacketWithNextHeader(
+                                        ?,
+                                        v_longPosVectorIut,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct GeoNetworking TSB ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] geoNetworkingPort.receive(
+                        f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwTsbPacketWithNextHeader(
+                                        ?,
+                                        v_longPosVectorIut,
+                                        e_ipv6
+                                    )
+                                )
+                            ),
+                            mw_ipv6Payload(v_ipv6Packet)
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received incorrect GeoNetworking TSB ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MG_TVL_BV_03
+            
+        } // end mgTvl
+        
+    } // end group messageGeneration
+    
+    //5.2.2
+    group messageReception {
+        
+        //5.2.2.1
+        group mrGvl {
+            
+            /**
+             * @desc    Checks handling of a received GeoBroadcast message containing an 
+             *          IPv6 packet, which has destination area corresponding to an existing SGVL 
+             *          of the IUT
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVL (SGVL1)
+             *      the IUT having configured SGVLs (SGVL2..SGVLx)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoBroadcast message
+             *              containing Destination Area parameters corresponding to SGVL1
+             *              containing payload 
+             *                  indicating an IPv6 packet
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to GVL1 an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating the broadcast value
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/01
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_01() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    v_addressesIut.lla, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwBroadcastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoBroadcastArea(vc_gvlTable[c_gvl1].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getGvlInterface(c_gvl1),
+                            v_addressesNodeA.macAddress, // FIXME check where this comes from (verify TP)
+                            c_llBroadcast,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }   
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                     
+            } // end TC_IPV6GEO_MR_GVL_BV_01
+            
+            /**
+             * @desc    Checks handling of a received GeoBroadcast message containing an IPv6 
+             *          packet no carrying a Router Advertisement, which has destination area not corresponding to 
+             *          any existing SGVL of the IUT
+             * <pre>    
+             * Pics Selection: PICS_SGVL and PICS_DGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *      the IUT having configured DGVL (DGVL1)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoBroadcast message
+             *              containing Destination Area parameters not corresponding to any GVLs
+             *              containing payload 
+             *                  containing an IPv6 packet
+             *                      not containing an ICMPv6 RA message
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to DGVL1 an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating the broadcast value
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/02
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_02() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                
+                // No Router Advertisement for gvl2
+                f_prConfigureGVL({c_gvl1});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    v_addressesIut.solNodeMca, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwBroadcastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoBroadcastArea(vc_gvlTable[c_gvl2].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2)),
+                            v_addressesNodeA.macAddress,
+                            c_llBroadcast,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }   
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                     
+            } // end TC_IPV6GEO_MR_GVL_BV_02
+            
+            /**
+             * @desc    Checks handling of a received GeoAnycast message containing an IPv6 packet, which 
+             *          has destination area corresponding to an existing SGVL of the IUT
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoAnycast message
+             *              containing Destination Area parameters corresponding to SGVL1
+             *              containing payload 
+             *                  indicating an IPv6 packet
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to SGVL1 an Ethernet packet
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6 
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/03
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_03() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    v_addressesIut.solNodeMca, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwAnycastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoAnycastArea(vc_gvlTable[c_gvl1].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getGvlInterface(c_gvl1),
+                            v_addressesNodeA.macAddress,
+                            ?, 
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_03
+            
+            /**
+             * @desc    Checks handling of a received GeoAnycast message containing an IPv6 packet, which 
+             *          has destination area not corresponding to any existing GVL of the IUT
+             * <pre>    
+             * Pics Selection: PICS_SGVL and PICS_DGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured GVLs (GVL1 .. GVLx)
+             *      the IUT having configured DGVL (DGVL1)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoAnycast message
+             *              containing Destination Area parameters not corresponding to any SGVLs and
+             *               containing payload 
+             *                   indicating an IPv6 packet
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to DGVL1 an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating the broadcast value
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/04
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_04() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                
+                // No Router Advertisement for gvl_1
+                f_prConfigureGVL({c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    v_addressesIut.lla, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwBroadcastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoBroadcastArea(vc_gvlTable[c_gvl1].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2)),
+                            v_addressesNodeA.macAddress,
+                            c_llBroadcast, 
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_04
+            
+            /**
+             * @desc    Checks handling of a received GeoBroadcast message containing an
+             *          IPv6 packet carrying a Router Advertisement, which has destination area not corresponding to 
+             *          any existing SGVL of the IUT
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoBroadcast message
+             *              containing Destination Area parameters not corresponding to any SGVLs
+             *                  containing an IPv6 packet
+             *                      indicating an ICMPv6 RA message
+             *      }
+             *      then {
+             *          the IUT creates a new SGVL and a new virtual interface associated to it 
+             *          the IUT transmits on the virtual interface associated to the new GVL an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating '33:33:00:00:00:01'
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/05
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_05() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                //gvl3 handled later
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    c_allNodesMca, 
+                                    c_icmpHdr,
+                                    m_rtAdvWithOptions(
+                                        m_rtAdvOpt_prefixOpt(
+                                            vc_gvlTable[c_gvl3].prefixLength,
+                                            c_lFlag1,
+                                            c_aFlag1,
+                                            c_validLifetime30s,
+                                            c_preferredLifetime30s,
+                                            vc_gvlTable[c_gvl3].prefix
+                                        )
+                                    )
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwBroadcastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoBroadcastArea(vc_gvlTable[c_gvl3].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                f_sleep(PX_T_BUILD_CONFIG);
+                f_acUpdateInterfaces();
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getGvlInterface(c_gvl3),
+                            v_addressesNodeA.macAddress,
+                            c_macBroadcastAddr,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_05
+            
+            /**
+             * @desc    Checks handling of a received GeoUnicast message, containing an IPv6 packet with 
+             *          destination address matching one and only one address associated to a 
+             *          virtual interface of the IUT
+             * <pre>
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoUnicast message
+             *              containing an IPv6 packet 
+             *                  containing address associated to one SGVL (SGVLy)
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to SGVLy an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating a value derived from the Destination GN_ADDR field
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/06
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_06() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorIut, v_longPosVectorNodeA, v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := f_getPosition(c_compIut);
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    v_addressesIut.lla, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwUnicastPacket(
+                                v_longPosVectorNodeA,
+                                f_longPosVector2ShortPosVector(v_longPosVectorIut),
+                                vc_localSeqNumber
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getGvlInterface(c_gvl2),
+                            v_addressesNodeA.macAddress,
+                            v_addressesIut.macAddress,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_06
+            
+            /**
+             * @desc    Checks handling of a received GeoUnicast message, containing an 
+             *          IPv6 packet with destination address not matching addresses associated to IUT's SGVLs and 
+             *          with SOPV contained in one and only one geoArea associated to IUT's SGVLs
+             * <pre>
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoUnicast message
+             *              containing payload
+             *                  containing an IPv6 packet
+             *                      containing a destination address
+             *                          indicating address not associated to any GVL
+             *              containing Source position coordinates only contained in GVLy
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to GVLy an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating a value derived from the Destination GN_ADDR field
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/07
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            //TODO check the used addresses!!!
+            testcase TC_IPV6GEO_MR_GVL_BV_07() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorIut, v_longPosVectorNodeA, v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA, v_addressesNodeB;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := f_getPosition(c_compIut);
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeB := f_getAddresses(c_compNodeB);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    v_addressesNodeB.lla, 
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwUnicastPacket(
+                                v_longPosVectorNodeB,
+                                f_longPosVector2ShortPosVector(v_longPosVectorIut),
+                                vc_localSeqNumber
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getGvlInterface(c_gvl3),
+                            v_addressesNodeA.macAddress,
+                            v_addressesNodeB.macAddress,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_07
+            
+            /**
+             * @desc    Checks handling of a received GeoUnicast message, containing an IPv6 packet with 
+             *          destination address not matching addresses associated to IUT's GVLs and with SOPV not 
+             *          contained in any geoArea associated to IUT's GVLs
+             * <pre>    
+             * Pics Selection: PICS_SGVL and PICS_DGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *      the IUT having configured DGVL (DGVL1)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoUnicast message
+             *              containing payload
+             *                  containing an IPv6 packet
+             *                      containing a destination address
+             *                          indicating address not associated to any GVL
+             *              containing Source position coordinates not contained in any GVL
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to DGVL an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating a value derived from the Destination GN_ADDR field
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/08
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_08() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorIut, v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := f_getPosition(c_compIut);
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                                
+                v_ipv6Packet := m_ipv6Packet(
+                                    f_computeGlobalAddress(c_compNodeA, vc_gvlTable[c_gvl2].prefix, vc_gvlTable[c_gvl2].prefixLength),
+                                    f_computeGlobalAddress(c_compIut, vc_gvlTable[c_gvl2].prefix, vc_gvlTable[c_gvl2].prefixLength),
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwUnicastPacket(
+                                v_longPosVectorNodeB,
+                                f_longPosVector2ShortPosVector(v_longPosVectorIut),
+                                vc_localSeqNumber
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2)),
+                            v_addressesNodeA.macAddress,
+                            v_addressesIut.macAddress,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_08
+            
+            /**
+             * @desc    Checks handling of a received GeoUnicast message, containing an IPv6 packet with 
+             *          destination address not matching addresses associated to IUT's SGVLs and with SOPV 
+             *          contained in more than one geoArea associated to IUT's SGVLs and with IPv6 source 
+             *          address considered to be on-link on at least one of those SGVLs
+             * <pre>    
+             * Pics Selection: PICS_SGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *      GVLb invalidation timer being higher than SGVLa and SGVLc invalidation timers
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoUnicast message
+             *              containing payload
+             *                  containing an IPv6 packet
+             *                      containing a destination address
+             *                          indicating address not associated to any SGVL
+             *              containing Source position coordinates contained in SGVLa, SGVLb and SGVLc
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to SGVLb an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating a value derived from the Destination GN_ADDR field
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/09
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            //TODO check the used addresses!!!
+            testcase TC_IPV6GEO_MR_GVL_BV_09() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorIut, v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := f_getPosition(c_compIut);
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2, c_gvl3}, {c_validLifetime20s, c_validLifetime30s, c_validLifetime20s});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    f_computeGlobalAddress(c_compNodeA, vc_gvlTable[c_gvl2].prefix, vc_gvlTable[c_gvl2].prefixLength),
+                                    f_computeGlobalAddress(c_compIut, vc_gvlTable[c_gvl2].prefix, vc_gvlTable[c_gvl2].prefixLength),
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwUnicastPacket(
+                                v_longPosVectorNodeB,
+                                f_longPosVector2ShortPosVector(v_longPosVectorIut),
+                                vc_localSeqNumber
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getGvlInterface(c_gvl2),
+                            v_addressesNodeA.macAddress,
+                            v_addressesIut.macAddress,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_09
+            
+            /**
+             * @desc    Checks handling of a received GeoUnicast message, containing an IPv6 packet with 
+             *          destination address not matching addresses associated to IUT's SGVLs and with SOPV 
+             *          contained in more than one geoArea associated to IUT's SGVLs and with IPv6 source 
+             *          address not considered to be on-link on any of those SGVLs
+             * <pre>    
+             * Pics Selection: PICS_SGVL and PICS_DGVL
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured SGVLs (SGVL1 .. SGVLx)
+             *      the IUT having configured DGVLs (DGVL1)
+             *      IPv6 address IPV6_SRC not considered to be on-link on SGVLa, SGVLb, and SGVLc
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoUnicast message
+             *              containing payload
+             *                  containing an IPv6 packet
+             *                      containing a destination address
+             *                          indicating address not associated to any SGVL
+             *                      containing a source address IPV6_SRC
+             *              containing Source position coordinates contained in SGVLa, SGVLb and SGVLc
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to DGVL1 an Ethernet packet
+             *              containing Destination MAC address
+             *                  indicating a value derived from the Destination GN_ADDR field
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/GVL/BV/10
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_GVL_BV_10() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorIut, v_longPosVectorNodeB;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := f_getPosition(c_compIut);
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2, c_gvl3});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    f_computeGlobalAddress(c_compNodeA, vc_gvlTable[c_gvl2].prefix, vc_gvlTable[c_gvl2].prefixLength),
+                                    f_computeGlobalAddress(c_compIut, vc_gvlTable[c_gvl2].prefix, vc_gvlTable[c_gvl2].prefixLength),
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwUnicastPacket(
+                                v_longPosVectorNodeB,
+                                f_longPosVector2ShortPosVector(v_longPosVectorIut),
+                                vc_localSeqNumber
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2), f_getGvlInterface(c_gvl3)),
+                            v_addressesNodeA.macAddress,
+                            v_addressesIut.macAddress,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_GVL_BV_10
+            
+        } //end mrGvl
+        
+        // 5.2.2.2
+        group mrTvl {
+            
+            /**
+             * @desc    Checks handling of a received link-local IPv6 Unicast message, when using a TVL associated 
+             *          to an NBMA type virtual interface
+             * <pre>    
+             * Pics Selection: PICS_TLV
+             * Initial conditions: 
+             *  with {
+             *      the IUT having a configured TVL (TVL1)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a TSB message
+             *              containing an IPv6 packet
+             *      }
+             *      then {
+             *          the IUT transmits on the virtual interface associated to TVL1 an Ethernet packet
+             *              containing Source MAC address
+             *                  indicating a value derived from Source GN_ADDR field
+             *              containing Ether Type value
+             *                  indicating IPv6
+             *              containing the IPv6 packet
+             *      }
+             *  }
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/MR/TVL/BV/01
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_MR_TVL_BV_01() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorIut, v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorIut := f_getPosition(c_compIut);
+                v_addressesIut := f_getAddresses(c_compIut);
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                
+                f_acUpdateInterfaces();
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla,
+                                    v_addressesIut.lla,
+                                    c_noNextHdr, 
+                                    omit
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwTsbPacket(
+                                vc_localSeqNumber,
+                                v_longPosVectorIut
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                tc_ac.start;
+                alt {
+                  [] ipv6OverGeoNetworkingPort.receive(
+                        mw_ipv6OverGeoNwInd(
+                            f_getTvlInterface(),
+                            v_addressesNodeA.macAddress,
+                            ?,
+                            v_ipv6Packet
+                        )
+                    )  {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Received correct Ethernet packet ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Expected message not received ***");
+                      f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_timeout);
+                  }
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_MR_TVL_BV_01
+            
+        } // end mrTvl
+        
+    } // end group messageReception
+    
+    group virtualInterfaceManagement {
+        
+        group newVirtualInterfaces {
+            
+            /**
+             * @desc    Checks the Router Advertisement-triggered creation of a new SGVL associated to an Ethernet 
+             *          V2.0/IEEE 802.3 LAN type virtual interface
+             * <pre>    
+             * Pics Selection: PICS_SGVL and PICS_Ethernet
+             * Initial conditions: 
+             *  with {
+             *      the IUT having automatically configured SGVLs (SGVL1 .. SGVLx)
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          the IUT receives a GeoBroadcast message
+             *              containing Destination Area parameters not corresponding to any GVLs
+             *              containing an ICMPv6 RA payload 
+             *      }
+             *      then {
+             *          the IUT creates a new SGVL and associates to it a new virtual interface (VI1)
+             *              having a MAC address
+             *                  indicating a value derived from the IUT's GN_ADDR (Note)
+             *      }
+             *  }
+             * Note: reverse EUI-64 generation procedure
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/VM/NVI/BV/01
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2, 10.2.1
+             */
+            testcase TC_IPV6GEO_VM_NVI_BV_01() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                //gvl3 handled later
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    c_allNodesMca, 
+                                    c_icmpHdr,
+                                    m_rtAdvWithOptions(
+                                        m_rtAdvOpt_prefixOpt(
+                                            vc_gvlTable[c_gvl3].prefixLength,
+                                            c_lFlag1,
+                                            c_aFlag1,
+                                            c_validLifetime30s,
+                                            c_preferredLifetime30s,
+                                            vc_gvlTable[c_gvl3].prefix
+                                        )
+                                    )
+                                );
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwBroadcastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoBroadcastArea(vc_gvlTable[c_gvl3].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                f_sleep(PX_T_BUILD_CONFIG);
+                f_acUpdateInterfaces();
+                
+                if(f_getGvlInterface(c_gvl3) != "") {
+                    log("*** " & testcasename() & ": PASS: Virtual interface created ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                }
+                else {
+                    log("*** " & testcasename() & ": FAIL: Virtual interface not created ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error);
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                     
+            } // end TC_IPV6GEO_VM_NVI_BV_01
+            
+        } // end group newVirtualInterfaces
+        
+        group expiredVirtualInterfaces {
+            
+            /**
+             * @desc    Checks the removal of an expired GVL and its associated virtual interface
+             * <pre>
+             * Pics Selection: PICS_SGVL and PICS_Ethernet
+             * Initial conditions: 
+             *  with {
+             *      the IUT having configured a SGVL (SGVL1) derived from a received RA
+             *  }
+             * Expected behaviour:
+             *  ensure that {
+             *      when { 
+             *          every prefix entry associated to SGVL1 has expired
+             *      }
+             *      then {
+             *          the IUT removes the expired SGVL SGVL1
+             *          the IUT removes the associated virtual interface VI1
+             *      }
+             *  }
+             * Note: reverse EUI-64 generation procedure
+             * </pre>
+             * 
+             * @see         ETSI TS 102 859-2 v2.1.1 TP/IPv6GEO/VM/EVI/BV/01
+             * @reference   ETSI EN 302 636-6-1 clauses, 8.2.2
+             */
+            testcase TC_IPV6GEO_VM_EVI_BV_01() runs on ItsIpv6OverGeoNetworking system ItsIpv6OverGeoNetworkingSystem {
+                
+                // Local variables
+                var LongPosVector v_longPosVectorNodeA;
+                var AddressTableEntry v_addressesNodeA;
+                var template (value) Ipv6Packet v_ipv6Packet;
+                
+                // Test control
+                
+                // Test component configuration
+                f_cf01UpGn6();
+                v_longPosVectorNodeA := f_getPosition(c_compNodeA);
+                v_addressesNodeA := f_getAddresses(c_compNodeA);
+                
+                // Test adapter configuration
+                
+                // Preamble
+                f_prIpv6Neighbour();
+                f_prConfigureGVL({c_gvl1, c_gvl2});
+                
+                v_ipv6Packet := m_ipv6Packet(
+                                    v_addressesNodeA.lla, 
+                                    c_allNodesMca, 
+                                    c_icmpHdr,
+                                    m_rtAdvWithOptions(
+                                        m_rtAdvOpt_prefixOpt(
+                                            vc_gvlTable[c_gvl3].prefixLength,
+                                            c_lFlag1,
+                                            c_aFlag1,
+                                            c_validLifetime30s,
+                                            c_preferredLifetime30s,
+                                            vc_gvlTable[c_gvl3].prefix
+                                        )
+                                    )
+                                );
+                                
+                f_sendGeoNetMessageWithPayload(
+                    m_geoNwReq_linkLayerBroadcast(
+                        m_geoNwPdu(
+                            m_geoNwBroadcastPacket(
+                                v_longPosVectorNodeA,
+                                vc_localSeqNumber,
+                                f_getGeoBroadcastArea(vc_gvlTable[c_gvl3].area)
+                            )
+                        )
+                    ),
+                    m_ipv6Payload(v_ipv6Packet)
+                );
+                
+                f_sleep(PX_T_BUILD_CONFIG);
+                f_acUpdateInterfaces();
+                
+                if(f_getGvlInterface(c_gvl3) == "") {
+                    log("*** " & testcasename() & ": INCONC: Virtual interface not created ***");
+                    f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_error);
+                }
+                f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+                
+                // Test Body
+                f_sleep(int2float(c_validLifetime30s));
+                f_acUpdateInterfaces();
+                
+                if(f_getGvlInterface(c_gvl3) == "") {
+                    log("*** " & testcasename() & ": PASS: Virtual interface removed ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_success); 
+                }
+                else {
+                    log("*** " & testcasename() & ": FAIL: Virtual interface not removed ***");
+                    f_selfOrClientSyncAndVerdictTestBody(c_tbDone, e_error);
+                }
+                
+                // Postamble
+                f_poIpv6Neighbour();
+                f_cf01DownGn6();
+                
+            } // end TC_IPV6GEO_VM_EVI_BV_01
+            
+        } // end group expiredVirtualInterfaces
+        
+    } // end virtualInterfaceManagement
+    
+} // end ItsIpv6OverGeoNetworking_TestCases
+

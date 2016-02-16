@@ -1,0 +1,2665 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/GeoNetworking/LibItsGeoNetworking_Functions.ttcn $
+ *              $Id: LibItsGeoNetworking_Functions.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Module containing functions for GeoNetworking
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsGeoNetworking_Functions {
+    
+    // Libcommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    import from LibCommon_VerdictControl {type FncRetCode;}
+    import from LibCommon_Sync all;
+    import from LibCommon_Time all;
+    
+    // LibItsCommon
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TestSystem all;
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsExternal_TypesAndValues {type MacAddress};
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    import from LibItsSecurity_Templates all;
+    //import from LibItsSecurity_Functions all;
+    import from LibItsSecurity_Pixits all;
+    
+    // LibItsGeoNetworking
+    import from LibItsGeoNetworking_TestSystem all;
+    import from LibItsGeoNetworking_TypesAndValues all;
+    import from LibItsGeoNetworking_Templates all;
+    import from LibItsGeoNetworking_Pixits all;
+    import from LibItsGeoNetworking_Pics all;
+    
+    group utFuntions {
+        
+        /**
+         * @desc    Requests to bring the IUT in an initial state
+         * @param   p_init The initialisation to trigger.
+         */
+        function f_utInitializeIut(template (value) UtInitialize p_init) runs on ItsBaseGeoNetworking {
+			var UtInitializeResult v_UtInitializeResult;
+			v_UtInitializeResult.utInitializeResult := true;
+            
+            utPort.send(p_init);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtInitializeResult:v_UtInitializeResult) {
+                    tc_wait.stop;
+                    log("*** f_utInitializeIut: INFO: IUT initialized ***");
+                }
+                [] utPort.receive {
+                    tc_wait.stop;
+                    log("*** f_utInitializeIut: INFO: IUT could not be initialized ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utInitializeIut: INFO: IUT could not be initialized in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat;
+                }
+            }
+        }
+        
+        /**
+         * @desc    Requests to change the position of the IUT
+         */
+        function f_utChangePosition() runs on ItsBaseGeoNetworking {
+			var UtChangePositionResult v_UtChangePositionResult;
+			v_UtChangePositionResult.utChangePositionResult := true;
+
+			var UtChangePositionResult v_UtChangePositionResult_false;
+			v_UtChangePositionResult_false.utChangePositionResult := false;
+            
+            utPort.send(m_changePosition);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtChangePositionResult:v_UtChangePositionResult) {
+                    tc_wait.stop;
+                    log("*** f_utChangePosition: INFO: IUT position changed ***");
+                }
+                [] utPort.receive(UtChangePositionResult:v_UtChangePositionResult_false) {
+                    tc_wait.stop;
+                    log("*** f_utChangePosition: INFO: IUT position change was not successful ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] a_utDefault() {
+                }
+                [] tc_wait.timeout {
+                    log("*** f_utChangePosition: INFO: IUT position not changed in time ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat;
+                }
+            }
+        }
+        
+        /**
+         * @desc    Triggers event from the application layer
+         * @param   p_event The event to trigger.
+         */
+        function f_utTriggerEvent(template (value) UtGnTrigger p_event) runs on ItsGeoNetworking return boolean {
+            var UtGnTriggerResult v_UtGnTriggerResult_true;
+			v_UtGnTriggerResult_true.utGnTriggerResult := true;
+
+			var UtGnTriggerResult v_UtGnTriggerResult_false;
+			v_UtGnTriggerResult_false.utGnTriggerResult := false;
+            // Variables
+            var boolean v_return := true;
+
+            utPort.send(p_event);
+            tc_wait.start;
+            alt {
+                [] utPort.receive(UtGnTriggerResult:v_UtGnTriggerResult_true) {
+                    tc_wait.stop;
+                }
+                [] utPort.receive(UtGnTriggerResult:v_UtGnTriggerResult_false) {
+                    tc_wait.stop;
+                    log("*** UtGnTriggerResult: INFO: UT trigger was not successful ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] a_utDefault() {
+                }
+                [] tc_wait.timeout {
+                    v_return := false;
+                }
+                [else] { // Shortcut defaults
+                    //f_sleep(0.050); // 50 ms
+                    repeat;
+                }
+            }
+            return v_return;
+        }
+        
+    } // End of group utFunctions
+    
+    group geoConfigurationFunctions {
+        
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - two ITS nodes (nodeA, nodeB)
+         *       - Area1 which only includes NodeB and IUT
+         *       - Area2 which only includes NodeB
+         *         NodeB being close to the area center
+         */
+        function f_cf01Up() runs on ItsGeoNetworking {
+            
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            
+            // Map
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            map(self:geoNetworkingPort, system:geoNetworkingPort);
+            
+            // Connect
+            f_connect4SelfOrClientSync();
+            activate(a_cf01Down());
+            
+            // Initialise secured mode
+            f_initialiseSecuredMode();
+            
+            //Initialze the IUT
+            f_initialState();
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            f_initialiseComponent(v_positionTable, v_areaTable, c_compNodeB);
+            
+        } // end f_cf01Up
+        
+        function f_cf01Down() runs on ItsGeoNetworking {
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            unmap(self:geoNetworkingPort, system:geoNetworkingPort);
+            
+            // Disconnect
+            f_disconnect4SelfOrClientSync();
+            
+        } // end f_cf01Down
+        
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - one ITS node (NodeB)
+         *       - one ITS node (NodeD)
+         *       - Area1 which only includes NodeB, NodeD and IUT
+         *       - Area2 which only includes NodeB and NodeD
+         *         NodeB being close to the area center
+         *
+         * @param p_mainUtComponent Name of the component that will initialize IUT and handle default UT messages
+         */
+        function f_cf02Up(in charstring p_mainUtComponent := c_compMTC) runs on ItsMtc {
+            
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            var ItsGeoNetworking v_component;
+            var integer i;
+            
+            // Select components
+            vc_componentTable := {{c_compNodeB, omit}, {c_compNodeD, omit}};
+            
+            // Create components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent := ItsGeoNetworking.create(vc_componentTable[i].componentName) alive;
+            }
+            
+            // Map & Connect
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            connect(self:syncPort, mtc:syncPort);
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                map(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                map(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                map(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                connect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            
+            activate(a_cf02Down());
+            
+            //Initialze the IUT
+            if(p_mainUtComponent == c_compMTC) {
+                // Initialise secured mode
+                f_initialiseSecuredMode();
+                
+                // MTC intializes IUT
+                f_initialState();
+            }
+            else {
+                v_component := f_getComponent(p_mainUtComponent);
+                v_component.start(f_initialState());
+                v_component.done;    
+            }
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            // Initialize components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.start(f_initialiseComponent(v_positionTable, v_areaTable, vc_componentTable[i].componentName));
+            }
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.done;
+            }
+            
+        } // end f_cf02Up
+        
+        /**
+         * @desc Deletes configuration cf02
+         */
+        function f_cf02Down() runs on ItsMtc {
+            
+            // Local variables
+            var integer i;
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap & Disconnect
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) { 
+                unmap(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                unmap(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                unmap(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                disconnect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            disconnect(self:syncPort, mtc:syncPort);
+            
+        } // end f_cf02Down
+        
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - one ITS node (NodeA)
+         *       - one ITS node in direction of NodeA (NodeB)
+         *       - one ITS node not in direction of NodeA (NodeC)
+         *       - Area1 which only includes NodeB and IUT
+         *       - Area2 which only includes NodeB
+         *         NodeB being close to the area center
+         * @param p_mainUtComponent Name of the component that will initialize IUT and handle default UT messages
+         */
+        function f_cf03Up(in charstring p_mainUtComponent := c_compMTC) runs on ItsMtc {
+            
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            var ItsGeoNetworking v_component;
+            var integer i;
+            
+            // Select components
+            vc_componentTable := {{c_compNodeB, omit}, {c_compNodeC, omit}};
+            
+            // Create components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent := ItsGeoNetworking.create(vc_componentTable[i].componentName) alive;
+            }
+            
+            // Map & Connect
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            connect(self:syncPort, mtc:syncPort);
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                map(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                map(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                map(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                connect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            
+            activate(a_cf03Down());
+            
+            //Initialze the IUT
+            if(p_mainUtComponent == c_compMTC) {
+                // Initialise secured mode
+                f_initialiseSecuredMode();
+                
+                // MTC intializes IUT
+                f_initialState();
+            }
+            else {
+                v_component := f_getComponent(p_mainUtComponent);
+                v_component.start(f_initialState());
+                v_component.done;   
+            }
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            // Initialize components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.start(f_initialiseComponent(v_positionTable, v_areaTable, vc_componentTable[i].componentName));
+            }
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.done;
+            }
+            
+        } // end f_cf03Up
+        
+        /**
+         * @desc Deletes configuration cf03
+         */
+        function f_cf03Down() runs on ItsMtc {
+            
+            // Local variables
+            var integer i;
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap & Disconnect
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) { 
+                unmap(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                unmap(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                unmap(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                disconnect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            disconnect(self:syncPort, mtc:syncPort);
+        
+        } // end f_cf03Down
+        
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - one ITS node (NodeA)
+         *       - one ITS node in direction of NodeA and having
+         *         shortest distance to NodeA (NodeB)
+         *       - one ITS node in direction of NodeA (NodeD)
+         *       - one ITS node not in direction of NodeA (NodeC)
+         *       - Area1 which only includes NodeB, NodeD and IUT
+         *       - Area2 which only includes NodeA, NodeB and NodeD
+         *         NodeB being close to the area center
+         * @param p_mainUtComponent Name of the component that will initialize IUT and handle default UT messages
+         */
+        function f_cf04Up(in charstring p_mainUtComponent := c_compMTC) runs on ItsMtc {
+            
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            var ItsGeoNetworking v_component;
+            var integer i;
+            
+            // Select components
+            vc_componentTable := {{c_compNodeB, omit}, {c_compNodeC, omit}, {c_compNodeD, omit}};
+            
+            // Create components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent := ItsGeoNetworking.create(vc_componentTable[i].componentName) alive;
+            }
+            
+            // Map & Connect
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            connect(self:syncPort, mtc:syncPort);
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                map(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                map(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                map(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                connect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            
+            activate(a_cf04Down());
+            
+            //Initialze the IUT
+            if(p_mainUtComponent == c_compMTC) {
+                // Initialise secured mode
+                f_initialiseSecuredMode();
+                
+                // MTC intializes IUT
+                f_initialState();
+            }
+            else {
+                v_component := f_getComponent(p_mainUtComponent);
+                v_component.start(f_initialState());
+                v_component.done;   
+            }
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            // Initialize components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.start(f_initialiseComponent(v_positionTable, v_areaTable, vc_componentTable[i].componentName));
+            }
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.done;
+            }
+            
+        } // end f_cf04Up
+        
+        /**
+         * @desc Deletes configuration cf04
+         */
+        function f_cf04Down() runs on ItsMtc {
+            
+            // Local variables
+            var integer i;
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap & Disconnect
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) { 
+                unmap(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                unmap(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                unmap(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                disconnect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            disconnect(self:syncPort, mtc:syncPort);
+            
+        } // end f_cf04Down
+
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - one ITS node (NodeB)
+         *       - one ITS node not in direction of NodeB and having
+         *         longest distance to NodeB (NodeE)
+         *       - Area1 which only includes NodeB, NodeD and IUT
+         * @param p_mainUtComponent Name of the component that will initialize IUT and handle default UT messages
+         */
+        function f_cf05Up(in charstring p_mainUtComponent := c_compMTC) runs on ItsMtc {
+            
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            var ItsGeoNetworking v_component;
+            var integer i;
+            
+            // Select components
+            vc_componentTable := {{c_compNodeB, omit}, {c_compNodeE, omit}};
+            
+            // Create components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent := ItsGeoNetworking.create(vc_componentTable[i].componentName) alive;
+            }
+            
+            // Map & Connect
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            connect(self:syncPort, mtc:syncPort);
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                map(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                map(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                map(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                connect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            
+            activate(a_cf05Down());
+            
+            //Initialze the IUT
+            if(p_mainUtComponent == c_compMTC) {
+                // Initialise secured mode
+                f_initialiseSecuredMode();
+                
+                // MTC intializes IUT
+                f_initialState();
+            }
+            else {
+                v_component := f_getComponent(p_mainUtComponent);
+                v_component.start(f_initialState());
+                v_component.done;   
+            }
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            // Initialize components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.start(f_initialiseComponent(v_positionTable, v_areaTable, vc_componentTable[i].componentName));
+            }
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.done;
+            }
+        }
+        
+        /**
+         * @desc Deletes configuration cf05
+         */
+        function f_cf05Down() runs on ItsMtc {
+            
+            // Local variables
+            var integer i;
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap & Disconnect
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) { 
+                unmap(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                unmap(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                unmap(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                disconnect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            disconnect(self:syncPort, mtc:syncPort);
+            
+        } // end f_cf05Down
+        
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - one ITS node (NodeB)
+         *       - one ITS node not in direction of NodeB and having
+         *         shortest distance to NodeB (NodeF)
+         *       - Area1 which only includes NodeB, NodeD and IUT
+         *       - IUT not in sectorial area of NodeB-NodeF
+         * @param p_mainUtComponent Name of the component that will initialize IUT and handle default UT messages
+         */
+        function f_cf06Up(in charstring p_mainUtComponent := c_compMTC) runs on ItsMtc {
+                    
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            var ItsGeoNetworking v_component;
+            var integer i;
+            
+            // Select components
+            vc_componentTable := {{c_compNodeB, omit}, {c_compNodeF, omit}};
+            
+            // Create components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent := ItsGeoNetworking.create(vc_componentTable[i].componentName) alive;
+            }
+            
+            // Map & Connect
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            connect(self:syncPort, mtc:syncPort);
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                map(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                map(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                map(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                connect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            
+            activate(a_cf06Down());
+            
+            //Initialze the IUT
+            if(p_mainUtComponent == c_compMTC) {
+                // Initialise secured mode
+                f_initialiseSecuredMode();
+                
+                // MTC intializes IUT
+                f_initialState();
+            }
+            else {
+                v_component := f_getComponent(p_mainUtComponent);
+                v_component.start(f_initialState());
+                v_component.done;   
+            }
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            // Initialize components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.start(f_initialiseComponent(v_positionTable, v_areaTable, vc_componentTable[i].componentName));
+            }
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.done;
+            }
+        }
+        
+        /**
+         * @desc Deletes configuration cf06
+         */
+        function f_cf06Down() runs on ItsMtc {
+            
+            // Local variables
+            var integer i;
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap & Disconnect
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) { 
+                unmap(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                unmap(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                unmap(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                disconnect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            disconnect(self:syncPort, mtc:syncPort);
+            
+        } // end f_cf06Down
+
+        /**
+         * @desc This configuration features:
+         *       - one ITS node (IUT)
+         *       - one ITS node (NodeB)
+         *       - one ITS node in direction of NodeB and having
+         *         shortest distance to NodeB (NodeD)
+         *       - Area1 which only includes NodeB, NodeD and IUT
+         * @param p_mainUtComponent Name of the component that will initialize IUT and handle default UT messages
+         */
+        function f_cf07Up(in charstring p_mainUtComponent := c_compMTC) runs on ItsMtc {
+                    
+            // Variables
+            var PositionTable v_positionTable := {};
+            var GeoAreaTable v_areaTable := {};
+            var ItsGeoNetworking v_component;
+            var integer i;
+            
+            // Select components
+            vc_componentTable := {{c_compNodeB, omit}, {c_compNodeD, omit}};
+            
+            // Create components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent := ItsGeoNetworking.create(vc_componentTable[i].componentName) alive;
+            }
+            
+            // Map & Connect
+            map(self:acPort, system:acPort);
+            map(self:utPort, system:utPort);
+            connect(self:syncPort, mtc:syncPort);
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                map(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                map(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                map(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                connect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            
+            activate(a_cf07Down());
+            
+            //Initialze the IUT
+            if(p_mainUtComponent == c_compMTC) {
+                // Initialise secured mode
+                f_initialiseSecuredMode();
+                
+                // MTC intializes IUT
+                f_initialState();
+            }
+            else {
+                v_component := f_getComponent(p_mainUtComponent);
+                v_component.start(f_initialState());
+                v_component.done;   
+            }
+            
+            // Positions & Areas
+            f_preparePositionsAndAreas(v_positionTable, v_areaTable);
+            
+            // Initialize components
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.start(f_initialiseComponent(v_positionTable, v_areaTable, vc_componentTable[i].componentName));
+            }
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) {
+                vc_componentTable[i].gnComponent.done;
+            }
+        }
+        
+        /**
+         * @desc Deletes configuration cf06
+         */
+        function f_cf07Down() runs on ItsMtc {
+            
+            // Local variables
+            var integer i;
+            
+            f_uninitialiseSecuredMode();
+            
+            // Unmap & Disconnect
+            for(i:=0; i < lengthof(vc_componentTable); i:=i+1) { 
+                unmap(vc_componentTable[i].gnComponent:utPort, system:utPort);
+                unmap(vc_componentTable[i].gnComponent:acPort, system:acPort);
+                unmap(vc_componentTable[i].gnComponent:geoNetworkingPort, system:geoNetworkingPort);
+                disconnect(vc_componentTable[i].gnComponent:syncPort, self:syncPort);
+            }
+            unmap(self:acPort, system:acPort);
+            unmap(self:utPort, system:utPort);
+            disconnect(self:syncPort, mtc:syncPort);
+            
+        } // end f_cf0yDown
+        
+        /**
+         * @desc    Behavior function for initializing component's variables and tables
+         * @param   p_positionTable Table containing position vectors of all nodes
+         * @param   p_areaTable     Table containing all defined geoAreas
+         * @param   p_componentName Name of the component
+         */
+        function f_initialiseComponent(
+            in PositionTable p_positionTable,
+            in GeoAreaTable p_areaTable,
+            in charstring p_componentName)
+        runs on ItsGeoNetworking {
+            
+            vc_positionTable := p_positionTable;
+            vc_areaTable := p_areaTable;
+            vc_componentName := p_componentName;
+            
+            vc_localSeqNumber := f_getInitialSequenceNumber();
+            vc_multipleMessagesCount := f_getMessageCount();
+            
+        } // end f_initialiseComponent
+        
+        /**
+         * @desc    Makes the simulated ITS node behave as a neighbour of IUT
+         */
+        function f_startBeingNeighbour() runs on ItsGeoNetworking {
+			var LongPosVector v_LongPosVector_compName := f_getPosition(vc_componentName);
+			var ExtendedHeader v_m_beaconHeader := valueof(m_beaconHeader(v_LongPosVector_compName));
+
+            
+            vc_neighbourDefault := activate(a_neighbourDefault());
+            f_acTriggerEvent(m_startBeaconing(v_m_beaconHeader.beaconHeader));
+            f_sleepIgnoreDef(PX_NEIGHBOUR_DISCOVERY_DELAY);
+        } // end f_startBeingNeighbour
+        
+        /**
+         * @desc    Makes the simulated ITS node behave as not being a neighbour of IUT
+         */
+        function f_stopBeingNeighbour() runs on ItsGeoNetworking {
+            
+            f_acTriggerEvent(m_stopBeaconing);
+            if (PICS_GN_SECURITY == true) {
+                deactivate(vc_neighbourDefault);
+            }
+        } // end f_stopBeingNeighbour
+        
+        /**
+         * @desc Initialise secure mode if required
+         */
+        function f_initialiseSecuredMode() runs on ItsBaseGeoNetworking {
+            if (PICS_GN_SECURITY == true) {
+                if(e_success != f_acEnableSecurity()){
+                    log("*** INFO: TEST CASE NOW STOPPING ITSELF! ***");
+                    stop;
+                }
+            }
+        } // End of function f_initialiseSecuredMode()
+        
+        function f_uninitialiseSecuredMode() runs on ItsBaseGeoNetworking {
+            if (PICS_GN_SECURITY == true) {
+
+                f_acDisableSecurity();
+            }
+        } // End of function f_initialiseSecuredMode()
+        
+    } // end geoConfigurationFunctions
+    
+    group componentFunctions {
+        /**
+         * @desc    Get the component  corresponding to a key
+         * @param   p_componentName   Name searched component
+         * @return  ItsGeoNetworking - The searched position vector
+         */
+        function f_getComponent(
+            in charstring p_componentName
+        ) runs on ItsMtc
+        return ItsGeoNetworking {
+            
+            var ItsGeoNetworking v_return := null;
+            var integer i := 0;
+            
+            for (i:=0; i<lengthof(vc_componentTable); i:=i+1) {
+                if (vc_componentTable[i].componentName == p_componentName) {
+                    v_return := vc_componentTable[i].gnComponent;
+                }
+            }
+            
+            return v_return;
+        }
+    }
+    
+    group geoPositionFunctions {
+        
+        /**
+         * @desc   Prepare positions and areas tables according to general constellation 
+         * @param p_positionTable  Position Table
+         * @param p_areaTable      Area Table
+         */
+        function f_preparePositionsAndAreas(
+            inout PositionTable p_positionTable,
+            inout GeoAreaTable p_areaTable
+        ) runs on ItsBaseGeoNetworking {
+            
+            var LongPosVector v_longPosVectorIut, v_longPosVectorNodeA, v_longPosVectorNodeB, v_longPosVectorNodeC, v_longPosVectorNodeD, v_longPosVectorNodeE, v_longPosVectorNodeF;
+            
+            // Get positions
+            v_longPosVectorIut := f_getIutLongPosVector();
+            v_longPosVectorNodeA := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeA, c_latitudeFactorNodeA);
+            v_longPosVectorNodeB := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeB, c_latitudeFactorNodeB);
+            v_longPosVectorNodeC := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeC, c_latitudeFactorNodeC);
+            v_longPosVectorNodeD := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeD, c_latitudeFactorNodeD);
+            v_longPosVectorNodeE := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeE, c_latitudeFactorNodeE);
+            v_longPosVectorNodeF := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeF, c_latitudeFactorNodeF);
+            
+            // Propagate GN addresses
+            v_longPosVectorNodeA.gnAddr := f_getTsGnLocalAddress(c_compNodeA);
+            v_longPosVectorNodeB.gnAddr := f_getTsGnLocalAddress(c_compNodeB);
+            v_longPosVectorNodeC.gnAddr := f_getTsGnLocalAddress(c_compNodeC);
+            v_longPosVectorNodeD.gnAddr := f_getTsGnLocalAddress(c_compNodeD);
+            v_longPosVectorNodeE.gnAddr := f_getTsGnLocalAddress(c_compNodeE);
+            v_longPosVectorNodeF.gnAddr := f_getTsGnLocalAddress(c_compNodeF);
+            
+            // Position table
+            f_addPosition(p_positionTable, c_compIut, v_longPosVectorIut);
+            f_addPosition(p_positionTable, c_compNodeA, v_longPosVectorNodeA);
+            f_addPosition(p_positionTable, c_compNodeB, v_longPosVectorNodeB);
+            f_addPosition(p_positionTable, c_compNodeC, v_longPosVectorNodeC);
+            f_addPosition(p_positionTable, c_compNodeD, v_longPosVectorNodeD);
+            f_addPosition(p_positionTable, c_compNodeE, v_longPosVectorNodeE);
+            f_addPosition(p_positionTable, c_compNodeF, v_longPosVectorNodeF);
+            
+            // Area table
+            f_addArea(p_areaTable, c_area1,
+                f_computeCircularArea(v_longPosVectorNodeD, float2int(5.0 * f_distance(v_longPosVectorNodeB, v_longPosVectorNodeD))));
+            f_addArea(p_areaTable, c_area2,
+                f_computeCircularArea(v_longPosVectorNodeB, float2int(1.5 * f_distance(v_longPosVectorNodeB, v_longPosVectorNodeD))));               
+            
+        }
+        
+        /**
+         * @desc    Add a position vector in position table
+         * @param   p_positionTable Position table to be updated
+         * @param   p_positionKey   Reference key of the added position vector
+         * @param   p_positionValue Added position vector
+         */
+        function f_addPosition(
+            inout PositionTable p_positionTable,
+            in charstring p_positionKey,
+            in LongPosVector p_positionValue
+        ) {
+            
+            p_positionTable[lengthof(p_positionTable)] := {
+                key := p_positionKey,
+                position := p_positionValue
+            };
+        }
+        
+        /**
+         * @desc    Get the position vector corresponding to a key
+         * @param   p_positionKey   Reference key of the searched position vector
+         * @return  LongPosVector - The searched position vector
+         */
+        function f_getPosition(
+            in charstring p_positionKey
+        ) runs on ItsGeoNetworking
+        return LongPosVector {
+            
+            var LongPosVector v_return;
+            var integer i := 0;
+            
+            for (i:=0; i<lengthof(vc_positionTable); i:=i+1) {
+                if (vc_positionTable[i].key == p_positionKey) {
+                    v_return := vc_positionTable[i].position;
+                }
+            }
+            
+            if (isbound(v_return) and (v_return.timestamp == 0)) {
+                v_return.timestamp := f_computeGnTimestamp();
+            }
+            return v_return;
+        }
+        /**
+         * @desc    Set the position vector corresponding to a ComponentNode
+         * @param   p_compNode  Reference to the Component to be changed
+         * @param   p_longPosVector - The new position vector
+         */
+
+        function f_changePositon(
+            in charstring p_compNode,
+            in LongPosVector p_longPosVector
+        ) runs on ItsGeoNetworking {
+            
+            var integer i := 0;
+
+             for (i:=0; i<lengthof(vc_positionTable); i:=i+1) {
+                if (vc_positionTable[i].key == p_compNode) {
+                    vc_positionTable[i].position := p_longPosVector;
+                    break;
+                }
+            }
+        }
+        
+        /**
+         * @desc    Compute a position based on reference point and distance factors
+         * @param   p_refPosition       Reference point
+         * @param   p_longitudeFactor   Number of DISTANCE_UNIT applied for computing longitude
+         * @param   p_latitudeFactor    Number of DISTANCE_UNIT applied for computing latitude
+         * @return  LongPosVector - Computed position
+         * @see     PICS_GN_DEFAULT_MAX_COMMUNICATION_RANGE
+         */
+        function f_computePosition(
+            in LongPosVector p_refPosition,
+            in integer p_longitudeFactor,
+            in integer p_latitudeFactor
+        ) return LongPosVector {
+            
+            const integer c_distance2Gps := 100;
+            var LongPosVector v_return := p_refPosition;                        
+            var UInt32 v_distanceUnit := (c_distance2Gps * PICS_GN_DEFAULT_MAX_COMMUNICATION_RANGE) / 10;
+            
+            v_return.latitude := v_return.latitude + p_latitudeFactor * v_distanceUnit;
+            v_return.longitude := v_return.longitude + p_longitudeFactor * v_distanceUnit;
+            v_return.timestamp := f_computeGnTimestamp();
+            v_return.pai := int2bit(1,1);
+            
+            return v_return;
+        }
+        
+        /**
+         * @desc    Add a geoArea in geoArea table
+         * @param   p_geoAreaTable  GeoArea table to be updated
+         * @param   p_areaKey       Reference key of the added geoArea
+         * @param   p_geoArea       Added geoArea
+         */
+        function f_addArea(
+            inout GeoAreaTable p_geoAreaTable,
+            in charstring p_areaKey,
+            in GeoArea p_geoArea
+        ) {
+            p_geoAreaTable[lengthof(p_geoAreaTable)] := {
+                key := p_areaKey,
+                geoArea := p_geoArea
+            };
+        }
+        
+        /**
+         * @desc    Get the geoArea corresponding to a key
+         * @param   p_areaName   Reference key of the searched geoArea
+         * @return  GeoArea - The serached geoArea
+         */
+        function f_getArea(
+            in charstring p_areaName
+        ) runs on ItsGeoNetworking
+        return GeoArea {
+            var GeoArea v_return;
+            var integer i := 0;
+            
+            for (i:=0; i<lengthof(vc_areaTable); i:=i+1) {
+                if (vc_areaTable[i].key == p_areaName) {
+                    v_return := vc_areaTable[i].geoArea;
+                }
+            }
+            
+            return v_return;
+        }
+        
+        /**
+         * @desc    Get the geoBroadcastArea corresponding to a key
+         * @param   p_areaName   Reference key of the searched geoBroadcastArea
+         * @return  GeoBroadcastArea - The serached geoBroadcastArea
+         */
+        function f_getGeoBroadcastArea(in charstring p_areaName) runs on ItsGeoNetworking
+        return GeoBroadcastArea {
+            return f_geoArea2GeoBroadcastArea(f_getArea(p_areaName));
+        }
+        
+        /**
+         * @desc    Get the GeoAnycastArea corresponding to a key
+         * @param   p_areaName   Reference key of the searched GeoAnycastArea
+         * @return  GeoAnycastArea - The serached GeoAnycastArea
+         */
+        function f_getGeoAnycastArea(in charstring p_areaName) runs on ItsGeoNetworking
+        return GeoAnycastArea {
+            return f_geoArea2GeoAnycastArea(f_getArea(p_areaName));
+        }
+        
+        /**
+         * @desc    Convert GeoArea type to GeoBroadcastArea
+         * @param   p_area  GeoArea to be converted
+         * @return  GeoBroadcastArea
+         */
+        function f_geoArea2GeoBroadcastArea(GeoArea p_area)
+        return GeoBroadcastArea {
+            var GeoBroadcastArea v_broadcastArea;
+            
+            if (p_area.shape == e_geoCircle) {
+                v_broadcastArea.geoBroadcastSubType := e_geoBroadcastCircle;
+            }
+            else if (p_area.shape == e_geoRect) {
+                v_broadcastArea.geoBroadcastSubType := e_geoBroadcastRect;
+            }
+            else if (p_area.shape == e_geoElip) {
+                v_broadcastArea.geoBroadcastSubType := e_geoBroadcastElip;
+            }
+            else {
+                v_broadcastArea.geoBroadcastSubType := e_reserved;
+            }
+            
+            v_broadcastArea.geoBroadcastArea := p_area.area;
+            
+            return v_broadcastArea;
+        }
+        
+        /**
+         * @desc    Convert GeoArea type to GeoAnycastArea
+         * @param   p_area  GeoArea to be converted
+         * @return  GeoAnycastArea
+         */
+        function f_geoArea2GeoAnycastArea(GeoArea p_area)
+        return GeoAnycastArea {
+            var GeoAnycastArea v_anycastArea;
+            
+            if (p_area.shape == e_geoCircle) {
+                v_anycastArea.geoAnycastSubType := e_geoAnycastCircle;
+            }
+            else if (p_area.shape == e_geoRect) {
+                v_anycastArea.geoAnycastSubType := e_geoAnycastRect;
+            }
+            else if (p_area.shape == e_geoElip) {
+                v_anycastArea.geoAnycastSubType := e_geoAnycastElip;
+            }
+            else {
+                v_anycastArea.geoAnycastSubType := e_reserved;
+            }
+            
+            v_anycastArea.geoAnycastArea := p_area.area;
+            
+            return v_anycastArea;
+        }
+        
+        /**
+         * @desc    Compute a square geoArea
+         * @param   p_centerLongPosVector   Center point of the square area
+         * @param   p_distanceA             Width of the square area in meters
+         * @return  GeoArea - Computed geoArea
+         */
+        function f_computeSquareArea(
+            in LongPosVector p_centerLongPosVector,
+            in UInt16 p_distanceA
+        ) return GeoArea {
+            
+            var GeoArea v_geoArea;
+            
+            v_geoArea := {
+                shape := e_geoRect,
+                area := {
+                    geoAreaPosLatitude := p_centerLongPosVector.latitude,
+                    geoAreaPosLongitude := p_centerLongPosVector.longitude,
+                    distanceA := p_distanceA,
+                    distanceB := p_distanceA,
+                    angle := 0
+                }
+            }
+            
+            return v_geoArea;
+        }
+        
+        /**
+         * @desc    Compute a circular geoArea
+         * @param   p_centerLongPosVector   Center point of the square area
+         * @param   p_distanceA             Radius of the square area in meters
+         * @return  GeoArea - Computed geoArea
+         */
+        function f_computeCircularArea(
+            in LongPosVector p_centerLongPosVector,
+            in UInt16 p_distanceA
+        ) return GeoArea {
+                
+            var GeoArea v_geoArea;
+            
+            v_geoArea := {
+                shape := e_geoCircle,
+                area := {
+                    geoAreaPosLatitude := p_centerLongPosVector.latitude,
+                    geoAreaPosLongitude := p_centerLongPosVector.longitude,
+                    distanceA := p_distanceA,
+                    distanceB := 0,
+                    angle := 0
+                }
+            }
+            
+            return v_geoArea;
+        }
+        
+        /**
+         * @desc    Compute radius of an circular area
+         * @param   p_squareMeters  Square meters of an circular area
+         * @return  Computed radius in meters
+         * @see     fx_computeRadiusFromCircularArea
+         */
+        function f_radiusFromCircularArea(
+            in float p_squareMeters
+        ) return float {
+         
+//            log("*** f_distance: INFO: calling fx_computeRadiusFromCircularArea() ***");
+            return fx_computeRadiusFromCircularArea(p_squareMeters);
+        }
+        
+        /**
+         * @desc    Compute distance between two points
+         * @param   p_pointA    First point
+         * @param   p_pointB    Second point
+         * @return  Computed distance in meters
+         * @see     fx_computeDistance
+         */
+        function f_distance(
+            in LongPosVector p_pointA,
+            in LongPosVector p_pointB
+        ) return float {
+         
+//            log("*** f_distance: INFO: calling fx_computeDistance() ***");
+            return fx_computeDistance(p_pointA.latitude, p_pointA.longitude, p_pointB.latitude, p_pointB.longitude);
+        }
+        
+    } // end geoPositionFunctions
+    
+    group geoAltsteps {
+        
+        /**
+         * @desc The base default.
+         */
+        altstep a_default() runs on ItsGeoNetworking {
+            
+            var LongPosVector v_longPosVectorIut;
+            
+            [] a_receiveLsRequest(
+                ?, ?, v_longPosVectorIut
+               ) {
+                repeat;
+            }
+            [] geoNetworkingPort.receive(
+                mw_geoNwInd(
+                    mw_geoNwSecPdu(
+                        mdw_securedMessage_CAMs,
+                        ?
+            ))) {
+                // Skip CAM messages
+                log("*** a_default: WARNING: Skip secured CAM messages ***");
+                repeat;
+            }
+            [] geoNetworkingPort.receive {
+                log("*** a_default: WARNING: Received an unexpected message ***");
+                repeat;
+            }
+            [] tc_wait.timeout {
+                log("*** a_default: ERROR: Timeout while awaiting reaction of the IUT prior to Upper Tester action ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] tc_ac.timeout {
+                log("*** a_default: ERROR: Timeout while awaiting the reception of a message ***");
+                f_selfOrClientSyncAndVerdict("error", e_timeout);
+            }
+            [] a_shutdown() {
+                log("*** a_default: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+        
+        /**
+         * @desc    Neighbour default altstep (answers to LS Requests)
+         */
+        altstep a_neighbourDefault() runs on ItsGeoNetworking {
+			var LongPosVector v_LongPosVector_compName := f_getPosition(vc_componentName);
+         	var LongPosVector v_LongPosVector_compNodeA := f_getPosition(c_compNodeA);
+
+            
+            [] a_receiveLsRequestAndReply(
+                ?, v_LongPosVector_compName.gnAddr.mid,
+                f_getPosition(vc_componentName),
+                f_getPosition(vc_componentName)
+               ) {
+                repeat;
+            }
+            [vc_componentName == c_compNodeB] a_receiveLsRequestAndReply(
+                ?, v_LongPosVector_compNodeA.gnAddr.mid,
+                f_getPosition(c_compNodeA),
+                f_getPosition(vc_componentName)
+               ) {
+                repeat;
+            }
+            [] a_default() {
+            }
+        }
+        
+        /**
+         * @desc The default for handling upper tester messages.
+         */
+        altstep a_utDefault() runs on ItsBaseGeoNetworking {
+            var UtGnEventInd v_ind;
+            [] utPort.receive(UtGnEventInd:?) -> value v_ind {
+                //store every upper tester indication received
+                vc_utInds[lengthof(vc_utInds)] := v_ind;
+                repeat;
+            }
+            [] utPort.receive {
+                log("*** " & testcasename() & ": INFO: Received unexpected UT message from IUT ***");
+                repeat;
+            }
+        }
+        
+        /**
+         * @desc Default handling cf01 de-initialisation.
+         */
+        altstep a_cf01Down() runs on ItsGeoNetworking {
+            [] a_shutdown() {
+                f_poDefault();
+                f_cf01Down();
+                log("*** a_cf01Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+        
+        /**
+         * @desc Default handling cf02 de-initialisation.
+         */
+        altstep a_cf02Down() runs on ItsMtc {
+            [] a_shutdown() {
+                f_cf02Down();
+                log("*** a_cf02Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+        
+        /**
+         * @desc Default handling cf03 de-initialisation.
+         */
+        altstep a_cf03Down() runs on ItsMtc {
+            [] a_shutdown() {
+                f_cf03Down();
+                log("*** a_cf03Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+        
+        /**
+         * @desc Default handling cf04 de-initialisation.
+         */
+        altstep a_cf04Down() runs on ItsMtc {
+            [] a_shutdown() {
+                f_cf04Down();
+                log("*** a_cf04Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+
+        /**
+         * @desc Default handling cf05 de-initialisation.
+         */
+        altstep a_cf05Down() runs on ItsMtc {
+            [] a_shutdown() {
+                f_cf05Down();
+                log("*** a_cf05Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+        
+        /**
+         * @desc Default handling cf06 de-initialisation.
+         */
+        altstep a_cf06Down() runs on ItsMtc {
+            [] a_shutdown() {
+                f_cf06Down();
+                log("*** a_cf06Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }
+        
+        /**
+         * @desc Default handling cf07 de-initialisation.
+         */
+        altstep a_cf07Down() runs on ItsMtc {
+            [] a_shutdown() {
+                f_cf07Down();
+                log("*** a_cf07Down: INFO: TEST COMPONENT NOW STOPPING ITSELF! ***");
+                stop;
+            }
+        }        
+        group geoGeoUnicastAltsteps {
+            
+            /**
+             * @desc    Receive GeoUnicast packet
+             * @param   p_sourceLongPosVec          Expected source position vector
+             * @param   p_destinationShortPosVec    Expected destination position vector
+             * @param   p_seqNumber                 Expected sequence number
+             */
+            altstep a_receiveGeoUnicast(
+                in template (present) ShortPosVector p_destinationShortPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwUnicastPacket(
+                    p_destinationShortPosVec,
+                    p_seqNumber)))) {
+                }
+            }
+            
+            /**
+             * @desc    Receive GeoUnicast packet for specific destination
+             * @param   p_destinationShortPosVec    Expected destination position vector
+             */
+            altstep a_receiveGeoUnicastWithDestination(in template (present) ShortPosVector p_destinationShortPosVec) runs on ItsGeoNetworking {
+                
+                [] a_receiveGeoUnicast(p_destinationShortPosVec, ?) {}
+            }
+            
+            /**
+             * @desc Receive any GeoUnicast packet
+             */
+            altstep a_receiveAnyGeoUnicast() runs on ItsGeoNetworking {
+                
+                [] a_receiveGeoUnicast(?, ?) {}
+            }
+            
+        } // end geoGeoUnicastAltsteps
+        
+        group geoGeoBroadcastAltsteps {
+            
+            /**
+             * @desc Receive GeoBroadcast packet
+             * @param   p_srcLongPosVec     Expected source position vector
+             * @param   p_seqNumber         Expected sequence number
+             */
+            altstep a_receiveGeoBroadcast(
+                in template (present) LongPosVector p_srcLongPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBroadcastPacket(
+                        p_srcLongPosVec,
+                        p_seqNumber
+                    )))) {
+                }
+            }
+            
+            /**
+             * @desc Receive GeoBroadcast packet with specific Area and HopLimit
+             * @param   p_srcLongPosVec     Expected source position vector
+             * @param   p_seqNumber         Expected sequence number
+             * @param   p_broadcastArea     Expected geoBroadcastArea
+             * @param   p_routerHopLimit    Expected router hop limit
+             * @param   p_maxHopLimit       Expected max hop limit (Default: ?)
+             */
+            altstep a_receiveGeoBroadcastWithAreaWithHopLimit(
+                in template (present) LongPosVector p_srcLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoBroadcastArea p_broadcastArea,
+                in template (present) UInt8 p_routerHopLimit,
+                in template (present) UInt8 p_maxHopLimit := ?
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBroadcastPacketWithAreaAndHl(
+                        p_srcLongPosVec,
+                        p_seqNumber,
+                        p_broadcastArea,
+                        p_maxHopLimit
+                      ),
+                      -,
+                      p_routerHopLimit
+                    ))) {
+                }
+            }
+            
+            /**
+             * @desc Receive GeoBroadcast packet for specific Geobroadcast Area
+             * @param   p_srcLongPosVec     Expected source position vector
+             * @param   p_seqNumber         Expected sequence number
+             * @param   p_broadcastArea     Expected geoBroadcastArea
+             */
+            altstep a_receiveGeoBroadcastWithArea(
+                in template (present) LongPosVector p_srcLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoBroadcastArea p_broadcastArea
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBroadcastPacketWithArea(
+                        p_srcLongPosVec,
+                        p_seqNumber,
+                        p_broadcastArea
+                    )))) {
+                }
+            }
+            
+        } // end geoGeoBroadcastAltsteps
+        
+        group geoGeoAnycastAltsteps {
+            
+            /**
+             * @desc Receive GeoAnycast packet
+             * @param   p_srcLongPosVec     Expected source position vector
+             * @param   p_senderLongPosVec  Expected sender position vector
+             * @param   p_seqNumber         Expected sequence number
+             */
+            altstep a_receiveGeoAnycast(
+                in template (present) LongPosVector p_srcLongPosVec,
+                in template (present) LongPosVector p_senderLongPosVec,
+                in template (present) UInt16 p_seqNumber
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwAnycastPacket(
+                        p_srcLongPosVec,
+                        p_seqNumber
+                    )))) {
+                }
+            }
+            
+            /**
+             * @desc Receive GeoAnycast packet with specific Area and HopLimit
+             * @param   p_srcLongPosVec     Expected source position vector
+             * @param   p_senderLongPosVec  Expected sender position vector
+             * @param   p_seqNumber         Expected sequence number
+             * @param   p_anycastArea       Expected geoAnycastArea
+             * @param   p_hopLimit          Expected hop limit
+             * @param   p_maxHopLimit       Expected max hop limit (Default: ?)
+             */
+            altstep a_receiveGeoAnycastWithAreaWithHopLimit(
+                in template (present) LongPosVector p_srcLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoAnycastArea p_anycastArea,
+                in template (present) UInt8 p_hopLimit,
+                in template (present) UInt8 p_maxHopLimit := ?
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwAnycastPacketWithArea(
+                        p_srcLongPosVec,
+                        p_seqNumber,
+                        p_anycastArea
+                      ),
+                      -,
+                      p_hopLimit
+                    ))) {
+                }
+            }
+            
+            /**
+             * @desc Receive GeoAnycast packet for specific GeoAnycast Area
+             * @param   p_srcLongPosVec     Expected source position vector
+             * @param   p_senderLongPosVec  Expected sender position vector
+             * @param   p_seqNumber         Expected sequence number
+             * @param   p_anycastArea       Expected geoAnycastArea
+             */
+            altstep a_receiveGeoAnycastWithArea(
+                in template (present) LongPosVector p_srcLongPosVec,
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GeoAnycastArea p_anycastArea
+            ) runs on ItsGeoNetworking {
+                
+                [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwAnycastPacketWithArea(
+                        p_srcLongPosVec,
+                        p_seqNumber,
+                        p_anycastArea
+                    )))) {
+                }
+            }
+            
+        } // end geoGeoAnycastAltsteps
+        
+        group geoLocationServiceAltsteps {
+            
+            /**
+             * @desc    Receive Location Service Request
+             * @param   p_seqNumber Expected sequence number of the received LS Request
+             * @param   p_gnAddress GN address expected in received LS Request
+             * @param   p_reqSrcPosVector Expected source position vector of the received LS Request
+             */
+            altstep a_receiveLsRequest(
+                in template (present) UInt16 p_seqNumber,
+                in template (present) GN_Address.mid p_mid,
+                out LongPosVector p_reqSrcPosVector
+            ) runs on ItsGeoNetworking {
+                var GeoNetworkingInd v_msg;
+                
+                [] geoNetworkingPort.receive(
+                    mw_geoNwInd(
+                        mw_geoNwPdu(
+                            mw_geoNwLsRequestPacket(
+                                p_seqNumber,
+                                p_mid
+                            )
+                        )
+                    )
+                ) -> value v_msg {
+                    p_reqSrcPosVector := valueof(v_msg.msgIn.gnPacket.packet.extendedHeader.lsRequestHeader.srcPosVector);
+                }
+            }
+            
+            /**
+             * @desc Receive any Location Service Request
+             */
+            altstep a_receiveAnyLsRequest() runs on ItsGeoNetworking {
+                var LongPosVector v_reqSrcPosVector;
+                
+                [] a_receiveLsRequest(?, ?, v_reqSrcPosVector) {}
+            }
+            
+            /**
+             * @desc Receive any Location Service Reply
+             */
+            altstep a_receiveAnyLsReply() runs on ItsGeoNetworking {
+                [] geoNetworkingPort.receive( mw_geoNwInd( mw_geoNwPdu( mw_geoNwLsReplyPacket(?, ?) ))) {
+                    //ignore and repeat
+                    repeat;
+                }
+            }
+            
+            /**
+             * @desc Receive Location Service Request and send Location Service Reply
+             * @param   p_reqSeqNumber          Expected sequence number of the received LS Request
+             * @param   p_gnAddress             GN address expected in received LS Request
+             * @param   p_repSrcPosVector       Source position vector of the sent LS Response
+             * @param   p_repSenderPosVector    Sender position vector of the sent LS Response
+             */
+            altstep a_receiveLsRequestAndReply(
+                in template (present) UInt16 p_reqSeqNumber,
+                in template (value) GN_Address.mid p_mid,
+                in template (value) LongPosVector p_repSrcPosVector,
+                in template (value) LongPosVector p_repSenderPosVector
+            ) runs on ItsGeoNetworking {
+                var LongPosVector v_repDstPosVector;
+                
+                [] a_receiveLsRequest(p_reqSeqNumber, p_mid, v_repDstPosVector) {
+                    f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(m_geoNwPdu(
+                        m_geoNwLsReplyPacket(
+                            p_repSrcPosVector,
+                            f_longPosVector2ShortPosVector(v_repDstPosVector),
+                            vc_localSeqNumber
+                    ))));
+                }
+            }
+          
+        } // end geoLocationServiceAltsteps
+        
+        
+    } // end geoAltsteps
+    
+    group preambles {
+        
+        /**
+         * @desc The default preamble.
+         */
+        function f_prDefault() runs on ItsGeoNetworking {
+            activate(a_default());
+            activate(a_utDefault());
+        }
+        
+        /**
+         * @desc Preamble for non-neighbour nodes
+         */
+        function f_prNonNeighbour() runs on ItsGeoNetworking {
+            f_prDefault();
+        }
+        
+        /**
+         * @desc Preamble for neighbour nodes
+         */
+        function f_prNeighbour() runs on ItsGeoNetworking {
+            f_prDefault();
+            f_startBeingNeighbour();
+            f_sleep(0.5);
+        }
+        
+        /**
+         * @desc Brings the IUT into an initial state.
+         * @remark Component variable vc_hashedId8ToBeUsed shall be set with the IUT certificate to be used
+         */
+        function f_initialState() runs on ItsBaseGeoNetworking {
+            
+            if (PICS_GN_SECURITY) {
+                var Oct8 v_hashedId8ToBeUsed := 'FFFFFFFFFFFFFFFF'O; //TODO f_setupIutCertificate(vc_hashedId8ToBeUsed);
+                if (oct2int(v_hashedId8ToBeUsed) == 0) {
+                    v_hashedId8ToBeUsed := 'FFFFFFFFFFFFFFFF'O; // Reset to unknown value, the IUT will use its own certificates
+                }
+                f_utInitializeIut(m_secGnInitialize(v_hashedId8ToBeUsed));
+                return;
+            } // else, default behavior
+            f_utInitializeIut(m_gnInitialize);
+        }
+        
+        /**
+         * @desc    Receive and reply to LS Requests
+         * @param   p_reqSeqNumber          Expected sequence number of the received LS Request
+         * @param   p_gnAddress             GN address expected in received LS Request
+         * @param   p_repSrcPosVector       Source position vector of the sent LS Response
+         * @param   p_repSenderPosVector    Sender position vector of the sent LS Response
+         */
+        function f_handleLocationService(
+          in template (present) UInt16 p_reqSeqNumber,
+          in template (value) GN_Address.mid p_mid,
+          in template (value) LongPosVector p_repSrcPosVector,
+          in template (value) LongPosVector p_repSenderPosVector
+        ) runs on ItsGeoNetworking {
+            
+            tc_ac.start;
+            alt {
+                [] a_receiveLsRequestAndReply(p_reqSeqNumber, p_mid, p_repSrcPosVector, p_repSenderPosVector) {
+                    tc_ac.stop;
+                }
+            }
+            
+        }
+        
+        /**
+         * @desc    Send LS request and receive LS Reply
+         * @param   p_reqSrcPosVector   Source position vector of the sent LS Request
+         * @param   p_reqSeqNumber      Sequence number of the sent LS Request
+         * @param   p_gnAddress         GN address for which the LS Request is sent
+         * @param   p_repSrcPosVector   Expected source position vector in received LS Response
+         * @return  FncRetCode
+         */
+        function f_processLocationService(
+          in template (value) LongPosVector p_reqSrcPosVector,
+          in template (value) UInt16 p_reqSeqNumber,
+          in template (value) GN_Address p_gnAddress,
+          out LongPosVector p_repSrcPosVector
+        ) runs on ItsGeoNetworking return FncRetCode {
+            var FncRetCode v_ret := e_error;
+            var GeoNetworkingInd v_msg;
+            
+            f_sendGeoNetMessage(
+                m_geoNwReq_linkLayerBroadcast(
+                    m_geoNwPdu(
+                        m_geoNwLsRequestPacket(
+                            p_reqSrcPosVector,
+                            p_reqSeqNumber,
+                            p_gnAddress
+                        )
+                    )
+                )
+            );
+            
+            tc_ac.start;
+            alt {
+                [] geoNetworkingPort.receive(
+                        mw_geoNwInd(
+                            mw_geoNwPdu(
+                                mw_geoNwLsReplyPacket(
+                                    ?,
+                                    mw_shortPosVectorPosition(f_longPosVector2ShortPosVector(valueof(p_reqSrcPosVector)))
+                                )
+                            )
+                        )
+                    ) -> value v_msg {
+                    tc_ac.stop;
+                    p_repSrcPosVector := valueof(v_msg.msgIn.gnPacket.packet.extendedHeader.lsReplyHeader.srcPosVector);
+                    v_ret := e_success;
+                }
+            }
+            
+            return v_ret;
+        }
+        
+    } // end preambles
+    
+    group postambles {
+        
+        /**
+         * @desc The default postamble.
+         */
+        function f_poDefault() runs on ItsGeoNetworking {
+            //empty
+        }
+        
+        /**
+         * @desc Postamble for neighbour nodes
+         */
+        function f_poNeighbour() runs on ItsGeoNetworking {
+            f_stopBeingNeighbour();
+            f_poDefault();
+        }
+        
+    } // end postambles
+    
+    group adapterControl {
+        
+        /**
+         * @desc    Triggers event in the test system adaptation.
+         * @param   p_event The event to trigger
+         * @return  FncRetCode
+         */
+        function f_acTriggerEvent(template (value) AcGnPrimitive p_event) runs on ItsBaseGeoNetworking return FncRetCode {
+            var FncRetCode v_ret := e_success;
+            
+            acPort.send(p_event);
+            
+            return v_ret;
+        }
+        
+        /**
+         * @desc    Get the position vector corresponding to a specific GN address
+         * @param   p_gnAddress     GN address for which the search is performed
+         * @return  LongPosVector - IUT's position
+         */
+        function f_acGetLongPosVector(GN_Address p_gnAddress) runs on ItsBaseGeoNetworking return LongPosVector {
+            var AcGnResponse v_result;
+            
+            f_acTriggerEvent(m_getLongPosVector(p_gnAddress));
+            tc_ac.start;
+
+	    log("ELNRNAG f_acGetLongPosVector:");
+	    log(mw_getLongPosVectorAny(p_gnAddress));	    
+
+            alt {
+                [] acPort.receive(mw_getLongPosVectorAny(p_gnAddress)) -> value v_result {
+                    tc_ac.stop;
+                }
+                [] acPort.receive {
+                    tc_ac.stop;
+                    log("*** f_acGetLongPosVector: ERROR: Received unexpected message ***");
+                    f_selfOrClientSyncAndVerdict("error", e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** f_acGetLongPosVector: ERROR: Timeout while waiting for adapter control event result ***");
+                    f_selfOrClientSyncAndVerdict("error", e_timeout);
+                }
+            }
+            
+            return v_result.getLongPosVector;
+        }
+        
+        /**
+         * @desc    Triggers test adapter to send beacons for multiple neighbours
+         * @param   p_numberOfNeighbour Number of neighbours to simulate
+         * @return  FncRetCode
+         */
+        function f_acStartBeaconingMultipleNeighbour(in integer p_numberOfNeighbour) runs on ItsGeoNetworking return FncRetCode {
+            var LongPosVector v_LongPosVector_compName := f_getPosition(vc_componentName);
+			var ExtendedHeader v_m_beaconHeader := valueof(m_beaconHeader(v_LongPosVector_compName));
+
+            return f_acTriggerEvent(m_startBeaconingMultipleNeighbour(v_m_beaconHeader.beaconHeader, p_numberOfNeighbour));
+            
+        }
+        
+        /**
+         * @desc    Triggers test adapter to enable security support
+         * @return  FncRetCode
+         */
+        function f_acEnableSecurity() runs on ItsBaseGeoNetworking return FncRetCode {
+            
+            // Local variables
+            
+            // Load certificates
+            //TODO if( not f_loadCertificates(PX_IUT_SEC_CONFIG_NAME) ) {
+                return e_error;
+            //}
+            
+            // Initialize vc_location
+            /*TODO f_setGenerationLocation(
+                f_getTsLatitude(),
+                f_getTsLongitude()
+            );*/
+            
+            return f_acTriggerEvent(
+                AcGnPrimitive:{ acEnableSecurity := m_enableSecurity(
+                    cc_taCert_A
+                ) } 
+            );
+        }
+        
+        /**
+         * @desc    Triggers test adapter to disable security support
+         * @return  FncRetCode
+         */
+        function f_acDisableSecurity() runs on ItsBaseGeoNetworking return FncRetCode {
+            
+            //TODO f_unloadCertificates();
+            
+            return f_acTriggerEvent(AcGnPrimitive:{ acDisableSecurity := m_disableSecurity } );
+            
+        }
+        
+    } // end adapterControl
+    
+    group commonFunctions {
+        
+        /**
+         * @desc    Gets the value of the lifetime in seconds.
+         * @param   p_lifetime Lifetime to be converted
+         * @return  Lifetime in seconds
+         */
+        function f_getLifetimeValue(in Lifetime p_lifetime) runs on ItsGeoNetworking return float {
+            var float v_lifetime := 0.0;
+          
+            select (p_lifetime.ltBase) {
+                case (e_50ms) {
+                    v_lifetime := int2float(p_lifetime.multiplier) * 0.5;
+                }
+                case (e_1s) {
+                    v_lifetime := int2float(p_lifetime.multiplier) * 1.0;
+                }
+                case (e_10s) {
+                    v_lifetime := int2float(p_lifetime.multiplier) * 10.0;
+                }
+                case (e_100s) {
+                    v_lifetime := int2float(p_lifetime.multiplier) * 100.0;
+                }
+            }
+          
+            return v_lifetime;
+        }
+        
+        /**
+         * @desc    Computes GN timestamp based on current time
+         * @return  Unix-Epoch-Time mod 2^32
+         */
+        function f_computeGnTimestamp() return UInt32 {
+            
+            //  Timestamp is 1s older than current time to avoid sending beacons coming from the future (time sync between nodes)
+            var UInt32 v_timestamp := fx_computeGnTimestamp() - 1000;
+            return v_timestamp;    
+        }
+        
+    } // end commonFunctions
+    
+    group testerFunctions {
+        
+        /**
+         * @desc    Gets the tester GN local address for a specific node
+         * @param   p_node  Simulated node
+         * @return  GN address of simulated node
+         */
+        function f_getTsGnLocalAddress(in charstring p_node) return GN_Address {
+            var GN_Address v_gnAddr := valueof(m_dummyGnAddr);
+            
+            select (p_node) {
+                case (c_compNodeA) {
+                    v_gnAddr := PX_TS_NODE_A_LOCAL_GN_ADDR;
+                }
+                case (c_compNodeB) {
+                    v_gnAddr := PX_TS_NODE_B_LOCAL_GN_ADDR;
+                }
+                case (c_compNodeC) {
+                    v_gnAddr := PX_TS_NODE_C_LOCAL_GN_ADDR;
+                }
+                case (c_compNodeD) {
+                    v_gnAddr := PX_TS_NODE_D_LOCAL_GN_ADDR;
+                }
+                case (c_compNodeE) {
+                    v_gnAddr := PX_TS_NODE_E_LOCAL_GN_ADDR;
+                }
+                case (c_compNodeF) {
+                    v_gnAddr := PX_TS_NODE_F_LOCAL_GN_ADDR;
+                }
+                case else {
+                    log("*** f_getTsGnLocalAddress: INFO: Unknown component " & p_node & " ***");
+                }
+            }
+            
+            return v_gnAddr;
+        }
+        
+        /**
+         * @desc    Sends a GeoNetworking message and in case of an included sequence number in the message the
+         *          local sequence number will be increased by one.
+         * @param   p_geoNetReq The message to send.
+         */
+        function f_sendGeoNetMessage(in template (value) GeoNetworkingReq p_geoNetReq) runs on ItsGeoNetworking {
+            geoNetworkingPort.send(p_geoNetReq);
+            if (not (ischosen(p_geoNetReq.msgOut.gnPacket.packet.extendedHeader.shbHeader)
+                    or ischosen(p_geoNetReq.msgOut.gnPacket.packet.extendedHeader.beaconHeader))) {
+                f_setLocalSequenceNumber();
+            }
+        }
+        
+        /**
+         * @desc    Sends a GeoNetworking message with a payload and in case of an included sequence number in the message the
+         *          local sequence number will be increased by one.
+         * @param   p_geoNetReq The message to send.
+         * @param   p_payload   The payload to include.
+         */
+        function f_sendGeoNetMessageWithPayload(
+            in template (value) GeoNetworkingReq p_geoNetReq,
+            in template (value) Payload p_payload
+        ) runs on ItsGeoNetworking {
+            p_geoNetReq.msgOut.gnPacket.packet.payload := p_payload;
+            geoNetworkingPort.send(p_geoNetReq);
+            if (not (ischosen(p_geoNetReq.msgOut.gnPacket.packet.extendedHeader.shbHeader)
+                    or ischosen(p_geoNetReq.msgOut.gnPacket.packet.extendedHeader.beaconHeader))) {
+                f_setLocalSequenceNumber();
+            }
+        }
+        
+        /**
+         * @desc    Receive a GeoNetworking message with a payload and in case of an included sequence number in the message the
+         *          local sequence number will be increased by one.
+         * @param   p_geoNetInd The message to receive.
+         * @param   p_payload   The payload to include.
+         */
+        function f_receiveGeoNetMessageWithPayload(
+            in template (present) GeoNetworkingInd p_geoNetInd,
+            in template (present) Payload p_payload
+        ) return template (present) GeoNetworkingInd {
+            var template (present) GeoNetworkingInd v_geoNetInd := p_geoNetInd;
+            
+            v_geoNetInd.msgIn.gnPacket.packet.payload := p_payload;
+            
+            return v_geoNetInd;
+        }
+        
+        /**
+         * @desc    Sets the value of the sequence number for the next event.
+         */
+        function f_setLocalSequenceNumber() runs on ItsGeoNetworking {
+            vc_localSeqNumber := (vc_localSeqNumber + 1) mod c_uInt16Max;
+        }
+        
+        /**
+         * @desc    Creates an initial seqence number
+         * @return  Time based initial sequence number (increasing with time)
+         */
+        function f_getInitialSequenceNumber() return UInt16 {
+            
+            return (f_computeGnTimestamp() / 1000) mod c_uInt16Max;
+        }
+        
+        /**
+         * @desc    Number of messages to be sent
+         * @return  Number of messages to be sent
+         */
+        function f_getMessageCount() return integer {
+            return PX_MESSAGE_COUNT;
+        }
+        
+    } // end testerFunctions
+    
+    group iutFunctions {
+        
+        /**
+         * @desc    Gets the IUT GN local address
+         * @return  IUT's GN_Address
+         * @see     PICS_GN_LOCAL_GN_ADDR
+         */
+        function f_getIutGnLocalAddress() return GN_Address {
+            
+            return PICS_GN_LOCAL_GN_ADDR;
+        }
+        
+        /**
+         * @desc    Gets the IUT GN local address configuration method
+         * @return  GnAddressConfigurationMethod - IUT's GN local address configuration method
+         * @see     PICS_GN_LOCAL_ADDR_CONF_METHOD
+         */
+        function f_getIutGnLocalAddressConfigurationMethod() return GnAddressConfigurationMethod {
+            return PICS_GN_LOCAL_ADDR_CONF_METHOD;
+        }
+        
+        /**
+         * @desc    Gets the IUT MAc address
+         * @return  MacAddress - IUT's MAc Address
+         * @see     PICS_IUT_MAC_ADDRESS
+         */
+        function f_getIutMacAddress() return MacAddress {
+            return PICS_IUT_MAC_ADDRESS;
+        }
+        
+        /**
+         * @desc    Gets the GeoUnicast forwarding algorithm
+         * @return  IUT's GeoUnicast forwarding algorithm
+         * @see     PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM
+         */
+        function f_getGeoUnicastForwardingAlgorithm() return GeoUnicastForwardingAlgorithm {
+            return PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM;
+        }
+        
+        /**
+         * @desc    Gets the GeoBroadcast forwarding algorithm
+         * @return  IUT's GeoBroadcast forwarding algorithm
+         * @see     PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM
+         */
+        function f_getGeoBroadcastForwardingAlgorithm() return GeoBroadcastForwardingAlgorithm {
+            return PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM;
+        }
+        
+        /**
+         * @desc    Gets the IUT default hop limit
+         * @return  IUT's default hop limit
+         * @see     PICS_GN_DEFAULT_HOP_LIMIT
+         */
+        function f_getDefaultHopLimit() return UInt8 {
+            return PICS_GN_DEFAULT_HOP_LIMIT;
+        }
+        
+        /**
+         * @desc    Is the ITS-S mobile or stationary?
+         * @return  Flags indicating whether the ITS-S is mobile or stationary.
+         * @see     PICS_GN_IS_MOBILE
+         */
+        function f_isMobile() return Bit8 {
+            if (PICS_GN_IS_MOBILE) {
+              return '10000000'B;
+            }
+            return '00000000'B;
+        }
+        
+        /**
+         * @desc    Gets the LS retransmission timer.. Valid for NetRepInterval = default (cong. ctrl).
+         * @return  LS retransmission timer in seconds
+         * @see     PICS_GN_LOCATION_SERVICE_RETRANSMIT_TIMER
+         */
+        function f_getLsRetransmitTimer() return float {
+            var float v_itsGnLocationServiceRetransmitTimer := int2float(PICS_GN_LOCATION_SERVICE_RETRANSMIT_TIMER/1000);
+            
+            return v_itsGnLocationServiceRetransmitTimer;
+        }
+        
+        /**
+         * @desc    Gets the LS retransmission timer for NetRepInterval = medium (cong. ctrl).
+         * @return  LS retransmission timer (medium) in seconds
+         * @see     PX_GN_LOCATION_SERVICE_TIMER_MEDIUM
+         */
+        function f_getLsRetransmitTimerMedium() return float {
+            var float v_itsGnLocationServiceRetransmitTimerMedium := int2float(PX_GN_LOCATION_SERVICE_TIMER_MEDIUM/1000);
+            
+            return v_itsGnLocationServiceRetransmitTimerMedium;
+        }
+        
+        /**
+         * @desc    Gets the LS retransmission timer for NetRepInterval = maximum (cong. ctrl).
+         * @return  LS retransmission timer (maximum) in seconds
+         * @see     PX_GN_LOCATION_SERVICE_TIMER_MAXIMUM
+         */
+        function f_getLsRetransmitTimerMaximum() return float {
+            var float v_itsGnLocationServiceRetransmitTimerMaximum := int2float(PX_GN_LOCATION_SERVICE_TIMER_MAXIMUM/1000);
+            
+            return v_itsGnLocationServiceRetransmitTimerMaximum;
+        }
+        
+        /**
+         * @desc    Gets the App retransmission timer. Valid for AppRepInterval = default (cong. ctrl).
+         * @return  App retransmission timer in seconds
+         * @see     PX_GN_APPLICATION_RETRANSMIT_TIMER
+         */
+        function f_getAppRetransmitTimer() return float {
+            var float v_itsGnLocationApplicationRetransmitTimer := int2float(PX_GN_APPLICATION_RETRANSMIT_TIMER/1000);
+            
+            return v_itsGnLocationApplicationRetransmitTimer;
+        }
+        
+        /**
+         * @desc    Gets the App retransmission timer for AppRepInterval = medium (cong. ctrl).
+         * @return  App retransmission timer (medium) in seconds
+         * @see     PX_GN_APPLICATION_RETRANSMIT_TIMER_MEDIUM
+         */
+        function f_getAppRetransmitTimerMedium() return float {
+            var float v_itsGnLocationApplicationRetransmitTimerMedium := int2float(PX_GN_APPLICATION_RETRANSMIT_TIMER_MEDIUM/1000);
+            
+            return v_itsGnLocationApplicationRetransmitTimerMedium;
+        }
+        
+        /**
+         * @desc    Gets the App retransmission timer for AppRepInterval = maximum (cong. ctrl).
+         * @return  App retransmission timer (maximum) in seconds
+         * @see     PX_GN_APPLICATION_RETRANSMIT_TIMER_MAXIMUM
+         */
+        function f_getAppRetransmitTimerMaximum() return float {
+            var float v_itsGnLocationApplicationRetransmitTimerMaximum := int2float(PX_GN_APPLICATION_RETRANSMIT_TIMER_MAXIMUM/1000);
+            
+            return v_itsGnLocationApplicationRetransmitTimerMaximum;
+        }
+        
+        /**
+         * @desc    Gets the LS maximum retransmission number.
+         * @return  LS maximum retransmission number
+         * @see     PICS_GN_LOCATION_SERVICE_MAX_RETRANS
+         */
+        function f_getLsMaxRetrans() return integer {
+            var integer v_itsGnLocationServiceMaxRetrans := PICS_GN_LOCATION_SERVICE_MAX_RETRANS;
+            
+            return v_itsGnLocationServiceMaxRetrans;
+        }
+        
+        /**
+         * @desc    Gets the Application maximum retransmission number.
+         * @return  Application maximum retransmission number
+         * @see     PX_GN_APPLICATION_MAX_RETRANS
+         */
+        function f_getAppMaxRetrans() return integer {
+            var integer v_itsGnApplicationMaxRetrans := PX_GN_APPLICATION_MAX_RETRANS;
+            
+            return v_itsGnApplicationMaxRetrans;
+        }
+        
+        /**
+         * @desc    Gets the Location Service packet buffer size.
+         * @return  Location Service packet buffer size in Kbytes
+         * @see     PICS_GN_LOCATION_SERVICE_PACKET_BUFFER_SIZE
+         */
+        function f_getLsPacketBufferSize() return integer {
+            var integer v_itsGnLocationServicePacketBufferSize := PICS_GN_LOCATION_SERVICE_PACKET_BUFFER_SIZE;
+            
+            return v_itsGnLocationServicePacketBufferSize;
+        } // end f_getLsPacketBufferSize
+        
+        /**
+         * @desc    Gets the UC forwarding packet buffer size.
+         * @return  UC forwarding packet buffer size in bytes
+         * @see     PICS_GN_UC_FORWARDING_PACKET_BUFFER_SIZE
+         */
+        function f_getUcForwardingPacketBufferSize() return integer {
+            var integer v_itsGnUcForwardingPacketBufferSize := PICS_GN_UC_FORWARDING_PACKET_BUFFER_SIZE;
+            
+            return v_itsGnUcForwardingPacketBufferSize * 1024;
+        } // end f_getUcForwardingPacketBufferSize
+        
+        /**
+         * @desc    Gets the BC forwarding packet buffer size.
+         * @return  BC forwarding packet buffer size in bytes
+         * @see     PICS_GN_BC_FORWARDING_PACKET_BUFFER_SIZE
+         */
+        function f_getBcForwardingPacketBufferSize() return integer {
+            var integer v_itsGnBcForwardingPacketBufferSize := PICS_GN_BC_FORWARDING_PACKET_BUFFER_SIZE;
+            
+            return v_itsGnBcForwardingPacketBufferSize * 1024;
+        } // end f_getBcForwardingPacketBufferSize
+        
+        /**
+         * @desc    Gets the maximum lifetime of a packet.
+         * @return  Maximum lifetime of a packet in seconds
+         * @see     PICS_GN_MAX_PACKET_LIFETIME
+         */
+        function f_getMaxPacketLifeTime() return float {
+            var float v_itsGnMaxPacketLifetime := int2float(PICS_GN_MAX_PACKET_LIFETIME);
+            
+            return v_itsGnMaxPacketLifetime;
+        }
+        
+        /**
+         * @desc    Gets delta for timers.
+         * @return  Delta for timers in seconds
+         * @see     PX_T_DELTA
+         */
+        function f_getDeltaTimer() return float {
+            var float v_deltaTimer := PX_T_DELTA;
+            
+            return v_deltaTimer;
+        }
+        
+        /**
+         * @desc Gets the beacon service retransmit timer.
+         * @return  Beacon service retransmit timer
+         */
+        function f_getBsRetransmitTimer() return float {
+            var float v_itsGnBeaconServiceRetransmitTimer;
+            
+            v_itsGnBeaconServiceRetransmitTimer := int2float(
+                (PICS_GN_BEACON_SERVICE_RETRANSMIT_TIMER/1000));
+            
+            return v_itsGnBeaconServiceRetransmitTimer;
+        }
+        
+        /**
+         * @desc    Gets the beacon service retransmit timer for NetBeaconInterval = medium (cong. ctrl).
+         * @return  Beacon service retransmit timer (medium)
+         */
+        function f_getBsRetransmitTimerMedium() return float {
+            var float v_itsGnBeaconServiceRetransmitTimerMedium; // timer value increased (medium)
+            
+            v_itsGnBeaconServiceRetransmitTimerMedium := int2float(
+                (PX_GN_BEACON_SERVICE_TIMER_MEDIUM+float2int((f_getBsMaxJitter() - 0.0 +1.0)*rnd()) + 0)/1000);
+            
+            return v_itsGnBeaconServiceRetransmitTimerMedium;
+        }
+        
+        /**
+         * @desc    Gets the beacon service retransmit timer for NetBeaconInterval = maximum (cong. ctrl).
+         * @return  Beacon service retransmit timer (maximum)
+         */
+        function f_getBsRetransmitTimerMaximum() return float {
+            var float v_itsGnBeaconServiceRetransmitTimerMaximum; // timer value increased (maximum)
+            
+            v_itsGnBeaconServiceRetransmitTimerMaximum := int2float(
+                (PX_GN_BEACON_SERVICE_TIMER_MAXIMUM+float2int((f_getBsMaxJitter() - 0.0 +1.0)*rnd()) + 0)/1000);
+            
+            return v_itsGnBeaconServiceRetransmitTimerMaximum;
+        }
+        
+        /**
+         * @desc    Gets the maximum beacon service jitter.
+         * @return  Maximum beacon service jitter
+         */
+        function f_getBsMaxJitter() return float {
+            var float v_itsGnBeaconServiceMaxJitter := int2float(PICS_GN_BEACON_SERVICE_MAX_JITTER)/1000.0;
+            
+            return v_itsGnBeaconServiceMaxJitter;
+        }
+        
+        /**
+         * @desc    Gets the Lifetime of a Location Table Entry.
+         * @return  Lifetime of a Location Table Entry in seconds
+         * @see     PICS_GN_LIFETIME_LOC_TE
+         */
+        function f_getLifetimeLocTableEntry() return float {
+            var float v_itsGnLifetimeLocTableEntry := int2float(PICS_GN_LIFETIME_LOC_TE);
+            
+            return v_itsGnLifetimeLocTableEntry;
+        } // end f_getLifetimeLocTableEntry
+        
+        /**
+         * @desc    Gets the maximum communication range for CBF algorithm
+         * @return  Maximum communication range for CBF algorithm in meters
+         * @see     PICS_GN_DEFAULT_MAX_COMMUNICATION_RANGE
+         */
+        function f_getCbfMaxCommunicationRange() return integer {
+            var integer v_maxCommunicationRange := PICS_GN_DEFAULT_MAX_COMMUNICATION_RANGE;
+            
+            return v_maxCommunicationRange;
+        } // end f_getCbfMaxCommunicationRange
+        
+        function f_getGeoUnicastCbfMaxTime() return integer {
+            var integer v_cbfMaxTime := PICS_GN_GEOUNICAST_CBF_MAX_TIME;
+            
+            return v_cbfMaxTime;
+        } // end f_getGeoUnicastCbfMaxTime
+        
+        function f_getGeoUnicastCbfMinTime() return integer {
+            var integer v_cbfMinTime := PICS_GN_GEOUNICAST_CBF_MIN_TIME;
+            
+            return v_cbfMinTime;
+        } // end f_getGeoUnicastCbfMinTime
+        
+        function f_getGeoBroadcastCbfMaxTime() return integer {
+            var integer v_cbfMaxTime := PICS_GN_GEOBROADCAST_CBF_MAX_TIME;
+            
+            return v_cbfMaxTime;
+        } // end f_getGeoBroadcastCbfMaxTime
+        
+        function f_getGeoBroadcastCbfMinTime() return integer {
+            var integer v_cbfMinTime := PICS_GN_GEOBROADCAST_CBF_MIN_TIME;
+            
+            return v_cbfMinTime;
+        } // end f_getGeoBroadcastCbfMinTime
+        
+        function f_getGnMaxAreaSize() return float {
+            var float v_maxAreaSize := PICS_GN_MAX_GEO_AREA_SIZE;
+            
+            return v_maxAreaSize;
+        } // end f_getGnMaxAreaSize
+        
+        function f_getAdvancedGbcForwardingMaxCounter() return integer {        
+            var integer v_maxCounter := PICS_GN_ADVANCED_BC_FORWARDING_MAX_COUNTER;
+            
+            return v_maxCounter;  
+        }
+        
+        /**
+         * @desc    Set the number of neighbour in the Location Table.
+         * @see     PX_MIN_NR_NEIGHBOUR
+         */
+        function f_setNrNeighbourLocTableDefault() runs on ItsGeoNetworking {
+            var integer v_nrNeighbour := f_random (0, PX_MIN_NR_NEIGHBOUR);
+            
+            f_acStartBeaconingMultipleNeighbour(v_nrNeighbour);
+            
+        } // end f_setNrNeighbourLocTableDefault
+        
+        /**
+         * @desc    Set the number of neighbour in the Location Table (medium).
+         * @see     PX_MIN_NR_NEIGHBOUR
+         * @see     PX_MAX_NR_NEIGHBOUR
+         */
+        function f_setNrNeighbourLocTableMedium() runs on ItsGeoNetworking {
+            var integer v_nrNeighbour := f_random (PX_MIN_NR_NEIGHBOUR, PX_MAX_NR_NEIGHBOUR);
+            
+            f_acStartBeaconingMultipleNeighbour(v_nrNeighbour);
+            
+        } // end f_setNrNeighbourLocTableMedium
+        
+        /**
+         * @desc    Set the number of neighbour in the Location Table (maximum).
+         * @see     PX_MAX_NR_NEIGHBOUR
+         * @see     PX_MIN_NR_NEIGHBOUR
+         */
+        function f_setNrNeighbourLocTableMaximum() runs on ItsGeoNetworking {
+            var integer v_nrNeighbour := f_random (PX_MAX_NR_NEIGHBOUR, (2*PX_MIN_NR_NEIGHBOUR));
+            
+            f_acStartBeaconingMultipleNeighbour(v_nrNeighbour);
+            
+        } // end f_setNrNeighbourLocTableMaximum
+                
+    } // end iutFunctions
+    
+    group posVectorFunctions {
+        
+        /**
+         * @desc    Convert long position vector to short position vector
+         * @param   p_longPosVector Long position vector to be converted
+         * @return  Short position vector
+         */
+        function f_longPosVector2ShortPosVector(in LongPosVector p_longPosVector) return ShortPosVector {
+            var ShortPosVector v_shortPosVector;
+            
+            v_shortPosVector := {
+                gnAddr := p_longPosVector.gnAddr,
+                timestamp := p_longPosVector.timestamp,
+                latitude := p_longPosVector.latitude,
+                longitude := p_longPosVector.longitude
+            };
+            
+            return v_shortPosVector;
+        }
+        
+        /**
+         * @desc    Get IUT's long position vector
+         * @return  IUT's long position vector
+         */
+        function f_getIutLongPosVector() runs on ItsBaseGeoNetworking return LongPosVector {
+            return f_acGetLongPosVector(f_getIutGnLocalAddress());
+        }
+        
+        /**
+         * @desc    Get IUT's short position vector
+         * @return  IUT's short position vector
+         */
+        function f_getIutShortPosVector() runs on ItsGeoNetworking return ShortPosVector {
+            var LongPosVector v_longPosVectorIut := f_getPosition(c_compIut);
+            
+            if (not isbound(v_longPosVectorIut)) {
+                v_longPosVectorIut := f_getIutLongPosVector();
+            }
+            return f_longPosVector2ShortPosVector(v_longPosVectorIut);
+        }
+        
+        /**
+         * @desc    Compute a position using a reference position, a distance and an orientation
+         * @param   p_iutLongPosVector Reference position
+         * @param   p_distance Distance to the reference position (in meter)
+         * @param   p_orientation direction of the computed position (0 to 359; 0 means North)
+         * @return  LongPosVector
+         */
+        function f_computePositionUsingDistance(in LongPosVector p_iutLongPosVector, in integer p_distance, in integer p_orientation)
+        return LongPosVector {
+            var LongPosVector v_result := p_iutLongPosVector;
+            
+            log("*** f_computePositionUsingDistance: INFO: calling fx_computePositionUsingDistance() ***");
+            fx_computePositionUsingDistance(p_iutLongPosVector.latitude, p_iutLongPosVector.longitude, p_distance, p_orientation, v_result.latitude, v_result.longitude);
+            
+            return v_result;
+        }
+        
+    } // end posVectorFunctions
+    
+    group externalFunctions {
+        
+        /**
+         * @desc    External function to compute timestamp based on current time
+         * @return  Unix-Epoch-Time mod 2^32
+         */
+        external function fx_computeGnTimestamp() return UInt32;
+        
+    } // End of group externalFunctions
+    
+    group security {
+        
+        /**
+         * @desc    Waiting for the GN message with Security
+         * @param   p_InSecMsg  SecurityMessage template 
+         * @param   p_received  returns received SecurityMessage 
+         */
+        altstep a_securedMessage (
+            in template (present) SecuredMessage p_InSecMsg,
+            out SecuredMessage p_received
+        ) runs on ItsGeoNetworking {
+            var GeoNetworkingInd v_geoNw;
+            [] geoNetworkingPort.receive(mw_geoNwInd(
+                                            mw_geoNwSecPdu(
+                                                p_InSecMsg,
+                                                mw_geoNwAnyPacket_withPayload(?)
+                                        ))) -> value v_geoNw {
+                    p_received := f_getSecuredMessage(v_geoNw.msgIn);
+            }
+        }
+        
+        /**
+         * @desc         Receive GN message with security containing certificate as a signer info
+         * @param p_cert returns the certificate used for sign received message
+         */
+        altstep a_securedMessageWithCertificate(
+                                                out SecuredMessage p_received
+        ) runs on ItsGeoNetworking {
+            
+            [] a_securedMessage (
+                mdw_securedMessage (superset(mw_header_field_signer_info_certificate)),
+                p_received
+            ) {
+                // Nothing to do
+            }
+        } // End of altstep a_securedMessageWithCertificate
+
+        /**
+         * @desc         Receive GN message with security containing certificate chain as a signer info
+         * @param p_cert returns the certificate used for sign received message
+         */
+        altstep a_securedMessageWithCertificateChain(
+                                                     out SecuredMessage p_received
+        ) runs on ItsGeoNetworking {
+            [] a_securedMessage (
+                mdw_securedMessage(
+                    superset(
+                        mw_header_field_signer_info_certificate_chain
+                )),
+                p_received
+            ) {
+                // Nothing to do
+            }
+        } // End of altstep a_securedMessageWithCertificateChain
+        
+        /**
+         * @desc         Receive GN message with security containing digest as a signer info
+         * @param p_cert returns the certificate used for sign received message
+         */
+        altstep a_securedMessageWithDigest(
+                                           out SecuredMessage p_received
+        ) runs on ItsGeoNetworking {
+            [] a_securedMessage (
+                mdw_securedMessage (
+                    superset(
+                        mw_header_field_signer_info_digest
+                )), 
+                p_received
+            ) {
+                // Nothing to do
+            }
+        } // End of altstep a_securedMessageWithDigest
+        
+    } // End of group altSteps
+    
+    group waitingHelpers {
+        
+        /**
+         * @desc  Wait for GN message with security containing certificate as a signer info
+         * @return the certificate used for sign received message
+         */
+        function f_waitForCertificate(
+                                      out Certificate p_cert
+        ) runs on ItsGeoNetworking return boolean {
+            var SecuredMessage v_recv;
+            var boolean v_ret := false;
+            
+            alt {
+                [] a_securedMessageWithCertificate(v_recv) {
+                    var SignerInfo v_si;
+                    
+                    /* TODO if (f_getMsgSignerInfo(v_recv, v_si) == true) { 
+                        p_cert :=  v_si.signerInfo.certificate;
+                        v_ret := true;
+                    }*/
+                }
+            } // End of 'alt' statement
+            
+            return v_ret;
+        } // End of function f_waitForCertificate
+        
+        /**
+         * @desc  Wait for GN message with security containing certificate chain as a signer info
+         * @return the certificate used for sign received message
+         */
+        function f_waitForCertificateChain (out CertificateChain p_chain)
+        runs on ItsGeoNetworking
+        return boolean {
+            var SecuredMessage v_recv;
+            var boolean v_ret := false;
+            
+            alt {
+                [] a_securedMessageWithCertificateChain(v_recv) {
+                    var SignerInfo v_si;
+                    /* TODO if(f_getMsgSignerInfo(v_recv, v_si)) {
+                        p_chain :=  v_si.signerInfo.certificates;
+                        v_ret := true;
+                    }*/
+                }
+            }
+            return v_ret;
+        }
+
+        /**
+         * @desc  Ask for the certificate chain and wait for GN message with security containing certificate chain as a signer info
+         * @return the certificate chain used for sign received message
+         */
+        function f_askForCertificateChain (in template(value) octetstring p_CamPayload)
+        runs on ItsGeoNetworking
+        return boolean {
+            var SecuredMessage v_recv;
+            var SignerInfo     v_si;
+            var boolean v_ret := false;
+            alt {
+                [] a_securedMessageWithCertificate(v_recv) {
+                    /*TODO if(f_getMsgSignerInfo(v_recv, v_si)) {
+                        if(f_getCertificateSignerInfo(v_si.signerInfo.certificate, v_si)) {
+                            if(match (v_si.type_, e_certificate_digest_with_sha256)) {
+                                f_sendCertificateRequest(v_si.signerInfo.digest, p_CamPayload);
+                                if(tc_ac.running) {
+                                    tc_ac.stop;tc_ac.start;
+                                }
+                                v_ret := true;
+                            }
+                        }
+                    }*/
+                }
+            }
+            return v_ret;
+        }
+        /**
+         * @desc  Ask for the certificate chain and wait for GN message with security containing certificate chain as a signer info
+         * @return the certificate chain used for sign received message
+         */
+        function f_askAndWaitForCertificateChain(
+                                                 out CertificateChain p_chain, 
+                                                 in template(value) octetstring p_CamPayload
+        ) runs on ItsGeoNetworking return boolean {
+            // Local variables
+            var SecuredMessage v_recv;
+            var SignerInfo     v_si;
+            var boolean v_ret := false;
+            
+            alt {
+                [] a_securedMessageWithCertificate(v_recv) {
+                    tc_ac.stop;
+                /*TODO    if(f_getMsgSignerInfo(v_recv, v_si)) {
+                        if(f_getCertificateSignerInfo(v_si.signerInfo.certificate, v_si)) {
+                            if(match (v_si.type_, e_certificate_digest_with_sha256)) {
+                                f_sendCertificateRequest(v_si.signerInfo.digest, p_CamPayload);
+                                tc_ac.start;
+                                repeat;
+                            }
+                        }
+                    }*/
+                }
+                [] a_securedMessageWithCertificateChain(v_recv) {
+                    tc_ac.stop;
+                    /*TODO if(f_getMsgSignerInfo(v_recv, v_si) == true) {
+                        p_chain := v_si.signerInfo.certificates;
+                        v_ret := true;
+                    } */
+                }
+            } // End of 'alt' statement
+            
+            return v_ret;
+        } // End of function f_askAndWaitForCertificateChain
+        
+        /**
+         * @desc  Wait for GN message with security containing digest as a signer info
+         * @return the digest of the certificate been used to sign received message
+         */
+        function f_waitForDigest(out HashedId8 p_digest)
+        runs on ItsGeoNetworking return boolean {
+            // Local variables
+            var SecuredMessage v_recv;
+            var boolean v_ret := false;
+            
+            alt {
+                [] a_securedMessageWithDigest(v_recv) {
+                    var SignerInfo v_si;
+                   /*TODO if(f_getMsgSignerInfo(v_recv, v_si)) { 
+                        p_digest :=  v_si.signerInfo.digest;
+                        v_ret := true;
+                    } */
+                }
+            } // End of 'alt' statement
+            
+            return v_ret;
+        } // End of function f_waitForDigest
+        
+    } // End of group waitingHelpers
+        
+    group CertRequests{
+        
+        function f_sendCertificateRequest (
+                                           in template (value) HashedId8 p_digest,
+                                           in template (value) octetstring p_payload
+        )
+        runs on ItsGeoNetworking
+        {
+            var GeoNetworkingReq v_gnReq;
+            var GnNonSecuredPacket v_gnNonSecuredPacket;
+            var template (value) ToBeSignedSecuredMessage v_toBeSignedSecuredMessage;
+            var template (value) SecuredMessage v_securedMessage;
+                
+            // Build signed SecuredMessage
+            v_gnNonSecuredPacket := valueof(m_geoNwShbPacket(
+                f_getPosition(c_compNodeC) // FIXME To be verified YANN
+            ));
+            // Add CAM payload
+            v_gnNonSecuredPacket.payload := valueof(f_adaptPayload_m(p_payload));
+            
+            /*TODO f_buildGnSecuredCam(
+                v_securedMessage,
+                m_payload_signed(bit2oct(encvalue(v_gnNonSecuredPacket))),
+                e_certificate,
+                { 
+                    m_header_field_unrecognised_certificate(
+                        f_HashedId3FromHashedId8(
+                            valueof(p_digest)
+                    )) 
+                } 
+            );*/
+                
+            // Build secured Gn packet
+            v_gnReq := valueof(m_geoNwReq_linkLayerBroadcast(
+                m_geoNwSecPdu(
+                    v_gnNonSecuredPacket,
+                    v_securedMessage
+                ) // End of template m_geoNwSecPdu
+            )); // End of template m_geoNwReq_linkLayerBroadcast
+            
+            // Send Message
+            f_sendGeoNetMessage(v_gnReq);
+            
+        } // End of function f_sendCertificateRequest
+        
+    } // End of group CertRequests 
+    
+    group messageGetters {
+        
+        /**
+         * @desc    return SecuredMessage field of GeoNetworking packet 
+         * @param   p_msg GeoNetworking packet
+         * @return  the SecuredMessage if any
+         */
+        function f_getSecuredMessage(in GeoNetworkingPdu p_msg)
+        return SecuredMessage {
+            return p_msg.gnPacket.securedMsg;
+        }
+        
+    }
+    
+} // end LibItsGeoNetworking_Functions
+

@@ -1,0 +1,142 @@
+/**
+ *  @author     ETSI / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/DENM/LibItsDenm_TypesAndValues.ttcn $
+ *              $Id: LibItsDenm_TypesAndValues.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Module containing type and value definitions for DENM
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsDenm_TypesAndValues {
+    
+    //LibIts
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    import from ITS_Container language "ASN.1:1997" all;
+    
+    group actionTypes {
+        
+        /**
+         * @desc Indication of whether event cancellation has to be raised by the test system or iut
+         */
+        type enumerated Trigger {
+            e_ets(0),
+            e_iut(1)
+        } with { variant "" };
+        
+    } // end group actionTypes
+    
+    group otherTypes {
+        
+        /**
+         * @desc List of SituationContainers used in behaviours 
+         */
+        type record of SituationContainer SituationContainerList with { variant "" };
+        
+        /**
+         * @desc List of ActionIDs used in behaviours 
+         */
+        type record of ActionID ActionIDList with { variant "" };
+    }
+    
+    group denmConstants {
+
+		const ItsPduHeader.protocolVersion c_protocolVersionDenm := 1;
+        const ItsPduHeader.messageID c_messageIdDenm := 1;
+        
+        const ValidityDuration c_duration_2sec := 2;
+        const ValidityDuration c_duration_5sec := 5;
+        const ValidityDuration c_duration_10sec := 10;
+        
+        const TransmissionInterval c_interval_1sec := 1000;
+        const TransmissionInterval c_interval_2sec := 2000;
+        const TransmissionInterval c_interval_4sec := 4000;
+        const TransmissionInterval c_interval_5sec := 5000;
+        const TransmissionInterval c_interval_10sec := 10000;
+        
+    } // end group denmConstants
+    
+    group utPrimitives {
+        
+        /**
+         * @desc Upper Tester message to request triggering of an event at IUT 
+         */
+        type record UtDenmTrigger {
+            TimestampIts detectionTime,
+            ValidityDuration validityDuration optional,
+            ValidityDuration repetitionDuration optional,
+            SituationContainer situation,
+            RelevanceDistance relevanceDistance,
+            RelevanceTrafficDirection relevanceTrafficDirection,
+            TransmissionInterval transmissionInterval optional,
+            TransmissionInterval repetitionInterval optional,
+            AlacarteContainer alacarte optional
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester result message of request of triggering of an event at IUT 
+         */
+        type record UtDenmTriggerResult {
+            boolean result,
+            ActionID actionId
+        } with { variant (result) "FIELDLENGTH(8)";
+				 variant (actionId) ""; };
+        
+        /**
+         * @desc Upper Tester message to update an event at IUT 
+         */
+        type record UtDenmUpdate {
+            ActionID actionId,
+            TimestampIts detectionTime,
+            ValidityDuration validityDuration optional,
+            SituationContainer situation optional,
+            LocationContainer location optional,
+            RelevanceDistance relevanceDistance optional,
+            RelevanceTrafficDirection relevanceTrafficDirection optional,
+            TransmissionInterval transmissionInterval optional,
+            TransmissionInterval repetitionInterval optional,
+            AlacarteContainer alacarte optional
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester result message of an update request of an event on DENM IUT 
+         */
+        type record UtDenmUpdateResult { 
+            boolean result,
+            ActionID actionId
+        } with { variant (result) "FIELDLENGTH(8)";
+				 variant (actionId) ""; };
+        
+        /**
+         * @desc Upper Tester message to request the termination of an event at IUT 
+         */
+        type record UtDenmTermination {
+            ActionID actionId
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester result message of termination of an event on DENM IUT 
+         */
+        type boolean UtDenmTerminationResult with { variant "FIELDLENGTH(8)" };
+        
+        /**
+         * @desc Upper Tester message to check event/status on DENM IUT 
+         */
+        type record UtDenmEventInd {
+            DENM denMsg
+        } with { variant "" };
+        
+        /**
+         * @desc List of Upper Tester messages to check event/status on DENM IUT 
+         */
+        type record of UtDenmEventInd UtDenmEventIndList with { variant "" };
+        
+        /**
+         * @desc List of ActionID received in response to the Upper Tester triggered messages
+         */
+        type record of ActionID UtDenmActionIDList with { variant "" };
+        
+    }
+   
+} with { encode "RAW" };
+

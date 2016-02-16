@@ -1,0 +1,45 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "e3b3c999-5727-4e84-8456-390555d8dcfb",
+            "type": "STRING",
+            "value": "Check that the sent Secured CAM contains exactly one element of the header fields: signer_info, generation_time, message_type.\r\nCheck that the header fields are in the ascending order according to the numbering of the enumeration except of the signer_info, which is encoded first.\r\nCheck that generation_time_with_confidence is not used"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "e3b3c999-5727-4e84-8456-390555d8dcfb",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/c7afae7a-c9c2-4459-972d-33da342b7baf",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/1b243599-d5bc-4e46-a449-8d24fb05ab5f",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/4f1d2ecd-4dde-469a-8899-662f2ace2105",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/c2508610-0005-4b07-8ba2-0490a71f0a58"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "e3b3c999-5727-4e84-8456-390555d8dcfb",
+            "type": "STRING",
+            "value": "02. Check header fields"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "e3b3c999-5727-4e84-8456-390555d8dcfb",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "e3b3c999-5727-4e84-8456-390555d8dcfb",
+            "type": "STRING",
+            "value": "complete"
+        }
+    },
+    "uuid": "e3b3c999-5727-4e84-8456-390555d8dcfb"
+}

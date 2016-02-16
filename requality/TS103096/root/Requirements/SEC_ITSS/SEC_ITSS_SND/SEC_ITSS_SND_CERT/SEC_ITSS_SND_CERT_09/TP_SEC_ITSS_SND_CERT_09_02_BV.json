@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "d7a254c8-e520-47ba-a846-5e4db105c1f1",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "d7a254c8-e520-47ba-a846-5e4db105c1f1",
+            "type": "STRING",
+            "value": "Check the signatures of the certificates in the chain"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "d7a254c8-e520-47ba-a846-5e4db105c1f1",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'certificate_chain'\r\n\t\t\t\tcontaining certificates\r\n\t\t\t\t\tindicating CERTIFICATES {\r\n\t\t\t\t\t\tcontaining CERTIFICATES[N] {\r\n\t\t\t\t\t\t\tcontaining signer_info {\r\n\t\t\t\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\t\t\t\tindicating 'certificate_digest_with_sha256'\r\n\t\t\t\t\t\t\t\tcontaining digest\r\n\t\t\t\t\t\t\t\t\treferenced to the certificate CERTIFICATES[N-1]\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tcontaining signature\r\n\t\t\t\t\t\t\t\tverifiable using CERTIFICATES[N-1]\r\n\t\t\t\t\t\t\t\t\t.subject_attributes['verification_key'].key\r\n\t\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "d7a254c8-e520-47ba-a846-5e4db105c1f1",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "d7a254c8-e520-47ba-a846-5e4db105c1f1",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "d7a254c8-e520-47ba-a846-5e4db105c1f1"
+}

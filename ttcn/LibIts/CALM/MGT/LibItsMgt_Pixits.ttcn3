@@ -1,0 +1,81 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/MGT/LibItsMgt_Pixits.ttcn3 $
+ *              $Id: LibItsMgt_Pixits.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       ITS station management (ISO 24102-3) Pixits
+ */
+module LibItsMgt_Pixits {
+    
+    // LibCommon
+    import from LibCommon_DataStrings {
+        type Bit4
+    };
+    
+    // LibIts
+    import from CALMiitsscu language "ASN.1:1997" {
+        type ITS_SCUtype 
+    }; 
+    import from CALMllsap language "ASN.1:1997" {
+        type 
+            MedType, CIaClass, CIclass 
+    }; 
+    import from CALMfntp language "ASN.1:1997" {
+        type PortNumber
+    };
+    import from CALMmanagement language "ASN.1:1997" {
+        type ITS_scuId
+    };
+	import from LibItsMgt_TypesAndValues {
+		group asn1Constants 
+	};
+    
+    /**
+     * @desc ITS-SCU-ID of the source ITS-SCU which produces the request
+     */
+    modulepar ITS_scuId PX_SRC_ITS_SCU_ID := 10;
+    
+    /**
+     * @desc ITS-SCU-ID of the source ITS-SCU which produces AliveMessages
+     */
+    modulepar ITS_scuId PX_SRC_ITS_SCU_ID_ALIVE := 12;
+    
+    /**
+     * @desc ITS_SCUtype of the source ITS-SCU which produces the request
+     */
+    modulepar ITS_SCUtype PX_SRC_ITS_SCU_TYPE := 2; // router
+    
+    /**
+     * @desc ITS-SCU-ID of the destination ITS-SCU which shall evaluate the request
+     */
+    modulepar ITS_scuId PX_DST_ITS_SCU_ID := 12;
+    
+    /**
+     * @desc ITS-SCU-ID of an other ITS-SCU which shall evaluate the request
+     */
+    modulepar ITS_scuId PX_OTHER_ITS_SCU_ID := 0;
+    
+    /**
+     * @desc Defines the value to set to fill field for PduRequest field
+     * @see ISO/WD 24102-4 - Clause 7
+     */
+    modulepar Bit4 PX_PDU_REQUEST_FILL_FIELD_VALUE := '0000'B;
+    
+    /**
+     * @desc Indicates type of access technology (medium)
+     * @see ISO 21218
+     */
+    modulepar MedType PX_MED_TYPE := c_medType_unknown; 
+    
+    /**
+     * @desc Indicates the CI access class
+     * @see ISO 21218
+     */
+    modulepar CIaClass PX_CIACLASS := c_cIaClass_unknown; 
+    
+    /**
+     * @desc Indicates the CI class
+     * @see ISO 21218
+     */
+    modulepar CIclass PX_CICLASS := c_cIClass_unknown; 
+    
+} // End of module LibItsMgt_Pixits

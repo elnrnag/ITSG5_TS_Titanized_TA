@@ -1,0 +1,20 @@
+{
+    "attributes": {
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that ITS-S discards a signed 1609.2 message if the signature is calculated over the hash of the version_and_type and the unsigned_certificate fields if the calculation does not use the compressed representation of all public keys and reconstruction values contained in the certificate."
+        },
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/64c83378-09cf-4eca-8a71-b2c226cd35ad"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "0022fe66-0da9-4a23-9f19-221196bd5085"
+}

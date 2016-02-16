@@ -1,0 +1,1312 @@
+[INFO] Incoming connection: /127.0.0.1:36092
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 1
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":0,"msg":{"reg":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":0,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming connection: /127.0.0.1:36093
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 2
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":0,"msg":{"reg":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":0,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":1,"msg":{"mapped":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id utPort to TSI utPort
+[INFO] Mapped port id: utPort to TSI utPort
+[INFO] Supplying parameter UtSecuredMode to TA: false
+[INFO] Supplying parameter TsSecuredRootPath to TA: data/certificates
+[INFO] Supplying parameter TsSecuredConfiId to TA: vendorA
+[INFO] Supplying parameter UpperTesterSettings to TA: 159.107.198.160:1600
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":1,"msg":{"mapped":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id btpPort to TSI btpPort
+[INFO] Mapped port id: btpPort to TSI btpPort
+[INFO] Supplying parameter btpPort to TA: GN/ETH
+[INFO] Supplying parameter LinkLayer_NodeB to TA: BABEBABE0002
+[INFO] Supplying parameter TsBeaconInterval to TA: 1000
+[INFO] Supplying parameter TsLatitude to TA: 0
+[INFO] Supplying parameter TsLongitude to TA: 0
+[INFO] Supplying parameter TsSecuredMode to TA: false
+[INFO] Supplying parameter TsSecuredRootPath to TA: data/certificates
+[INFO] Supplying parameter TsSecuredConfiId to TA: vendorA
+[INFO] Supplying parameter TsItsAidOther to TA: 
+gnUpdateLocTable: Adding Loc Entry for: 000000000000
+[INFO] Supplying parameter IutEthernetTypeValue to TA: 0x8947
+[INFO] Supplying parameter LocalEthernetMAC to TA: ecf4bb350b3e
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":2,"msg":{"sendmsg":{"data":{"encoded_data":"000000000000000000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":2,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":3,"msg":{"sendmsg":{"data":{"encoded_data":"700FA01388"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":3,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6101"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F101105000800004010016F082DACA8B02A2BC50DA7C000059A30000368480000000000000000FA01388
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"010FA01388"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"010FA01388"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":4,"msg":{"unmapped":{}}}
+[INFO] Unmapping utPort
+[INFO] Unmapping locally utPort
+[INFO] Unmapped utPort
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":4,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":2,"msg":{"unmapped":{}}}
+[INFO] Unmapping btpPort
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50DBF7000059A300003684800000000000000007D1000001020000000003336006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Unmapping locally btpPort
+[INFO] Unmapped btpPort
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":2,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":5,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":5,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":3,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":3,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming connection: /127.0.0.1:36094
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 3
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":6,"msg":{"reg":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":6,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming connection: /127.0.0.1:36095
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 4
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":4,"msg":{"reg":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":4,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":7,"msg":{"mapped":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id utPort to TSI utPort
+[INFO] Mapped port id: utPort to TSI utPort
+[INFO] Supplying parameter UtSecuredMode to TA: false
+[INFO] Supplying parameter TsSecuredRootPath to TA: data/certificates
+[INFO] Supplying parameter TsSecuredConfiId to TA: vendorA
+[INFO] Supplying parameter UpperTesterSettings to TA: 159.107.198.160:1600
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":7,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":5,"msg":{"mapped":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id btpPort to TSI btpPort
+[INFO] Mapped port id: btpPort to TSI btpPort
+[INFO] Supplying parameter btpPort to TA: GN/ETH
+[INFO] Supplying parameter LinkLayer_NodeB to TA: BABEBABE0002
+[INFO] Supplying parameter IutEthernetTypeValue to TA: 0x8947
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":5,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":8,"msg":{"sendmsg":{"data":{"encoded_data":"000000000000000000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":8,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":9,"msg":{"sendmsg":{"data":{"encoded_data":"710FA00000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":9,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6101"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F101205000800004010016F082DACA8B02A2BC50DE5D000059A30000368480000000000000000FA00000
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"020FA00000"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"020FA00000"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":10,"msg":{"unmapped":{}}}
+[INFO] Unmapping utPort
+[INFO] Unmapping locally utPort
+[INFO] Unmapped utPort
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":10,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":6,"msg":{"unmapped":{}}}
+[INFO] Unmapping btpPort
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50DF7A000059A300003684800000000000000007D10000010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Unmapping locally btpPort
+[INFO] Unmapped btpPort
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":6,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":11,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":11,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":7,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":7,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming connection: /127.0.0.1:36096
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 5
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":12,"msg":{"reg":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":12,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming connection: /127.0.0.1:36097
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 6
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":8,"msg":{"reg":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":8,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":13,"msg":{"mapped":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id utPort to TSI utPort
+[INFO] Mapped port id: utPort to TSI utPort
+[INFO] Supplying parameter UtSecuredMode to TA: false
+[INFO] Supplying parameter TsSecuredRootPath to TA: data/certificates
+[INFO] Supplying parameter TsSecuredConfiId to TA: vendorA
+[INFO] Supplying parameter UpperTesterSettings to TA: 159.107.198.160:1600
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":13,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":9,"msg":{"mapped":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id btpPort to TSI btpPort
+[INFO] Mapped port id: btpPort to TSI btpPort
+[INFO] Supplying parameter btpPort to TA: GN/ETH
+[INFO] Supplying parameter LinkLayer_NodeB to TA: BABEBABE0002
+[INFO] Supplying parameter IutEthernetTypeValue to TA: 0x8947
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":9,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":14,"msg":{"sendmsg":{"data":{"encoded_data":"000000000000000000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":14,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":15,"msg":{"sendmsg":{"data":{"encoded_data":"710FA00000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":15,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6101"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F101205000800004010016F082DACA8B02A2BC50E2DC000059A30000368480000000000000000FA00000
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"020FA00000"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"020FA00000"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50E2FA000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":16,"msg":{"unmapped":{}}}
+[INFO] Unmapping utPort
+[INFO] Unmapping locally utPort
+[INFO] Unmapped utPort
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":16,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":10,"msg":{"unmapped":{}}}
+[INFO] Unmapping btpPort
+[INFO] Unmapping locally btpPort
+[INFO] Unmapped btpPort
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":10,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":17,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":17,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[ERROR] PortHandler queue error: null
+[INFO] Message received: {"msg_id":11,"msg":{"unregister":{}}}
+[STACKTRACE] 
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+java.lang.Thread.getStackTrace(Thread.java:1589)
+org.eclipse.titan.trimapper.TitanTriLogger.error(TitanTriLogger.java:33)
+[INFO] {"msg_id":11,"msg":{"result":{"result":"TRI_ok"}}}
+org.eclipse.titan.trimapper.TitanTESocketHandler.run(TitanTESocketHandler.java:36)
+[END STACKTRACE]
+[INFO] Message handled
+[ERROR] PortHandler queue error: null
+[INFO] End of port handler's life
+[STACKTRACE] 
+java.lang.Thread.getStackTrace(Thread.java:1589)
+java.lang.InterruptedExceptionorg.eclipse.titan.trimapper.TitanTriLogger.error(TitanTriLogger.java:33)
+org.eclipse.titan.trimapper.TitanTESocketHandler.run(TitanTESocketHandler.java:36)
+[END STACKTRACE]
+
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireInterruptibly(AbstractQueuedSynchronizer.java:1219)
+	at java.util.concurrent.locks.ReentrantLock.lockInterruptibly(ReentrantLock.java:340)
+	at java.util.concurrent.LinkedBlockingQueue.put(LinkedBlockingQueue.java:338)
+	at org.eclipse.titan.trimapper.TitanTESocketHandler.run(TitanTESocketHandler.java:34)
+[INFO] TE incoming socket closed
+[INFO] Incoming connection: /127.0.0.1:36098
+[INFO] Starting new handler thread...java.lang.InterruptedException
+
+[INFO] Handler thread started	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireInterruptibly(AbstractQueuedSynchronizer.java:1219)
+
+[INFO] Wait iteration 7	at java.util.concurrent.locks.ReentrantLock.lockInterruptibly(ReentrantLock.java:340)
+	at java.util.concurrent.LinkedBlockingQueue.put(LinkedBlockingQueue.java:338)
+
+	at org.eclipse.titan.trimapper.TitanTESocketHandler.run(TitanTESocketHandler.java:34)
+[INFO] Opening socket on port 2222
+[INFO] TE incoming socket closed
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":18,"msg":{"reg":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":18,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming connection: /127.0.0.1:36099
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 8
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":12,"msg":{"reg":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":12,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":19,"msg":{"mapped":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id utPort to TSI utPort
+[INFO] Mapped port id: utPort to TSI utPort
+[INFO] Supplying parameter UtSecuredMode to TA: false
+[INFO] Supplying parameter TsSecuredRootPath to TA: data/certificates
+[INFO] Supplying parameter TsSecuredConfiId to TA: vendorA
+[INFO] Supplying parameter UpperTesterSettings to TA: 159.107.198.160:1600
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":19,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":13,"msg":{"mapped":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id btpPort to TSI btpPort
+[INFO] Mapped port id: btpPort to TSI btpPort
+[INFO] Supplying parameter btpPort to TA: GN/ETH
+[INFO] Supplying parameter LinkLayer_NodeB to TA: BABEBABE0002
+[INFO] Supplying parameter IutEthernetTypeValue to TA: 0x8947
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":13,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":20,"msg":{"sendmsg":{"data":{"encoded_data":"000000000000000000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":20,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":14,"msg":{"sendmsg":{"data":{"encoded_data":"010FA013880102030405"}}}}
+[INFO] Handling message sending...
+>>> GnLayer.send: 0FA013880102030405
+<<< GnLayer.send: 01002B011050000000090100CCD0BABEBABE0002BC50D7C9000000000000000000000000000000000FA013880102030405
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":14,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"5500090FA013880102030405"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"5500090FA013880102030405"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6300050102030405"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6300050102030405"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50EA04000059A300003684800000000000000007D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50ED86000059A300003684800000000000000007D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50F10E000059A300003684800000000000000007D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037F6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50F48B000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50F814000059A300003684800000000000000007D1000001020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50FB9A000059A300003684800000000000000007D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC50FF1D000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F10A20420080002F0A000000000016F082DACA8B02A2BC50FF78000059A300003684800000000000642500006D0900640014000A000007D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC5102A2000059A300003684800000000000000007D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC510625000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC5109A9000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC510D2D000059A300003684800000000000000007D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":21,"msg":{"unmapped":{}}}
+[INFO] Unmapping utPort
+[INFO] Unmapping locally utPort
+[INFO] Unmapped utPort
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":21,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":15,"msg":{"unmapped":{}}}
+[INFO] Unmapping btpPort
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC5110B1000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Unmapping locally btpPort
+[INFO] Unmapped btpPort
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":15,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":22,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":22,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":16,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":16,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming connection: /127.0.0.1:36101
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 9
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":23,"msg":{"reg":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":23,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming connection: /127.0.0.1:36102
+[INFO] Starting new handler thread...
+[INFO] Handler thread started
+[INFO] Wait iteration 10
+[INFO] Opening socket on port 2222
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":17,"msg":{"reg":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"MTC","componentTypeName":"N/A"}}}}}
+[INFO] Registering port
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"MTC","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Registration complete, sending reply...
+[INFO] Port registered
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":17,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":24,"msg":{"mapped":{"portid":{"portName":"utPort","portTypeName":"UpperTesterPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"UpperTesterPort","portName":"utPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id utPort to TSI utPort
+[INFO] Mapped port id: utPort to TSI utPort
+[INFO] Supplying parameter UtSecuredMode to TA: false
+[INFO] Supplying parameter TsSecuredRootPath to TA: data/certificates
+[INFO] Supplying parameter TsSecuredConfiId to TA: vendorA
+[INFO] Supplying parameter UpperTesterSettings to TA: 159.107.198.160:1600
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":24,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":18,"msg":{"mapped":{"portid":{"portName":"btpPort","portTypeName":"BtpPort","component_":{"componentId":"00000001","componentName":"System","componentTypeName":"N/A"}}}}}
+[INFO] Handling Map message...
+[INFO] {"portid":{"portTypeName":"BtpPort","portName":"btpPort","component_":{"componentName":"System","componentTypeName":"N/A","componentId":"00000001"}}}
+[INFO] Mapping port id btpPort to TSI btpPort
+[INFO] Mapped port id: btpPort to TSI btpPort
+[INFO] Supplying parameter btpPort to TA: GN/ETH
+[INFO] Supplying parameter LinkLayer_NodeB to TA: BABEBABE0002
+[INFO] Supplying parameter IutEthernetTypeValue to TA: 0x8947
+[INFO] Mapping handled
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":18,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":25,"msg":{"sendmsg":{"data":{"encoded_data":"000000000000000000"}}}}
+[INFO] Handling message sending...
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":25,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0101"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F10A20420080002F0A000001000016F082DACA8B02A2BC5112F0000059A300003684800000000000642500006D0900640014000A000007D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":19,"msg":{"sendmsg":{"data":{"encoded_data":"020FA000000102030405"}}}}
+[INFO] Handling message sending...
+>>> GnLayer.send: 0FA000000102030405
+<<< GnLayer.send: 01002B012050000000090100CCD0BABEBABE0002BC51035D000000000000000000000000000000000FA000000102030405
+[INFO] Message sent...
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":19,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"5500090FA000000102030405"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"5500090FA000000102030405"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6300050102030405"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"6300050102030405"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC511436000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC5117B7000059A300003684800000000000000007D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC511B3E000059A300003684800000000000000007D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Message handled
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] Message handled
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037B6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC511EC4000059A300003684800000000000000007D10000010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037E6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037A6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC512244000059A300003684800000000000000007D1000001020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003786006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC5125C9000059A300003684800000000000000007D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F10A20420080002F0A000002000016F082DACA8B02A2BC51267B000059A300003684800000000000642500006D0900640014000A000007D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC51294D000059A300003684800000000000000007D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC512CD2000059A300003684800000000000000007D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D10000010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E010200000000037C6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC513057000059A300003684800000000000000007D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC5133D8000059A300003684800000000000000007D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"55003207D1000001020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"63002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"23002E01020000000003796006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC513757000059A300003684800000000000000007D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D10000010200000000037D6006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800"}}}}
+[INFO] Message handled
+>>> GnLayer.receive: 0100F10A20420080002F0A000003000016F082DACA8B02A2BC513A02000059A300003684800000000000642500006D0900640014000A000007D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000
+[INFO] Incoming message...
+[INFO] EnqueueMessage incoming
+[INFO] Sending message to TE: {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":1,"msg":{"enqueue_msg":{"data":{"encoded_data":"0207D20000010100000000010000000000000000000000000000000006B49D201D693A401FFFFFFE11DBBA1F012C0000"}}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":26,"msg":{"unmapped":{}}}
+[INFO] Unmapping utPort
+[INFO] Unmapping locally utPort
+[INFO] Unmapped utPort
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":26,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":20,"msg":{"unmapped":{}}}
+[INFO] Unmapping btpPort
+>>> GnLayer.receive: 01004801205000800032010016F082DACA8B02A2BC513AE0000059A300003684800000000000000007D1000001020000000003826006B4A8544D6941109FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800
+[INFO] Unmapping locally btpPort
+[INFO] Unmapped btpPort
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":20,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":27,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending utPort message to TE: 
+[INFO] {"msg_id":27,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed
+[INFO] Incoming message...
+[INFO] Incoming Southbound message...
+[INFO] Message received: {"msg_id":21,"msg":{"unregister":{}}}
+[INFO] Message handled, sending reply...
+[INFO] Sending btpPort message to TE: 
+[INFO] {"msg_id":21,"msg":{"result":{"result":"TRI_ok"}}}
+[INFO] Message handled
+[INFO] End of port handler's life
+[INFO] TE incoming socket closed

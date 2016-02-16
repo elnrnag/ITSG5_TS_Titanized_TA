@@ -1,0 +1,28 @@
+/**
+ *    @author      ETSI / STF405
+ *    @version     $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/Common/LibItsExternal_TypesAndValues.ttcn $
+ *                 $Id: LibItsExternal_TypesAndValues.ttcn 828 2014-05-22 13:57:28Z filatov $
+ *    @desc        Module containing types and values for External protocols
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module LibItsExternal_TypesAndValues {
+
+    // LibCommon
+    import from LibCommon_DataStrings all;
+
+    group linkLayerConstants {
+
+        /**
+         * @desc Ethernet MAC address
+         */
+        type Oct6 MacAddress;
+                
+        const MacAddress c_llBroadcast := 'FFFFFFFFFFFF'O;
+        
+    } // end linkLayerConstants
+        
+} // end LibItsIpv6OverGeoNetworking_TypesAndValues
+

@@ -1,0 +1,791 @@
+[INFO] Scanning for projects...
+[WARNING] The POM for org.eclipse.m2e:lifecycle-mapping:jar:1.0.0 is missing, no dependency information available
+[WARNING] Failed to retrieve plugin descriptor for org.eclipse.m2e:lifecycle-mapping:1.0.0: Plugin org.eclipse.m2e:lifecycle-mapping:1.0.0 or one of its dependencies could not be resolved: Failed to read artifact descriptor for org.eclipse.m2e:lifecycle-mapping:jar:1.0.0
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Upper Tester for GeoNetworking 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[WARNING] The POM for org.eclipse.m2e:lifecycle-mapping:jar:1.0.0 is missing, no dependency information available
+[WARNING] Failed to retrieve plugin descriptor for org.eclipse.m2e:lifecycle-mapping:1.0.0: Plugin org.eclipse.m2e:lifecycle-mapping:1.0.0 or one of its dependencies could not be resolved: Failed to read artifact descriptor for org.eclipse.m2e:lifecycle-mapping:jar:1.0.0
+[INFO] 
+[INFO] --- exec-maven-plugin:1.4.0:java (default-cli) @ uppertester ---
+09:39:26.617 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.geonetworking.GeonetStation - Initialized station with GN address 1652964939457561250 and MAC address MacAddress[0]
+09:39:26.619 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.geonetworking.GeonetStation - Starting BEACON service
+09:39:26.621 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:26.664 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending first CAM
+09:39:26.697 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:27.125 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.Initialize
+09:39:27.125 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:27.125 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:27.125 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:27.125 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field hashedId8
+09:39:27.126 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting hashedId8
+09:39:27.126 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - long!
+09:39:27.126 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Set default UDP port to 5000
+09:39:27.127 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: InitializeResult [messageType=1, result=1]
+09:39:27.127 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.127 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.127 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:27.171 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.BtpTriggerA
+09:39:27.171 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:27.171 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:27.171 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field destinationPort
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting destinationPort
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Short!
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field sourcePort
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting sourcePort
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Short!
+09:39:27.172 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:27.173 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpTriggerResult@526cbe2d
+09:39:27.173 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.174 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.175 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:27.542 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:27.551 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:27.724 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:27.726 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@1f36db31
+09:39:27.726 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.726 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.726 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.727 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:27.727 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@198d9a14
+09:39:27.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:27.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@55b8deec
+09:39:27.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.730 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:27.731 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 58
+09:39:27.732 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@78a6dc8c
+09:39:27.732 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:27.732 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@12d9a936
+09:39:27.733 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.734 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.734 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.734 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Message for unsupported BTP port 4000
+09:39:27.734 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.734 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:27.734 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:27.735 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@ff421e5
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@64dd4991
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.736 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@7c090252
+09:39:27.736 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:27.736 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:27.736 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:27.736 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:28.119 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.Initialize
+09:39:28.119 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:28.119 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:28.120 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:28.120 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field hashedId8
+09:39:28.120 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting hashedId8
+09:39:28.120 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - long!
+09:39:28.120 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Set default UDP port to 41069
+09:39:28.120 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: InitializeResult [messageType=1, result=1]
+09:39:28.121 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.121 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.121 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:28.163 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.BtpTriggerB
+09:39:28.163 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:28.164 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:28.164 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:28.164 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field destinationPort
+09:39:28.164 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting destinationPort
+09:39:28.164 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Short!
+09:39:28.165 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field destinationPortInfo
+09:39:28.165 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting destinationPortInfo
+09:39:28.165 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Short!
+09:39:28.165 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:28.166 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpTriggerResult@3377951c
+09:39:28.166 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.166 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.166 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:28.441 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:28.449 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:28.725 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 58
+09:39:28.726 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@7788cd9f
+09:39:28.726 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:28.727 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.727 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@3673bf08
+09:39:28.727 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:28.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.728 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:28.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:28.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:28.729 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:28.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Message for unsupported BTP port 4000
+09:39:28.729 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:28.729 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@6902c225
+09:39:28.729 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:28.729 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@341840ff
+09:39:28.729 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:28.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.729 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:28.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:28.729 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:28.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:28.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:28.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@24534011
+09:39:28.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:28.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:28.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:29.270 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.Initialize
+09:39:29.271 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:29.271 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:29.271 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field hashedId8
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting hashedId8
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - long!
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Set default UDP port to 49787
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: InitializeResult [messageType=1, result=1]
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.272 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:29.315 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.BtpTriggerB
+09:39:29.315 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:29.315 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:29.315 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:29.315 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field destinationPort
+09:39:29.315 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting destinationPort
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Short!
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field destinationPortInfo
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting destinationPortInfo
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Short!
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpTriggerResult@55932eb8
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.316 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.317 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:29.342 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:29.346 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:29.727 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 58
+09:39:29.727 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@31e05dec
+09:39:29.727 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:29.727 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.727 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@1364a89
+09:39:29.728 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:29.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.728 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:29.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:29.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:29.728 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:29.728 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Message for unsupported BTP port 4000
+09:39:29.728 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:29.729 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@135768fe
+09:39:29.729 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:29.729 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.729 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@4fae059d
+09:39:29.729 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:29.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.730 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:29.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:29.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:29.730 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:29.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:29.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@29f2af49
+09:39:29.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:29.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:29.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:30.241 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:30.246 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:30.433 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.Initialize
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field hashedId8
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting hashedId8
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - long!
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Set default UDP port to 51434
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: InitializeResult [messageType=1, result=1]
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.434 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:30.729 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:30.729 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@7bd1f722
+09:39:30.729 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:30.730 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@15b818b0
+09:39:30.730 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:30.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.730 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:30.730 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:30.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:30.731 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:30.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:30.731 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@695cd5f3
+09:39:30.731 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 63
+09:39:30.732 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.732 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:30.732 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@4de27a8f
+09:39:30.732 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:30.732 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.733 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:30.733 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:30.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@4fdc6a3b
+09:39:30.733 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:30.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:30.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:30.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:30.733 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour CCD0BABEBABE0002
+09:39:30.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Message for unsupported BTP port 4000
+09:39:31.142 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:31.148 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:31.730 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:31.731 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@fc27073
+09:39:31.731 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:31.732 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:31.732 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@2664961a
+09:39:31.732 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:31.732 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:31.732 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:31.732 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:31.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:31.733 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:31.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:31.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@15ba98a7
+09:39:31.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:31.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:31.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:32.041 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:32.046 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:32.732 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:32.733 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@d7c0716
+09:39:32.733 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:32.733 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:32.733 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@49b53c44
+09:39:32.733 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:32.734 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:32.734 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:32.734 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:32.734 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:32.734 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:32.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:32.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@1987ba2a
+09:39:32.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:32.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:32.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:32.941 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:32.950 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:33.734 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:33.734 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@1dcf287e
+09:39:33.734 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:33.734 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:33.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@b6b777c
+09:39:33.735 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:33.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:33.736 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:33.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:33.736 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:33.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:33.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:33.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@3c7173bf
+09:39:33.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:33.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:33.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:33.841 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:33.843 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:34.735 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:34.735 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@3c661f99
+09:39:34.735 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:34.735 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:34.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@54a494c9
+09:39:34.735 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:34.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:34.735 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:34.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:34.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:34.735 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:34.735 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:34.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@1244389
+09:39:34.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:34.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:34.736 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:34.741 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:34.748 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:35.642 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:35.650 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:35.736 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:35.737 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@73cdd7f4
+09:39:35.737 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:35.737 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:35.737 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@4f1d0f91
+09:39:35.737 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:35.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:35.738 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:35.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:35.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:35.738 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:35.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:35.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@7ce9212a
+09:39:35.739 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:35.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:35.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:35.739 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@2d808c77
+09:39:35.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:35.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:35.740 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:35.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:35.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@5285eff7
+09:39:35.742 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:35.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:35.743 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:35.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:35.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:35.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:35.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@574d6b74
+09:39:35.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:35.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:35.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:36.541 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:36.548 [pool-2-thread-4] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:36.630 [pool-2-thread-3] INFO  net.gcdc.uppertester.ItsStation - attempt to send DENM
+09:39:36.639 [pool-2-thread-3] INFO  net.gcdc.uppertester.ItsStation - bytes encoded 
+09:39:36.639 [pool-2-thread-3] INFO  net.gcdc.uppertester.ItsStation - sending DENM as BTP packet net.gcdc.geonetworking.BtpPacket@489c5cbd 
+09:39:36.639 [pool-2-thread-3] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:36.641 [pool-2-thread-3] DEBUG net.gcdc.geonetworking.GeonetStation - Area Area [center=Pos(0.0025637354000000003, 0.002791291), distanceAmeters=100.0, distanceBmeters=20.0, angleDegreesFromNorth=10.0, type=ELLIPSE] don't contains me Pos(0.0022946677, 0.0013956455)
+09:39:36.642 [pool-2-thread-3] DEBUG net.gcdc.uppertester.ItsStation - btp packet sent with no exception 
+09:39:36.737 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:36.738 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@63074a49
+09:39:36.738 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:36.738 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:36.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@739e3169
+09:39:36.738 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:36.738 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:36.738 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:36.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:36.739 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:36.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:36.739 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 117
+09:39:36.739 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:36.740 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding non-(SHB/BEACON) entry 16F082DACA8B02A2
+09:39:36.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@16be1fcc
+09:39:36.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:36.742 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Fwd alg set to 0 (unspecified), forwarding disabled
+09:39:36.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:36.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:37.442 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:37.449 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:37.739 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:37.739 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@3404cd16
+09:39:37.740 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:37.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:37.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@27347a08
+09:39:37.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:37.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:37.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:37.741 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:37.741 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:37.741 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:37.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:37.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@6637b753
+09:39:37.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:37.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:37.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:38.342 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:38.349 [pool-2-thread-4] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:38.740 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:38.740 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@53e4de92
+09:39:38.740 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:38.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:38.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@56d06e45
+09:39:38.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:38.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:38.740 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:38.740 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:38.741 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:38.741 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:38.741 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:38.741 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@df7a08a
+09:39:38.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:38.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:38.742 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:39.241 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:39.249 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:39.741 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:39.742 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@15afba6a
+09:39:39.742 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:39.742 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:39.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@43f79045
+09:39:39.743 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:39.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:39.743 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:39.743 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:39.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:39.744 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:39.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:39.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@3220c4df
+09:39:39.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:39.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:39.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:40.142 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:40.149 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:40.743 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:40.744 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@55d262f
+09:39:40.744 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:40.744 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:40.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@2675da69
+09:39:40.744 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:40.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:40.745 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:40.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:40.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:40.746 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:40.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:40.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@3563739
+09:39:40.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:40.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:40.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:41.042 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:41.049 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - parsing class net.gcdc.uppertester.Initialize
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field messageType
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting messageType
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - Byte!
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - field hashedId8
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - accepting hashedId8
+09:39:41.607 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.Parser - long!
+09:39:41.608 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Set default UDP port to 35874
+09:39:41.608 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: InitializeResult [messageType=1, result=1]
+09:39:41.608 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.608 [net.gcdc.uppertester.ItsStation.main()] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.608 [net.gcdc.uppertester.ItsStation.main()] DEBUG net.gcdc.uppertester.ItsStation - Waiting for packet
+09:39:41.621 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - attempt to send DENM
+09:39:41.623 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - bytes encoded 
+09:39:41.623 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - sending DENM as BTP packet net.gcdc.geonetworking.BtpPacket@d90849b 
+09:39:41.623 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:41.624 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Area Area [center=Pos(0.0025637354000000003, 0.002791291), distanceAmeters=100.0, distanceBmeters=20.0, angleDegreesFromNorth=10.0, type=ELLIPSE] don't contains me Pos(0.0022946677, 0.0013956455)
+09:39:41.624 [pool-2-thread-2] DEBUG net.gcdc.uppertester.ItsStation - btp packet sent with no exception 
+09:39:41.744 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:41.745 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@af1e312
+09:39:41.745 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:41.745 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@e72b85b
+09:39:41.745 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:41.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.745 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:41.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:41.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:41.745 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:41.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:41.746 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 117
+09:39:41.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@da565c6
+09:39:41.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:41.746 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding non-(SHB/BEACON) entry 16F082DACA8B02A2
+09:39:41.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:41.746 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Fwd alg set to 0 (unspecified), forwarding disabled
+09:39:41.747 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 63
+09:39:41.747 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@65bcb129
+09:39:41.747 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:41.747 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@47132eed
+09:39:41.747 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:41.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:41.748 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:41.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:41.748 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour CCD0BABEBABE0002
+09:39:41.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:41.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Message for unsupported BTP port 4000
+09:39:41.942 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:41.949 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:42.746 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:42.747 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@3c6dee0f
+09:39:42.747 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:42.747 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:42.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@552839c7
+09:39:42.748 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:42.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:42.748 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:42.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:42.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:42.749 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:42.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:42.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@43e9637e
+09:39:42.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:42.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:42.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:42.841 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:42.847 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:43.742 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:43.748 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:43.748 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@f830807
+09:39:43.748 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:43.749 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:43.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@63840b85
+09:39:43.749 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:43.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:43.749 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:43.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:43.750 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:43.750 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:43.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:43.752 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:43.752 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@72107bcd
+09:39:43.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:43.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:43.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:44.641 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:44.651 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:44.749 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:44.749 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@18300a3c
+09:39:44.749 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:44.749 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:44.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@79eff58b
+09:39:44.749 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:44.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:44.749 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:44.750 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:44.750 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@78e1b737
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:44.750 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@2ac3b9e1
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:44.750 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:44.750 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:44.750 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:44.750 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:44.750 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@17e078b6
+09:39:44.751 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@121500f9
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:44.751 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:45.542 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:45.548 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:45.751 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:45.751 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@2a8537f9
+09:39:45.751 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:45.752 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:45.752 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@101dd23e
+09:39:45.752 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:45.752 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:45.752 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:45.752 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:45.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:45.753 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:45.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:45.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@15d5ecb6
+09:39:45.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:45.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:45.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:46.442 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:46.449 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:46.622 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - attempt to send DENM
+09:39:46.626 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - bytes encoded 
+09:39:46.627 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - sending DENM as BTP packet net.gcdc.geonetworking.BtpPacket@fa7abed 
+09:39:46.627 [pool-2-thread-4] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:46.627 [pool-2-thread-4] DEBUG net.gcdc.geonetworking.GeonetStation - Area Area [center=Pos(0.0025637354000000003, 0.002791291), distanceAmeters=100.0, distanceBmeters=20.0, angleDegreesFromNorth=10.0, type=ELLIPSE] don't contains me Pos(0.0022946677, 0.0013956455)
+09:39:46.628 [pool-2-thread-4] DEBUG net.gcdc.uppertester.ItsStation - btp packet sent with no exception 
+09:39:46.752 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:46.753 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@49085ca2
+09:39:46.753 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:46.753 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:46.753 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@43f9b523
+09:39:46.754 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:46.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:46.754 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:46.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:46.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:46.754 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:46.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:46.755 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 117
+09:39:46.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@3ee32fb2
+09:39:46.756 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding non-(SHB/BEACON) entry 16F082DACA8B02A2
+09:39:46.757 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:46.757 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Fwd alg set to 0 (unspecified), forwarding disabled
+09:39:46.758 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:46.758 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:47.341 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:47.348 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:47.753 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:47.754 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@35506f5f
+09:39:47.754 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:47.754 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:47.754 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@33bfe151
+09:39:47.754 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:47.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:47.755 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:47.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:47.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:47.755 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:47.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:47.755 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@7a61a761
+09:39:47.756 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:47.756 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:47.756 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:48.242 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:48.250 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:48.755 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:48.756 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@2134100c
+09:39:48.756 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:48.756 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:48.756 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@610994db
+09:39:48.756 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:48.757 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:48.757 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:48.757 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:48.757 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:48.757 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:48.759 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:48.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@3c0be7a2
+09:39:48.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:48.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:48.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:49.142 [pool-2-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:49.150 [pool-2-thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:49.757 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:49.757 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@31945b7a
+09:39:49.757 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:49.758 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:49.758 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@301c004
+09:39:49.758 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:49.758 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:49.758 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:49.758 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:49.759 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:49.759 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:49.759 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:49.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@67e54826
+09:39:49.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:49.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:49.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:50.042 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:50.048 [pool-2-thread-4] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:50.758 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:50.759 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@7ea013f6
+09:39:50.759 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:50.759 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:50.759 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@3f7ebc6c
+09:39:50.759 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:50.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:50.760 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:50.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:50.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:50.760 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:50.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:50.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@19847705
+09:39:50.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:50.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:50.761 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:50.941 [pool-2-thread-4] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:50.943 [pool-2-thread-4] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:51.622 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - attempt to send DENM
+09:39:51.625 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - bytes encoded 
+09:39:51.625 [pool-2-thread-2] INFO  net.gcdc.uppertester.ItsStation - sending DENM as BTP packet net.gcdc.geonetworking.BtpPacket@47a1f659 
+09:39:51.625 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:51.626 [pool-2-thread-2] DEBUG net.gcdc.geonetworking.GeonetStation - Area Area [center=Pos(0.0025637354000000003, 0.002791291), distanceAmeters=100.0, distanceBmeters=20.0, angleDegreesFromNorth=10.0, type=ELLIPSE] don't contains me Pos(0.0022946677, 0.0013956455)
+09:39:51.627 [pool-2-thread-2] DEBUG net.gcdc.uppertester.ItsStation - btp packet sent with no exception 
+09:39:51.759 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:51.759 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@5a3471cc
+09:39:51.759 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:51.760 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@291b3658
+09:39:51.760 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:51.760 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:51.760 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@398ce07d
+09:39:51.760 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 117
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:51.760 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:51.760 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding non-(SHB/BEACON) entry 16F082DACA8B02A2
+09:39:51.760 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - Fwd alg set to 0 (unspecified), forwarding disabled
+09:39:51.842 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:51.847 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:52.741 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:52.743 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:52.744 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:52.744 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@4fe64c0f
+09:39:52.744 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:52.744 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:52.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@188b95c4
+09:39:52.744 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:52.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:52.744 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:52.744 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:52.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:52.745 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:52.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:52.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@74158372
+09:39:52.745 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:52.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:52.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:53.642 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:53.647 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:53.745 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:53.746 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@38998c2c
+09:39:53.746 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:53.746 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:53.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@68c1b9bb
+09:39:53.746 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:53.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:53.746 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:53.746 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:53.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:53.747 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:53.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:53.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@688d9b8
+09:39:53.747 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:53.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:53.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:53.747 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@28dc262
+09:39:53.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:53.748 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:53.748 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:53.748 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:53.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@28d4b13d
+09:39:53.748 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:53.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:53.748 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:53.748 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:53.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:53.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:53.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@23c030bc
+09:39:53.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:53.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:53.749 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:54.542 [pool-2-thread-5] INFO  net.gcdc.uppertester.ItsStation - Sending CAM with Low Freq container
+09:39:54.547 [pool-2-thread-5] DEBUG net.gcdc.geonetworking.GeonetStation - Sending message, hasEtherHeader: true, sender mac MacAddress[0]
+09:39:54.746 [Thread-1] DEBUG net.gcdc.geonetworking.GeonetStation - GN Received payload of size 104
+09:39:54.747 [Thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.GnEventIndication@34d454db
+09:39:54.747 [pool-1-thread-1] DEBUG net.gcdc.uppertester.ItsStation - Sending BTP event indication
+09:39:54.747 [Thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:54.747 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.BtpEventIndication@600f10f5
+09:39:54.747 [Thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:54.763 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:54.764 [Thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!
+09:39:54.764 [Thread-1] DEBUG net.gcdc.geonetworking.LocationTable - Adding direct neighbour 16F082DACA8B02A2
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Got CAM
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.ItsStation - Sending message to TS: net.gcdc.uppertester.CamEventIndication@131dfe52
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Byte!
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - Short!
+09:39:54.764 [pool-1-thread-1] INFO  net.gcdc.uppertester.Parser - byte array!

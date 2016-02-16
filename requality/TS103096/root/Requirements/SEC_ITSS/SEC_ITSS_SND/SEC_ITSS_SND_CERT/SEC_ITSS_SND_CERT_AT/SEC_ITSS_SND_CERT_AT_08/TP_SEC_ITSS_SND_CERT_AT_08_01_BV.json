@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that AT certificate is signed by AA cert"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tthe IUT being requested to include certificate chain in the next CAM\r\n} ensure that {\r\n\t when {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage\r\n\t\t\tcontaining header_fields['signer_info'].signer {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating certificate_chain\r\n\t\t\t\tcontaining certificates[last-1] (CERT_AA) {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_authority' (2)\r\n\t\t\t\t\tand containing subject_attributes['verification key'] (KEY)\r\n\t\t\t\t}\r\n\t\t\t\tcontaining certificates[last] {\r\n\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\tindicating 'authorization_ticket' (1)\r\n\t\t\t\t\t}\r\n\t\t\t\t\tand containing signer_info{\r\n\t\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\t\tindicating 'certificate_digest_with_ecdsap256'\r\n\t\t\t\t\t\tcontaining digest\r\n\t\t\t\t\t\t\treferencing to CERT_AA\r\n\t\t\t\t\t}\r\n\t\t\t\t\tand containing signature\r\n\t\t\t\t\t\tverifiable using KEY\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "36af1ef7-6e5f-470d-9942-6c11c753d38f"
+}

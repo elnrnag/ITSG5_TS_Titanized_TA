@@ -1,0 +1,1105 @@
+/**
+ *  @author     ETSI / STF405 / STF449
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/GeoNetworking/LibItsGeoNetworking_TypesAndValues.ttcn $
+ *              $Id: LibItsGeoNetworking_TypesAndValues.ttcn 1201 2015-06-03 08:50:31Z mullers $
+ *  @desc       Module containing types and values for GeoNetworking Protocol
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+
+//TODO: Fix strange encodings!
+module LibItsGeoNetworking_TypesAndValues {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues all;
+    import from LibCommon_DataStrings all;
+    
+    // LibIts
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsBtp_TypesAndValues {type BtpPacket;}
+    import from LibItsIpv6OverGeoNetworking_TypesAndValues {type Ipv6Packet;}
+    
+    // LibItsSecurity
+    import from LibItsSecurity_TypesAndValues all;
+    
+    group geoConfigurationValues {
+        
+        const charstring c_compIut := "IUT";
+        const charstring c_compMTC := "MTC";
+        const charstring c_compNodeA := "NodeA";
+        const charstring c_compNodeB := "NodeB";
+        const charstring c_compNodeC := "NodeC";
+        const charstring c_compNodeD := "NodeD";
+        const charstring c_compNodeE := "NodeE";
+        const charstring c_compNodeF := "NodeF";
+        
+        const charstring c_area1 := "AREA1";
+        const charstring c_area2 := "AREA2";
+        
+        const integer c_latitudeFactorNodeA := 10;
+        const integer c_latitudeFactorNodeB := 2;
+        const integer c_latitudeFactorNodeC := -6;
+        const integer c_latitudeFactorNodeD := 1;
+        const integer c_latitudeFactorNodeE := -1;
+        const integer c_latitudeFactorNodeF := 2;
+        const integer c_longitudeFactorNodeA := 0;
+        const integer c_longitudeFactorNodeB := 0;
+        const integer c_longitudeFactorNodeC := 0;
+        const integer c_longitudeFactorNodeD := 0;
+        const integer c_longitudeFactorNodeE := 0;
+        const integer c_longitudeFactorNodeF := -3;
+    } // end geoConfigurationValues
+    
+    group geoSyncMessages {
+        
+        const charstring c_msgSent := "Message sent";
+        
+    } // end geoSyncMessages
+    
+    group geoTestingConstants {
+        
+        const UInt6 c_defaultLifetime := 10; // in seconds
+        const UInt16 c_lifetime := 1000 * c_defaultLifetime; // in seconds
+        
+    } // end geoTestingConstants
+    
+    group units {
+        
+        const float c_squareKm := 1000000.0;
+        
+    } // end units
+    
+    group geoConfigurationTypes {
+        
+        /**
+         * @desc    Entry of position table
+         * @member  key         Reference key of the entry
+         * @member  position    Position vector stored in the entry
+         */
+        type record PositionEntry {
+            charstring key,
+            LongPosVector position
+        } with { variant "" };
+        
+        /**
+         * @desc    Table containing node positions
+         */
+        type record of PositionEntry PositionTable with { variant "" };
+        
+        /**
+         * @desc    Parameters of a geometric area
+         * @member  geoAreaPosLatitude  Latitude of area's center
+         * @member  geoAreaPosLongitude Longitude of area's center
+         * @member  distanceA           Distance A
+         * @member  distanceB           Distance B
+         * @member  angle               Angle
+         */
+        type record Area {
+            Int32  geoAreaPosLatitude,
+            Int32  geoAreaPosLongitude,
+            UInt16 distanceA,
+            UInt16 distanceB,
+            UInt16 angle
+        } with { variant "" };
+        
+        /**
+         * @desc    Compact definition of GeoBroadcastArea
+         * @member  geoBroadcastSubType Type of GeoBroadcastArea (=shape)
+         * @member  geoBroadcastArea    Parameters of the geometric area
+         */
+        type record GeoBroadcastArea {
+            HeaderSubTypeGeoBroadcast geoBroadcastSubType,
+            Area geoBroadcastArea
+        } with { variant "" };
+        
+        /**
+         * @desc    Compact definition of GeoAnycastArea
+         * @member  geoAnycastSubType   Type of GeoAnycastArea (=shape)
+         * @member  geoAnycastArea      Parameters of the geometric area
+         */
+        type record GeoAnycastArea {
+            HeaderSubTypeGeoAnycast geoAnycastSubType,
+            Area geoAnycastArea
+        } with { variant "" };
+        
+        /**
+         * @desc    Compact definition of a GeoArea (either GeoBroadcastArea or GeoAnycastArea)
+         * @member  shape   Shape of the GeoArea
+         * @member  area    Parameters of the geometric area
+         */
+        type record GeoArea {
+            GeoShape shape,
+            Area area
+        } with { variant "" };
+        
+        /**
+         * @desc    Geometric shapes used to define GeoAreas
+         */
+        type enumerated GeoShape {
+            e_geoCircle(0),
+            e_geoRect(1),
+            e_geoElip(2),
+            e_reserved
+        } with { variant "" };
+        
+        /**
+         * @desc    Entry of GeoArea table
+         * @member  key     Reference key of the entry
+         * @member  geoArea GeoArea stored in the entry
+         */
+        type record GeoAreaEntry {
+            charstring key,
+            GeoArea geoArea
+        } with { variant "" };
+        
+        /**
+         * @desc    Table containing geoArea definitions
+         */
+        type record of GeoAreaEntry GeoAreaTable with { variant "" };
+        
+    } // end geoConfigurationTypes
+    
+    group geoNwValues {
+        
+        group geoNwHeaderConstants {
+            
+            const UInt4 c_geoNwProtocolVersion := 0;
+            
+            const UInt8 c_hopLimit1 := 1;
+            const UInt8 c_defaultHopLimit := 10;
+            
+        } // end geoNwHeaderConstants
+        
+    } // end geoNwValues
+    
+    group geoNetworkingPdus {
+        
+        /**
+         * @desc GeoNetworking Packet
+         *
+         * @see ETSI EN 302 636-4-1 chapter 8.2, 8.3, 8.4
+         *
+         * @member basicHeader
+         * @member gnPacket
+         */
+        type record GeoNetworkingPdu {
+            BasicHeader         basicHeader,
+            GeoNetworkingPacket gnPacket
+        } with { variant "" };
+        
+        type record GeoNetworkingPacket {
+            GnNonSecuredPacket  packet,
+            SecuredMessage      securedMsg optional
+        } with { variant "" };
+		//with { encode (securedMsg) "LibItsSecurity"}
+        
+        type record GnNonSecuredPacket {
+            CommonHeader    commonHeader,
+            ExtendedHeader  extendedHeader optional,
+            Payload         payload optional
+        } with { variant "" };       
+    } // end group geoNetworkingPdus
+    
+    group geoNetworkingHeader {
+        
+        group geoNetworkingBasicHeader {
+            
+            /**
+             * @desc Basic Header
+             *
+             * <pre>
+             *  0               1               2               3
+             *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+             * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             * |   V   |  NH   |    Reserved   |      LT       |      RHL      |
+             * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             * </pre>
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.6.1
+             *
+             * @member version
+             * @member nextHeader
+             * @member reserved
+             * @member lifeTime
+             * @member routerHopLimit
+             */
+            type record BasicHeader {
+                UInt4           version,
+                BasicNextHeader nextHeader,
+                UInt8           reserved,
+                Lifetime        lifeTime,
+                UInt8           routerHopLimit
+            } with { variant "FIELDORDER(msb)" };
+            
+            type enumerated BasicNextHeader {
+                e_any(0),
+                e_commonHeader(1),
+                e_securedPacket(2),
+                e_reserved
+            } with { variant "FIELDLENGTH(4)" }; 
+			//with { variant "4 bit" }
+            
+            /**
+             * @desc Indicates the maximum tolerable time a packet can be buffered until it reaches its destination.
+             * @member multiplier
+             * @member ltBase
+             */
+            type record Lifetime {
+                UInt6   multiplier,
+                LtBase  ltBase
+            } with { variant "" };
+            
+            /**
+             * @desc The base for the calculation of the lifetime.
+             */
+            type enumerated LtBase {
+                e_50ms(0),
+                e_1s(1),
+                e_10s(2),
+                e_100s(3)
+            } with { variant "FIELDLENGTH(2)" };
+			//with { variant "2 bit" }
+            
+        } // end group geoNetworkingBasicHeader
+        
+        group geoNetworkingCommonHeader {
+            
+            /**
+             * @desc Common header for GeoNetworking
+             *
+             * <pre>
+             *  0               1               2               3
+             *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+             * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             * |  NH   |   R   |  HT   |  HST  |      TC       |     Flags     |
+             * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             * |              PL               |     MHL       |    Reserved   |
+             * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             * </pre>
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.7.2
+             *
+             * @member nextHeader
+             * @member reserved
+             * @member headerTST Header type + Header Sub Type
+             * @member trafficClass
+             * @member flags
+             * @member plLength
+             * @member maxHopLimit
+             * @member reserved2
+             */
+            type record CommonHeader {
+                NextHeader      nextHeader,
+                UInt4           reserved,
+                HeaderTST       headerTST,
+                TrafficClass    trafficClass,
+                Bit8            flags,
+                UInt16          plLength, // The Codec shall set the length of the paylaod if present
+                UInt8           maxHopLimit,
+                UInt8           reserved2
+            } with { variant "FIELDORDER(msb)" };
+            
+            /**
+             * @desc Identifies the type of header immediately following the Common Header (4Bits).
+             */
+            type enumerated NextHeader {
+                e_any(0),
+                e_btpA(1),
+                e_btpB(2),
+                e_ipv6(3),
+                e_reserved
+            } with { variant "FIELDLENGTH(4)" };
+			//with {variant "4 bits"}
+            
+            /**
+             * @desc TrafficClass
+             *
+             * <pre>
+             *  0   1   2   3   4   5   6   7
+             * +---+---+---+---+---+---+---+---+
+             * |SCF|Ch.|         TC ID         |
+             * |   |Off|                       |
+             * +---+---+---+---+---+---+---+---+
+             * </pre>
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.7.5
+             *
+             * @member scf
+             * @member channelOffload
+             * @member tcId
+             */
+            type record TrafficClass {
+                SCF                     scf,
+                ChannelOffload          channelOffload,
+                TcId                    tcId
+            } with { variant "" };
+            type enumerated SCF {
+                e_scfDisabled(0),
+                e_scfEnable (1)
+            } with { variant "FIELDLENGTH(1)" }; 
+			//with {variant "1 bit"}
+            type enumerated ChannelOffload {
+                e_choffDisabled(0),
+                e_choffEnable (1)
+            } with { variant "FIELDLENGTH(1)" }; 
+			//with {variant "1 bit"}
+            type UInt6 TcId with { variant "" };
+            
+        } // end group geoNetworkingCommonHeader
+        
+        group geoNetworkingExtendedHeaders {
+            
+            /**
+             * @desc GeoNetworking ExtendedHeader
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.3
+             *
+             * @member commonHeader
+             * @member gnExtHeader
+             */
+            type union ExtendedHeader {
+                GeoUnicastHeader    geoUnicastHeader,
+                TSBHeader           tsbHeader,
+                SHBHeader           shbHeader,
+                GeoBroadcastHeader  geoBroadcastHeader,
+                GeoAnycastHeader    geoAnycastHeader,
+                BeaconHeader        beaconHeader,
+                LSRequestHeader     lsRequestHeader,
+                LSReplyHeader       lsReplyHeader,
+                AnyHeader           anyHeader
+            } with { variant "" };
+            
+            /**
+             * @desc The unspecified ANY header.
+             *
+             * @member seqNumber
+             * @member reserved
+             */
+            type record AnyHeader {
+                UInt16          seqNumber,
+                UInt16          reserved
+            } with { variant "" };
+            
+            /**
+             * @desc The BEACON packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.6
+             *
+             * @member commonHeader
+             */
+            type record BeaconHeader {
+                LongPosVector   srcPosVector
+            } with { variant "" };
+            
+            /**
+             * @desc The GEOANYCAST packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.5
+             *
+             * @member seqNumber
+             * @member reserved
+             * @member srcPosVector
+             * @member geoAreaPosLatitude
+             * @member geoAreaPosLongitude
+             * @member distanceA
+             * @member distanceB
+             * @member angle
+             * @member reserved
+             */
+            type record GeoAnycastHeader {
+                UInt16          seqNumber,
+                UInt16          reserved,
+                LongPosVector   srcPosVector,
+                Int32           geoAreaPosLatitude,
+                Int32           geoAreaPosLongitude,
+                UInt16          distanceA,
+                UInt16          distanceB,
+                UInt16          angle,
+                UInt16          reserved2
+            } with { variant "" };
+            
+            /**
+             * @desc The GEOBROADCAST packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.5
+             *
+             * @member seqNumber
+             * @member reserved
+             * @member srcPosVector
+             * @member geoAreaPosLatitude
+             * @member geoAreaPosLongitude
+             * @member distanceA
+             * @member distanceB
+             * @member angle
+             * @member reserved
+             */
+            type GeoAnycastHeader GeoBroadcastHeader with { variant "" };
+            
+            /**
+             * @desc The GEOUNICAST packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.2
+             *
+             * @member seqNumber
+             * @member reserved
+             * @member srcPosVector
+             * @member dstPosVector
+             */
+            type record GeoUnicastHeader {
+                UInt16          seqNumber,
+                UInt16          reserved,
+                LongPosVector   srcPosVector,
+                ShortPosVector  dstPosVector
+            } with { variant "" };
+            
+            /**
+             * @desc The Location Service (LS) Reply packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.8
+             *
+             * @member seqNumber
+             * @member reserved
+             * @member srcPosVector
+             * @member dstPosVector
+             */
+            type record LSReplyHeader {
+                UInt16          seqNumber,
+                UInt16          reserved,
+                LongPosVector   srcPosVector,
+                ShortPosVector  dstPosVector
+            } with { variant "" };
+            
+            /**
+             * @desc The Location Service (LS) Request packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.7
+             *
+             * @member seqNumber
+             * @member reserved
+             * @member srcPosVector
+             * @member gnAddress
+             */
+            type record LSRequestHeader {
+                UInt16          seqNumber,
+                UInt16          reserved,
+                LongPosVector   srcPosVector,
+                GN_Address      gnAddress
+            } with { variant "" };
+            
+            /**
+             * The Single Hop Broadcast (SHB) packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.4
+             *
+             * @member srcPosVector
+             * @member reserved
+             */
+            type record SHBHeader {
+                LongPosVector   srcPosVector,
+                UInt32          reserved
+            } with { variant "" };
+            
+            /**
+             * @desc The Topologically-Scoped Broadcast (TSB) packet header.
+             *
+             * @see ETSI EN 302 636-4-1 chapter 8.8.3
+             *
+             * @member seqNumber
+             * @member reserved
+             * @member srcPosVector
+             */
+            type record TSBHeader {
+                UInt16          seqNumber,
+                UInt16          reserved,
+                LongPosVector   srcPosVector
+            } with { variant "" };
+            
+            group geoNetworkingHeadersSubtypes {
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for ANY.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record AnyHeaderType {
+                    HeaderType  headerType(e_any),
+                    UInt4       headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for BEACON.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record BeaconHeaderType {
+                    HeaderType  headerType(e_beacon),
+                    UInt4       headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for GEOANYCAST.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record GeoAnycastHeaderType {
+                    HeaderType              headerType(e_geoAnycast),
+                    HeaderSubTypeGeoAnycast headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for GEOBROADCAST.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record GeoBroadcastHeaderType {
+                    HeaderType                  headerType(e_geoBroadcast),
+                    HeaderSubTypeGeoBroadcast   headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for GEOUNICAST.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record GeoUnicastHeaderType {
+                    HeaderType  headerType(e_geoUnicast),
+                    UInt4       headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for Location Service LS.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record LsHeaderType {
+                    HeaderType      headerType(e_locationService),
+                    HeaderSubTypeLs headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for Service Announcement SA.
+                 * @member headerType
+                 * @member reserved
+                 */
+                type record SaHeaderType {
+                    HeaderType      headerType(e_serviceAnnouncement),
+                    HeaderSubTypeSa headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header type and the header subtype for Topologically-Scoped Broadcast TSB.
+                 * @member headerType
+                 * @member headerSubType
+                 */
+                type record TsbHeaderType {
+                    HeaderType       headerType(e_topologicallyScopedBroadcast),
+                    HeaderSubTypeTSB headerSubType
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the header subtype for GEOANYCAST.
+                 */
+                type enumerated HeaderSubTypeGeoAnycast {
+                    e_geoAnycastCircle(0),
+                    e_geoAnycastRect(1),
+                    e_geoAnycastElip(2),
+                    e_reserved
+                } with { variant "FIELDLENGTH(4)" }; 
+				//with {variant "4 bits"}
+                
+                /**
+                 * @desc Identifies the header subtype for GEOBROADCAST.
+                 */
+                type enumerated HeaderSubTypeGeoBroadcast {
+                    e_geoBroadcastCircle(0),
+                    e_geoBroadcastRect(1),
+                    e_geoBroadcastElip(2),
+                    e_reserved
+                } with { variant "FIELDLENGTH(4)" }; 
+				//with {variant "4 bits"}
+                
+                /**
+                 * @desc Identifies the header subtype for Topologically-scoped broadcast TSB.
+                 */
+                type enumerated HeaderSubTypeTSB {
+                    e_singleHop(0),
+                    e_multiHop(1),
+                    e_reserved
+                } with { variant "FIELDLENGTH(4)" }; 
+				//with {variant "4 bits"}
+                
+                /**
+                 * @desc Identifies the header subtype for Location Service LS.
+                 */
+                type enumerated HeaderSubTypeLs {
+                    e_lsRequest(0),
+                    e_lsReply(1),
+                    e_reserved
+                } with { variant "FIELDLENGTH(4)" }; 
+				//with {variant "4 bits"}
+                
+                /**
+                 * @desc Identifies the header subtype for Service Announcement SA.
+                 */
+                type enumerated HeaderSubTypeSa {
+                    e_sa(0),
+                    e_saEos(1),
+                    e_reserved
+                } with { variant "FIELDLENGTH(4)" }; 
+				//with {variant "4 bits"}
+                
+                /**
+                 * @desc Identifies the header type and the header subtype.
+                 * @member anyHdr
+                 * @member beaconHdr
+                 * @member geoUnicastHdr
+                 * @member geoAnycastHdr
+                 * @member geoBroadcastHdr
+                 * @member tsbHdr
+                 * @member lsHdr
+                 * @member saHdr
+                 * @member reserved
+                 */
+                type union HeaderTST {
+                    AnyHeaderType           anyHdr,
+                    BeaconHeaderType        beaconHdr,
+                    GeoUnicastHeaderType    geoUnicastHdr,
+                    GeoAnycastHeaderType    geoAnycastHdr,
+                    GeoBroadcastHeaderType  geoBroadcastHdr,
+                    TsbHeaderType           tsbHdr,
+                    LsHeaderType            lsHdr,
+                    SaHeaderType            saHdr,
+                    UInt8                   reserved
+                } with { variant "FIELDORDER(msb)" };
+                
+                /**
+                 * @desc Identifies the type of the GeoAdhoc header type (4Bits).
+                 */
+                type enumerated HeaderType {
+                    e_any(0),
+                    e_beacon(1),
+                    e_geoUnicast(2),
+                    e_geoAnycast(3),
+                    e_geoBroadcast(4),
+                    e_topologicallyScopedBroadcast(5),
+                    e_locationService(6),
+                    e_serviceAnnouncement(7),
+                    e_reserved
+                } with { variant "FIELDLENGTH(4)" }; 
+				//with {variant "4 bits"}
+                
+                /**
+                 * @desc Long Position Vector
+                 *
+                 * <pre>
+                 *  0               1               2               3
+                 *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                           GN_ADDR                             |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                           GN_ADDR                             |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                             TST                               |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                             Lat                               |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                             Long                              |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |P|              S              |               H               |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * </pre>
+                 *
+                 * @see ETSI EN 302 636-4-1 chapter 8.5.2
+                 *
+                 * @member gnAddr
+                 * @member timestamp
+                 * @member latitude
+                 * @member longitude
+                 * @member pai Position Accuracy Indicator
+                 * @member speed
+                 * @member heading
+                 */
+                type record LongPosVector {
+                    GN_Address  gnAddr,
+                    UInt32      timestamp,
+                    Int32       latitude,
+                    Int32       longitude,
+                    Bit1        pai,
+                    Int15       speed,
+                    UInt16      heading
+                } with { variant "" };
+                
+                /**
+                 * @desc Short Position Vector
+                 *
+                 * <pre>
+                 *  0               1               2               3
+                 *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                           GN_ADDR                             |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                             TST                               |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                             Lat                               |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * |                             Long                              |
+                 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 * </pre>
+                 *
+                 * @see ETSI EN 302 636-4-1 chapter 8.5.3
+                 *
+                 * @member gnAddr
+                 * @member timestamp
+                 * @member latitude
+                 * @member longitude
+                 */
+                type record ShortPosVector {
+                    GN_Address  gnAddr,
+                    UInt32      timestamp,
+                    Int32       latitude,
+                    Int32       longitude
+                } with { variant "" };
+                
+                group geoNetworkingAddress {
+                    /**
+                     * @desc GeoNetworking address
+                     *
+                     * <pre>
+                     *  0               1               2               3
+                     *  0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+                     * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                     * |M|  S_T    |       S_CC        |             M_ID              |
+                     * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                     * |                              M_ID                             |
+                     * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                     * </pre>
+                     *
+                     * @see ETSI EN 302 636-4-1 chapter 6.2
+                     *
+                     * @member typeOfAddress
+                     * @member stationType
+                     * @member mid
+                     */
+                    type record GN_Address {
+                        TypeOfAddress   typeOfAddress,
+                        StationType     stationType,
+                        UInt10          stationCountryCode,
+                        Oct6            mid
+                    } with { variant "" };
+                    
+                    group geoNetworkingAddressSubtypes {
+                        
+                        /**
+                         * @desc Identifies the ITS station (5Bits).
+                         */
+                        type enumerated StationType {
+                            e_unknown(0),
+                            e_pedestrian(1),
+                            e_cyclist(2),
+                            e_moped(3),
+                            e_motorcycle(4),
+                            e_passengerCar(5),
+                            e_bus(6),
+                            e_lightTruck(7),
+                            e_heavyTruck(8),
+                            e_trailer(9),
+                            e_specialVehicle(10),
+                            e_tram(11),
+                            e_roadSideUnit(15)
+                        } with { variant "FIELDLENGTH(5)"}; 
+						//with { variant "5 bit"}
+                        
+                        /**
+                         * @desc Distinguish between manually configured
+                         * network address and the initial GeoNetwork address (1Bit).
+                         */
+                        type enumerated TypeOfAddress {
+                            e_manual(1),
+                            e_initial(0)
+                        } with { variant "FIELDLENGTH(1)"}; 
+						//with { variant "1 bit"}
+                        
+                    } // end group geoNetworkingAddressSubtypes
+                    
+                } // end group geoNetworkingAddress
+                
+            } // end group geoNetworkingHeadersSubtypes
+            
+        } // end group geoNetworkingExtendedHeaders
+        
+    } // end group geoNetworkingHeader
+    
+    group geoNetworkingPayload {
+        
+        type octetstring GnRawPayload with { variant "" };
+        
+        /**
+         * @desc The payload of the GN packet
+         * @member decodedPayload The decoded payload
+         * @member rawPayload Raw payload as it is received
+         */
+        type record Payload {
+            DecodedPayload decodedPayload optional,
+            GnRawPayload rawPayload
+        } with { variant "" };
+        
+        /**
+         * @desc The decoded payload of the GN packet
+         * @member ipv6Packet The IPv6 packet
+         * @member btpPacket BTP packet
+         */
+        type union DecodedPayload {
+            Ipv6Packet ipv6Packet,
+            BtpPacket btpPacket
+        } with { variant "" };
+		/*with {
+            encode (ipv6Packet) "LibItsIpv6OverGeoNetworking";
+            encode (btpPacket) "LibItsBtp"
+        }*/
+        
+    } //end group geoNetworkingPayload
+    
+    group geoNwPicsTypes {
+        
+        /**
+         * @desc The GeoUnicast forwarding algorithm.
+         */
+        type enumerated GeoUnicastForwardingAlgorithm {
+            e_unspecified(0),
+            e_greedy(1),
+            e_cbf(2)
+        } with { variant "" };
+        
+        /**
+         * @desc The GeoBroadcast forwarding algorithm.
+         */
+        type enumerated GeoBroadcastForwardingAlgorithm {
+            e_unspecified(0),
+            e_simple(1),
+            e_cbf(2),
+            e_advanced(3)
+        } with { variant "" };
+        
+        /**
+         * @desc GN address configuration method.  
+         */
+         type enumerated GnAddressConfigurationMethod {
+          	e_auto(0),
+          	e_managed(1),
+          	e_anonymous(2)   
+         } with { variant "" };
+        
+    } // end geoNwPicsTypes
+    
+    group utPrimitives {
+        
+        /**
+         * @desc    UT primitives for GeoNetworking
+         * @member  geoUnicast      -
+         * @member  geoBroadcast    -
+         * @member  geoAnycast      -
+         * @member  shb             -
+         * @member  tsb             -
+         * @member  changePosition  -
+         * @member  checkPacket     -
+         */
+        type union UtGnTrigger {
+            GenerateGeoUnicastMessage geoUnicast,
+            GenerateGeoBroadcastMessage geoBroadcast,
+            GenerateGeoAnycastMessage geoAnycast,
+            GenerateSHBMessage shb,
+            GenerateTSBMessage tsb
+        } with { variant "" };
+        
+		type record UtGnTriggerResult {
+			boolean utGnTriggerResult
+		} with { variant "FIELDLENGTH(8)" };
+        
+        /**
+         * @desc    UT primitive for IUT to send a GeoUnicast packet
+         * @member  gnAddress       Destination of the packet
+         * @member  lifetime        Lifetime of the packet
+         * @member  trafficClass    Traffic class of the packet
+         * @member  payload         Payload of the packet
+         */
+        type record GenerateGeoUnicastMessage {
+            GN_Address gnAddress,
+            UInt16 lifetime,
+            TrafficClass trafficClass,
+            Payload payload 
+        } with { variant "" };
+        
+        /**
+         * @desc    UT primitive for IUT to send a GeoBroadcast packet
+         * @member  shape           Shape of the area
+         * @member  lifetime        Lifetime of the packet
+         * @member  trafficClass    Traffic class of the packet
+         * @member  area            Destination GeoArea
+         * @member  payload         Payload of the packet
+         */
+        type record GenerateGeoBroadcastMessage {
+        	GeoShape shape,
+            UInt16 lifetime,
+            TrafficClass trafficClass,
+            UInt24 reserved,
+            Area area,
+            Payload payload 
+        } with { variant "" };
+        
+        /**
+         * @desc    UT primitive for IUT to send a Geoanycast packet
+         */
+        type GenerateGeoBroadcastMessage GenerateGeoAnycastMessage with { variant "" };
+        
+        /**
+         * @desc    UT primitive for IUT to send a SHB packet
+         * @member  trafficClass    Traffic class of the packet
+         * @member  payload         Payload of the packet
+         */
+        type record GenerateSHBMessage {
+        	TrafficClass trafficClass,
+            Payload payload 
+        } with { variant "" };
+        
+        /**
+         * @desc    UT primitive for IUT to send a SHB packet
+         * @member  nbHops          Number of Hops
+         * @member  lifetime        Lifetime of the packet
+         * @member  trafficClass    Traffic class of the packet
+         * @member  payload         Payload of the packet
+         */
+        type record GenerateTSBMessage {
+        	UInt8   nbHops,
+            UInt16 lifetime,
+        	TrafficClass trafficClass,
+            Payload payload 
+        } with { variant "" };
+        
+        /**
+         * @desc Upper Tester message to check Upper Layer message transmission on GN IUT 
+         */
+        type record UtGnEventInd {
+//            GeoNetworkingPdu gnPdu
+            GnRawPayload rawPayload
+        } with { variant "" }
+        
+        /**
+         * @desc List of Upper Tester messages to check Upper Layer message transmission on GN IUT 
+         */
+        type record of UtGnEventInd UtGnEventIndList with { variant "" };
+        
+    } // end utPrimitives
+    
+    group acPrimitives {
+        
+        /**
+         * @desc    TA primitives for GeoNetworking
+         * @member  startBeaconing                  -
+         * @member  stopBeaconing                   -
+         * @member  startPassBeaconing              -
+         * @member  stopPassBeaconing               -
+         * @member  startBeaconingMultipleNeighbour -
+         * @member  stopBeaconingMultipleNeighbour  -
+         * @member  getLongPosVector                -
+         * @member  acEnableSecurity                -
+         * @member  acDisableSecurity               -
+         */
+        type union AcGnPrimitive {
+            AcStartBeaconing startBeaconing,
+            AcStopBeaconing stopBeaconing,
+            AcStartPassBeaconing startPassBeaconing,
+            AcStopPassBeaconing stopPassBeaconing,
+            AcStartBeaconingMultipleNeighbour startBeaconingMultipleNeighbour,
+            AcStopBeaconingMultipleNeighbour stopBeaconingMultipleNeighbour,
+            AcGetLongPosVector getLongPosVector,
+            AcEnableSecurity acEnableSecurity,
+            AcDisableSecurity acDisableSecurity
+        } with { variant "" };
+        
+        /**
+         * @desc    Primitive for receiveing response from TA
+         * @member  getLongPosVector
+         */
+        type union AcGnResponse {
+            LongPosVector getLongPosVector,
+            AcGnResponseFailure failure
+        } with { variant "" };
+        /*with {
+            encode(getLongPosVector) "LibItsGeoNetworking"
+        };*/
+        
+        type record AcGnResponseFailure {
+            boolean     failure
+        } with { variant "" };
+        
+        /**
+         * @desc    Primitive for TA to start sending beacons for the test component
+         * @member  beaconHeader        Beacon template
+         */
+        type record AcStartBeaconing {
+            GeoNetworkingPdu beaconPacket
+        } with { variant "" };
+        /*with {
+            encode(beaconPacket) "LibItsGeoNetworking"
+        };*/
+        
+        /**
+         * @desc    Primitive for TA to stop sending beacons for the test component
+         */
+        type record AcStopBeaconing {
+        } with { variant "" };
+        
+        /**
+         * @desc    Primitive for TA to start enqueueing received beacons
+         * @member  beaconHeader    Filter
+         */
+        type record AcStartPassBeaconing {
+            BeaconHeader beaconHeader
+        } with { variant "" };
+        /*with {
+            encode(beaconHeader) "LibItsGeoNetworking"
+        };*/
+        
+        /**
+         * @desc    Primitive for TA to stop enqueueing received beacons
+         */
+        type record AcStopPassBeaconing {
+        } with { variant "" };
+        
+        /**
+         * @desc    Primitive for TA to start sending beacons for multiple neighbours
+         * @member  beaconHeader        Beacon template
+         * @member  numberOfNeighbour   Number of neighbours to simulate
+         */
+        type record AcStartBeaconingMultipleNeighbour {
+            GeoNetworkingPdu beaconPacket,
+            integer numberOfNeighbour
+        } with { variant "" };
+        /*with {
+            encode(beaconPacket) "LibItsGeoNetworking"
+        };*/
+        
+        /**
+         * @desc    Primitive for TA to stop sending beacons for multiple neighbours
+         */
+        type record AcStopBeaconingMultipleNeighbour {
+        } with { variant "" };
+        
+        /**
+         * @desc    Primitive for retrieving the position vector corresponding to a specific GN address
+         * @member  gnAddress   GN address to be searched
+         */
+        type record AcGetLongPosVector {
+            GN_Address gnAddress
+        } with { variant "" };
+        /*with {
+            encode(gnAddress) "LibItsGeoNetworking"
+        };*/
+        
+    } // end acPrimitives
+    
+} with { encode "RAW" };
+
+

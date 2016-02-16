@@ -1,0 +1,247 @@
+/**
+ *  @author     ETSI / STF455
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/ATSP/LibItsAtsp_TypesAndValues.ttcn3 $
+ *              $Id: LibItsAtsp_TypesAndValues.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Types and constants definitions for Access Technology Layer (ISO 21218)
+ */
+module LibItsAtsp_TypesAndValues {
+	
+	import from CALMiitsscu language "ASN.1:1997" {
+        type 
+            McmdRq
+    };
+	import from CALMmsap language "ASN.1:1997" {
+        type
+			SimIUTcmd, SimIUTreq, CIstateChng,
+			MI_Command_request, MI_Command_confirm,
+			MI_Request_request, MI_Request_confirm,
+			MI_Get_request, MI_Get_confirm,
+			MI_Set_request, MI_Set_confirm,
+			ErrStatus, WakeUp,
+			CONcmd
+    };
+	
+	import from CALMllsap language "ASN.1:1997" {
+        type
+			INsapPrimitivesUp, INsapPrimitivesDown,
+			I_ParamNo, INtxStatus, CIstatus,
+			UserPriority
+    };
+
+	import from LibCommon_BasicTypesAndValues {
+        type
+			UInt8
+    };
+	
+	group cfContants {
+
+		const UInt8 c_miCmd_regCmd := 1;
+		const UInt8 c_miCmd_ciState := 2;
+		const UInt8 c_miCmd_wakeUp := 3;
+		const UInt8 c_miCmd_rTScmd := 4;
+		const UInt8 c_miCmd_rTSackCmd := 5;
+		const UInt8 c_miCmd_cONcmd := 6;
+		const UInt8 c_miCmd_rIcmd := 7;
+		const UInt8 c_miCmd_manuCmd := 8;
+		const UInt8 c_miCmd_vciCmd := 9;
+		const UInt8 c_miCmd_monitor := 10;
+		const UInt8 c_miCmd_unitDataCmd := 11;
+		const UInt8 c_miCmd_UnknownCmd := 254; // this is not part of the standard, only for testing.
+		const UInt8 c_miCmd_testMI := 255;
+
+		const UInt8 c_miReq_regReq := 1;
+		const UInt8 c_miReq_prioReg := 2;
+		const UInt8 c_miReq_rTSreq := 3;
+		const UInt8 c_miReq_rTSackReq := 4;
+		const UInt8 c_miReq_rIreq := 5;
+		const UInt8 c_miReq_manuReq := 6;
+		const UInt8 c_miReq_events := 7;
+		const UInt8 c_miReq_posUpdateReq := 8;
+		const UInt8 c_miReq_unitDataReq := 9;
+		const UInt8 c_miReq_testMIecho := 255;
+
+		const CONcmd c_ciConDeleteAC := 0;
+		const CONcmd c_ciConConnect := 1;
+		const CONcmd c_ciConDisconnect :=255;
+		
+		const CIstateChng c_ciStateChngDeregister := 0;
+		const CIstateChng c_ciStateChngActivate := 4;
+		const CIstateChng c_ciStateChngResume := 8;
+		const CIstateChng c_ciStateChngConnect := 16;
+		const CIstateChng c_ciStateChngDisconnect := 32;
+		const CIstateChng c_ciStateChngSuspend := 64;
+		const CIstateChng c_ciStateChngInactivate := 128;
+		const CIstateChng c_ciStateChngInvalidValue := 255;
+		
+		const CIstatus c_ciStatusNot_existent := 0;
+		const CIstatus c_ciStatusExistent := 1;
+		const CIstatus c_ciStatusUnknown := 2;
+		const CIstatus c_ciStatusRegistered := 4;
+		const CIstatus c_ciStatusActive := 8;
+		const CIstatus c_ciStatusConnected := 16;
+		const CIstatus c_ciStatusSuspended := 64;
+		const CIstatus c_ciStatusInactive := 128;
+		
+		const UInt8 c_PrioStatus_release := 0;
+		const UInt8 c_PrioStatus_request :=16;
+		const UInt8 c_PrioStatus_ignored := 64;
+		const UInt8 c_PrioStatus_granted := 128;
+		
+		const I_ParamNo c_ciIParamNoErrors := 0;
+		const I_ParamNo c_ciIParamNoCommProfile := 2;
+		const I_ParamNo c_ciIParamNoProperties := 3;
+		const I_ParamNo c_ciIParamNoManuDeviceID := 4;
+		const I_ParamNo c_ciIParamNoITS_scuId := 5;
+		const I_ParamNo c_ciIParamNoMedID := 6;
+		const I_ParamNo c_ciIParamNoLocalCIID := 7;
+		const I_ParamNo c_ciIParamNoTimeoutReg := 8;
+		const I_ParamNo c_ciIParamNoMacAddress := 9;
+		const I_ParamNo c_ciIParamNoMacAddrTemp := 10;
+		const I_ParamNo c_ciIParamNoCiClass := 11;
+		const I_ParamNo c_ciIParamNoCiaClass := 12;
+		const I_ParamNo c_ciIParamNoCiStatus := 13;
+		const I_ParamNo c_ciIParamNoNotify := 16;
+		const I_ParamNo c_ciIParamNoMedType := 17;
+		const I_ParamNo c_ciIParamNoRegInfo := 18;
+		const I_ParamNo c_ciIParamNoConnect := 19;
+		const I_ParamNo c_ciIParamNoSimPin := 20;
+		const I_ParamNo c_ciIParamNoProviderInfo := 21;
+		const I_ParamNo c_ciIParamNoMinUserPriority := 22;
+		const I_ParamNo c_ciIParamNoQueueLevel := 23;
+		const I_ParamNo c_ciIParamNoQueueLowTh := 24;
+		const I_ParamNo c_ciIParamNoQueueAlarmTh := 25;
+		const I_ParamNo c_ciIParamNoDistancePeer := 26;
+		const I_ParamNo c_ciIParamNoCommRangeRef := 27;
+		const I_ParamNo c_ciIParamNoTimeOfLastRecep := 28;
+		const I_ParamNo c_ciIParamNoInactTimeLimit := 29;
+		const I_ParamNo c_ciIParamNoMediumUsage := 30;
+		const I_ParamNo c_ciIParamNoMedUseObsTime := 31;
+		const I_ParamNo c_ciIParamNoPeerMAC := 32;
+		const I_ParamNo c_ciIParamNoVirtualCI := 33;
+		const I_ParamNo c_ciIParamNoMinPrioCrossCI := 34;
+		const I_ParamNo c_ciIParamNoRxSens := 35;
+		const I_ParamNo c_ciIParamNoTxPower := 36;
+		const I_ParamNo c_ciIParamNoTxPowMax := 37;
+		const I_ParamNo c_ciIParamNoPeerRXpower := 38;
+		const I_ParamNo c_ciIParamNoDataRate := 39;
+		const I_ParamNo c_ciIParamNoDataRateNW := 40;
+		const I_ParamNo c_ciIParamNoDataRatesNW := 41;
+		const I_ParamNo c_ciIParamNoDataRateNWreq := 42;
+		const I_ParamNo c_ciIParamNoDirectivity := 43;
+		const I_ParamNo c_ciIParamNoBlockLength := 44;
+		const I_ParamNo c_ciIParamNoFreeAirTime := 45;
+		const I_ParamNo c_ciIParamNoFrameLengthMax := 46;
+		const I_ParamNo c_ciIParamNoKineVectIn := 47;
+		const I_ParamNo c_ciIParamNoKineVectOut := 48;
+		const I_ParamNo c_ciIParamNoCost := 49;
+		const I_ParamNo c_ciIParamNoReliability := 50;
+		const I_ParamNo c_ciIParamNoLogicalChannel := 51;
+		
+		const UserPriority c_IParamValueMinPrioCrossCI := 100;
+		
+		const ErrStatus c_ciErrStatusSuccess := 0;
+		const ErrStatus c_ciErrStatusUnspecFailure := 1;
+		const ErrStatus c_ciErrStatusInvalParamNo := 2;
+		const ErrStatus c_ciErrStatusInvalParamVal := 3;
+		const ErrStatus c_ciErrStatusRiViolation := 4;
+		const ErrStatus c_ciErrStatusCmdReqNo := 5;
+		const ErrStatus c_ciErrStatusCmdReqVal := 6;
+		const ErrStatus c_ciErrStatusAccessViolation := 7;
+		const ErrStatus c_ciErrStatusInvalidType := 8;
+		const ErrStatus c_ciErrStatusSequenceError := 9;
+		const ErrStatus c_ciErrStatusNonavailValue := 10;
+		const ErrStatus c_ciErrStatusHardwareFailure := 255;
+		
+		
+		const WakeUp c_ciWakeUpDisable := 0;
+		const WakeUp c_ciWakeUpEnable := 255;
+		
+		const INtxStatus c_ciINtxStatus_Success := 0;
+		const INtxStatus c_ciINtxStatus_QueueFull := 1;
+		const INtxStatus c_ciINtxStatus_Timeout := 2;
+		const INtxStatus c_ciINtxStatus_Priority := 3;
+		const INtxStatus c_ciINtxStatus_unspecFailure := 255;
+		
+	}
+	
+	group cnPrimitives {
+        /**
+         * @desc Trigger to initialize the IUT.
+         * @member McmdRq MN-COMMAND-Request message to initialize the upper tester
+         * 
+         * @see TS 1xx xxx V<0.0.0> (<2013-04>)
+         */
+        type record UtAtspInitialize {
+            McmdRq    mcmdRq 
+        }  with {
+            encode (mcmdRq) "LibItsIicp_asn1"  
+        }
+        
+		/**
+         * @desc Trigger to initialize the IUT.
+         * @member McmdRq MN-COMMAND-Request message to initialize the upper tester
+         * 
+         * @see TS 1xx xxx V<0.0.0> (<2013-04>)
+         */
+        type record CfAtspInitialize {  
+        }
+        
+        /**
+         * @desc Send a MI-SAP.request primitive to the Management layer through a SAP.
+         * @member miRequestRequest MI_Request_request primitive 
+         */
+        type union CfAtspEventInd { 
+			MI_Request_request    miRequestRequest,
+			MI_Command_confirm	  miCommandConfirm,
+			MI_Get_confirm    	  miGetConfirm,
+			MI_Set_confirm    	  miSetConfirm
+        }
+        with {
+            encode (miCommandConfirm, miRequestRequest, miGetConfirm, miSetConfirm) "LibItsCALMmsap_asn1"  
+        }
+		
+		/**
+         * @desc Send a MI-SAP.request primitive to the Management layer through a SAP.
+         * @member mnCommandRequest MI_Command_request primitive 
+         */
+        type union CfAtspEvent { 
+			MI_Request_confirm    miRequestConfirm,
+            MI_Command_request    miCommandRequest,  
+            MI_Get_request    	  miGetRequest,
+			MI_Set_request    	  miSetRequest
+        }
+        with {
+            encode (miRequestConfirm, miCommandRequest, miGetRequest, miSetRequest) "LibItsCALMmsap_asn1"  
+        }
+		
+		
+    } // End of group cnPrimitives
+
+	
+	group utPrimitives {
+        
+        /**
+         * @desc Present an IN-SAP service primitive to the access layer
+         * @member inSapPrimitivesDown IN-SAP down primitive 
+         */
+        type union UtAtspEvent { 
+            INsapPrimitivesDown inSapPrimitivesDown
+        }
+        with {
+            encode (inSapPrimitivesDown) "LibItsAtsp_asn1"  
+        }
+        
+        /**
+         * @desc Present an IN-SAP service primitive to networking & transport layer
+         * @member inSapPrimitivesUp IN-SAP up primitive 
+         */
+        type union UtAtspEventInd { 
+            INsapPrimitivesUp inSapPrimitivesUp
+        }
+        with {
+            encode (inSapPrimitivesUp) "LibItsAtsp_asn1"  
+        }
+        
+    } // End of group utPrimitives
+	
+} // End of module LibItsAtsp_TypesAndValues

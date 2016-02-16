@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "PIC_SUPPORT_UNSTATS_REGIONS_TREE": {
+            "isGenerated": false,
+            "key": "PIC_SUPPORT_UNSTATS_REGIONS_TREE",
+            "origin": "5a72fefc-399b-4f4c-a1fc-99291a4993e7",
+            "type": "STRING",
+            "value": "true"
+        },
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "17fbdce7-b53f-4ad0-a39a-9dcd8385d15d",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "5a72fefc-399b-4f4c-a1fc-99291a4993e7",
+            "type": "STRING",
+            "value": "Check that the IUT accepts a message when its signing certificate contains the region restriction with the identified region which is less and fully covered by the id region of the issuing certificate\r\n"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "5a72fefc-399b-4f4c-a1fc-99291a4993e7",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate (CERT_TS_09_03_BV_AT) {\r\n\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\t\tcontaining id_region {\r\n\t\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\t\tindicating 'un_stats' (1)\r\n\t\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\t\tindicating ID_REGION_AT\r\n\t\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t\t\t\tindicating 0\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tcontaining signer_info.digest\r\n\t\t\t\t\t\t\treferencing to a CERT_TS_09_03_BV_AA\r\n\t\t\t\t\t\t\t\tcontaining validity_restrictions['region'] {\r\n\t\t\t\t\t\t\t\t\tcontaining region_type\r\n\t\t\t\t\t\t\t\t\t\tindicating 'id'\r\n\t\t\t\t\t\t\t\t\tcontaining id_region {\r\n\t\t\t\t\t\t\t\t\t\tcontaining region_dictionary\r\n\t\t\t\t\t\t\t\t\t\t\tindicating 'un_stats' (1)\r\n\t\t\t\t\t\t\t\t\t\tcontaining region_identifier\r\n\t\t\t\t\t\t\t\t\t\t\tindicating ID_REGION_AA_UNSTATS\r\n\t\t\t\t\t\t\t\t\t\tcontaining local_region\r\n\t\t\t\t\t\t\t\t\t\t\tindicating 0\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT accepts the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "17fbdce7-b53f-4ad0-a39a-9dcd8385d15d",
+            "type": "STRING",
+            "value": "in process"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "17fbdce7-b53f-4ad0-a39a-9dcd8385d15d",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "5a72fefc-399b-4f4c-a1fc-99291a4993e7"
+}

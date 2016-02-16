@@ -1,0 +1,3763 @@
+/**
+ *    @author   ETSI / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsDENM/ItsDenm_TpFunctions.ttcn $
+ *              $Id: ItsDenm_TpFunctions.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *    @desc     DENM TP functions
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+module ItsDenm_TpFunctions {
+    
+    // LibCommon
+    import from LibCommon_Sync all;
+    import from LibCommon_Time all;
+    import from LibCommon_VerdictControl all;
+    import from LibCommon_BasicTypesAndValues all;  
+    
+    // LibIts
+    import from LibItsCommon_Functions all;
+    import from LibItsCommon_TypesAndValues all;
+    import from LibItsDenm_TestSystem all;
+    import from LibItsDenm_Functions all;
+    import from LibItsDenm_Templates all;
+    import from LibItsDenm_TypesAndValues all;
+    import from LibItsDenm_Pics all;
+    import from DENM_PDU_Descriptions language "ASN.1:1997" all;
+    import from ITS_Container language "ASN.1:1997" all;
+    
+    // 5.2.1
+    group denMessageTransmission {
+        
+      // 5.2.1.1
+      group denMessageFormat {
+          
+          /**
+           * @desc    TP Function for TC_DEN_MSGF_BV_01
+           */
+          function f_DEN_MSGF_BV_01() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_denmPdu(
+                              mw_denm,
+                              mw_anyStationId, 
+                              c_protocolVersionDenm, 
+                              c_messageIdDenm
+                          )
+                      ) 
+                  ) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received a DENM with incorrect header information. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_MSGF_BV_01
+          
+          /**
+           * @desc    TP Function for TC_DEN_MSGF_BV_02
+           */
+          function f_DEN_MSGF_BV_02() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_denmPdu(
+                              mw_denm(
+                                  mw_anyDenmMgmtCon,
+                                  -,
+                                  mw_denmLocationWithTrace({ ?, * })
+                              )
+                          )
+                      ) 
+                  ) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received a DENM with incorrect location container information. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_MSGF_BV_02
+          
+      } // end denMessageFormat
+      
+      // 5.2.1.2
+      group denEventGeneration {
+        
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_01
+           */
+          function f_DEN_EVGN_BV_01() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_anyDenmPdu(
+                              mw_itsPduHeader,
+                              mw_denm (mw_anyDenmMgmtCon)
+                          )
+                      ) 
+                  ) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received a DENM with incorrect header and management information. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_01
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_02
+           */
+          function f_DEN_EVGN_BV_02() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainerList v_situations := {
+                  m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable),
+                  m_situation(c_causeAccident, c_subCauseCode_Unavailable),
+                  m_situation(c_causeRoadworks, c_subCauseCode_Unavailable),
+                  m_situation(c_causeSlowVehicle, c_subCauseCode_Unavailable)
+              };
+              var boolean v_success := true;
+              var ActionIDList v_actionIds;
+              var DenmInd v_denmInd;
+              var integer i;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              for (i := 0; i < lengthof(v_situations) - 1; i := i + 1) {
+                  f_utTriggerEvent(m_utTriggerEvent(v_situations[i]));
+                  f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+                  v_actionIds[i] := v_denmInd.msgIn.denm.management.actionID;
+              }
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_utTriggerEvent(m_utTriggerEvent(v_situations[lengthof(v_situations) - 1]));
+              f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+              v_actionIds[lengthof(v_actionIds) - 1] := v_denmInd.msgIn.denm.management.actionID;
+              
+              //check the action id
+              for (i := 0; i < lengthof(v_actionIds) - 1; i := i + 1) {
+                  if (v_actionIds[lengthof(v_actionIds) - 1].sequenceNumber == v_actionIds[i].sequenceNumber) {
+                      v_success := false;
+                  }
+              }
+              if (v_success==true) {
+                  log("*** " & testcasename() & ": PASS: actionID field indicating unused value. ***");
+                  f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+              }
+              else {
+                  log("*** " & testcasename() & ": FAIL: actionID field indicating used value. ***");
+                  f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+              }
+              
+              // Postamble
+              for (i := 0; i < lengthof(v_actionIds); i := i + 1) {
+                  f_poCancelEvent(e_iut, v_actionIds[i]);
+              }
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_02
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_03
+           */
+          function f_DEN_EVGN_BV_03() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_denmPdu(
+                              mw_denm(
+                                  mw_denmMgmtConWithActionID(
+                                      v_actionId
+                                  )
+                              )
+                          )
+                      )
+                  ) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_03
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_04
+           */
+          function f_DEN_EVGN_BV_04() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_denmPdu(
+                              mw_denm(
+                                  mw_anyDenmMgmtCon,
+                                  v_situation
+                              )
+                          )
+                      )
+                  ) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_04
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_05
+           */
+          function f_DEN_EVGN_BV_05() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainerList v_situations := {
+                  m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable),
+                  m_situation(c_causeAccident, c_subCauseCode_Unavailable),
+                  m_situation(c_causeRoadworks, c_subCauseCode_Unavailable),
+                  m_situation(c_causeSlowVehicle, c_subCauseCode_Unavailable)
+              };
+              var ActionIDList v_actionIds;
+              var DenmInd v_denmInd;
+              var integer i;
+              var TimestampIts v_timestampIts;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              for (i := 0; i < lengthof(v_situations) - 1; i := i + 1) {
+                  f_utTriggerEvent(m_utTriggerEvent(v_situations[i]));
+                  f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+                  v_actionIds[i] := v_denmInd.msgIn.denm.management.actionID;
+                  v_timestampIts := v_denmInd.msgIn.denm.management.referenceTime;
+              }
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_utTriggerEvent(m_utTriggerEvent(v_situations[lengthof(v_situations) - 1]));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_denmPdu(
+                              mw_denm(
+                                  mw_denmMgmtConWithReferenceTime(?)
+                              )
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_ac.stop;
+                      v_actionIds[lengthof(v_actionIds)] := v_denmInd.msgIn.denm.management.actionID;
+                      if (v_timestampIts<v_denmInd.msgIn.denm.management.referenceTime) {
+                          log("*** " & testcasename() & ": PASS: Reference Time has increased since last received DENM. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          log("*** " & testcasename() & ": FAIL: Reference Time has not increased since last received DENM. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              for (i := 0; i < lengthof(v_actionIds); i := i + 1) {
+                  f_poCancelEvent(e_iut, v_actionIds[i]);
+              }
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_05
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_07
+           */
+          function f_DEN_EVGN_BV_07() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainerList v_situations := {
+                  m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable),
+                  m_situation(c_causeAccident, c_subCauseCode_Unavailable),
+                  m_situation(c_causeRoadworks, c_subCauseCode_Unavailable),
+                  m_situation(c_causeSlowVehicle, c_subCauseCode_Unavailable)
+              };
+              var SequenceNumber v_sequenceNumber;
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var integer i;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              for (i := 0; i < lengthof(v_situations) - 1; i := i + 1) {
+                  f_utTriggerEvent(m_utTriggerEvent(v_situations[i]));
+                  f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+                  f_poCancelEvent(e_iut, v_denmInd.msgIn.denm.management.actionID);
+              }
+              //save the last sequence number
+              v_sequenceNumber := v_denmInd.msgIn.denm.management.actionID.sequenceNumber;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_utTriggerEvent(m_utTriggerEvent(v_situations[lengthof(v_situations) - 1]));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_denmPdu(
+                              mw_denm(
+                                  mw_denmMgmtConWithActionID(
+                                      mw_actionId(-, f_increaseSequenceNumber(v_sequenceNumber))
+                                  )
+                              )
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_ac.stop;
+                      v_actionId := v_denmInd.msgIn.denm.management.actionID;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_07
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVGN_BV_10
+           */
+          function f_DEN_EVGN_BV_10() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation (c_causeVehicleBreakdown, c_subCauseCode_Unavailable );
+              var StationID v_stationId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_stationId := f_getIutStationId ( );
+              f_utChangePseudonym ( m_utChangePseudonym );
+              f_utTriggerEvent ( m_utTriggerEvent ( v_situation) );
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( mw_denmInd ( mw_denmPdu ( mw_denm ( mw_anyDenmMgmtCon ) ) ) ) -> value v_denmInd {
+                      tc_ac.stop;
+                      if ( v_denmInd.msgIn.denm.management.actionID.originatingStationID != v_stationId ) {
+                      	log("*** " & testcasename() & ": PASS: Successfully received expected DENM - Pseudonym changed. ***");
+                      	f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                      	log("*** " & testcasename() & ": FAIL: received expected DENM - Pseudonym not changed. ***");
+                      	f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_cfDown();
+             
+          } // end TC_DEN_EVGN_BV_10
+          
+      } // end denEventGeneration
+      
+      // 5.2.1.3
+      group denEventUpdate {
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVUP_BV_02
+           */
+          function f_DEN_EVUP_BV_01() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_UPDATE) {
+                  log("*** " & testcasename() & ": PICS_DENM_UPDATE required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_situation.eventType.subCauseCode := c_vehicleBreakDownSubCauseCode_engineProblem;
+              f_utUpdateEvent(m_utUpdateEvent(v_actionId, v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_anyDenmPdu(
+                              mw_itsPduHeader,
+                              mw_denm (mw_anyDenmMgmtCon)
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVUP_BV_01
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVUP_BV_02
+           */
+          function f_DEN_EVUP_BV_02() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_UPDATE) {
+                  log("*** " & testcasename() & ": PICS_DENM_UPDATE required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_situation.eventType.subCauseCode := c_vehicleBreakDownSubCauseCode_engineProblem;
+              f_utUpdateEvent(m_utUpdateEvent(v_actionId, v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_anyDenmPdu(
+                              mw_itsPduHeader,
+                              mw_denm (
+                                  mw_denmMgmtConWithActionID(
+                                      v_actionId
+                                  )
+                              )
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVUP_BV_02
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVUP_BV_03
+           */
+          function f_DEN_EVUP_BV_03() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var TimestampIts v_referenceTime1 , v_timestampIts , v_msgtimestamp;
+              var integer v_diff;
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_UPDATE) {
+                  log("*** " & testcasename() & ": PICS_DENM_UPDATE required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+              v_timestampIts := f_getCurrentTime();
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_referenceTime1 := v_denmInd.msgIn.denm.management.referenceTime;
+              v_diff := v_timestampIts - v_referenceTime1;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_situation.eventType.subCauseCode := c_vehicleBreakDownSubCauseCode_engineProblem;
+              f_utUpdateEvent(m_utUpdateEvent(v_actionId, v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_anyDenmPdu(
+                              mw_itsPduHeader,
+                              mw_denm (
+                                  mw_denmMgmtCon(
+                                      v_actionId
+                                  )
+                              )
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_ac.stop;
+                      v_timestampIts := f_getCurrentTime();
+                      v_msgtimestamp := v_denmInd.msgIn.denm.management.referenceTime;
+                      if ( ( ( v_timestampIts + v_diff ) > v_msgtimestamp ) and ( v_msgtimestamp > v_referenceTime1 ) ) {
+                          log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          log("*** " & testcasename() & ": FAIL: ReferenceTime not updated correctly ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVUP_BV_03
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVUP_BO_04
+           */
+          function f_DEN_EVUP_BO_04() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_UPDATE) {
+                  log("*** " & testcasename() & ": PICS_DENM_UPDATE required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_situation.eventType.subCauseCode := c_vehicleBreakDownSubCauseCode_engineProblem;
+              f_utUpdateEvent(m_utUpdateEvent(m_actionId(f_increaseSequenceNumber(v_actionId.sequenceNumber), f_getIutStationId()), v_situation));
+              
+              tc_noac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_anyDenmPdu(
+                              mw_itsPduHeader,
+                              mw_denm (
+                                  mw_denmMgmtCon(
+                                      m_actionId(
+                                          f_increaseSequenceNumber(v_actionId.sequenceNumber),
+                                          f_getIutStationId()
+                                      )
+                                  )
+                              )
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_noac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received updated DENM for the actionId which is not in originator ITS-S message table. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_noac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_noac.timeout {
+                      log("*** " & testcasename() & ": PASS: No DENM was sent. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVUP_BO_04
+          
+      } // end denEventUpdate
+      
+      // 5.2.1.4
+      group denEventTermination {
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BV_01
+           */
+          function f_DEN_EVTR_BV_01() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_CANCELLATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_CANCELLATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation, c_duration_10sec));
+              f_awaitDenMessage ( mw_denmInd ( mw_denmPdu ( mw_denm (  mw_denmMgmtCon ( mw_anyActionId, -, -, c_duration_10sec ) ) ) ) , v_denmInd );
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_utTerminateEvent(m_utEventCancellation(v_actionId));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( mw_denmInd ( mw_denmPdu (
+                  										mw_denm ( mw_denmMgmtConTermination ( v_actionId, -, -, -, -, isCancellation ))))) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_01
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BV_02
+           */
+          function f_DEN_EVTR_BV_02() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_NEGATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_NEGATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              v_actionId := f_sendDenMessage ( m_denm ( m_denmMgmtCon ( m_tsActionId ), v_situation, m_denmLocation_zeroDelta ) );
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_sleep(0.5);
+              f_utTerminateEvent(m_utEventCancellation(v_actionId));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( mw_denmInd ( mw_denmPdu (
+                  										mw_denm ( mw_denmMgmtConTermination ( v_actionId, f_getIutStationType(), -, -, -, isNegation ))))) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_02
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BV_03
+           */
+          function f_DEN_EVTR_BV_03() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var TimestampIts v_referenceTime1 := f_getCurrentTime();
+              var TimestampIts v_referenceTime2;
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_NEGATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_NEGATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              v_actionId := f_sendDenMessage ( m_denm ( m_denmMgmtCon ( m_tsActionId, -, -, -, v_referenceTime1, v_referenceTime1 ), v_situation, m_denmLocation_zeroDelta ) );
+              
+              v_referenceTime2 := f_getCurrentTime();
+              v_situation.eventType.subCauseCode := c_vehicleBreakDownSubCauseCode_engineProblem;
+              v_actionId := f_sendDenMessage ( m_denm ( m_denmMgmtCon ( m_tsActionId, -, -, -, v_referenceTime2, v_referenceTime2 ), v_situation, m_denmLocation_zeroDelta ) );
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_sleep(0.5);
+              f_utTerminateEvent(m_utEventCancellation(v_actionId));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( mw_denmInd ( mw_denmPdu (
+                                            mw_denm ( mw_denmMgmtConTermination ( v_actionId, -, v_referenceTime2, -, -, isNegation ))))) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_03
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BV_04
+           */
+          function f_DEN_EVTR_BV_04() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_CANCELLATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_CANCELLATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation, c_duration_10sec));
+              f_awaitDenMessage( mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtCon ( mw_anyActionId ) ) ) ), v_denmInd );
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_utTerminateEvent(m_utEventCancellation(v_actionId));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( 
+                  		mw_denmInd ( 
+                  			mw_denmPdu ( 
+                  				mw_denm ( mw_denmMgmtConTermination ( v_actionId, -, -, -, -, isCancellation ), omit, omit, omit ) ) ) ) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_04
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BV_05
+           */
+          function f_DEN_EVTR_BV_05() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_NEGATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_NEGATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              v_actionId := f_sendDenMessage ( m_denm ( m_denmMgmtCon ( m_tsActionId ), v_situation, m_denmLocation_zeroDelta ) );
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_sleep(0.5);
+              f_utTerminateEvent(m_utEventCancellation(v_actionId));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( 
+                  		mw_denmInd ( 
+                  			mw_denmPdu ( 
+                  				mw_denm ( mw_denmMgmtConTermination ( v_actionId, -, -, -, -, isNegation ), omit, omit, omit ) ) ) ) -> value v_denmInd {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_05
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BO_06
+           */
+          function f_DEN_EVTR_BO_06() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainerList v_situations := {
+                  m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable),
+                  m_situation(c_causeAccident, c_subCauseCode_Unavailable),
+                  m_situation(c_causeRoadworks, c_subCauseCode_Unavailable),
+                  m_situation(c_causeSlowVehicle, c_subCauseCode_Unavailable)
+              };
+              var ActionID v_unknownActionId;
+              var ActionIDList v_actionIds;
+              var DenmInd v_denmInd;
+              var integer i;
+              
+              // Test control
+              if (not PICS_DENM_NEGATION and not PICS_DENM_CANCELLATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_NEGATION OR PICS_DENM_CANCELLATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              for (i := 0; i < lengthof(v_situations); i := i + 1) {
+                  f_utTriggerEvent(m_utTriggerEvent(v_situations[i]));
+                  f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+                  v_actionIds[i] := v_denmInd.msgIn.denm.management.actionID;
+              }
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_unknownActionId := valueof(m_actionId(
+                                        f_increaseSequenceNumber(
+                                            v_actionIds[lengthof(v_actionIds) - 1].sequenceNumber
+                                        ),
+                                        v_actionIds[lengthof(v_actionIds) - 1].originatingStationID
+                                    ));
+              f_utTerminateEvent(m_utEventCancellation(v_unknownActionId));
+              
+              tc_noac.start;
+              alt {
+                  [] denmPort.receive(
+                      mw_denmInd(
+                          mw_anyDenmPdu(
+                              mw_itsPduHeader,
+                              mw_denm (
+                                  mw_denmMgmtCon(v_unknownActionId)
+                              )
+                          )
+                      )
+                  ) -> value v_denmInd {
+                      tc_noac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received termination DENM for the unknown actionId. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_noac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_noac.timeout {
+                      log("*** " & testcasename() & ": PASS: No termination DENM was sent. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+              }
+              
+              // Postamble
+              for (i := 0; i < lengthof(v_situations); i := i + 1) {
+                  f_poCancelEvent(e_iut, v_actionIds[i]);
+              }
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BO_06
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BO_07
+           */
+          function f_DEN_EVTR_BO_07() runs on ItsDenm {
+              
+              // Local constants
+              const SequenceNumber v_initialSequenceNumber := 0;
+              // Local variables
+              var template (value) SituationContainerList v_situations := {
+                  m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable),
+                  m_situation(c_causeAccident, c_subCauseCode_Unavailable),
+                  m_situation(c_causeRoadworks, c_subCauseCode_Unavailable),
+                  m_situation(c_causeSlowVehicle, c_subCauseCode_Unavailable)
+              };
+              var SequenceNumber v_sequenceNumber := v_initialSequenceNumber;
+              var ActionID v_unknownActionId;
+              var ActionIDList v_actionIds; 
+              var DenmInd v_denmInd;
+              var integer i;
+              
+              // Test control
+              if (not PICS_DENM_NEGATION and not PICS_DENM_CANCELLATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_NEGATION OR PICS_DENM_CANCELLATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              for (i := 0; i < lengthof(v_situations); i := i + 1) {
+                  v_sequenceNumber := f_increaseSequenceNumber(v_sequenceNumber);
+                  v_actionIds[i] := f_sendDenMessage( m_denm( m_denmMgmtCon( m_tsActionId(v_sequenceNumber) ), v_situations[i], m_denmLocation_zeroDelta ) );
+              }
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_unknownActionId := valueof(m_actionId(
+                                        f_increaseSequenceNumber(
+                                            v_actionIds[lengthof(v_actionIds) - 1].sequenceNumber
+                                        ),
+                                        f_getTsStationId()
+                                    ));
+              f_sleep(0.5);
+              f_utTerminateEvent(m_utEventCancellation(v_unknownActionId));
+              
+              tc_noac.start;
+              alt {
+                  [] denmPort.receive( mw_denmInd( mw_anyDenmPdu( mw_itsPduHeader, mw_denm ( mw_denmMgmtCon(v_unknownActionId) ) ) ) ) -> value v_denmInd {
+                      tc_noac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received termination DENM for the unknown actionId. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_noac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_noac.timeout {
+                      log("*** " & testcasename() & ": PASS: No termination DENM was sent. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+              }
+              
+              // Postamble
+              for (i := 0; i < lengthof(v_situations); i := i + 1) {
+                  f_poCancelEvent(e_ets, v_actionIds[i]);
+              }
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_07
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVTR_BV_08
+           */
+          function f_DEN_EVTR_BV_08() runs on ItsDenm {
+              
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var TimestampIts v_referenceTime1 , v_timestampIts , v_msgtimestamp;
+              var integer v_diff;
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_CANCELLATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_CANCELLATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              f_awaitDenMessage(mw_denmInd(mw_anyDenmPdu), v_denmInd);
+              v_timestampIts := f_getCurrentTime();
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_referenceTime1 := v_denmInd.msgIn.denm.management.referenceTime;
+              v_diff := v_timestampIts - v_referenceTime1;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              f_utTerminateEvent ( m_utEventCancellation ( v_actionId ) );
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( 
+                  		mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtConTermination ( v_actionId, -, -, -, -, isCancellation ) ) ) ) ) -> value v_denmInd {
+                      tc_ac.stop;
+                      v_timestampIts := f_getCurrentTime();
+                      v_msgtimestamp := v_denmInd.msgIn.denm.management.referenceTime;
+                      if ( ( ( v_timestampIts + v_diff ) > v_msgtimestamp ) and ( v_msgtimestamp > v_referenceTime1 ) ) {
+                          log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          log("*** " & testcasename() & ": FAIL: ReferenceTime not updated correctly ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVTR_BV_08
+          
+      } // end denEventTermination
+      
+      // 5.2.1.5
+      group denMessageRepetition {
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_TI_01
+           */
+          function f_DEN_EVRP_TI_01() runs on ItsDenm {
+              
+              // Local constants
+              const TransmissionInterval	c_repetitionInterval	:= c_interval_1sec;		// INTERVAL_1
+              const ValidityDuration		c_validityDuration		:= c_duration_10sec;		// DURATION_2
+              const ValidityDuration		c_repetitionDuration	:= c_validityDuration;				// DURATION_1
+              const float c_lowerRepetitionInterval := int2float(c_repetitionInterval)*0.95;
+              const float c_upperRepetitionInterval := int2float(c_repetitionInterval)*1.05;
+              // Local variables
+              var template (value)	SituationContainer v_situation := m_situation (c_causeVehicleBreakdown, c_subCauseCode_Unavailable );
+              var template (present) DenmInd v_expectedDenmInd := 
+              							mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtCon ( mw_actionId, -, -, c_validityDuration ) ) ) ); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              // Local timers
+              timer t_repetition;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent ( m_utTriggerEvent ( v_situation, c_validityDuration, c_repetitionDuration, c_repetitionInterval ) );
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              t_repetition.start(2.0 * (int2float(c_repetitionInterval)/1000.0));
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] denmPort.receive(v_expectedDenmInd) -> value v_denmInd {
+                      if (match(t_repetition.read*1000.0, (c_lowerRepetitionInterval..c_upperRepetitionInterval))) {
+                          t_repetition.stop;
+                          log("*** " & testcasename() & ": PASS: Successfully received expected DENM in the expected interval. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          t_repetition.stop;
+                          log("*** " & testcasename() & ": FAIL: Received expected DENM, interval was not correct. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] t_repetition.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVRP_TI_01
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_02
+           */
+          function f_DEN_EVRP_BV_02() runs on ItsDenm {
+              
+              // Local constants
+              const ValidityDuration c_validityDuration := c_duration_10sec;
+              const TransmissionInterval c_repetitionInterval := c_interval_5sec;
+              const ValidityDuration c_repetitionDuration := c_validityDuration;
+              const float c_lowerRepetitionInterval := int2float(c_repetitionInterval)*0.95;
+              const float c_upperRepetitionInterval := int2float(c_repetitionInterval)*1.05;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expectedDenmInd :=
+              									mw_denmInd(mw_denmPdu(mw_denm( mw_denmMgmtCon( mw_actionId, -, -, c_validityDuration)))); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              // Local timers
+              timer t_repetition;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent( m_utTriggerEvent( v_situation, c_validityDuration, c_repetitionDuration, c_repetitionInterval ) );
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              //update event after 1 second
+              tc_noac.start(1.0);
+              tc_noac.timeout;
+              v_situation.eventType.subCauseCode := c_vehicleBreakDownSubCauseCode_engineProblem;
+              f_utUpdateEvent(m_utUpdateEvent(v_actionId, v_situation));
+              v_expectedDenmInd.msgIn.denm.situation := v_situation;
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              t_repetition.start(2.0 * (int2float(c_repetitionInterval)/1000.0));
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] denmPort.receive(v_expectedDenmInd) -> value v_denmInd {
+                      if (match(t_repetition.read*1000.0, (c_lowerRepetitionInterval..c_upperRepetitionInterval))) {
+                          t_repetition.stop;
+                          log("*** " & testcasename() & ": PASS: Successfully received expected DENM in the expected interval. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          t_repetition.stop;
+                          log("*** " & testcasename() & ": FAIL: Received expected DENM, interval was not correct. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] t_repetition.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVRP_BV_02
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_03
+           */
+          function f_DEN_EVRP_BV_03() runs on ItsDenm {
+              
+              // Local constants
+              const ValidityDuration c_validityDuration := c_duration_10sec;
+              const TransmissionInterval c_repetitionInterval := c_interval_4sec;
+              const ValidityDuration c_repetitionDuration := c_validityDuration;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expectedDenmInd :=
+              									mw_denmInd(mw_denmPdu(mw_denm(mw_denmMgmtCon(mw_actionId, -, -, c_validityDuration)))); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var integer i;
+              // Local timers
+              timer t_validity;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent( v_situation, c_validityDuration, c_repetitionDuration, c_repetitionInterval ));
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              t_validity.start(1.5 * int2float(c_validityDuration));
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              //await retransmitted DENM message based on the repetition interval in between the validity duration
+              for (i:=0; i<(c_validityDuration/(c_repetitionInterval/1000)); i := i + 1) {
+                  f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              }
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] t_validity.timeout {
+                      log("*** " & testcasename() & ": PASS: Retransmission of DENM stopped successfully. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(v_expectedDenmInd) {
+                      t_validity.stop;
+                      log("*** " & testcasename() & ": FAIL: Retransmission of DENM was not stopped. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_validity.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVRP_BV_03
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_04
+           */
+          function f_DEN_EVRP_BV_04() runs on ItsDenm {
+              
+              // Local constants
+              const ValidityDuration c_validityDuration := c_duration_10sec;
+              const TransmissionInterval c_repetitionInterval := c_interval_2sec;
+              const ValidityDuration c_repetitionDuration := c_duration_5sec;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expectedDenmInd := mw_denmInd(mw_denmPdu(mw_denm(mw_denmMgmtCon(mw_actionId, -, -, c_validityDuration)))); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var integer i;
+              // Local timers
+              timer t_repetition;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(m_utTriggerEvent(v_situation, c_validityDuration, c_repetitionDuration, c_repetitionInterval ));
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              t_repetition.start(1.5 * int2float(c_repetitionDuration));
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              //await retransmitted DENM message based on the repetition interval in between the repetition duration
+              for (i:=0; i<(c_repetitionDuration/(c_repetitionInterval/1000)); i := i + 1) {
+                  f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              }
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] t_repetition.timeout {
+                      log("*** " & testcasename() & ": PASS: Retransmission of DENM stopped successfully. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(v_expectedDenmInd) -> value v_denmInd {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Retransmission of DENM was not stopped. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVRP_BV_04
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_05
+           */
+          function f_DEN_EVRP_BV_05() runs on ItsDenm {
+              
+              // Local constants
+              const ValidityDuration c_validityDuration := c_duration_10sec;
+              const ValidityDuration c_repetitionDuration := c_validityDuration;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expectedDenmInd := mw_denmInd(
+                                                                      mw_denmPdu(
+                                                                          mw_denm(
+                                                                              mw_denmMgmtCon(
+                                                                                  mw_actionId,
+                                                                                  -,
+                                                                                  -,
+                                                                                  -,
+                                                                                  *
+                                                                              )
+                                                                          )
+                                                                      )
+                                                                  ); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var integer i;
+              // Local timers
+              timer t_validity;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(
+                  m_utTriggerEvent(
+                      v_situation, 
+                      c_validityDuration, 
+                      c_repetitionDuration,
+                      omit //no repetitionInterval
+                  )
+              );
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              t_validity.start(1.5 * int2float(c_validityDuration));
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] t_validity.timeout {
+                      log("*** " & testcasename() & ": PASS: No retransmission of DENM occured as expected. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(v_expectedDenmInd) -> value v_denmInd {
+                      t_validity.stop;
+                      log("*** " & testcasename() & ": FAIL: Unexpected retransmission of DENM occured. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_validity.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVRP_BV_05
+          
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_06
+           */
+          function f_DEN_EVRP_BV_06() runs on ItsDenm {
+              
+              // Local constants
+              const ValidityDuration c_validityDuration := c_duration_10sec;
+              const TransmissionInterval c_repetitionInterval := c_interval_2sec;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expectedDenmInd := mw_denmInd(
+                                                                      mw_denmPdu(
+                                                                          mw_denm(
+                                                                              mw_denmMgmtCon(
+                                                                                  mw_actionId,
+                                                                                  -,
+                                                                                  -,
+                                                                                  c_validityDuration                                                                                  
+                                                                              )
+                                                                          )
+                                                                      )
+                                                                  ); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var integer i;
+              // Local timers
+              timer t_validity;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent(
+                  m_utTriggerEvent(
+                      v_situation, 
+                      c_validityDuration,
+                      omit, //no repetitionDuration 
+                      c_repetitionInterval
+                  )
+              );
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              t_validity.start(1.5 * int2float(c_validityDuration));
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] t_validity.timeout {
+                      log("*** " & testcasename() & ": PASS: No retransmission of DENM occured as expected. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(v_expectedDenmInd) -> value v_denmInd {
+                      t_validity.stop;
+                      log("*** " & testcasename() & ": FAIL: Unexpected retransmission of DENM occured. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_validity.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_EVRP_BV_06
+           
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_08
+           */
+          function f_DEN_EVRP_BV_08() runs on ItsDenm {
+              
+              // Local constants
+              const ValidityDuration c_duration1 := 3 * c_duration_2sec;
+              const ValidityDuration c_duration2 := c_duration_10sec;
+              const TransmissionInterval c_interval1 := c_interval_1sec;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation (c_causeVehicleBreakdown, c_subCauseCode_Unavailable );
+              var template (present) DenmInd v_expectedDenmInd :=
+              									mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtCon ( mw_actionId, -, -, c_duration2 ) ) ) ); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent ( m_utTriggerEvent ( v_situation, c_duration2, c_duration1, c_interval1 ) );
+              f_awaitDenMessage ( v_expectedDenmInd, v_denmInd );
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := ?;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+
+              // Test Body
+              f_utChangePseudonym ( m_utChangePseudonym );
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive ( v_expectedDenmInd ) -> value v_denmInd {
+                      tc_ac.stop;
+                      if ( v_denmInd.msgIn.denm.management.actionID.originatingStationID != v_actionId.originatingStationID ) {
+                      	log("*** " & testcasename() & ": PASS: Successfully received expected DENM - Pseudonym changed. ***");
+                      	f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                      	log("*** " & testcasename() & ": FAIL: received expected DENM - Pseudonym not changed. ***");
+                      	f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+
+          } // end TC_DEN_EVRP_BV_08
+           
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_09
+           */
+          function f_DEN_EVRP_BV_09() runs on ItsDenm {
+              // Local constants
+              const ValidityDuration c_duration1 := 3 * c_duration_2sec;
+              const ValidityDuration c_duration2 := c_duration_10sec;
+              const TransmissionInterval c_interval1 := c_interval_1sec;
+              const float c_lowerTransmissionInterval := int2float(c_interval1)*0.95;
+              const float c_upperTransmissionInterval := int2float(c_interval1)*1.05;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expectedDenmInd :=
+              									mw_denmInd(mw_denmPdu(mw_denm( mw_denmMgmtCon( mw_actionId, -, -, c_duration2)))); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              // Local timers
+              timer t_repetition;
+
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent( m_utTriggerEvent( v_situation, c_duration2, c_duration1, c_interval1 ) );
+              f_awaitDenMessage(v_expectedDenmInd, v_denmInd);
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expectedDenmInd.msgIn.denm.management.actionID := v_actionId;
+              t_repetition.start(2.0 * (int2float(c_interval1)/1000.0));
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] denmPort.receive(v_expectedDenmInd) -> value v_denmInd {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] t_repetition.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+
+          } // end TC_DEN_EVRP_BV_09
+           
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_10
+           */
+          function f_DEN_EVRP_BV_10() runs on ItsDenm {
+              // Local constants
+              const ValidityDuration c_duration1 := 3 * c_duration_2sec;
+              const ValidityDuration c_duration2 := c_duration_10sec;
+              const TransmissionInterval c_interval1 := c_interval_1sec;
+              const float c_lowerTransmissionInterval := int2float(c_interval1)*0.95;
+              const float c_upperTransmissionInterval := int2float(c_interval1)*1.05;
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expected := mw_denmInd(mw_denmPdu(mw_denm( mw_denmMgmtCon( mw_actionId, -, -, c_duration2 )))); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var TimestampIts v_referenceTime;
+              // Local timers
+              timer t_repetition;
+
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent( m_utTriggerEvent( v_situation, c_duration2, c_duration1, c_interval1 ) );
+              f_awaitDenMessage ( v_expected, v_denmInd );
+              t_repetition.start(2.0 * (int2float(c_interval1)/1000.0));
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_referenceTime := v_denmInd.msgIn.denm.management.referenceTime;
+              v_expected.msgIn.denm.management.actionID := v_actionId;
+              v_expected.msgIn.denm.management.referenceTime := v_referenceTime;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] denmPort.receive ( v_expected ) -> value v_denmInd {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": PASS: Successfully received expected DENM in the expected interval. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] t_repetition.timeout {
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+
+          } // end TC_DEN_EVRP_BV_10
+           
+          /**
+           * @desc    TP Function for TC_DEN_EVRP_BV_11
+           */
+          function f_DEN_EVRP_BV_11() runs on ItsDenm {
+              // Local constants
+              const ValidityDuration c_duration1 := defaultValidity + 100;
+              const ValidityDuration c_duration2 := defaultValidity;
+              const TransmissionInterval c_interval1 := c_interval_10sec;
+              const float c_diffValidity := int2float ( ( c_duration1 - c_duration2 ) );
+              // Local variables
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var template (present) DenmInd v_expected := mw_denmInd(mw_denmPdu(mw_denm( mw_denmMgmtCon( mw_actionId, -, -, c_duration2 ifpresent)))); 
+              var ActionID v_actionId;
+              var DenmInd v_denmInd;
+              var TimestampIts v_referenceTime;
+              // Local timers
+              timer t_repetition;
+              timer t_default;
+
+              // Test control
+              if (not PICS_DENM_REPETITION) {
+                  log("*** " & testcasename() & ": PICS_DENM_REPETITION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Preamble
+              f_prInitialState();
+              f_utTriggerEvent( m_utTriggerEvent( v_situation, omit, c_duration1, c_interval1 ) );
+              f_awaitDenMessage ( v_expected, v_denmInd );
+              t_repetition.start(2.0 * int2float(c_interval1)/1000.0);
+              t_default.start ( int2float(c_duration1) );
+              v_actionId := v_denmInd.msgIn.denm.management.actionID;
+              v_expected.msgIn.denm.management.actionID := v_actionId;
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              alt {
+                  [] denmPort.receive ( v_expected ) -> value v_denmInd {
+                      t_repetition.stop;
+                      if ( t_default.read*1000.0 < c_diffValidity ) {
+                          log("*** " & testcasename() & ": FAIL: DENM received after validity duration. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          log("*** " & testcasename() & ": INFO: DENM retransmission. ***");
+                          t_repetition.start(2.0 * (int2float(c_interval1)/1000.0));
+                          repeat;
+                      }
+                  }
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": FAIL: Received an unexpected DENM. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                  }
+                  [] t_repetition.timeout {
+                      if ( t_default.read*1000.0 < c_diffValidity ) {
+                          t_default.stop;
+                          log("*** " & testcasename() & ": PASS: Retransmission of DENM stopped. ***");
+                          f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                      }
+                      else {
+                          t_default.stop;
+                      	  log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      	  f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                      }
+                  }
+                  [] t_default.timeout {
+                      t_repetition.stop;
+                      log("*** " & testcasename() & ": INCONC: Timeout while awaiting the reception of a message. ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+
+          } // end TC_DEN_EVRP_BV_11
+          
+      } // end denMessageRepetition
+      
+      group denMessageLowerLayerParameters {
+          
+          /**
+           * @desc    TP Function for TC_DEN_PAR_BV_01
+           */
+          function f_DEN_PAR_BV_01() runs on ItsDenm {
+              
+              // Local variables
+              const UInt8 c_gnNhBtpB := 2;
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(mw_denmIndWithGnParameters(mw_anyDenmPdu, c_gnNhBtpB)) { 
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Expected DENM message encapsultated in BTP-B packet received ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                  }
+                  [] denmPort.receive(mw_denmIndWithGnParameters(mw_anyDenmPdu, omit)) { 
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": INCONC: no GN NH information in DenmInd ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);  
+                  }                    
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) { 
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Expected DENM message received, but not encapsulated in BTP-B packet ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                  }                    
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: DENM message not received ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_PAR_BV_01
+
+          /**
+           * @desc    TP Function for TC_DEN_PAR_BV_02
+           */
+          function f_DEN_PAR_BV_02() runs on ItsDenm {
+              
+              // Local variables
+              const UInt8 c_gnHtGbc := 4;
+              var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+              var ActionID v_actionId;
+              
+              // Test control
+              if (not PICS_DENM_GENERATION) {
+                  log("*** " & testcasename() & ": PICS_DENM_GENERATION required for executing the TC ***");
+                  setverdict(inconc);
+                  stop;
+              }
+              
+              // Test component configuration
+              f_cfUp();
+              
+              // Test adapter configuration
+              
+              // Preamble
+              f_prInitialState();
+              f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+              
+              // Test Body
+              v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+              
+              tc_ac.start;
+              alt {
+                  [] denmPort.receive(mw_denmIndWithGnParameters(mw_anyDenmPdu, -, c_gnHtGbc)) { 
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": PASS: Expected DENM message encapsulated in GBC packet received ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_success);  
+                  }
+                  [] denmPort.receive(mw_denmIndWithGnParameters(mw_anyDenmPdu, -, omit)) { 
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": INCONC: no GN HT information in DenmInd ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);  
+                  }                    
+                  [] denmPort.receive(mw_denmInd(mw_anyDenmPdu)) { 
+                      tc_ac.stop;
+                      log("*** " & testcasename() & ": FAIL: Expected DENM message received, but not encapsulated in GBC packet ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                  }                    
+                  [] tc_ac.timeout {
+                      log("*** " & testcasename() & ": INCONC: DENM message not received ***");
+                      f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                  }
+              }
+              
+              // Postamble
+              f_poCancelEvent(e_iut, v_actionId);
+              f_cfDown();
+             
+          } // end TC_DEN_PAR_BV_02
+      
+      } // end denMessageLowerLayerParameters      
+      
+    } // end denMessageTransmission
+    
+    // 5.2.2
+    group denMessageReception {
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BV_01
+         */
+        function f_DEN_MSRV_BV_01() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            f_sleep(PX_TNOAC);
+            for ( i := 0; i < lengthof(vc_utEvents) and not match(v_actionId, vc_utEvents[i].denMsg.denm.management.actionID); i := i + 1) {
+                // empty on purpose 
+            }
+            if (i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": PASS: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BV_01
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BV_02
+         */
+        function f_DEN_MSRV_BV_02() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation1 := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var template (value) SituationContainer v_situation2 := m_situation(c_causeVehicleBreakdown, c_vehicleBreakDownSubCauseCode_engineProblem);
+            var TimestampIts v_referenceTime2;
+            var ActionID v_actionId;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId
+                    ),
+                    v_situation1,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            f_sleep(1.0);
+            v_referenceTime2 := f_getCurrentTime();
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        v_actionId,
+                        -, -, -, v_referenceTime2
+                    ),
+                    v_situation2,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            f_sleep(PX_TAC);
+            for ( i := 0; i < lengthof(vc_utEvents) 
+                      and not match(v_actionId, vc_utEvents[i].denMsg.denm.management.actionID)
+                      and vc_utEvents[i].denMsg.denm.management.referenceTime != v_referenceTime2; i := i + 1) {
+                // empty on purpose 
+            }
+            if (i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": PASS: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BV_02
+                
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BO_03
+         */
+        function f_DEN_MSRV_BO_03() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtConTermination(
+                        m_tsActionId,
+                        -,
+                        -,
+                        -,
+                        -,
+                        -,
+                        isNegation
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            f_sleep(PX_TNOAC);
+            if (0 != lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": FAIL: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            else {
+                log("*** " & testcasename() & ": PASS: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BO_03
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BO_04
+         */
+        function f_DEN_MSRV_BO_04() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId, v_actionIdIut;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            v_actionId := f_utTriggerEvent(m_utTriggerEvent(v_situation));
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionIdIut := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtConTermination(
+                        m_actionId(
+                            f_increaseSequenceNumber(v_actionId.sequenceNumber)
+                        ),
+                        -,
+                        -,
+                        -,
+                        -,
+                        -,
+                        isCancellation
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                ),
+                false
+            );
+            
+            f_sleep(PX_TNOAC);
+            if (0 != lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": FAIL: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            else {
+                log("*** " & testcasename() & ": PASS: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_iut, v_actionIdIut);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BO_04
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BO_05
+         */
+        function f_DEN_MSRV_BO_05() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation1 := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var template (value) SituationContainer v_situation2 := m_situation(c_causeVehicleBreakdown, c_vehicleBreakDownSubCauseCode_engineProblem);
+            var TimestampIts v_detectionTime := f_getCurrentTime();
+            var TimestampIts v_referenceTime1 := f_getCurrentTime();
+            var TimestampIts v_referenceTime2 := v_referenceTime1 - 1000;
+            var ActionID v_actionId;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -, -, -, v_detectionTime, v_referenceTime1
+                    ),
+                    v_situation1,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            f_sleep(1.0);
+			vc_utEvents := {};
+            v_actionId := f_sendDenMessage ( m_denm ( m_denmMgmtCon ( v_actionId, -, -, -, v_detectionTime, v_referenceTime2 ), v_situation2, m_denmLocation_zeroDelta ) );
+            
+            f_sleep(PX_TNOAC);
+            for ( i := 0; i < lengthof(vc_utEvents) 
+                      and not match(v_actionId, vc_utEvents[i].denMsg.denm.management.actionID)
+                      and vc_utEvents[i].denMsg.denm.management.referenceTime != v_referenceTime2; i := i + 1) {
+                // empty on purpose 
+            }
+            if (i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": FAIL: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            else {
+                log("*** " & testcasename() & ": PASS: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BO_05
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BO_06
+         */
+        function f_DEN_MSRV_BO_06() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation1 := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var template (value) SituationContainer v_situation2 := m_situation(c_causeVehicleBreakdown, c_vehicleBreakDownSubCauseCode_engineProblem);
+            var template (value) DecentralizedEnvironmentalNotificationMessage v_denm;
+            var TimestampIts v_detectionTime1 := f_getCurrentTime();
+            var TimestampIts v_detectionTime2 := v_detectionTime1 - 1000;
+            var TimestampIts v_referenceTime1 := v_detectionTime1;
+            var ActionID v_actionId;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_denm := m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -, - , -, 
+                        v_detectionTime1,
+                        v_referenceTime1
+                    ),
+                    v_situation1,
+                    m_denmLocation_zeroDelta
+                );
+            v_actionId := f_sendDenMessage(v_denm);
+            
+            f_sleep(1.0);
+            vc_utEvents := {};
+            v_detectionTime2 := valueof(v_denm.management.detectionTime) - 1000;
+            v_actionId := f_sendDenMessage ( 
+                            m_denm ( m_denmMgmtCon ( v_actionId, -, - , -, v_detectionTime2, v_referenceTime1 ), v_situation2,  m_denmLocation_zeroDelta ) );
+            f_sleep(PX_TNOAC);
+            for ( i := 0; i < lengthof(vc_utEvents) 
+                      and not match(v_actionId, vc_utEvents[i].denMsg.denm.management.actionID)
+                      and vc_utEvents[i].denMsg.denm.management.detectionTime != v_detectionTime2; i := i + 1) {
+                // empty on purpose 
+            }
+            if (i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": FAIL: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            else {
+                log("*** " & testcasename() & ": PASS: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BO_06
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BV_07
+         */
+        function f_DEN_MSRV_BV_07() runs on ItsDenm {
+            
+            // Local variables
+            var template (value) SituationContainer v_situation1 := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var template (value) SituationContainer v_situation2 := m_situation(c_causeVehicleBreakdown, c_vehicleBreakDownSubCauseCode_engineProblem);
+            var template (value) DecentralizedEnvironmentalNotificationMessage v_denm;
+            var TimestampIts v_detectionTime2 := f_getCurrentTime();
+            var TimestampIts v_detectionTime1 :=v_detectionTime2 - 1000;
+            var TimestampIts v_referenceTime1 := v_detectionTime2;
+            var ActionID v_actionId;
+            var integer i;
+            
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_denm := m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -, - , -,
+                        v_detectionTime1,
+                        v_referenceTime1
+                    ),
+                    v_situation1,
+                    m_denmLocation_zeroDelta
+                );
+            v_actionId := f_sendDenMessage(v_denm);
+            
+            f_sleep(1.0);
+            v_detectionTime2 := valueof(v_denm.management.detectionTime) + 1000;
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        v_actionId,
+                        -, - , -,
+                        v_detectionTime2,
+                        v_referenceTime1
+                    ),
+                    v_situation2,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            f_sleep(PX_TAC);
+            for ( i := 0; i < lengthof(vc_utEvents) 
+                      and not match(v_actionId, vc_utEvents[i].denMsg.denm.management.actionID)
+                      and vc_utEvents[i].denMsg.denm.management.detectionTime != v_detectionTime2; i := i + 1) {
+                // empty on purpose 
+            }
+            if (i < lengthof(vc_utEvents)) {
+                log("*** " & testcasename() & ": PASS: DENM was transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+            }
+            else {
+                log("*** " & testcasename() & ": FAIL: DENM was not transmitted to upper layer ***");
+                f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_MSRV_BV_07
+        
+        /**
+         * @desc    TP Function for TC_DEN_MSRV_BV_10
+         */
+        function f_DEN_MSRV_BV_10() runs on ItsDenm {
+
+            //Local constants
+
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+
+            // Test control
+	        if (not PICS_DENM_RECEPTION) {
+                log("*** " & testcasename() & ": PICS_DENM_RECEPTION required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage (
+                m_denm ( m_denmMgmtCon ( m_tsActionId), v_situation, m_denmLocation_zeroDelta, m_alacarteConImpactReduction ) );
+            
+            tc_ac.start;
+            alt {
+                [] denmPort.receive ( mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtCon ( mw_actionId ( f_getTsStationId() ) ), v_situation, mw_anyDenmLocation, 
+                                                                                                         mw_alacarteConImpactReduction ) ) ) ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: DENM with correct alacarte container ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                [] denmPort.receive ( mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtCon ( mw_actionId ( f_getTsStationId() ) ) ) ) ) ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: DENM with incorrect containers ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: DENM not rreceived ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+
+        } // end TC_DEN_MSRV_BV_10
+        
+    } // end denMessageReception
+    
+    // 5.2.3
+    group denKeepAliveForwarding {
+
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_01
+         */
+        function f_DEN_KAFW_BV_01() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            // Local timers
+            timer t_forwarding := 2.0 * int2float(c_transmissionInterval) / 1000.0;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            t_forwarding.start;
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    if(t_forwarding.running) {
+                        t_forwarding.stop;
+                        log("*** " & testcasename() & ": FAIL: IUT re-forwarded the packet too early ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                    else {
+                        tc_ac.stop;
+                        log("*** " & testcasename() & ": PASS: DENM re-forwarded ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                }
+                [] t_forwarding.timeout {
+                    tc_ac.start;
+                    log("*** " & testcasename() & ": INFO: Ready for receiving re-forwarded DENM ***");
+                    repeat;
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": FAIL: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_01
+        
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_02
+         */
+        function f_DEN_KAFW_BV_02() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var TimestampIts v_referenceTime1 := f_getCurrentTime();
+            var TimestampIts v_referenceTime2 := v_referenceTime1 - 1000;
+            var ActionID v_actionId;
+            // Local timers
+            timer t_forwarding := 2.0 * int2float(c_transmissionInterval) /1000.0;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval,
+                        -,
+                        v_referenceTime1
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+    
+            // start KAF timer here, as 2nd DENM shall be ignored
+			t_forwarding.start;
+            f_sleep(5.0);
+			
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval,
+                        -,
+                        v_referenceTime2
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId, -, v_referenceTime1)
+                            )
+                        )
+                    ) 
+                ) {
+                    if(t_forwarding.running) {
+                        t_forwarding.stop;
+                        log("*** TC_DEN_KAFW_BV_02: INFO: IUT re-forwarded the packet too early ***");
+						f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                    else {
+                        tc_ac.stop;
+                        log("*** TC_DEN_KAFW_BV_02: PASS: DENM re-forwarded ***");
+						f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }  
+                }
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    t_forwarding.stop;
+                    log("*** " & testcasename() & ": FAIL: IUT re-forwarded wrong version of DENM ***");
+					f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] t_forwarding.timeout {
+                    tc_ac.start;
+                    log("*** " & testcasename() & ": INFO: Ready for receiving re-forwarded DENM ***");
+                    repeat;
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": FAIL: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_02
+                
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_TI_03
+         */
+        function f_DEN_KAFW_TI_03() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            // Local timers
+            timer t_forwardingMin := 2.0 * int2float(c_transmissionInterval) / 1000.0;
+            timer t_forwardingMax := 2.0 * int2float(c_transmissionInterval) / 1000.0 + 0.15 /* from the spec */ + 0.1 /* processing time */;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            t_forwardingMin.start;
+            t_forwardingMax.start;
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) { 
+                    t_forwardingMax.stop;
+                    if(t_forwardingMin.running) {
+                        t_forwardingMin.stop;
+                        log("*** " & testcasename() & ": FAIL: IUT re-forwarded the packet too early ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                    else {
+                        log("*** " & testcasename() & ": PASS: DENM re-forwarded correctly ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }  
+                }
+                [] t_forwardingMin.timeout {
+                    log("*** " & testcasename() & ": INFO: Ready for receiving re-forwarded DENM ***");
+                    repeat;   
+                }
+                [] t_forwardingMax.timeout {
+                    log("*** " & testcasename() & ": FAIL: DENM was not forwarded on time ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);  
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_TI_03
+
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_04
+         */
+        function f_DEN_KAFW_BV_04() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            ),
+                            f_getIutStationId()
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: DENM re-forwarded with correct stationID ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            ),
+                            mw_anyStationId
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: DENM re-forwarded with incorrect stationID ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_04
+
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_05
+         */
+        function f_DEN_KAFW_BV_05() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+            }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: DENM re-forwarded with correct actionID ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(mw_anyActionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: DENM re-forwarded with incorrect actionID ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_05
+        
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_06
+         */
+        function f_DEN_KAFW_BV_06() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var TimestampIts v_referenceTime1 := f_getCurrentTime();
+            var ActionID v_actionId;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval,
+                        -, 
+                        v_referenceTime1
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId, -, v_referenceTime1)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: DENM re-forwarded with correct referenceTime ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: DENM re-forwarded with incorrect referenceTime ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_06
+
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_07
+         */
+        function f_DEN_KAFW_BV_07() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtConTermination(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 4 / 1000,
+                        c_transmissionInterval,
+                        -,
+                        -,
+                        isNegation
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon ( v_actionId, - )
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: DENM re-forwarded with correct isNegation ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon ( v_actionId, - )
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: DENM re-forwarded with incorrect isNegation ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_07
+
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_08
+         */
+        function f_DEN_KAFW_BV_08() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 3 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta,
+                    m_alacarteConLaneCount
+                )
+            );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId),
+                                v_situation,
+                                m_denmLocation_zeroDelta,
+                                m_alacarteConLaneCount
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": PASS: DENM re-forwarded with correct containers ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: DENM re-forwarded with incorrect containers ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                [] tc_ac.timeout {
+                    log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_08
+
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_09
+         */
+        function f_DEN_KAFW_BV_09() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            // Local timers
+            timer t_validity := int2float(c_transmissionInterval * 3) / 1000.0;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 3 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            t_validity.start;
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    if(t_validity.running) {
+                        log("*** " & testcasename() & ": INFO: DENM re-forwarded during validity period ***");
+                        tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+                        repeat;
+                    }
+                    else {
+                        log("*** " & testcasename() & ": FAIL: DENM re-forwarded after validity expiration ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                [] tc_ac.timeout {
+                    if(t_validity.running) {
+                        log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                    else {
+                        log("*** " & testcasename() & ": PASS: DENM not reforwarded after validity expiration ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                }
+                
+                [] t_validity.timeout {
+                    log("*** " & testcasename() & ": INFO: End of validity period ***");
+                    repeat;
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_09
+                                  
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_10
+         */
+        function f_DEN_KAFW_BV_10() runs on ItsDenm {
+            
+            //Local constants
+            const TransmissionInterval c_transmissionInterval := c_interval_10sec;
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            var boolean v_positionChanged := false;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Test adapter configuration
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage(
+                m_denm(
+                    m_denmMgmtCon(
+                        m_tsActionId,
+                        -,
+                        c_transmissionInterval * 5 / 1000,
+                        c_transmissionInterval
+                    ),
+                    v_situation,
+                    m_denmLocation_zeroDelta
+                )
+            );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                [] denmPort.receive(
+                    mw_denmInd(
+                        mw_denmPdu(
+                            mw_denm(
+                                mw_denmMgmtCon(v_actionId)
+                            )
+                        )
+                    ) 
+                ) {
+                    tc_ac.stop;
+                    if(v_positionChanged == false) {
+                        log("*** " & testcasename() & ": INFO: DENM re-forwarded. Changing position ***");
+                        f_utChangePosition(m_utChangePosition(1000, 0));
+                        v_positionChanged := true;
+                        tc_ac.start;
+                        repeat;
+                    }
+                    else {
+                        log("*** " & testcasename() & ": FAIL: DENM was re-forwarded ***");
+                        f_utChangePosition(m_utChangePosition(-1000, 0));
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                    }
+                }
+                [] tc_ac.timeout {
+                    if(v_positionChanged == false) {
+                        log("*** " & testcasename() & ": INCONC: DENM was not forwarded ***");
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
+                    }
+                    else {
+                        log("*** " & testcasename() & ": PASS: DENM stopped re-forwarding DENM ***");
+                        f_utChangePosition(m_utChangePosition(-1000, 0));
+                        f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    }
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+            
+        } // end TC_DEN_KAFW_BV_10
+                                   
+        /**
+         * @desc    TP Function for TC_DEN_KAFW_BV_11
+         */
+        function f_DEN_KAFW_BV_11() runs on ItsDenm {
+
+            // Local variables
+            var template (value) SituationContainer v_situation := m_situation(c_causeVehicleBreakdown, c_subCauseCode_Unavailable);
+            var ActionID v_actionId;
+            
+            // Test control
+	        if (not PICS_DENM_KAF) {
+                log("*** " & testcasename() & ": PICS_DENM_KAF required for executing the TC ***");
+                setverdict(inconc);
+                stop;
+    	    }
+            
+            // Test component configuration
+            f_cfUp();
+            
+            // Preamble
+            f_prInitialState();
+            f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
+            
+            // Test Body
+            v_actionId := f_sendDenMessage( m_denm ( m_denmMgmtCon ( m_tsActionId ), v_situation, m_denmLocation_zeroDelta ) );
+            
+            tc_ac.start((int2float(c_interval_10sec) * 2.0 / 1000.0) + 0.5);
+            alt {
+                []  denmPort.receive ( mw_denmInd ( mw_denmPdu ( mw_denm ( mw_denmMgmtCon ( v_actionId ) ) ) ) ) {
+                    tc_ac.stop;
+                    log("*** " & testcasename() & ": FAIL: IUT reconstructs and sends the DENM associated with ACTION_ID ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                }
+                []  tc_ac.timeout {
+                    log("*** " & testcasename() & ": PASS: IUT does not reconstruct and send the DENM associated with ACTION_ID1 ***");
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                }
+            }
+            
+            // Postamble
+            f_poCancelEvent(e_ets, v_actionId);
+            f_cfDown();
+
+        } // end TC_DEN_KAFW_BV_11
+        
+    } // end denKeepAliveForwarding
+    
+} // end ItsDenm_TpFunctions
+

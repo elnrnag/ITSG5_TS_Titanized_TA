@@ -1,0 +1,30 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2000-2016 Ericsson Telecom AB
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+///////////////////////////////////////////////////////////////////////////////
+//
+//  File:     MAP_Types.ttcn
+//  Rev:      
+//  Prodnr:   
+//  Updated:  2016-02-08
+//  Contact:  http://ttcn.ericsson.se
+///////////////////////////////////////////////////////////////////////////////
+
+module MAP_Types
+{
+  import from ITS_Container language "ASN.1:1997" all;
+  import from MAP_SPAT_ETSI language "ASN.1:1997" all;
+  import from LibItsMapSpat_TestSystem all;
+
+  external function enc_MAP_PDU( in MAP_PDU pdu) return octetstring;
+  external function dec_MAP_PDU( in octetstring stream) return MAP_PDU;
+
+function f_enc_MapReq(in MapReq pdu) return octetstring {
+  return enc_MAP_PDU(pdu.msgOut)
+}
+
+
+}

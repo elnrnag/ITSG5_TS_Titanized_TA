@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "1185a9b5-610f-4a45-8e36-d5acf14ff5ac",
+            "type": "STRING",
+            "value": "If ITS-S sends a signed message with general security profile check that the signature contained in the SecuredMessage is calculated over the right fields by cryptographically verifying the signature."
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "1185a9b5-610f-4a45-8e36-d5acf14ff5ac",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/e1e96227-c64e-4d30-8d81-67ee8a5f802f",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/3d07e7dc-24bf-4edb-973d-71d1fd22e490"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "1185a9b5-610f-4a45-8e36-d5acf14ff5ac",
+            "type": "STRING",
+            "value": "07. Check signature"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "1185a9b5-610f-4a45-8e36-d5acf14ff5ac",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "1185a9b5-610f-4a45-8e36-d5acf14ff5ac"
+}

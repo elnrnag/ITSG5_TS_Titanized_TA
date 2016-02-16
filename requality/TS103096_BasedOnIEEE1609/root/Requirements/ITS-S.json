@@ -1,0 +1,15 @@
+{
+    "attributes": {
+        "_locations": {
+            "key": "_locations",
+            "type": "LIST",
+            "value": ["/Documents/TS103096-02.xhtml/7fbdcca1-3eab-4654-a02f-b94da5ab71e2"]
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "6ba5c537-fff0-4c40-ae46-6c2cb8868cbc"
+}

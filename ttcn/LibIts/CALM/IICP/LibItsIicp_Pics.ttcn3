@@ -1,0 +1,52 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/IICP/LibItsIicp_Pics.ttcn3 $
+ *              $Id: LibItsIicp_Pics.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Fast service advertisement protocol (ISO 24102-5) PICS
+ */
+module LibItsIicp_Pics {
+    
+    /**
+     * @desc IICP PICS
+     */
+    group iicpPics {
+        
+        /**
+         * @desc Is IUT an host only?
+         * @see  ETSI TS 102 797-1 v0.0.0 C.5/1
+         */
+        modulepar boolean PICS_ROLE_RONLY := false;
+        
+        /**
+         * @desc Is IUT a router only?
+         * @see  ETSI TS 102 797-1 v0.0.0 C.5/2
+         */
+        modulepar boolean PICS_ROLE_HONLY := false;
+        
+        /**
+         * @desc Is IUT both host and router?
+         * @see  ETSI TS 102 797-1 v0.0.0 C.5/3
+         */
+        modulepar boolean PICS_ROLE_RH := false;
+        
+       /**
+        * @desc Does the architecture implement ITS station-internal network?
+        * @see  ETSI TS 102 797-1 v0.0.0 C.6/1
+        */
+        modulepar boolean PICS_ITS_S_INW := false;
+        
+        /**
+         * @desc Is IISC available?
+         * @see  ISO/WD 24102-4
+         */
+        modulepar boolean PICS_IICP_MGM := true;
+        
+        /**
+         * @desc Is IUT support notification to the ITS Management layer
+         * @see  ETSI TS 102 985-1 v1.1.2 A.6/3
+         */
+        modulepar boolean PICS_ITS_MGT_NOT := false;
+        
+    } // End of group iicpPics
+    
+} // End of module LibItsIicp_Pics

@@ -1,0 +1,153 @@
+/**
+ *  @author     ETSI / STF422_EETS
+ *  @version    $URL: file:///D:/RepositoriesNew/LibIts/trunk/ttcn/CALM/FNTP/LibItsFntp_TypesAndValues.ttcn3 $
+ *              $Id: LibItsFntp_TypesAndValues.ttcn3 829 2014-06-02 13:03:32Z garciay $
+ *  @desc       Types and constants definitions for Fast Networking & Transport layer Protocol (ISO 29281-2)
+ */
+module LibItsFntp_TypesAndValues {
+    
+    // LibCommon
+    import from LibCommon_BasicTypesAndValues { 
+        type UInt16 
+    };
+    import from LibCommon_DataStrings { 
+        type Bit1, Bit6 
+    };
+    
+    // LibIts
+    
+    // LibItsCalm
+    import from CALMllsap language "ASN.1:1997" {
+        type
+            INsapPrimitivesUp 
+    };
+    import from CALMfntp language "ASN.1:1997" {
+        type 
+            FNTPNPDU, 
+            NFsapPrimitivesDown, NFsapPrimitivesUp, FNTPintForwarding, 
+            PortNumber 
+    };
+    import from CALMiitsscu language "ASN.1:1997" {
+        type 
+            McmdRq 
+    };
+    import from CALMmsap language "ASN.1:1997" {
+        type 
+            MN_Request_request, MN_Request 
+    };
+    
+    /**
+     * @desc FNTP port values
+     * @see ISO/CD 29281-2 Table 1 — FNTP endpoints identified by port numbers
+     */
+    group fntpPortsValues {
+        
+        /**
+         * @desc Groupcast manager, i.e. Service Advertisement Message (SAM) endpoint
+         */
+        const UInt16 c_portSam := 0;
+        
+        /**
+         * @desc dynamic port
+         */
+        const UInt16 c_portDyn := 128; 
+        
+        /**
+         * @desc Low limit of reserved range
+         */
+        const UInt16 c_portReservedLow := 32717;
+        
+        /**
+         * @desc High limit of reserved range
+         */
+        const UInt16 c_portReservedHigh := 32763;
+        
+        /**
+         * @desc Inter ITS-SCU communications specified in ISO 24102-4
+         */
+        const UInt16 c_portIic := 32764;
+        
+        /**
+         * @desc Shall be used to identify an ITS-SCU with functionality of an ITS-S router. These values shall be used only in the FNTP forwarding header
+         */
+        const UInt16 c_portRtr := 32765;
+        
+        /**
+         * @desc Shall be used to identify an ITS-SCU with functionality of an ITS-S host. These values shall be used only in the FNTP forwarding header
+         */
+        const UInt16 c_portHst := 32766;
+        
+        /**
+         * @desc Unknown or 'don't care' port
+         */
+        const UInt16 c_portNon := 32767;
+        
+    } // End of group fntpPortsValues
+    
+    group utPrimitives {
+        
+        /**
+         * @desc Trigger to initialize the IUT.
+         * @member McmdRq IICPrequests/McmdRq message to initialize the upper tester
+         * 
+         * @see ISO 24102-4
+         */
+        type record UtFntpInitialize { 
+            McmdRq    mcmdRq 
+        }  with {
+            encode (mcmdRq) "LibItsIicp_asn1"  
+        }
+        
+        /**
+         * @desc Events at the application layer of the IUT.
+         * @member nfSapPrimitivesDown NF-SAP down primitive 
+         */
+        type union UtFntpEvent { 
+            NFsapPrimitivesDown nfSapPrimitivesDown 
+        }
+        with {
+            encode (nfSapPrimitivesDown) "LibItsFntp_asn1"  
+        }
+        
+        /**
+         * @desc Send a NF-SAP primitive from Facility layer through a SAP.
+         * @member nfSapPrimitivesUp NF-SAP up primitive 
+         */
+        type union UtFntpEventInd { 
+            NFsapPrimitivesUp nfSapPrimitivesUp 
+        }
+        with {
+            encode (nfSapPrimitivesUp) "LibItsFntp_asn1"  
+        }
+        
+    } with {
+        encode "UpperTester"
+    } // End of group utPrimitives
+    
+    group cfPrimitives { 
+        
+        /**
+         * @desc Trigger to initialize the IUT.
+         */
+        type record CfFntpInitialize {  
+        }
+        
+        /**
+         * @desc Send a MN-SAP.request primitive to the Management layer through a SAP.
+         * @member mnRequestRequest MN_REQUEST_Request primitive 
+         */
+        type union CfFntpEventInd { 
+            MN_Request_request    mnRequestRequest 
+        }
+        with {
+            encode (mnRequestRequest) "LibItsCALMmsap_asn1"  
+        }
+    
+    } with {
+        encode "ConfigTester"
+    } // End of group cfPrimitives 
+    
+}
+with {
+    encode "LibItsFntp"
+} //End of module LibItsFntp_TypesAndValues

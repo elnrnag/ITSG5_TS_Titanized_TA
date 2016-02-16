@@ -1,0 +1,33 @@
+{
+    "attributes": {
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "96ef49a9-c3e9-496e-bc0a-ec45a16824ca",
+            "type": "LIST",
+            "value": ["/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/70256032-089a-4b8b-b120-defd1af8a96d"]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "96ef49a9-c3e9-496e-bc0a-ec45a16824ca",
+            "type": "STRING",
+            "value": "12. Check signing certificate type"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "96ef49a9-c3e9-496e-bc0a-ec45a16824ca",
+            "type": "STRING",
+            "value": "Requirement"
+        },
+        "coverageStatus": {
+            "isGenerated": false,
+            "key": "coverageStatus",
+            "origin": "96ef49a9-c3e9-496e-bc0a-ec45a16824ca",
+            "type": "STRING",
+            "value": "in process"
+        }
+    },
+    "uuid": "96ef49a9-c3e9-496e-bc0a-ec45a16824ca"
+}

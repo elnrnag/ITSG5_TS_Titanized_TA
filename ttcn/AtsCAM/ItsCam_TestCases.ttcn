@@ -1,0 +1,2220 @@
+/**
+ *    @author   ETSI / STF405 / STF449 / STF484
+ *    @version  $URL: file:///D:/RepositoriesNew/ITS/trunk/ttcn/AtsCAM/ItsCam_TestCases.ttcn $
+ *              $Id: ItsCam_TestCases.ttcn 2230 2015-06-03 09:11:02Z mullers $
+ *    @desc     CAM Testcases 
+ *
+ *            This file is compatible with the Titan compiler R4C
+ *
+ *
+ */
+
+module ItsCam_TestCases {
+    
+    // LibIts
+    import from LibItsCam_TestSystem all;
+    
+    // Ats Its
+    import from ItsCam_TpFunctions all;
+
+    // 5.2.1
+    group camMessageDissemination { 
+        
+        group camMessageFormat {
+            
+            /**
+             * @desc Check that protocolVersion is set to 1 and messageID is 
+             *       set to 2.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated 
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing ITS PDU header
+             *                     containing protocolVersion
+             *                         indicating value 1
+             *                     and containing messageID
+             *                         indicating value 2
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/FMT/BV-01
+             * @reference ETSI EN 302 637-2 , Annex B.1
+             */
+            testcase TC_CAM_MSD_FMT_BV_01() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_FMT_BV_01();
+                
+            } // end TC_CAM_MSD_FMT_BV_01
+            
+            /**
+             * @desc Check that LF container is included in 1st CAM since CA 
+             *       basic service activation.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND NOT PIC_RSU
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         and the IUT has not sent any CAM yet
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated 
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing lowFrequencyContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/FMT/BV-02
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_FMT_BV_02() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_FMT_BV_02();
+                
+            } // end TC_CAM_MSD_FMT_BV_02
+            
+            /**
+             * @desc Check that LF container is included if time elapsed since 
+             *       the generation of the last CAM with the low frequency 
+             *       container generation is equal or larger than 500 ms.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND NOT PIC_RSU
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         and the IUT has sent a CAM
+             *             containing cam
+             *                 containing camParameters
+             *                     containing lowFrequencyContainer at time TIME_1
+             *         and the IUT has not sent CAM
+             *             containing cam
+             *                 containing camParameters
+             *                     containing lowFrequencyContainer after TIME_1
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated at time TIME_2 >= (TIME_1 + 500ms)
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing lowFrequencyContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/FMT/BV-03
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_FMT_BV_03() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_FMT_BV_03();
+                
+            } // end TC_CAM_MSD_FMT_BV_03
+            
+            /**
+             * @desc Check that specialVehicle container is included in 1st CAM 
+             *       since CA basic service activation.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_SPECIALVEHICLECONTAINER AND NOT PIC_RSU
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         and the IUT is configured to advertise itself as a special vehicle
+             *         and the IUT has not sent any CAM yet
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/FMT/BV-04
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_FMT_BV_04() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_FMT_BV_04();
+                
+            } // end TC_CAM_MSD_FMT_BV_04
+            
+            /**
+             * @desc Check that specialVehicle container is included if time 
+             *       elapsed since the generation of the last CAM with the 
+             *       special vehicle container generation is equal or larger 
+             *       than 500 ms.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_SPECIALVEHICLECONTAINER AND NOT PIC_RSU
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         and the IUT has sent a CAM
+             *             containing cam
+             *                 containing camParameters
+             *                     containing specialVehicleContainer at time TIME_1
+             *         and the IUT has not sent CAM
+             *             containing cam
+             *                 containing camParameters
+             *                     containing specialVehicleContainer after TIME_1
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated at time TIME_2 >= (TIME_1 + 500ms)
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/FMT/BV-05
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_FMT_BV_05() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_FMT_BV_05();
+                
+            } // end TC_CAM_MSD_FMT_BV_05
+            
+        } // end group camMessageFormat
+        
+        group camInformationAdaptation {
+            
+            group camInVehicleData {
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO:  Curvature value
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .curvature
+                 *     VALUE: measured value
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_01() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_01();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_01
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO:  Brake pedal being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .brakePedalActive
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-02
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_02() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_02();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_02
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO:  Brake pedal being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .brakePedalActive
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-03
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_03() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_03();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_03
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Gas pedal being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .gasPedalActive
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-04
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_04() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_04();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_04
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Gas pedal being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .gasPedalActive
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-05
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_05() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_05();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_05
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Emergency brake being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .emergencyBrakeActive
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-06
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_06() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_06();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_06
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Emergency brake being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .emergencyBrakeActive
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-07
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_07() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_07();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_07
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Collision warning being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .collisionWarningActive
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-08
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_08() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_08();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_08
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Collision warning being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .collisionWarningActive
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-09
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_09() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_09();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_09
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: ACC being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .accActive
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-10
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_10() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_10();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_10
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: ACC being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .accActive
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-11
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_11() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_11();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_11
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Cruise control being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .cruiseControl
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-12
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_12() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_12();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_12
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Cruise control being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .cruiseControl
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-13
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_13() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_13();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_13
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Speed limiter being activated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .speedLimiterActive
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-14
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_14() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_14();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_14
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Speed limiter control being deactivated
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .accelerationControl
+                 *                .speedLimiterActive
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-15
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_15() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_15();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_15
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Low beam headlights being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .lowBeamHeadlightsOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-16
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_16() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_16();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_16
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Low beam headlights being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .lowBeamHeadlightsOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-17
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_17() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_17();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_17
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: High beam headlights being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .highBeamHeadlightsOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-18
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_18() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_18();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_18
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: High beam headlights being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .highBeamHeadlightsOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-19
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_19() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_19();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_19
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Left turn signal being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .leftTurnSignalOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-20
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_20() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_20();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_20
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Left turn signal being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .leftTurnSignalOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-21
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_21() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_21();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_21
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Right turn signal being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .rightTurnSignalOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-22
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_22() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_22();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_22
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Right turn signal being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .rightTurnSignalOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-23
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_23() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_23();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_23
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Daytime running lights being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .daytimeRunningLightsOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-24
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_24() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_24();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_24
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Daytime running lights being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .daytimeRunningLightsOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-25
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_25() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_25();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_25
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Reverse light being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .reverseLightOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-26
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_26() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_26();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_26
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Reverse light being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .reverseLightOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-27
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_27() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_27();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_27
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Fog lights being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .fogLightOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-28
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_28() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_28();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_28
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Fog lights being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .fogLightOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-29
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_29() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_29();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_29
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Parking lights being activated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .parkingLightsOn
+                 *     VALUE: 1
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-30
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_30() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_30();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_30
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Parking lights being deactivated
+                 *     FIELD: lowFrequencyContainer
+                 *                .basicVehicleContainerLowFrequency
+                 *                .exteriorLights
+                 *                .parkingLightsOn
+                 *     VALUE: 0
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-31
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_31() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_31();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_31
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Heading value
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .heading
+                 *     VALUE: measured value
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-32
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_32() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_32();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_32
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Speed value
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .speed
+                 *     VALUE: measured value
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-33
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_33() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_33();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_33
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Drive direction value
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .driveDirection
+                 *     VALUE: measured value
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-34
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_34() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_34();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_34
+                
+                /**
+                 * @desc Check that latest value of in-vehicle data is included 
+                 *       in CAM.
+                 * <pre>
+                 * Pics Selection: PICS_CAM_GENERATION AND NOT PICS_RSU
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state
+                 *     }
+                 *     INFO: Yaw rate value
+                 *     FIELD: highFrequencyContainer
+                 *                .basicVehicleContainerHighFrequency
+                 *                .yawRate
+                 *     VALUE: measured value
+                 * 
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             the IUT is alerted about INFO
+                 *         }
+                 *         then {
+                 *             the IUT sends a valid CAM
+                 *                 containing cam
+                 *                     containing camParameters
+                 *                         containing FIELD set to VALUE
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+                 * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-01-35
+                 * @reference ETSI EN 302 637-2 , clause 5.2
+                 */
+                testcase TC_CAM_MSD_INA_BV_01_35() runs on ItsCam system ItsCamSystem {
+                    
+                    f_CAM_MSD_INA_BV_01_35();
+                    
+                } // end TC_CAM_MSD_INA_BV_01_35
+                
+            } // end group camInVehicleData
+            
+            /**
+             * @desc Check that publicTransportContainer is included if 
+             *       vehicleRole is set to publicTransport(1).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_PUBLICTRANS
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to publicTransport(1)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing publicTransportContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-02
+             * @reference ETSI EN 302 637-2 , Annex B.11
+             */
+            testcase TC_CAM_MSD_INA_BV_02() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_02();
+                
+            } // end TC_CAM_MSD_INA_BV_02
+            
+            /**
+             * @desc Check that specialTransportContainer is included if 
+             *       vehicleRole is set to specialTransport(2).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_SPECIALTRANS
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to specialTransport(2)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing specialTransportContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-03
+             * @reference ETSI EN 302 637-2 , Annex B.12
+             */
+            testcase TC_CAM_MSD_INA_BV_03() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_03();
+                
+            } // end TC_CAM_MSD_INA_BV_03
+            
+            /**
+             * @desc Check that dangerousGoodsContainer is included if 
+             *       vehicleRole is set to dangerousGoods(3).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_DANGEROUSGOODS
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to dangerousGoods(3)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing dangerousGoodsContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-04
+             * @reference ETSI EN 302 637-2 , Annex B.13
+             */
+            testcase TC_CAM_MSD_INA_BV_04() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_04();
+                
+            } // end TC_CAM_MSD_INA_BV_04
+            
+            /**
+             * @desc Check that roadWorksContainerBasic is included if 
+             *       vehicleRole is set to roadWork(4).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_ROADWORKS
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to roadWork(4)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing roadWorksContainerBasic
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-05
+             * @reference ETSI EN 302 637-2 , Annex B.14
+             */
+            testcase TC_CAM_MSD_INA_BV_05() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_05();
+                
+            } // end TC_CAM_MSD_INA_BV_05
+            
+            /**
+             * @desc Check that rescueContainer is included if vehicleRole is 
+             *       set to rescue(5).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_RESCUE
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to rescue(5)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing rescueContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-06
+             * @reference ETSI EN 302 637-2 , Annex B.15
+             */
+            testcase TC_CAM_MSD_INA_BV_06() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_06();
+                
+            } // end TC_CAM_MSD_INA_BV_06
+            
+            /**
+             * @desc Check that emergencyContainer is included if vehicleRole 
+             *       is set to emergency(6).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_EMERGENCY
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to emergency(6)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing emergencyContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-07
+             * @reference ETSI EN 302 637-2 , Annex B.16
+             */
+            testcase TC_CAM_MSD_INA_BV_07() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_07();
+                
+            } // end TC_CAM_MSD_INA_BV_07
+            
+            /**
+             * @desc Check that safetyCarContainer is included if vehicleRole 
+             *       is set to safetyCar(7).
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_SAFETY_CAR
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT’s vehicle role being set to safetyCar(7)
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             a CAM is generated
+             *         }
+             *         then {
+             *             the IUT sends a valid CAM
+             *                 containing cam
+             *                     containing camParameters
+             *                         containing specialVehicleContainer
+             *                             containing safetyCarContainer
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/INA/BV-08
+             * @reference ETSI EN 302 637-2 , Annex B.17
+             */
+            testcase TC_CAM_MSD_INA_BV_08() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_INA_BV_08();
+                
+            } // end TC_CAM_MSD_INA_BV_08
+            
+        } // end group camInformationAdaptation
+        
+        group camGenerationFrequency {
+            
+                /**
+                 * @desc Check that CAMs are not generated more frequently than 
+                 *       T_GenCamMin.
+                 * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_T_GENCAMMIN
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state"
+                 *     }
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             IUT sends a CAM
+                 *         }
+                 *         then {
+                 *             the IUT does not send any CAM before expiry of T_GenCamMin
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/TI-01
+                 * @reference ETSI EN 302 637-2 , clause 6.1.3
+                 */
+            testcase TC_CAM_MSD_GFQ_TI_01() runs on ItsCam system ItsCamSystem {
+                    
+                f_CAM_MSD_GFQ_TI_01();
+                    
+            } // end TC_CAM_MSD_GFQ_TI_01
+                    
+                /**
+                 * @desc Check that CAMs are not generated less frequently than 
+                 *       T_GenCamMax.
+                 * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+                 * Initial conditions: 
+                 *     with {
+                 *         the IUT being in the "initial state"
+                 *     }
+                 * Expected behaviour:
+                 *     ensure that {
+                 *         when {
+                 *             IUT sends a CAM
+                 *         }
+                 *         then {
+                 *             the IUT sends another CAM before expiry of T_GenCamMax
+                 *         }
+                 *     }
+                 * </pre>
+                 * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/TI-02
+                 * @reference ETSI EN 302 637-2 , clause 6.1.3
+                 */
+            testcase TC_CAM_MSD_GFQ_TI_02() runs on ItsCam system ItsCamSystem {
+                    
+                f_CAM_MSD_GFQ_TI_02();
+                    
+            } // end TC_CAM_MSD_GFQ_TI_02
+                    
+            /**
+             * @desc Check that TGenCam is set to T_GenCamMax after generating 
+             *       N_GenCam due to condition 2.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT having sent a CAM at time TIME_1
+             *         the IUT having sent an anticipated CAM due to condition 2 at time (TIME_1 + INTERVAL_1)
+             *         the IUT having sent (N_GenCam - 1) subsequent CAMs every INTERVAL_1
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             the IUT sends CAM
+             *         }
+             *         then {
+             *             the IUT sends another CAM after expiry of T_GenCamMax
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/TI-03
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_GFQ_TI_03() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_GFQ_TI_03();
+                
+            } // end TC_CAM_MSD_GFQ_TI_03
+                
+            /**
+             * @desc Check that CAM is generated immediately when the time 
+             *       elapsed since the last CAM generation is equal or larger 
+             *       than T_GenCam_Dcc and the absolute difference between 
+             *       current direction of the originating ITS-S (towards North) 
+             *       and  direction included in previous CAM exceeds 4°.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT having sent a CAM at time TIME_1
+             *             containing cam
+             *                 containing camParameters
+             *                     containing highFrequencyContainer
+             *                         containing basicVehicleContainerHighFrequency
+             *                             containing heading set to HEADING_1
+             *         the IUT not having sent any CAM since T_GenCam_Dcc
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             T_GenCam_Dcc expires
+             *             and the IUT is alerted that abs(CurrentHeading – HEADING_1) > 4°
+             *         }
+             *         then {
+             *             the IUT sends a CAM immediately
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/BV-04
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_GFQ_BV_04() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_GFQ_BV_04();
+                
+            } // end TC_CAM_MSD_GFQ_BV_04
+            
+            /**
+             * @desc Check that CAM is generated immediately when the time 
+             *       elapsed since the last CAM generation is equal or larger 
+             *       than T_GenCam_Dcc and the current position and position 
+             *       included in previous CAM exceeds 4 m.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT having sent a CAM at time TIME_1
+             *             containing cam
+             *                 containing camParameters
+             *                     containing basicContainer 
+             *                         containing referencePosition set to POSITION_1
+             *         the IUT not having sent any CAM since T_GenCam_Dcc
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             T_GenCam_Dcc expires
+             *             and the IUT is alerted that distance(CurrentPosition – POSITION_1) > 4 m
+             *         }
+             *         then {
+             *             the IUT sends a CAM immediately
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/BV-05
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_GFQ_BV_05() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_GFQ_BV_05();
+                
+            } // end TC_CAM_MSD_GFQ_BV_05
+            
+            /**
+             * @desc Check that CAM is generated immediately when the time 
+             *       elapsed since the last CAM generation is equal or larger 
+             *       than T_GenCam_Dcc and the absolute difference between 
+             *       current speed and speed included in previous CAM 
+             *       exceeds 0,5 m/s.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT having sent a CAM at time TIME_1
+             *             containing cam
+             *                 containing camParameters
+             *                     containing highFrequencyContainer
+             *                         containing basicVehicleContainerHighFrequency
+             *                             containing speed set to SPEED_1
+             *         the IUT not having sent any CAM since T_GenCam_Dcc
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *            T_GenCam_Dcc expires
+             *            and the IUT is alerted that abs(CurrentSpeed – SPEED_1) > 0,5 m/s
+             *         }
+             *         then {
+             *             the IUT sends a CAM immediately
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/BV-06
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_GFQ_BV_06() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_GFQ_BV_06();
+                
+            } // end TC_CAM_MSD_GFQ_BV_06
+            
+            /**
+             * @desc Check that CAM is generated immediately when the time 
+             *       elapsed since the last CAM generation is equal or larger 
+             *       than T_GenCam and equal or larger than T_GenCam_Dcc.
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *         the IUT having sent a CAM
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             T_GenCam expires
+             *             and T_GenCam_Dcc expires
+             *         }
+             *         then {
+             *             the IUT sends another CAM
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/TI-07
+             * @reference ETSI EN 302 637-2 , clause 6.1.3
+             */
+            testcase TC_CAM_MSD_GFQ_TI_07() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_GFQ_TI_07();
+                
+            } // end TC_CAM_MSD_GFQ_TI_07
+                
+            /**
+             * @desc Check that maximum CAM generation frequency for RSU ITS-S is 1Hz
+             *       
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION AND PICS_RSU
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *     }
+             * Expected behaviour:
+             *     ensure that {
+             *         when {
+             *             IUT sends a CAM
+             *         }
+             *         then {
+             *             the IUT does not send another CAM afterbefore 1s
+             *         }
+             *     }
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/GFQ/TI-08
+             * @reference ETSI EN 302 637-2 , clause 6.1.4
+             */
+            testcase TC_CAM_MSD_GFQ_TI_08() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_GFQ_TI_08();
+
+            } // end TC_CAM_MSD_GFQ_TI_08
+                
+        } // end group camGenerationFrequency
+
+        group camLowerLayerParameters {
+                
+            /**
+             * @desc Check that CAM is encapsulated in BTP type B packet
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *     }
+             * Expected behaviour:
+             *  ensure that {
+             *      when {
+             *          a CAM is generated
+             *      }
+             *      then {
+             *          the IUT sends a CAM
+             *              encapsulated in a BTP-B packet
+             *      }
+             *  } 
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/PAR/BV-01
+             * @reference ETSI EN 302 637-2 , clause 5.3.4.1
+             */
+            testcase TC_CAM_MSD_PAR_BV_01() runs on ItsCam system ItsCamSystem {
+                
+                f_CAM_MSD_PAR_BV_01();
+                
+            } // end TC_CAM_MSD_PAR_BV_01
+            
+            /**
+             * @desc Check that CAM is encapsulated in SHB packet
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *     }
+             * Expected behaviour:
+             *  ensure that {
+             *      when {
+             *          a CAM is generated
+             *      }
+             *      then {
+             *          the IUT sends a CAM
+             *              encapsulated in a SHB packet
+             *      }
+             *  } 
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/PAR/BV-02
+             * @reference ETSI EN 302 637-2 , clause 5.3.4.1
+             */
+            testcase TC_CAM_MSD_PAR_BV_02() runs on ItsCam system ItsCamSystem {
+        
+                f_CAM_MSD_PAR_BV_02();
+            
+            } // end TC_CAM_MSD_PAR_BV_02
+            
+            /**
+             * @desc Check that CAM is encapsulated in GN packet with lifetime lower than 1s
+             * <pre>
+             * Pics Selection: PICS_CAM_GENERATION
+             * Initial conditions: 
+             *     with {
+             *         the IUT being in the "initial state"
+             *     }
+             * Expected behaviour:
+             *  ensure that {
+             *      when {
+             *          a CAM is generated
+             *      }
+             *      then {
+             *          the IUT sends a CAM
+             *              encapsulated in a GN packet
+             *                  containing Basic Header
+             *                      containing Lifetime field 
+             *                          indicating value lower than 1s
+             *      }
+             *  } 
+             * </pre>
+             * 
+             * @see       ETSI TS 102 868-2 TP/CAM/MSD/PAR/BV-03
+             * @reference ETSI EN 302 637-2 , clause 5.3.4.1
+             */
+            testcase TC_CAM_MSD_PAR_BV_03() runs on ItsCam system ItsCamSystem {
+            
+                f_CAM_MSD_PAR_BV_03();
+            
+            } // end TC_CAM_MSD_PAR_BV_03                        
+
+        } // end group camLowerLayerParameters        
+        
+    } // end group camMessageDissemination
+      
+    group camMessageProcessing {
+        
+        /**
+         * @desc Check that content of received CAM is transmitted to 
+         *       applications and other facilities.
+         * <pre>
+         * Pics Selection: PICS_CAM_RECEPTION
+         * Initial conditions: 
+         *     with {
+         *         the IUT being in the "initial state"
+         *     }
+         * Expected behaviour:
+         *     ensure that {
+         *         when {
+         *             the IUT receives a valid CAM
+         *         }
+         *         then {
+         *             the IUT forwards the CAM content to upper layers
+         *             and the IUT forwards the CAM content to other facilities
+         *         }
+         *     }
+         * </pre>
+         * 
+         * @see       ETSI TS 102 868-2 TP/CAM/MSP/BV-01
+         * @reference ETSI EN 302 637-2 , clause 4.2.2
+         */
+        testcase TC_CAM_MSP_BV_01() runs on ItsCam system ItsCamSystem {
+            
+            f_CAM_MSP_BV_01();
+            
+        } // end TC_CAM_MSP_BV_01
+        
+    } // end group camMessageProcessing
+    
+} // end ItsCam_TestCases

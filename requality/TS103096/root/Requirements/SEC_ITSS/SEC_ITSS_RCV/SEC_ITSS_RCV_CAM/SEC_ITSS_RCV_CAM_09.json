@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "8deea1a5-3222-4877-8f1b-c6a4ec301ba0",
+            "type": "STRING",
+            "value": "Check the acceptance of payloads of Secured CAM\r\n"
+        },
+        "_locations": {
+            "isGenerated": false,
+            "key": "_locations",
+            "origin": "8deea1a5-3222-4877-8f1b-c6a4ec301ba0",
+            "type": "LIST",
+            "value": [
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/9c739ca7-141b-4d74-9a6e-54db6606bde3",
+                "/Documents/Draft_ETSI_TS_103 097 v1.1.14.xhtml/a61181d9-1ca0-444d-8723-5bc368222afc"
+            ]
+        },
+        "_name": {
+            "isGenerated": false,
+            "key": "_name",
+            "origin": "8deea1a5-3222-4877-8f1b-c6a4ec301ba0",
+            "type": "STRING",
+            "value": "09. Check payload"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "8deea1a5-3222-4877-8f1b-c6a4ec301ba0",
+            "type": "STRING",
+            "value": "Requirement"
+        }
+    },
+    "uuid": "8deea1a5-3222-4877-8f1b-c6a4ec301ba0"
+}

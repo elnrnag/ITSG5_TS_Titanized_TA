@@ -1,0 +1,25 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "I'm not sure that IUT has to discard this message if the certificate is good"
+        },
+        "_index": {
+            "key": "_index",
+            "type": "STRING",
+            "value": "1"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "Comment"
+        }
+    },
+    "uuid": "1a9c256d-de24-4ff7-a3d3-9c14cd7194d4"
+}

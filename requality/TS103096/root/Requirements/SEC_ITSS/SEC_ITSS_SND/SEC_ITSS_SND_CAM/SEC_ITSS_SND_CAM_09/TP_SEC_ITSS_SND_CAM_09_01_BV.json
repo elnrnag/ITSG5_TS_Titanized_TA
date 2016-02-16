@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "ea91326a-53a4-4d3a-b27b-07e490f86728",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "ea91326a-53a4-4d3a-b27b-07e490f86728",
+            "type": "STRING",
+            "value": "Check that the sent secured CAM contains the signer_info of type certificate_chain when the ITS-S has received a CAM containing a request of unrecognized certificate that matches with the AA certificate ID that issued its currently used AT certificate ID of the IUT."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "ea91326a-53a4-4d3a-b27b-07e490f86728",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n\tand the IUT is configured to send more than one CAM per second\r\n\tand the IUT having already sent a CAM\r\n\t\tcontaining header_fields['signer_info'].signer.type\r\n\t\t\tindicating 'certificate'\r\n\t\tat TIME_1\r\n\tand the IUT having received a SecuredMessage\r\n\t\tcontaining header_fields['request_unrecognized_certificate'] {\r\n\t\t\tcontaining digests {\r\n\t\t\t\tcontaining HashedId3 value\r\n\t\t\t\t\treferencing to the AA certificate\r\n\t\t\t}\r\n\t\t}\r\n\t\tat TIME_2 (TIME_1 < TIME_2 < TIME_1+1sec)\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a CAM\r\n\t\t\tat TIME_3 (TIME_1 < TIME_2 < TIME_3 < TIME_1+1sec)\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_CAM'\r\n\t\t\tcontaining header_fields['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate_chain'\r\n\t\t\t\t\tcontaining certificates[last]\r\n\t\t\t\t\t\tindicating the AT certificate\r\n\t\t\t\t\tcontaining certificates[last-1]\r\n\t\t\t\t\t\tindicating the AA certificate\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "ea91326a-53a4-4d3a-b27b-07e490f86728",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "ea91326a-53a4-4d3a-b27b-07e490f86728",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "ea91326a-53a4-4d3a-b27b-07e490f86728"
+}

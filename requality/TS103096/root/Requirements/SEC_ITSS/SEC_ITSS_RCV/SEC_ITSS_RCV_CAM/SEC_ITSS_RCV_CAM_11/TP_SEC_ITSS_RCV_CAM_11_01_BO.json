@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "_author": {
+            "key": "_author",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "key": "_description",
+            "type": "STRING",
+            "value": "Check that the IUT discards Secured message containing signature that is not verified using the verification key from the certificate contained in the message's signer info"
+        },
+        "_expectedResults": {
+            "key": "_expectedResults",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is receiving a SecuredMessage {\r\n\t\t\tcontaining header_fields ['signer_info'] {\r\n\t\t\t\tcontaining signer {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'certificate'\r\n\t\t\t\t\tcontaining certificate\r\n\t\t\t\t\t\tcontaining subject_info.subject_type\r\n\t\t\t\t\t\t\tindicating 'authorization_ticket' (2)\r\n\t\t\t\t\t\tand containing subject_attributes['verification key']\r\n\t\t\t\t\t\t\tcontaining key (KEY)\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tcontaining header_fields['its_aid']\r\n\t\t\t\tindicating 'AID_CAM'\r\n\t\t\tcontaining trailer_fields {\r\n\t\t\t\tcontaining single instance of type TrailerField {\r\n\t\t\t\t\tcontaining type\r\n\t\t\t\t\t\tindicating 'signature'\r\n\t\t\t\t\tcontaining signature\r\n\t\t\t\t\t\tNOT verifiable using KEY\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t} then {\r\n\t\tthe IUT discards the message\r\n\t}\r\n}"
+        },
+        "_status": {
+            "key": "_status",
+            "type": "STRING",
+            "value": "complete"
+        },
+        "_type": {
+            "key": "_type",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "68af795e-610e-46a3-b784-1f58f7d02a26"
+}

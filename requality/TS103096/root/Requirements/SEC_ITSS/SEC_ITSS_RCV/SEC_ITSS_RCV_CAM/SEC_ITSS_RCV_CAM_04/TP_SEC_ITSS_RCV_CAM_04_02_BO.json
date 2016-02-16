@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "b836d7bd-1c67-4179-8321-68e132a473cc",
+            "type": "STRING",
+            "value": "bissmeye"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "b836d7bd-1c67-4179-8321-68e132a473cc",
+            "type": "STRING",
+            "value": "Check that IUT discards a secured CAM if the header_fields does not contain the header field type: signer_info"
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "b836d7bd-1c67-4179-8321-68e132a473cc",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen { \r\n\t\tthe IUT is receiving a SecuredMessage (CAM)\r\n\t\t\tcontaining header_fields[0].type\r\n\t\t\t\tindicating 'generation_time'\r\n\t\t\tand containing header_fields[1]{\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'its_aid'\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tand not containing other header fields\r\n\t} then {\r\n\t\tthe IUT discards a SecuredMessage\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "b836d7bd-1c67-4179-8321-68e132a473cc",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "b836d7bd-1c67-4179-8321-68e132a473cc",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "b836d7bd-1c67-4179-8321-68e132a473cc"
+}

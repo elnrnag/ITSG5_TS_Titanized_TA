@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "_author": {
+            "isGenerated": false,
+            "key": "_author",
+            "origin": "954754e0-e1bf-43a9-8cfa-5202bc82f59e",
+            "type": "STRING",
+            "value": "filatov"
+        },
+        "_description": {
+            "isGenerated": false,
+            "key": "_description",
+            "origin": "954754e0-e1bf-43a9-8cfa-5202bc82f59e",
+            "type": "STRING",
+            "value": "Check that the Secured CAM contains non-empty payload of type signed."
+        },
+        "_expectedResults": {
+            "isGenerated": false,
+            "key": "_expectedResults",
+            "origin": "954754e0-e1bf-43a9-8cfa-5202bc82f59e",
+            "type": "STRING",
+            "value": "with {\r\n\tthe IUT being in the 'authorized' state\r\n}\r\nensure that {\r\n\twhen {\r\n\t\tthe IUT is requested to send a CAM\r\n\t} then {\r\n\t\tthe IUT sends a SecuredMessage {\r\n\t\t\tcontaining header_fields ['its_aid'] {\r\n\t\t\t\tcontaining its_aid\r\n\t\t\t\t\tindicating 'AID_CAM'\r\n\t\t\t}\r\n\t\t\tcontaining payload_field {\r\n\t\t\t\tcontaining type\r\n\t\t\t\t\tindicating 'signed'\r\n\t\t\t\tcontaining not-empty data\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}"
+        },
+        "_status": {
+            "isGenerated": false,
+            "key": "_status",
+            "origin": "954754e0-e1bf-43a9-8cfa-5202bc82f59e",
+            "type": "STRING",
+            "value": "verified"
+        },
+        "_type": {
+            "isGenerated": false,
+            "key": "_type",
+            "origin": "954754e0-e1bf-43a9-8cfa-5202bc82f59e",
+            "type": "STRING",
+            "value": "TestPurpose"
+        }
+    },
+    "uuid": "954754e0-e1bf-43a9-8cfa-5202bc82f59e"
+}
