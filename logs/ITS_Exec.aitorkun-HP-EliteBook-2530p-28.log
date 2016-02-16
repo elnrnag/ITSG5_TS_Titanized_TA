@@ -1,0 +1,49 @@
+2016/Feb/16 11:09:04.481359 EXECUTOR - TTCN-3 Parallel Test Component started on aitorkun-HP-EliteBook-2530p. Component reference: NodeD(28), component type: LibItsGeoNetworking_TestSystem.ItsGeoNetworking, component name: NodeD. Version: CRL 113 200/5 R4A.
+2016/Feb/16 11:09:04.481433 EXECUTOR - TTCN Logger v2.2 options: TimeStampFormat:=DateTime; LogEntityName:=No; LogEventTypes:=Yes; SourceInfoFormat:=Single; *.FileMask:=LOG_ALL | MATCHING | DEBUG; *.ConsoleMask:=ERROR | TESTCASE | STATISTICS | USER | VERDICTOP | WARNING | DEBUG; LogFileSize:=0; LogFileNumber:=1; DiskFullAction:=Error
+2016/Feb/16 11:09:04.481526 EXECUTOR - Connected to MC.
+2016/Feb/16 11:09:04.481570 PARALLEL - Initializing variables, timers and ports of component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking inside testcase TC_GEONW_PON_FPB_BV_10.
+2016/Feb/16 11:09:04.481770 WARNING - Warning: Test port parameter TRI_mapper_address is not supported on port syncPort.
+2016/Feb/16 11:09:04.481808 WARNING - Warning: Test port parameter TRI_mapper_address is not supported on port syncSendPort.
+2016/Feb/16 11:09:04.481855 WARNING - Warning: Test port parameter TRI_mapper_port is not supported on port syncPort.
+2016/Feb/16 11:09:04.481888 WARNING - Warning: Test port parameter TRI_mapper_port is not supported on port syncSendPort.
+2016/Feb/16 11:09:04.481920 PORTEVENT - Port syncPort was started.
+2016/Feb/16 11:09:04.481951 PORTEVENT - Port syncSendPort was started.
+2016/Feb/16 11:09:04.484670 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { reg := { portid := { portName := "utPort", portTypeName := "GeoNetworkingPort", component_ := { componentId := '0000001C'O, componentName := "NodeD", componentTypeName := "N/A" }, portindex := omit }, type_list := omit } } }
+2016/Feb/16 11:09:04.484768 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A302C226D7367223A7B22726567223A7B22706F72746964223A7B22706F72744E616D65223A227574506F7274222C22706F7274547970654E616D65223A2247656F4E6574776F726B696E67506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303143222C22636F6D706F6E656E744E616D65223A224E6F646544222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":0,\"msg\":{\"reg\":{\"portid\":{\"portName\":\"utPort\",\"portTypeName\":\"GeoNetworkingPort\",\"component_\":{\"componentId\":\"0000001C\",\"componentName\":\"NodeD\",\"componentTypeName\":\"N/A\"}}}}}")
+2016/Feb/16 11:09:04.487588 DEBUG - TRI_decode(): Stream before decoding: '7B226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D2C226D73675F6964223A307D'O ("{\"msg\":{\"result\":{\"result\":\"TRI_ok\"}},\"msg_id\":0}")
+2016/Feb/16 11:09:04.487698 DEBUG - TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+2016/Feb/16 11:09:04.487744 PORTEVENT - Port utPort was started.
+2016/Feb/16 11:09:04.487873 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { reg := { portid := { portName := "acPort", portTypeName := "<port type name>", component_ := { componentId := '0000001C'O, componentName := "NodeD", componentTypeName := "N/A" }, portindex := omit }, type_list := omit } } }
+2016/Feb/16 11:09:04.487943 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A302C226D7367223A7B22726567223A7B22706F72746964223A7B22706F72744E616D65223A226163506F7274222C22706F7274547970654E616D65223A223C706F72742074797065206E616D653E222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303143222C22636F6D706F6E656E744E616D65223A224E6F646544222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":0,\"msg\":{\"reg\":{\"portid\":{\"portName\":\"acPort\",\"portTypeName\":\"<port type name>\",\"component_\":{\"componentId\":\"0000001C\",\"componentName\":\"NodeD\",\"componentTypeName\":\"N/A\"}}}}}")
+2016/Feb/16 11:09:04.489037 DEBUG - TRI_decode(): Stream before decoding: '7B226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D2C226D73675F6964223A307D'O ("{\"msg\":{\"result\":{\"result\":\"TRI_ok\"}},\"msg_id\":0}")
+2016/Feb/16 11:09:04.489116 DEBUG - TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+2016/Feb/16 11:09:04.489157 PORTEVENT - Port acPort was started.
+2016/Feb/16 11:09:04.489261 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { reg := { portid := { portName := "geoNetworkingPort", portTypeName := "GeoNetworkingPort", component_ := { componentId := '0000001C'O, componentName := "NodeD", componentTypeName := "N/A" }, portindex := omit }, type_list := omit } } }
+2016/Feb/16 11:09:04.489329 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A302C226D7367223A7B22726567223A7B22706F72746964223A7B22706F72744E616D65223A2267656F4E6574776F726B696E67506F7274222C22706F7274547970654E616D65223A2247656F4E6574776F726B696E67506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303143222C22636F6D706F6E656E744E616D65223A224E6F646544222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":0,\"msg\":{\"reg\":{\"portid\":{\"portName\":\"geoNetworkingPort\",\"portTypeName\":\"GeoNetworkingPort\",\"component_\":{\"componentId\":\"0000001C\",\"componentName\":\"NodeD\",\"componentTypeName\":\"N/A\"}}}}}")
+2016/Feb/16 11:09:04.490825 DEBUG - TRI_decode(): Stream before decoding: '7B226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D2C226D73675F6964223A307D'O ("{\"msg\":{\"result\":{\"result\":\"TRI_ok\"}},\"msg_id\":0}")
+2016/Feb/16 11:09:04.491056 DEBUG - TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+2016/Feb/16 11:09:04.491103 PORTEVENT - Port geoNetworkingPort was started.
+2016/Feb/16 11:09:04.491122 PARALLEL - Component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking was initialized.
+2016/Feb/16 11:09:04.722289 PARALLEL - Kill was requested from MC. Terminating idle PTC.
+2016/Feb/16 11:09:04.722323 PARALLEL - Terminating component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking.
+2016/Feb/16 11:09:04.722344 PORTEVENT - Port syncPort was stopped.
+2016/Feb/16 11:09:04.722362 PORTEVENT - Port syncSendPort was stopped.
+2016/Feb/16 11:09:04.722382 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { unregister := { } } }
+2016/Feb/16 11:09:04.722438 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A312C226D7367223A7B22756E7265676973746572223A7B7D7D7D'O ("{\"msg_id\":1,\"msg\":{\"unregister\":{}}}")
+2016/Feb/16 11:09:04.761547 DEBUG - TRI_decode(): Stream before decoding: '7B226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D2C226D73675F6964223A317D'O ("{\"msg\":{\"result\":{\"result\":\"TRI_ok\"}},\"msg_id\":1}")
+2016/Feb/16 11:09:04.761684 DEBUG - TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+2016/Feb/16 11:09:04.761762 PORTEVENT - Port utPort was stopped.
+2016/Feb/16 11:09:04.761788 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { unregister := { } } }
+2016/Feb/16 11:09:04.761836 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A312C226D7367223A7B22756E7265676973746572223A7B7D7D7D'O ("{\"msg_id\":1,\"msg\":{\"unregister\":{}}}")
+2016/Feb/16 11:09:04.801472 DEBUG - TRI_decode(): Stream before decoding: '7B226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D2C226D73675F6964223A317D'O ("{\"msg\":{\"result\":{\"result\":\"TRI_ok\"}},\"msg_id\":1}")
+2016/Feb/16 11:09:04.801615 DEBUG - TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+2016/Feb/16 11:09:04.801708 PORTEVENT - Port acPort was stopped.
+2016/Feb/16 11:09:04.801739 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { unregister := { } } }
+2016/Feb/16 11:09:04.801802 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A312C226D7367223A7B22756E7265676973746572223A7B7D7D7D'O ("{\"msg_id\":1,\"msg\":{\"unregister\":{}}}")
+2016/Feb/16 11:09:04.842098 DEBUG - TRI_decode(): Stream before decoding: '7B226D7367223A7B22726573756C74223A7B22726573756C74223A225452495F6F6B227D7D2C226D73675F6964223A317D'O ("{\"msg\":{\"result\":{\"result\":\"TRI_ok\"}},\"msg_id\":1}")
+2016/Feb/16 11:09:04.842335 DEBUG - TRI_decode(): Decoded @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 1, msg := { result := { result := TRI_ok (0), result_string := omit } } }
+2016/Feb/16 11:09:04.842524 PORTEVENT - Port geoNetworkingPort was stopped.
+2016/Feb/16 11:09:04.842578 PARALLEL - Component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking was shut down inside testcase TC_GEONW_PON_FPB_BV_10.
+2016/Feb/16 11:09:04.842662 VERDICTOP - Final verdict of PTC: none
+2016/Feb/16 11:09:04.843026 EXECUTOR - Disconnected from MC.
+2016/Feb/16 11:09:04.844186 EXECUTOR - TTCN-3 Parallel Test Component finished.

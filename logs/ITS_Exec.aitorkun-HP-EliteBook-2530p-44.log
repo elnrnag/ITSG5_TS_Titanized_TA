@@ -1,0 +1,23 @@
+2016/Feb/16 11:09:18.583333 EXECUTOR - TTCN-3 Parallel Test Component started on aitorkun-HP-EliteBook-2530p. Component reference: NodeC(44), component type: LibItsGeoNetworking_TestSystem.ItsGeoNetworking, component name: NodeC. Version: CRL 113 200/5 R4A.
+2016/Feb/16 11:09:18.583435 EXECUTOR - TTCN Logger v2.2 options: TimeStampFormat:=DateTime; LogEntityName:=No; LogEventTypes:=Yes; SourceInfoFormat:=Single; *.FileMask:=LOG_ALL | MATCHING | DEBUG; *.ConsoleMask:=ERROR | TESTCASE | STATISTICS | USER | VERDICTOP | WARNING | DEBUG; LogFileSize:=0; LogFileNumber:=1; DiskFullAction:=Error
+2016/Feb/16 11:09:18.584366 EXECUTOR - Connected to MC.
+2016/Feb/16 11:09:18.584856 PARALLEL - Initializing variables, timers and ports of component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking inside testcase TC_GEONW_PON_FPB_BV_12_03.
+2016/Feb/16 11:09:18.585106 WARNING - Warning: Test port parameter TRI_mapper_address is not supported on port syncPort.
+2016/Feb/16 11:09:18.585174 WARNING - Warning: Test port parameter TRI_mapper_address is not supported on port syncSendPort.
+2016/Feb/16 11:09:18.585272 WARNING - Warning: Test port parameter TRI_mapper_port is not supported on port syncPort.
+2016/Feb/16 11:09:18.585330 WARNING - Warning: Test port parameter TRI_mapper_port is not supported on port syncSendPort.
+2016/Feb/16 11:09:18.585388 PORTEVENT - Port syncPort was started.
+2016/Feb/16 11:09:18.585420 PORTEVENT - Port syncSendPort was started.
+2016/Feb/16 11:09:18.585554 DEBUG - TRI_encode(): Encoding @TRI_interface_Types.TRI_mapper_PDU: { msg_id := 0, msg := { reg := { portid := { portName := "utPort", portTypeName := "GeoNetworkingPort", component_ := { componentId := '0000002C'O, componentName := "NodeC", componentTypeName := "N/A" }, portindex := omit }, type_list := omit } } }
+2016/Feb/16 11:09:18.585679 DEBUG - TRI_encode(): Stream after encoding: '7B226D73675F6964223A302C226D7367223A7B22726567223A7B22706F72746964223A7B22706F72744E616D65223A227574506F7274222C22706F7274547970654E616D65223A2247656F4E6574776F726B696E67506F7274222C22636F6D706F6E656E745F223A7B22636F6D706F6E656E744964223A223030303030303243222C22636F6D706F6E656E744E616D65223A224E6F646543222C22636F6D706F6E656E74547970654E616D65223A224E2F41227D7D7D7D7D'O ("{\"msg_id\":0,\"msg\":{\"reg\":{\"portid\":{\"portName\":\"utPort\",\"portTypeName\":\"GeoNetworkingPort\",\"component_\":{\"componentId\":\"0000002C\",\"componentName\":\"NodeC\",\"componentTypeName\":\"N/A\"}}}}}")
+2016/Feb/16 11:09:18.586244 ERROR - Dynamic test case error: TRI_Mapper connection lost 104 Connection reset by peer (Connection reset by peer)
+2016/Feb/16 11:09:18.586476 VERDICTOP - setverdict(error): none -> error
+2016/Feb/16 11:09:18.586554 EXECUTOR - Performing error recovery.
+2016/Feb/16 11:09:18.586744 EXECUTOR - Component type initialization failed. PTC terminates.
+2016/Feb/16 11:09:18.586766 PARALLEL - Terminating component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking.
+2016/Feb/16 11:09:18.586786 PORTEVENT - Port syncPort was stopped.
+2016/Feb/16 11:09:18.586802 PORTEVENT - Port syncSendPort was stopped.
+2016/Feb/16 11:09:18.586826 PARALLEL - Component type LibItsGeoNetworking_TestSystem.ItsGeoNetworking was shut down inside testcase TC_GEONW_PON_FPB_BV_12_03.
+2016/Feb/16 11:09:18.586906 VERDICTOP - Final verdict of PTC: error
+2016/Feb/16 11:09:18.587058 EXECUTOR - Disconnected from MC.
+2016/Feb/16 11:09:18.587078 EXECUTOR - TTCN-3 Parallel Test Component finished.
