@@ -1,1 +1,0 @@
-../TRI/MapSpat/UpperTesterMapSpatPort.cc

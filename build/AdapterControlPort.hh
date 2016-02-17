@@ -1,1 +1,0 @@
-../TRI/ACP/AdapterControlPort.hh
