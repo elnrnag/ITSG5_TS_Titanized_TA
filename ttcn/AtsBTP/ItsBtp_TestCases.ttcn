@@ -76,6 +76,7 @@ module ItsBtp_TestCases {
             f_selfOrClientSyncAndVerdictPreamble(c_prDone, e_success);
                                 
             // Test Body
+            
             f_utTriggerEvent(m_generateBtpA(f_getBtpDstPort(), f_getBtpSrcPort()));
             tc_ac.start;
             alt {

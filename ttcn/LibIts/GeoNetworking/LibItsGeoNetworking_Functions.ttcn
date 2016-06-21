@@ -1852,14 +1852,13 @@ module LibItsGeoNetworking_Functions {
     
     group testerFunctions {
         
-        /**
+        /**  
          * @desc    Gets the tester GN local address for a specific node
          * @param   p_node  Simulated node
          * @return  GN address of simulated node
          */
         function f_getTsGnLocalAddress(in charstring p_node) return GN_Address {
             var GN_Address v_gnAddr := valueof(m_dummyGnAddr);
-            
             select (p_node) {
                 case (c_compNodeA) {
                     v_gnAddr := PX_TS_NODE_A_LOCAL_GN_ADDR;

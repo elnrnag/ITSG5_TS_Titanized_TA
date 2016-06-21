@@ -56,6 +56,7 @@ module LibItsGeoNetworking_Templates {
             template (value) GeoNetworkingPdu p_geoNwMsg,
             template (value) MacAddress p_llDestinationAdress
         ) modifies m_geoNwReq_linkLayerBroadcast := {
+          	msgOut := p_geoNwMsg,
             macDestinationAddress := p_llDestinationAdress
         }
         
@@ -545,7 +546,7 @@ module LibItsGeoNetworking_Templates {
                 payload := f_adaptPayload_m(char2oct("DEFAULT_PAYLOAD"))
             },
             securedMsg := omit
-        }
+        }  
         
         /**
          * @desc    Send template for GeoNetworking Packet with no payload
@@ -2387,26 +2388,22 @@ module LibItsGeoNetworking_Templates {
             var template (present) Payload v_payload;
             
             if(PX_GN_UPPER_LAYER == e_any) {
-               //v_payload := { decodedPayload := *, rawPayload := p_finalPayload};
-               v_payload := { rawPayload := p_finalPayload};
+               v_payload := { decodedPayload := *, rawPayload := p_finalPayload};
                return v_payload;
             }
             
             if(PX_GN_UPPER_LAYER == e_ipv6) {
-               //v_payload := { decodedPayload := { ipv6Packet := mw_ipv6Packet(?, ?, ?, mw_octetstringPayload(p_finalPayload))}, rawPayload := ?};
-               v_payload := { rawPayload := ?};
+               v_payload := { decodedPayload := { ipv6Packet := mw_ipv6Packet(?, ?, ?, mw_octetstringPayload(p_finalPayload))}, rawPayload := ?};
                return v_payload;
             }
             
             if(PX_GN_UPPER_LAYER == e_btpA) {
-               //v_payload := { decodedPayload := { btpPacket := mw_btpA(?, ?, { decodedPayload := *, rawPayload := p_finalPayload } )}, rawPayload := ?};
-               v_payload := { rawPayload := ?};
+               v_payload := { decodedPayload := { btpPacket := mw_btpA(?, ?, { decodedPayload := *, rawPayload := p_finalPayload } )}, rawPayload := ?};
                return v_payload;
             }
             
             if(PX_GN_UPPER_LAYER == e_btpB) {
-               //v_payload := { decodedPayload := { btpPacket := mw_btpB(?, ?, { decodedPayload := *, rawPayload := p_finalPayload })}, rawPayload := ?};
-               v_payload := { rawPayload := ?};
+               v_payload := { decodedPayload := { btpPacket := mw_btpB(?, ?, { decodedPayload := *, rawPayload := p_finalPayload })}, rawPayload := ?};
                
                return v_payload;
             }

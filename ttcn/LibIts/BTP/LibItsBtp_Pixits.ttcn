@@ -43,7 +43,7 @@ module LibItsBtp_Pixits {
          * 		 
          */
     	modulepar BtpPayload PX_PAYLOAD := { 
-    	    //decodedPayload := omit, 
+    	    decodedPayload := omit, 
     	    rawPayload := '0102030405'O 
     	};
 
