@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="/home/elnrnag/Ericsson/ITS/ITSG5_TS_Titanized_TA/titan_tri_mapper/TitanTriMapper.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/trimapper/TitanTriMapper.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/trimapper/MANIFEST.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=codec"/>
+        <javaElement handleIdentifier="=certificatesio"/>
+        <javaElement handleIdentifier="=adapter"/>
+        <javaElement handleIdentifier="=OT3RUNTIME"/>
+        <javaElement handleIdentifier="=common"/>
+        <javaElement handleIdentifier="=trimapper"/>
+    </selectedElements>
+</jardesc>

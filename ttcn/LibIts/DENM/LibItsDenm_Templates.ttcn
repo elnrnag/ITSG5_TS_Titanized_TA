@@ -61,13 +61,13 @@ module LibItsDenm_Templates {
             template (present) DENM p_denMsg
         ) := {
             msgIn := p_denMsg,
-            gnNextHeader := *,
-            gnHeaderType := *,
-            gnHeaderSubtype := *,
-            gnLifetime := *,
-            gnTrafficClass := *,
-            btpDestinationPort := *,
-            btpInfo := * 
+            gnNextHeader := ?,
+            gnHeaderType := ?,
+            gnHeaderSubtype := ?,
+            gnLifetime := ?,
+            gnTrafficClass := ?,
+            btpDestinationPort := ?,
+            btpInfo := ? 
         }
 
         /**
@@ -558,7 +558,7 @@ module LibItsDenm_Templates {
             eventPosition := ?,
             relevanceDistance := *,
             relevanceTrafficDirection := *,
-            validityDuration := *, // It seems that a default value can be omitted (asn1studio)
+            validityDuration := ?, // It seems that a default value can be omitted (asn1studio)
             transmissionInterval := *,
             stationType    := ?
         }

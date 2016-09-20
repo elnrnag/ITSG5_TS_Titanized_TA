@@ -21,7 +21,7 @@ module ItsDenm_TestControl {
         
         if(PICS_DENM_GENERATION) {
             execute(TC_DEN_MSGF_BV_01());
-/*            execute(TC_DEN_MSGF_BV_02());
+            execute(TC_DEN_MSGF_BV_02());
             
             execute(TC_DEN_EVGN_BV_01());
             execute(TC_DEN_EVGN_BV_02());
@@ -29,9 +29,9 @@ module ItsDenm_TestControl {
             execute(TC_DEN_EVGN_BV_04());
             execute(TC_DEN_EVGN_BV_05());
             execute(TC_DEN_EVGN_BV_07());
-            execute(TC_DEN_EVGN_BV_10()); */
+            execute(TC_DEN_EVGN_BV_10()); 
         }
-/*        
+        
         if(PICS_DENM_UPDATE) {
             execute(TC_DEN_EVUP_BV_01());
             execute(TC_DEN_EVUP_BV_02());
@@ -100,7 +100,7 @@ module ItsDenm_TestControl {
             execute(TC_DEN_KAFW_BV_09());
             execute(TC_DEN_KAFW_BV_10());
         }
-*/	
+	
     }
     
 } // end ItsDenm_TestControl

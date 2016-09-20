@@ -5,6 +5,8 @@
 * which accompanies this distribution, and is available at
 * http://www.eclipse.org/legal/epl-v10.html
 *
+* This file is compatible with the Titan compiler R4C
+*
 ******************************************************************************/
 
 module TTCN_EncDec {
@@ -136,23 +138,68 @@ type record ExtTrafficClass {
   BIT6   tcId
 } with { variant "" };
 
+
+function f_enc_TrafficClass(TrafficClass tc) return ExtTrafficClass {
+  var ExtTrafficClass etc;
+  etc.scf := int2bit(enum2int(tc.scf),1);
+  etc.channelOffload := int2bit(enum2int(tc.channelOffload),1);
+  etc.tcId := int2bit(tc.tcId,6);
+  return etc;
+}
+
 type record ExtGnPayload {
   //DecodedPayload decodedPayload optional, //TODO: Not yet implemented
   octetstring rawPayload
 } with { variant "" };
 
 
-external function f_enc_Ut_Gn_GenerateGeoUnicastMessage(in GenerateGeoUnicastMessage pdu) return octetstring
+/*
+ * GeoUnicast
+*/
+
+type record ExtGenerateGeoUnicastMessage {
+  GN_Address gnAddress,
+  UInt16 lifetime,
+  ExtTrafficClass trafficClass,
+  UInt16 payloadLength,
+  ExtGnPayload payload 
+} with { variant(payloadLength) "LENGTHTO(payload)" };
+
+external function f_enc_Ext_UtGnGenerateGeoUnicastMessage(in ExtGenerateGeoUnicastMessage pdu) return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
 
+function f_enc_Ut_Gn_GenerateGeoUnicastMessage(in GenerateGeoUnicastMessage pdu) return octetstring {
+  var ExtGenerateGeoUnicastMessage ext;
+
+  ext.gnAddress := pdu.gnAddress;
+  ext.lifetime := pdu.lifetime;
+
+  ext.trafficClass := f_enc_TrafficClass(pdu.trafficClass);
+
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+
+  //TODO: decodedPayload 
+  /*if (ispresent(pdu.payload.decodedPayload)) {
+  ext.payloadLength := ext.payloadLength + lengthof(pdu.payload.DecodedPayload);
+  ext.payload.DecodedPayload := pdu.payload.DecodedPayload
+  }
+  */
+
+  return f_enc_Ext_UtGnGenerateGeoUnicastMessage(ext);
+}
 
 external function f_dec_Ut_Gn_GenerateGeoUnicastMessage(in octetstring stream) return GenerateGeoUnicastMessage
 with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
 
+
+/*
+ * GeoBroadcast
+*/
 
 type record ExtGenerateGeoBroadcastMessage {
   UInt8  shape,
@@ -206,21 +253,51 @@ with { extension "prototype(convert)"
 
 
 
+/*
+ * GeoAnycast
+*/
+
+function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring {
+  return f_enc_Ut_Gn_GenerateGeoBroadcastMessage(pdu);
+}
+
+/*
 external function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
-
+*/
 
 external function f_dec_Ut_Gn_GenerateGeoAnycastMessage(in octetstring stream) return GenerateGeoAnycastMessage
 with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
 
-external function f_enc_Ut_Gn_GenerateSHBMessage(in GenerateSHBMessage pdu) return octetstring
+/*
+ * SHBMessage
+*/
+
+
+type record ExtGenerateSHBMessage {
+  ExtTrafficClass trafficClass,
+  UInt16 payloadLength,
+  ExtGnPayload payload 
+} with { variant(payloadLength) "LENGTHTO(payload)" };
+
+external function f_enc_Ext_Ut_Gn_GenerateSHBMessage(in ExtGenerateSHBMessage pdu) 
+  return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
+
+function f_enc_Ut_Gn_GenerateSHBMessage(in GenerateSHBMessage pdu) return octetstring
+{
+  var ExtGenerateSHBMessage ext;
+  ext.trafficClass := f_enc_TrafficClass(pdu.trafficClass);
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+  return f_enc_Ext_Ut_Gn_GenerateSHBMessage(ext);
+}
 
 
 external function f_dec_Ut_Gn_GenerateSHBMessage(in octetstring stream) return GenerateSHBMessage
@@ -228,16 +305,51 @@ with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
 
-external function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
+/*
+ * TSBMessage
+*/
+
+type record ExtGenerateTSBMessage {
+  UInt8           nbHops,
+  UInt16          lifetime,
+  ExtTrafficClass trafficClass,
+  UInt16          payloadLength,
+  ExtGnPayload    payload 
+} with { variant(payloadLength) "LENGTHTO(payload)" };
+
+external function f_enc_Ext_Ut_Gn_GenerateTSBMessage(in ExtGenerateTSBMessage pdu) 
+  return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
 
+function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
+{
+  var ExtGenerateTSBMessage ext;
+  ext.nbHops := pdu.nbHops;
+  ext.lifetime := pdu.lifetime;
+  ext.trafficClass := f_enc_TrafficClass(pdu.trafficClass);
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+  return f_enc_Ext_Ut_Gn_GenerateTSBMessage(ext);
+}
+
+/*
+external function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+*/
 
 external function f_dec_Ut_Gn_GenerateTSBMessage(in octetstring stream) return GenerateTSBMessage
 with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
+
+
+/*
+ * UtGnTrigger
+*/
 
 
 function f_enc_UtGnTrigger(in UtGnTrigger pdu) return octetstring
@@ -793,43 +905,13 @@ function f_dec_BtpInd(in octetstring stream) return BtpInd {
 
     var DecodedBtpPayload v_decodedPayload;
     if (v_ExtBtpInd.nextheader == '01'O) { //BTP A Header
-      if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2001) 
-      {
-        v_decodedPayload := 
-        { camPacket := 
-          dec_CAM_PDU(v_ExtBtpInd.rawPayload)}
-      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2002) {
-        v_decodedPayload := 
-        { denmPacket := 
-          dec_DENM_PDU(v_ExtBtpInd.rawPayload)}
-      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2003) {
-        v_decodedPayload := 
-        { mapPacket := 
-          dec_MAP_PDU(v_ExtBtpInd.rawPayload)}
-      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2004) {
-        v_decodedPayload := 
-        { spatPacket := 
-          dec_SPAT_PDU(v_ExtBtpInd.rawPayload)}
-      }  
+      v_decodedPayload := 
+          decodeBTPPayload(v_ExtBtpInd.rawPayload, 
+                           v_ExtBtpInd.header.btpAHeader.destinationPort);
     } else if (v_ExtBtpInd.nextheader == '02'O) { //BTP B Header
-      if (v_ExtBtpInd.header.btpBHeader.destinationPort == 2001) 
-      {
-        v_decodedPayload := 
-        { camPacket := 
-          dec_CAM_PDU(v_ExtBtpInd.rawPayload)}
-      } else if (v_ExtBtpInd.header.btpBHeader.destinationPort == 2002) {
-        v_decodedPayload := 
-        { denmPacket := 
-          dec_DENM_PDU(v_ExtBtpInd.rawPayload)}
-      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2003) {
-        v_decodedPayload := 
-        { mapPacket := 
-          dec_MAP_PDU(v_ExtBtpInd.rawPayload)}
-      } else if (v_ExtBtpInd.header.btpAHeader.destinationPort == 2004) {
-        v_decodedPayload := 
-        { spatPacket := 
-          dec_SPAT_PDU(v_ExtBtpInd.rawPayload)}
-      }
+      v_decodedPayload := 
+          decodeBTPPayload(v_ExtBtpInd.rawPayload, 
+                           v_ExtBtpInd.header.btpBHeader.destinationPort);
     }
 
     if (isbound(v_decodedPayload)) {
@@ -843,6 +925,27 @@ function f_dec_BtpInd(in octetstring stream) return BtpInd {
   }
 
   return v_BtpInd
+
+}
+
+function decodeBTPPayload(octetstring rawPayload, integer destinationPort) 
+  return DecodedBtpPayload {
+    var DecodedBtpPayload v_decodedPayload;
+    if (destinationPort == 2001) 
+    {
+      v_decodedPayload := { camPacket := dec_CAM_PDU(rawPayload)}
+    } else if (destinationPort == 2002) {
+      v_decodedPayload := { denmPacket := dec_DENM_PDU(rawPayload)}
+    } else if (destinationPort == 2003) {
+      v_decodedPayload := { mapPacket := dec_MAP_PDU(rawPayload)}
+    } else if (destinationPort == 2004) {
+      v_decodedPayload := { spatPacket := dec_SPAT_PDU(rawPayload)}
+    } //TODO: Handle destinationPort == 2005
+    return v_decodedPayload;
+}
+
+function isWellKnownBTPPort(integer prt) return boolean {
+  return ((prt >= 2001) and (prt <= 2005));
 
 }
 
@@ -1005,13 +1108,13 @@ type record ExtGnNonSecuredPacket {
   octetstring        btpPayload       optional,
   GnRawPayload       rawPayload
 } with { variant 	            "FIELDORDER(msb)";
-  variant(plLength)       "LENGTHTO(ipv6Packet, 
-  btpHeader, 
-  btpPayload, 
-  rawPayload)";
+         variant(plLength)     	    "LENGTHTO(ipv6Packet, 
+                                              btpHeader, 
+                                              btpPayload, 
+                                              rawPayload)";
 
-  variant(extendedHeader) "CROSSTAG(anyHeader,           headerTST = 0;
-  beaconHeader,        headerTST = 16;
+         variant(extendedHeader) "CROSSTAG(anyHeader,           headerTST = 0;
+   beaconHeader,        headerTST = 16;
   geoUnicastHeader,    headerTST = 32;
   geoAnycastHeader,   {headerTST = 48,
   headerTST = 49,
@@ -1026,12 +1129,8 @@ type record ExtGnNonSecuredPacket {
 
   variant(ipv6Packet)     "PRESENCE(nextHeader = e_ipv6;)";
 
-  variant(btpHeader)      "PRESENCE(nextHeader = e_btpA;)";
-
-  variant(btpHeader)      "PRESENCE(nextHeader = e_btpB;)";
-
   variant(btpHeader)      "CROSSTAG(btpAHeader, nextHeader = e_btpA;
-  btpBHeader, nextHeader = e_btpB;)";
+                                    btpBHeader, nextHeader = e_btpB;)";
 
   variant(btpPayload)     "PRESENCE(nextHeader = e_btpA;)";
   variant(btpPayload)     "PRESENCE(nextHeader = e_btpB;)";
@@ -1155,103 +1254,65 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
 
     GNI.msgIn.gnPacket.packet.extendedHeader := EGNI.msgIn.packet.extendedHeader;
 
-    if (ispresent(EGNI.msgIn.packet.btpHeader)) {       
-      if (EGNI.msgIn.packet.nextHeader == e_btpA) {
-        var BtpPacket v_btpPacket;
 
-        if (ispresent(EGNI.msgIn.packet.btpPayload)) 
-        {
-          var DecodedBtpPayload v_decodedPayload;
-          if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2001) {
-            v_decodedPayload := 
-            { camPacket := 
-              dec_CAM_PDU(EGNI.msgIn.packet.btpPayload)}
-          } else if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2002) {
-            v_decodedPayload := 
-            { denmPacket := 
-              dec_DENM_PDU(EGNI.msgIn.packet.btpPayload)}
-          } else if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2003) {
-            v_decodedPayload := 
-            { mapPacket := 
-              dec_MAP_PDU(EGNI.msgIn.packet.btpPayload)}
-          } else if (EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort == 2004) {
-            v_decodedPayload := 
-            { spatPacket := 
-              dec_SPAT_PDU(EGNI.msgIn.packet.btpPayload)}
-          }
-          if (isbound(v_decodedPayload)) {
-            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-              payload := {decodedPayload := v_decodedPayload,
-                rawPayload := EGNI.msgIn.packet.btpPayload}};
-          } else {
-            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-              payload := {decodedPayload := omit,
-                rawPayload := EGNI.msgIn.packet.btpPayload}};
-          }
-
-        } else {
-          v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-            payload := omit};
-        }
-
-        GNI.msgIn.gnPacket.packet.payload.decodedPayload := {btpPacket := v_btpPacket};
-        GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;   
+    if (EGNI.msgIn.packet.nextHeader == e_btpA) {
+    
+      var BtpPacket v_btpPacket;
+      var DecodedBtpPayload v_decodedPayload;
+      if ((EGNI.msgIn.packet.plLength > 0) and
+           isWellKnownBTPPort(EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort) ) {
+        v_decodedPayload := 
+          decodeBTPPayload(EGNI.msgIn.packet.btpPayload, 
+                           EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort);
       }
-      else if (EGNI.msgIn.packet.nextHeader == e_btpB)
-      {
-        var BtpPacket v_btpPacket;
-        if (ispresent(EGNI.msgIn.packet.btpPayload)) 
-        {
-          var DecodedBtpPayload v_decodedPayload;
-          if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2001) 
-          {
-            v_decodedPayload := 
-            { camPacket := 
-              dec_CAM_PDU(EGNI.msgIn.packet.btpPayload)}
-          } else if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2002) 
-          {
-            v_decodedPayload := 
-            { denmPacket := 
-              dec_DENM_PDU(EGNI.msgIn.packet.btpPayload)}
-          } else if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2003) 
-          {
-            v_decodedPayload := 
-            { mapPacket := 
-              dec_MAP_PDU(EGNI.msgIn.packet.btpPayload)}
-          } else if (EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort == 2004) 
-          {
-            v_decodedPayload := 
-            { spatPacket := 
-              dec_SPAT_PDU(EGNI.msgIn.packet.btpPayload)}
-          } 
 
-          if (isbound(v_decodedPayload)) {
-            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-              payload := {decodedPayload := v_decodedPayload,
-                rawPayload := EGNI.msgIn.packet.btpPayload}};
-          } else {
-            v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-              payload := {decodedPayload := omit,
-                rawPayload := EGNI.msgIn.packet.btpPayload}};	         
-          }
-        } else {
+      if (isbound(v_decodedPayload)) {
           v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-            payload := omit};
-        }
+                          payload := {decodedPayload := v_decodedPayload,
+                                      rawPayload     := EGNI.msgIn.packet.btpPayload}};
+      } 
 
-        GNI.msgIn.gnPacket.packet.payload.decodedPayload := {btpPacket := v_btpPacket};
-        GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
-
-      } else if (EGNI.msgIn.packet.nextHeader == e_ipv6) {
-
-        //TODO Handle Ipv6
-        GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
-        GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
-
-      } else if (EGNI.msgIn.packet.nextHeader == e_any) {
-        GNI.msgIn.gnPacket.packet.payload := omit;
+      if (isbound(v_btpPacket)) {
+          GNI.msgIn.gnPacket.packet.payload.decodedPayload := 
+              {btpPacket := v_btpPacket};
+      } else {
+          GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
       }
     }
+    else if (EGNI.msgIn.packet.nextHeader == e_btpB)
+    {
+
+      var BtpPacket v_btpPacket;
+      var DecodedBtpPayload v_decodedPayload;
+
+      if ((EGNI.msgIn.packet.plLength > 0) and
+           isWellKnownBTPPort(EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort)) {
+        v_decodedPayload := 
+          decodeBTPPayload(EGNI.msgIn.packet.btpPayload, 
+                           EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort);
+      }
+
+      if (isbound(v_decodedPayload)) {
+          v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
+                          payload := {decodedPayload := v_decodedPayload,
+                                      rawPayload     := EGNI.msgIn.packet.btpPayload}};
+      } 
+
+      if (isbound(v_btpPacket)) {
+          GNI.msgIn.gnPacket.packet.payload.decodedPayload := 
+              {btpPacket := v_btpPacket};
+      } else {
+          GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
+      }
+
+    } else if (EGNI.msgIn.packet.nextHeader == e_ipv6) {
+
+      //TODO Handle Ipv6
+      GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
+    } else if (EGNI.msgIn.packet.nextHeader == e_any) {
+      GNI.msgIn.gnPacket.packet.payload := omit;
+    }
+    GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
   }//End of ExtGnNonSecuredPacket
 
   GNI.msgIn.gnPacket.securedMsg := EGNI.msgIn.securedMsg;
