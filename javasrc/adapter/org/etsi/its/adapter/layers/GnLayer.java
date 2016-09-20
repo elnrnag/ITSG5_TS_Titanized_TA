@@ -360,24 +360,6 @@ public class GnLayer extends Layer implements Runnable, IEthernetSpecific {
 				else {
 					// we are not interested in LS replies so far.
 				}
-
-//			} else if(headerType == HT_TSB) {
-//				//For now we don't care about the TSB, but we need to overcome a strange behavior
-//				//of the COHDA MK5 wireless router: It sends a 2bytes empty data at the end of the 
-//				//btpIndication, which is not against the standard, however it is not required
-//				//but it messes up the "message.length - payloadLength" position calculation
-//				//TSB ExtendedHeader length = 28 -> payloadPosition = 4+8+28 = 40
-//				if(payloadLength > 0) {
-//					byte[] payload = new byte[payloadLength];
-//					System.arraycopy(message, 40, payload, 0, payloadLength);
-//					lowerInfo.put(GN_NEXTHEADER, nextHeader);
-//					lowerInfo.put(GN_TYPE, headerType);
-//					lowerInfo.put(GN_SUBTYPE, headerSubType);
-//					lowerInfo.put(GN_LIFETIME, lifetime);
-//					lowerInfo.put(GN_TRAFFICCLASS, trafficClass);
-//					super.receive(payload, lowerInfo);
-//				}
-//
 			} else {
 				// Other messages
 				if(payloadLength > 0) {
