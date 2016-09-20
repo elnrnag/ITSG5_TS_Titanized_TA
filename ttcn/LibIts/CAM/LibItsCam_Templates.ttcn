@@ -36,13 +36,13 @@ module LibItsCam_Templates {
             in template (present) CAM p_camMsg
         ) := { 
             msgIn := p_camMsg,
-            gnNextHeader := *,
-            gnHeaderType := *,
-            gnHeaderSubtype := *,
-            gnLifetime := *,
-            gnTrafficClass := *,
-            btpDestinationPort := *,
-            btpInfo := * 
+            gnNextHeader := ?,
+            gnHeaderType := ?,
+            gnHeaderSubtype := ?,
+            gnLifetime := ?,
+            gnTrafficClass := ?,
+            btpDestinationPort := ?,
+            btpInfo := ? 
         };
         
         /**
