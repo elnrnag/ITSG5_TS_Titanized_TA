@@ -34,5 +34,7 @@ cd ../build
 ttcn3_start ./ITS_Exec cfg.cfg
 ```
 
-
+## More Info:
+# About TITAN:
+https://projects.eclipse.org/projects/tools.titan
 
