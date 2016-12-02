@@ -563,13 +563,13 @@ function f_enc_UtDenmTrigger(in UtDenmTrigger pdu) return octetstring
 
   v_ExtUtDenmTrigger.relevanceTrafficDirection := enum2int(pdu.relevanceTrafficDirection);
   if (ispresent(pdu.transmissionInterval)) {
-    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 8;
+    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 32;
     v_ExtUtDenmTrigger.transmissionInterval := pdu.transmissionInterval;
   } else {
     v_ExtUtDenmTrigger.transmissionInterval := 0; //omit;
   }
   if (ispresent(pdu.repetitionInterval)) {
-    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 32;
+    v_ExtUtDenmTrigger.bitmask := v_ExtUtDenmTrigger.bitmask + 64;
     v_ExtUtDenmTrigger.repetitionInterval := pdu.repetitionInterval;
   } else {
     v_ExtUtDenmTrigger.repetitionInterval := 0; //omit;

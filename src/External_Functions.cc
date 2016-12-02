@@ -29,13 +29,13 @@ namespace LibItsCommon__Functions {
    * @return  Timestamp - current time since 01/01/2014 in milliseconds
    */
   INTEGER fx__getCurrentTime() {
-    unsigned long long timestamp2014 = 1356998400000;
+    unsigned long long timestamp2004 = 1072915200000 ;
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
     unsigned long long timestampNow = tv.tv_sec*1000 + tv.tv_usec/1000;
     INTEGER i = INTEGER();
-    i.set_long_long_val(timestampNow - timestamp2014);
+    i.set_long_long_val(timestampNow - timestamp2004);
     return i;
   }
 

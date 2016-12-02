@@ -88,8 +88,8 @@ namespace LibItsDenm__TestSystem {
 
 	    //sequenceNumber	  
 	    unsigned int sequenceNumber = tmp1[6];
-	    stationId <<=8;
-	    stationId += tmp1[7];
+	    sequenceNumber <<=8;
+	    sequenceNumber += tmp1[7];
 	    ret_val.actionId().sequenceNumber() = sequenceNumber;
 	  
 	    incoming_message(ret_val);
@@ -115,8 +115,8 @@ namespace LibItsDenm__TestSystem {
 
 	    //sequenceNumber	  
 	    unsigned int sequenceNumber = tmp1[6];
-	    stationId <<=8;
-	    stationId += tmp1[7];
+	    sequenceNumber <<=8;
+	    sequenceNumber += tmp1[7];
 	    ret_val.actionId().sequenceNumber() = sequenceNumber;
 	  
 	    incoming_message(ret_val);
@@ -137,7 +137,7 @@ namespace LibItsDenm__TestSystem {
 	  tmp1++;
 	  LibItsDenm__TypesAndValues::UtDenmEventInd ret_val;
 
-	  ret_val = TTCN__EncDec::f__dec__Ut__Denm__EventInd(OCTETSTRING(tmp.lengthof()-1,tmp1+1));
+	  ret_val = TTCN__EncDec::f__dec__Ut__Denm__EventInd(OCTETSTRING(tmp.lengthof()-1,tmp1));
 
 	  incoming_message(ret_val);
 	} else if (tmp1[0] == 0x03) { //UtChangePositionResult
@@ -282,7 +282,7 @@ namespace LibItsDenm__TestSystem {
     /**** ****/
     // put the encoder here
     TTCN_Buffer sb;
-    unsigned int header = 0x10;
+    unsigned int header = 0x12;
     sb.put_c(header);
     sb.put_os(TTCN__EncDec::f__enc__UtDenmUpdate(send_par));
     /**** ****/
@@ -373,10 +373,15 @@ namespace LibItsDenm__TestSystem {
     /**** ****/
     // put the encoder here
     TTCN_Buffer sb;
-    unsigned int header = 0x02;
+    unsigned int header = 0x04;
     sb.put_c(header);
+
+    //put into the TRI message
+    sb.get_string(pdu.msg().sendmsg().data().encoded__data());
     /**** ****/
+
     pdu.msg().sendmsg().addr()=OMIT_VALUE;
+
     pdu.msg__id()=mp_data.msg_seq_num;
     mp_data.msg_seq_num++;
  
