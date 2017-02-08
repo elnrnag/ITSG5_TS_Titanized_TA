@@ -174,7 +174,7 @@ module LibItsGeoNetworking_Pixits {
              * @desc The IUT's upper layer
              * @see  ETSI TS 102 871-3 Table B.7
              */
-            modulepar NextHeader PX_GN_UPPER_LAYER := e_btpA;    
+            modulepar NextHeader PX_GN_UPPER_LAYER := e_btpB;  //ELNRNAG e_btpA;    
 
             /**
              * @desc   Is BTP header present in IUT's UT indication. Only applicable if PX_GN_UPPER_LAYER == e_btpA or e_btpB.

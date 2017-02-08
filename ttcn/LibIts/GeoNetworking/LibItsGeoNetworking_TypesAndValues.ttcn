@@ -165,7 +165,7 @@ module LibItsGeoNetworking_TypesAndValues {
         
         group geoNwHeaderConstants {
             
-            const UInt4 c_geoNwProtocolVersion := 0;
+            const UInt4 c_geoNwProtocolVersion := 1; //ELNRNAG 0;
             
             const UInt8 c_hopLimit1 := 1;
             const UInt8 c_defaultHopLimit := 10;
