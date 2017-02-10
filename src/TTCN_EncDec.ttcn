@@ -1310,7 +1310,7 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
       //TODO Handle Ipv6
       GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
     } else if (EGNI.msgIn.packet.nextHeader == e_any) {
-      GNI.msgIn.gnPacket.packet.payload := omit;
+      GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
     }
     GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
   }//End of ExtGnNonSecuredPacket
