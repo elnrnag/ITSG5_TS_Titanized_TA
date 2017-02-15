@@ -192,28 +192,28 @@ public final class TitanItsTriMapper implements ITERequired, TriCommunicationTE 
 		Timer t = new Timer(TIMER_THREADS_MONITOR, true);
 		t.scheduleAtFixedRate(new HandlerMonitor(), 0, THREADS_MONITORING_INTERVAL_MILLIS);
 		int i = 0;
-		while (!stop) {
-			TitanTriLogger.info("Wait iteration "+String.valueOf(i++));
-			try (ServerSocket listener = new ServerSocket(port)) {
+		try (ServerSocket listener = new ServerSocket(port)){
+			while (!stop) {
+				TitanTriLogger.info("Wait iteration "+String.valueOf(i++));
 				TitanTriLogger.info("Opening socket on port " + String.valueOf(port));
 				Socket s = listener.accept();
-				s.setKeepAlive(true);
-				TitanPortHandler ph = new TitanPortHandler(s, this);
-				portHandlerToTsiPortHandler.put(ph, getNullPortId());
 				TitanTriLogger.info("Starting new handler thread...");
+				TitanPortHandler ph = new TitanPortHandler(s, this);
 				ph.start();
+				portHandlerToTsiPortHandler.put(ph, getNullPortId());
 				TitanTriLogger.info("Handler thread started");
-			} catch (IOException e) {
-				TitanTriLogger.error("Communication error while waiting for new connections");
-				rc = 1;
-				e.printStackTrace();
-				stop = true;
-			} catch (NegativeArraySizeException nase) {
-				rc = 1;
-				TitanTriLogger.info(nase.getMessage());
-				stop = true;
 			}
-		}	
+		} catch (IOException e) {
+			TitanTriLogger.error("Communication error while waiting for new connections");
+			rc = 1;
+			e.printStackTrace();
+			stop = true;
+		} catch (NegativeArraySizeException nase) {
+			rc = 1;
+			TitanTriLogger.info(nase.getMessage());
+			stop = true;
+		}
+
 		//Stopping, stop all handlers as well
 		Iterator<TitanPortHandler> it = portHandlerToTsiPortHandler.keySet().iterator();
 		while (it.hasNext()) {
