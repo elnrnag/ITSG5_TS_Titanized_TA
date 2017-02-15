@@ -97,7 +97,7 @@ namespace LibItsGeoNetworking__TestSystem {
 
   void AdapterControlPort::user_map(const char * system_port)
   {
-    TRI_map("<port type name>",system_port,mp_data);
+    TRI_map("ACPort",system_port,mp_data);
     Handler_Add_Fd_Read(mp_data.tri_socket);
   }
 
@@ -109,7 +109,7 @@ namespace LibItsGeoNetworking__TestSystem {
 
   void AdapterControlPort::user_start()
   {
-    TRI_start("<port type name>",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
+    TRI_start("ACPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
   }
 
   void AdapterControlPort::user_stop()
