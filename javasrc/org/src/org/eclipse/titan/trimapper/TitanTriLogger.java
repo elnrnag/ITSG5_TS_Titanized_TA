@@ -6,6 +6,10 @@
  * http://www.eclipse.org/legal/epl-v10.html
  ******************************************************************************/
 package org.eclipse.titan.trimapper;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * 
  * @author elnrnag
@@ -24,12 +28,14 @@ public class TitanTriLogger {
 	
 	public static void info(String info){
 		if (loglevel <= LOGLEVEL_INFO) {
-			System.out.println("[INFO] "+info);
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+			System.out.println("[INFO] ("+ sdf.format(new Date()) +") "+info);
 		}
 	}
 	
 	public static void error(String error){
-		System.out.println("[ERROR] "+error);
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+		System.out.println("[ERROR] ("+ sdf.format(new Date()) +") "+error);
 		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 		System.out.println("[STACKTRACE] ");
 		for (int i = 0; i < stackTrace.length; i++) {
