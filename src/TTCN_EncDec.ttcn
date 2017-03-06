@@ -147,6 +147,22 @@ function f_enc_TrafficClass(TrafficClass tc) return ExtTrafficClass {
   return etc;
 }
 
+function f_dec_TrafficClass(ExtTrafficClass etc) return TrafficClass {
+  var TrafficClass tc;
+
+  var SCF v_SCF;
+  int2enum(bit2int(etc.scf),v_SCF);
+  tc.scf := v_SCF;
+
+  var ChannelOffload v_CO;
+  int2enum(bit2int(etc.channelOffload),v_CO);
+  tc.channelOffload := v_CO;
+  
+  tc.tcId := bit2int(etc.tcId);
+
+  return tc;
+}
+
 type record ExtGnPayload {
   //DecodedPayload decodedPayload optional, //TODO: Not yet implemented
   octetstring rawPayload
@@ -931,9 +947,9 @@ function f_dec_BtpInd(in octetstring stream) return BtpInd {
 function decodeBTPPayload(octetstring rawPayload, integer destinationPort) 
   return DecodedBtpPayload {
     var DecodedBtpPayload v_decodedPayload;
-    if (destinationPort == 2001) 
-    {
-      v_decodedPayload := { camPacket := dec_CAM_PDU(rawPayload)}
+    if (destinationPort == 2001) {
+      v_decodedPayload := { camPacket := dec_CAM_PDU('0102000000000320600AF3CD700E612ED01FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800'O)}
+      //rawPayload)}
     } else if (destinationPort == 2002) {
       v_decodedPayload := { denmPacket := dec_DENM_PDU(rawPayload)}
     } else if (destinationPort == 2003) {
@@ -1093,28 +1109,103 @@ with { extension "prototype(convert)"
 };
 
 
+/*
+type record ExtGN_Address {
+    TypeOfAddress   typeOfAddress,
+    LibItsGeoNetworking_TypesAndValues.StationType     stationType,
+    UInt10          stationCountryCode,
+    Oct6            mid
+} with { variant "FIELDORDER(msb)" };
+*/
+type record ExtLongPosVector {
+    //GN_Address  gnAddr,
+    BIT1	   typeOfAddress,
+    BIT5           stationType,
+    UInt10         stationCountryCode,
+    Oct6           mid,
+    //LongPosVect
+    UInt32         timestamp,
+    Int32          latitude,
+    Int32          longitude,
+    Bit1           pai,
+    Int15          speed,
+    UInt16         heading
+} with { variant "FIELDORDER(msb)" };
+
+external function f_decto_ExtLongPosVector(octetstring os) return ExtLongPosVector
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+function f_dec_ExtLongPosVector(ExtLongPosVector ELPV) return LongPosVector {
+    var LongPosVector LPV;
+
+    var TypeOfAddress toa;
+    int2enum(bit2int(ELPV.typeOfAddress),toa);
+    LPV.gnAddr.typeOfAddress := toa;
+
+    var LibItsGeoNetworking_TypesAndValues.StationType st;
+    int2enum(bit2int(ELPV.stationType),st);
+    LPV.gnAddr.stationType := st;
+
+    LPV.gnAddr.stationCountryCode := ELPV.stationCountryCode;
+    LPV.gnAddr.mid := ELPV.mid;
+
+    LPV.timestamp := ELPV.timestamp;
+    LPV.latitude := ELPV.latitude;
+    LPV.longitude := ELPV.longitude;
+    LPV.pai := ELPV.pai;
+    LPV.speed := ELPV.speed;
+    LPV.heading := ELPV.heading;
+
+    return LPV;
+}
+
+
+type union ExtExtendedHeader {
+    GeoUnicastHeader    geoUnicastHeader,
+    TSBHeader           tsbHeader,
+    ExtSHBHeader        shbHeader,
+    GeoBroadcastHeader  geoBroadcastHeader,
+    GeoAnycastHeader    geoAnycastHeader,
+    BeaconHeader        beaconHeader,
+    LSRequestHeader     lsRequestHeader,
+    LSReplyHeader       lsReplyHeader,
+    AnyHeader           anyHeader
+} with { variant "FIELDORDER(msb)" };
+
+
+type record ExtSHBHeader {
+    ExtLongPosVector   srcPosVector,
+    UInt32             reserved
+} with { variant "FIELDORDER(msb)" };
+
+
 type record ExtGnNonSecuredPacket {
+  //CommonHeader
   NextHeader         nextHeader,
   UInt4              reserved,
   UInt8              headerTST,
-  TrafficClass       trafficClass,
+  ExtTrafficClass    trafficClass,
   Bit8               flags,
   UInt16             plLength,
   UInt8              maxHopLimit,
   UInt8              reserved2,
-  ExtendedHeader     extendedHeader,//  optional,
+  ExtExtendedHeader  extendedHeader,//  optional,
   Ipv6Packet         ipv6Packet       optional,
   BtpHeader          btpHeader        optional,
   octetstring        btpPayload       optional,
-  GnRawPayload       rawPayload
+  GnRawPayload       rawPayload//,
+  //UInt16	     CohdaBug
 } with { variant 	            "FIELDORDER(msb)";
          variant(plLength)     	    "LENGTHTO(ipv6Packet, 
                                               btpHeader, 
                                               btpPayload, 
                                               rawPayload)";
 
-         variant(extendedHeader) "CROSSTAG(anyHeader,           headerTST = 0;
-   beaconHeader,        headerTST = 16;
+  variant(extendedHeader) "CROSSTAG(anyHeader,           headerTST = 0;
+  beaconHeader,        headerTST = 16;
   geoUnicastHeader,    headerTST = 32;
   geoAnycastHeader,   {headerTST = 48,
   headerTST = 49,
@@ -1128,7 +1219,10 @@ type record ExtGnNonSecuredPacket {
   lsReplyHeader, 	   headerTST = 97)";
 
   variant(ipv6Packet)     "PRESENCE(nextHeader = e_ipv6;)";
-
+/*
+  variant(btpHeader)      "PRESENCE(nextHeader = e_btpA;)";
+  variant(btpHeader)      "PRESENCE(nextHeader = e_btpB;)";
+*/
   variant(btpHeader)      "CROSSTAG(btpAHeader, nextHeader = e_btpA;
                                     btpBHeader, nextHeader = e_btpB;)";
 
@@ -1141,7 +1235,9 @@ type record ExtGeoNetworkingPdu {
   UInt4                 version,
   BasicNextHeader       nextHeader,
   UInt8                 reserved,
-  Lifetime              lifeTime,
+  //Lifetime              lifeTime,
+  UInt6                 ltMultiplier,
+  LtBase                ltBase,
   UInt8                 routerHopLimit,
   ExtGnNonSecuredPacket packet     optional,
   SecuredMessage        securedMsg optional
@@ -1159,11 +1255,12 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
   var ExtGeoNetworkingInd EGNI := f_dec_ExtGeoNetworkingInd(stream);
   var GeoNetworkingInd    GNI;
 
-  GNI.msgIn.basicHeader.version        := EGNI.msgIn.version;
-  GNI.msgIn.basicHeader.nextHeader     := EGNI.msgIn.nextHeader;
-  GNI.msgIn.basicHeader.reserved       := EGNI.msgIn.reserved;
-  GNI.msgIn.basicHeader.lifeTime       := EGNI.msgIn.lifeTime;
-  GNI.msgIn.basicHeader.routerHopLimit := EGNI.msgIn.routerHopLimit;
+  GNI.msgIn.basicHeader.version             := EGNI.msgIn.version;
+  GNI.msgIn.basicHeader.nextHeader          := EGNI.msgIn.nextHeader;
+  GNI.msgIn.basicHeader.reserved            := EGNI.msgIn.reserved;
+  GNI.msgIn.basicHeader.lifeTime.multiplier := EGNI.msgIn.ltMultiplier;
+  GNI.msgIn.basicHeader.lifeTime.ltBase     := EGNI.msgIn.ltBase;
+  GNI.msgIn.basicHeader.routerHopLimit      := EGNI.msgIn.routerHopLimit;
 
   if (ispresent(EGNI.msgIn.packet)) {
     GNI.msgIn.gnPacket.packet.commonHeader.nextHeader := 
@@ -1176,73 +1273,139 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {anyHdr := {headerType := e_any, 
             headerSubType := 0}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.anyHeader :=
+	  EGNI.msgIn.packet.extendedHeader.anyHeader;
       }
       case (16) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {beaconHdr := {headerType := e_beacon, 
             headerSubType := 0}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.beaconHeader :=
+	  EGNI.msgIn.packet.extendedHeader.beaconHeader;
+	    
       }
       case (32) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoUnicastHdr := {headerType := e_geoUnicast, 
             headerSubType := 0}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.geoUnicastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoUnicastHeader;
+	    
       }
       case (48) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoAnycastHdr := {headerType := e_geoAnycast, 
             headerSubType := e_geoAnycastCircle}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.geoAnycastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoAnycastHeader;
+	    
       }
       case (49) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoAnycastHdr := {headerType := e_geoAnycast, 
             headerSubType := e_geoAnycastRect}};
+    	GNI.msgIn.gnPacket.packet.extendedHeader.geoAnycastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoAnycastHeader;
+
+	    
       }
       case (50) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoAnycastHdr := {headerType := e_geoAnycast, 
             headerSubType := e_geoAnycastElip}};
+    	GNI.msgIn.gnPacket.packet.extendedHeader.geoAnycastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoAnycastHeader;
+
       }
       case (64) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoBroadcastHdr := {headerType := e_geoBroadcast, 
             headerSubType := e_geoBroadcastCircle}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoBroadcastHeader;
+	    
       }
       case (65) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoBroadcastHdr := {headerType := e_geoBroadcast, 
             headerSubType := e_geoBroadcastRect}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoBroadcastHeader;
+	    
       }
       case (66) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {geoBroadcastHdr := {headerType := e_geoBroadcast, 
             headerSubType := e_geoBroadcastElip}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader :=
+	  EGNI.msgIn.packet.extendedHeader.geoBroadcastHeader;
+	    
       }
       case (80) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
             headerSubType := e_singleHop}};
+
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector :=
+	    f_dec_ExtLongPosVector(EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector);
+/*
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.typeOfAddress :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.typeOfAddress;
+        GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationType :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationType;
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationCountryCode :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationCountryCode;
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.mid :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.mid;
+
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.timestamp :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.timestamp;
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.latitude :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.latitude;
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.longitude :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.longitude;
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.pai :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.pai;
+	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.speed :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.speed;
+        GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.heading :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.heading;
+
+*/
+
+        GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.reserved :=
+	  EGNI.msgIn.packet.extendedHeader.shbHeader.reserved;
+	  
       }
       case (81) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
             headerSubType := e_multiHop}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.tsbHeader :=
+	  EGNI.msgIn.packet.extendedHeader.tsbHeader;
+	    
       }
       case (96) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {lsHdr := {headerType := e_locationService, 
             headerSubType := e_lsRequest}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.lsRequestHeader :=
+	  EGNI.msgIn.packet.extendedHeader.lsRequestHeader;
+	    
       }
       case (97) {
         GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
         {lsHdr := {headerType := e_locationService, 
             headerSubType := e_lsReply}};
+	GNI.msgIn.gnPacket.packet.extendedHeader.lsReplyHeader :=
+	  EGNI.msgIn.packet.extendedHeader.lsReplyHeader;
+	    
       }
     } 
     //TODO saHdr???
 
 
-    GNI.msgIn.gnPacket.packet.commonHeader.trafficClass := 
-    EGNI.msgIn.packet.trafficClass;
+    GNI.msgIn.gnPacket.packet.commonHeader.trafficClass := f_dec_TrafficClass(EGNI.msgIn.packet.trafficClass);
     GNI.msgIn.gnPacket.packet.commonHeader.flags := 
     EGNI.msgIn.packet.flags;
     GNI.msgIn.gnPacket.packet.commonHeader.plLength := 
@@ -1252,7 +1415,8 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
     GNI.msgIn.gnPacket.packet.commonHeader.reserved2 := 
     EGNI.msgIn.packet.reserved2;
 
-    GNI.msgIn.gnPacket.packet.extendedHeader := EGNI.msgIn.packet.extendedHeader;
+    //GNI.msgIn.gnPacket.packet.extendedHeader := EGNI.msgIn.packet.extendedHeader;
+    
 
 
     if (EGNI.msgIn.packet.nextHeader == e_btpA) {
@@ -1348,12 +1512,18 @@ with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
 
-
+/*
 external function f_dec_LongPosVector(in octetstring stream) return LongPosVector
 with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
+*/
 
+function f_dec_LongPosVector(in octetstring stream) return LongPosVector {
+  var LongPosVector LPV;
+  LPV := f_dec_ExtLongPosVector(f_decto_ExtLongPosVector(stream));
+  return LPV;
+}
 
 
 

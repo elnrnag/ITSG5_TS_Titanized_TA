@@ -692,7 +692,14 @@ module ItsGeoNetworking_TpFunctions {
                     log("*** " & testcasename() & ": INCONC: Trigger failed ***");
                     f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
                 }
-                
+                log("ELNRNAG");
+		log(mw_geoNwInd(
+                      mw_geoNwPdu(
+                        mw_geoNwUnicastPacketWithSourcePv(
+                          mw_shortPosVectorPosition_withDelta(f_longPosVector2ShortPosVector(v_longPosVectorNodeB)), // DEPV
+                          ?, // sequence number
+                          mw_longPosVectorPosition_withDelta(v_longPosVectorIut) //SOPV
+                    ))));
                 tc_ac.start;
                 alt {
                     [] geoNetworkingPort.receive(
@@ -10127,6 +10134,67 @@ module ItsGeoNetworking_TpFunctions {
                 /**
                  * @desc    Behavior function for NodeD (TC_GEONW_PON_TSB_BO_03)
                  */
+
+function f_GEONW_PON_TSB_BO_03_nodeD() runs on ItsGeoNetworking {
+                    
+                    // Local variables
+                    var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+//FIXME RGY variable shall not be of template type, because a message is stored into it
+//                    var template (value) GeoNetworkingInd v_msgInd;                    
+                    var GeoNetworkingInd v_msgInd;
+                    
+                    // Preamble
+                    f_prNeighbour();
+                    tc_ac.start;
+                    alt {
+                        [] geoNetworkingPort.receive(
+                                mw_geoNwInd(
+                                    mw_geoNwPdu(
+                                        mw_geoNwTsbPacket(
+                                            ?,
+                                            mw_longPosVectorPosition(v_longPosVectorNodeB)
+                                        )
+                                    )
+                                )
+                            ) -> value v_msgInd {
+                            tc_ac.stop;
+                            log("*** " & testcasename() & ": PASS: Pre-conditions: TSB packet received correctly  ***");
+                            f_selfOrClientSyncAndVerdict(c_prDone, e_success);
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: Pre-conditions: Expected TSB message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
+                        }
+                    }
+                    
+                    // Test Body
+                    v_msgInd.msgIn.basicHeader.routerHopLimit := valueof(v_msgInd.msgIn.basicHeader.routerHopLimit) -1;
+                    f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(v_msgInd.msgIn));
+                    
+                    tc_noac.start;
+                    alt {
+                        [] geoNetworkingPort.receive(v_msgInd) {
+                            tc_noac.stop;
+                            log("*** " & testcasename() & ": FAIL: The same TSB packet was re-broadcasted ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                        }
+                        [] tc_noac.timeout {
+                            log("*** " & testcasename() & ": PASS: The same TSB packet was not re-broadcasted ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poNeighbour();
+                    
+                } // end f_GEONW_PON_TSB_BO_03_nodeD
+
+
+
+
+
+//ELNRNAG Copy from newer code
+/*
                 function f_GEONW_PON_TSB_BO_03_nodeD() runs on ItsGeoNetworking {
                     
                     // Local variables
@@ -10179,6 +10247,8 @@ module ItsGeoNetworking_TpFunctions {
                     f_poNeighbour();
                     
                 } // end f_GEONW_PON_TSB_BO_03_nodeD
+
+*/
                 
             } // end GEONW_PON_TSB_BO_03
             
@@ -10642,7 +10712,66 @@ module ItsGeoNetworking_TpFunctions {
                 /**
                  * @desc    Behavior function for NodeD (TC_GEONW_PON_TSB_BO_07)
                  */
-                function f_GEONW_PON_TSB_BO_07_nodeD() runs on ItsGeoNetworking {
+
+		 function f_GEONW_PON_TSB_BO_07_nodeD() runs on ItsGeoNetworking {
+                    
+                    // Local variables
+                    var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB);
+//FIXME RGY variable shall not be of template type, because a message is stored into it
+//                    var template (value) GeoNetworkingInd v_msgInd;
+                    var GeoNetworkingInd v_msgInd;
+                    var integer i;
+                    var template (value) GeoNetworkingPdu v_gnPacket;
+                    
+                    // Preamble
+                    f_prNeighbour();
+                    
+                    tc_ac.start;
+                    alt {
+                        [] geoNetworkingPort.receive(
+                                mw_geoNwInd(
+                                    mw_geoNwPdu(
+                                        mw_geoNwTsbPacket(
+                                            ?,
+                                            mw_longPosVectorPosition(v_longPosVectorNodeB)
+                                        )
+                                    )
+                                )
+                            ) -> value v_msgInd {
+                            tc_ac.stop;
+                            log("*** " & testcasename() & ": PASS: Pre-conditions: TSB correctly rebroadcasted ***");
+                            f_selfOrClientSyncAndVerdict(c_prDone, e_success);
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: Pre-conditions: TSB not rebroadcasted ***");
+                            f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
+                        }
+                    }
+                    
+                    // Test Body
+                    v_msgInd.msgIn.basicHeader.routerHopLimit := valueof(v_msgInd.msgIn.basicHeader.routerHopLimit) - 1;
+                    v_gnPacket := v_msgInd.msgIn;
+                    f_sendGeoNetMessage(m_geoNwReq_linkLayerBroadcast(v_msgInd.msgIn));
+                    f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                    
+                    // Postamble
+                    f_poNeighbour();
+                    
+                } // end f_GEONW_PON_TSB_BO_07_nodeD
+
+
+
+
+
+
+
+
+
+
+
+// ELNRNAG Copy from newer code
+/*
+function f_GEONW_PON_TSB_BO_07_nodeD() runs on ItsGeoNetworking {
                     
                     // Local variables
                     var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB);
@@ -10686,6 +10815,11 @@ module ItsGeoNetworking_TpFunctions {
                     f_poNeighbour();
                     
                 } // end f_GEONW_PON_TSB_BO_07_nodeD
+
+
+*/
+
+
                 
             } // end GEONW_PON_TSB_BO_07
             
@@ -11403,6 +11537,64 @@ module ItsGeoNetworking_TpFunctions {
                 /**
                  * @desc    Behavior function for NodeB (TC_GEONW_PON_GAC_BO_05)
                  */
+function f_GEONW_PON_GAC_BO_05_nodeB() runs on ItsGeoNetworking {
+                    
+                    // Local variables
+                    var LongPosVector v_longPosVectorNodeC := f_getPosition(c_compNodeC);
+                    var template (present) GeoNetworkingInd vt_msgInd;
+//FIXME RGY variable is declared to store the received message
+                    var GeoNetworkingInd v_msgInd;
+                    
+                    // Preamble
+                    f_prNeighbour();
+                    tc_ac.start;
+                    alt {
+                        [] geoNetworkingPort.receive(
+                                mw_geoNwInd(
+                                    mw_geoNwPdu(
+                                        mw_geoNwAnycastPacketWithArea(
+                                            mw_longPosVectorPosition(v_longPosVectorNodeC),
+                                            ?,
+                                            f_getGeoAnycastArea(c_area2)
+                                        )
+                                    )
+                                )
+                            ) -> value v_msgInd {
+//FIXME RGY the received value stored in the template variable too
+                            vt_msgInd:= v_msgInd
+                            tc_ac.stop;
+                            log("*** " & testcasename() & ": PASS: Pre-conditions: GAC message correctly forwarded to area center ***");
+                            f_selfOrClientSyncAndVerdict(c_prDone, e_success);
+                        }
+                        [] tc_ac.timeout {
+                            log("*** " & testcasename() & ": INCONC: Pre-conditions: GAC message not received ***");
+                            f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
+                        }
+                    }
+                    
+                    // Test Body
+//FIXME RGY for the AnyValue the template varibale is used
+                    vt_msgInd.msgIn.basicHeader.routerHopLimit := ?;
+                    tc_noac.start;
+                    alt {
+                        [] geoNetworkingPort.receive(vt_msgInd) {
+                            tc_noac.stop;
+                            log("*** " & testcasename() & ": FAIL: GAC message re-forwarded to area center ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_error);
+                        }
+                        [] tc_noac.timeout {
+                            log("*** " & testcasename() & ": PASS: GAC message not re-forwarded ***");
+                            f_selfOrClientSyncAndVerdict(c_tbDone, e_success);
+                        }
+                    }
+                    
+                    // Postamble
+                    f_poNeighbour();
+                    
+                } // end f_GEONW_PON_GAC_BO_05_nodeB
+                
+
+/*
                 function f_GEONW_PON_GAC_BO_05_nodeB() runs on ItsGeoNetworking {
                     
                     // Local variables
@@ -11455,6 +11647,11 @@ module ItsGeoNetworking_TpFunctions {
                     f_poNeighbour();
                     
                 } // end f_GEONW_PON_GAC_BO_05_nodeB
+
+
+*/
+
+
                 
                 /**
                  * @desc    Behavior function for NodeC (TC_GEONW_PON_GAC_BO_05)
