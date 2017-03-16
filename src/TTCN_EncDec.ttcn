@@ -139,7 +139,7 @@ type record ExtTrafficClass {
 } with { variant "" };
 
 
-function f_enc_TrafficClass(TrafficClass tc) return ExtTrafficClass {
+function f_TrafficClass2ExtTrafficClass(TrafficClass tc) return ExtTrafficClass {
   var ExtTrafficClass etc;
   etc.scf := int2bit(enum2int(tc.scf),1);
   etc.channelOffload := int2bit(enum2int(tc.channelOffload),1);
@@ -147,7 +147,7 @@ function f_enc_TrafficClass(TrafficClass tc) return ExtTrafficClass {
   return etc;
 }
 
-function f_dec_TrafficClass(ExtTrafficClass etc) return TrafficClass {
+function f_ExtTrafficClass2TrafficClass(ExtTrafficClass etc) return TrafficClass {
   var TrafficClass tc;
 
   var SCF v_SCF;
@@ -174,12 +174,13 @@ type record ExtGnPayload {
 */
 
 type record ExtGenerateGeoUnicastMessage {
-  GN_Address gnAddress,
+  ExtGN_Address gnAddress,
   UInt16 lifetime,
   ExtTrafficClass trafficClass,
   UInt16 payloadLength,
   ExtGnPayload payload 
-} with { variant(payloadLength) "LENGTHTO(payload)" };
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
 
 external function f_enc_Ext_UtGnGenerateGeoUnicastMessage(in ExtGenerateGeoUnicastMessage pdu) return octetstring
 with { extension "prototype(convert)"
@@ -189,10 +190,10 @@ with { extension "prototype(convert)"
 function f_enc_Ut_Gn_GenerateGeoUnicastMessage(in GenerateGeoUnicastMessage pdu) return octetstring {
   var ExtGenerateGeoUnicastMessage ext;
 
-  ext.gnAddress := pdu.gnAddress;
+  ext.gnAddress := f_GN_Address2ExtGN_Address(pdu.gnAddress);
   ext.lifetime := pdu.lifetime;
 
-  ext.trafficClass := f_enc_TrafficClass(pdu.trafficClass);
+  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
 
   ext.payloadLength := lengthof(pdu.payload.rawPayload);
   ext.payload.rawPayload := pdu.payload.rawPayload;
@@ -309,7 +310,7 @@ with { extension "prototype(convert)"
 function f_enc_Ut_Gn_GenerateSHBMessage(in GenerateSHBMessage pdu) return octetstring
 {
   var ExtGenerateSHBMessage ext;
-  ext.trafficClass := f_enc_TrafficClass(pdu.trafficClass);
+  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
   ext.payloadLength := lengthof(pdu.payload.rawPayload);
   ext.payload.rawPayload := pdu.payload.rawPayload;
   return f_enc_Ext_Ut_Gn_GenerateSHBMessage(ext);
@@ -344,7 +345,7 @@ function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octets
   var ExtGenerateTSBMessage ext;
   ext.nbHops := pdu.nbHops;
   ext.lifetime := pdu.lifetime;
-  ext.trafficClass := f_enc_TrafficClass(pdu.trafficClass);
+  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
   ext.payloadLength := lengthof(pdu.payload.rawPayload);
   ext.payload.rawPayload := pdu.payload.rawPayload;
   return f_enc_Ext_Ut_Gn_GenerateTSBMessage(ext);
@@ -944,12 +945,30 @@ function f_dec_BtpInd(in octetstring stream) return BtpInd {
 
 }
 
+function encodeBTPPayload(DecodedBtpPayload payload) 
+  return octetstring {
+    var octetstring result;
+    if (ischosen(payload.camPacket)) {
+      result := enc_CAM_PDU(payload.camPacket);
+    } else if (ischosen(payload.denmPacket)) {
+      result := enc_DENM_PDU(payload.denmPacket);
+    } else if (ischosen(payload.mapPacket)) {
+      result := enc_MAP_PDU(payload.mapPacket);
+    } else if (ischosen(payload.spatPacket)) {
+      result := enc_SPAT_PDU(payload.spatPacket);
+    } 
+    //TODO: Handle destinationPort == 2005
+    
+    return result;
+}
+
+
+
 function decodeBTPPayload(octetstring rawPayload, integer destinationPort) 
   return DecodedBtpPayload {
     var DecodedBtpPayload v_decodedPayload;
     if (destinationPort == 2001) {
-      v_decodedPayload := { camPacket := dec_CAM_PDU('0102000000000320600AF3CD700E612ED01FFFFFFC23B7743E40000FC0007E3FE9ED0733A9874FFFD00040000800'O)}
-      //rawPayload)}
+      v_decodedPayload := { camPacket := dec_CAM_PDU(rawPayload)}
     } else if (destinationPort == 2002) {
       v_decodedPayload := { denmPacket := dec_DENM_PDU(rawPayload)}
     } else if (destinationPort == 2003) {
@@ -962,8 +981,9 @@ function decodeBTPPayload(octetstring rawPayload, integer destinationPort)
 
 function isWellKnownBTPPort(integer prt) return boolean {
   return ((prt >= 2001) and (prt <= 2005));
-
 }
+
+
 
 //CAM------------------------------------------------------------------
 
@@ -1098,32 +1118,86 @@ with { extension "prototype(convert)"
 };
 
 
-external function f_enc_GeoNetworkingReq(in GeoNetworkingReq pdu) return octetstring
+type record ExtGeoNetworkingReq {
+                ExtGeoNetworkingPdu    msgOut,
+                MacAddress             macDestinationAddress
+            } with { variant "FIELDORDER(msb)" };
+
+external function f_enc_ExtGeoNetworkingReq(in ExtGeoNetworkingReq pdu) return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
+
+
+
+function f_enc_GeoNetworkingReq(in GeoNetworkingReq pdu) return octetstring {
+  var ExtGeoNetworkingReq EGNR;
+
+  EGNR.msgOut.version := pdu.msgOut.basicHeader.version;
+  EGNR.msgOut.nextHeader :=  pdu.msgOut.basicHeader.nextHeader;
+  EGNR.msgOut.reserved := pdu.msgOut.basicHeader.reserved;
+  EGNR.msgOut.lifeTime := f_Lifetime2ExtLifetime(pdu.msgOut.basicHeader.lifeTime);
+  EGNR.msgOut.routerHopLimit := pdu.msgOut.basicHeader.routerHopLimit
+
+  if (ispresent(pdu.msgOut.gnPacket.packet)) {
+    EGNR.msgOut.packet := f_GnNonSecuredPacket2ExtGnNonSecuredPacket(pdu.msgOut.gnPacket.packet);
+  } else {
+    EGNR.msgOut.packet := omit;
+  }
+
+
+  //TODO: Encode securedMsg when security comes in
+  EGNR.msgOut.securedMsg := pdu.msgOut.gnPacket.securedMsg;
+
+
+  EGNR.macDestinationAddress := pdu.macDestinationAddress;
+
+  return f_enc_ExtGeoNetworkingReq(EGNR);
+}
 
 external function f_dec_ExtGeoNetworkingInd(in octetstring stream) return ExtGeoNetworkingInd
 with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
 
-
-/*
 type record ExtGN_Address {
-    TypeOfAddress   typeOfAddress,
-    LibItsGeoNetworking_TypesAndValues.StationType     stationType,
-    UInt10          stationCountryCode,
-    Oct6            mid
-} with { variant "FIELDORDER(msb)" };
-*/
+    Bit1   typeOfAddress,
+    Bit5   stationType,
+    UInt10 stationCountryCode,
+    Oct6   mid
+} with { variant "FIELDORDER(msb)"};
+
+function f_ExtGN_Address2GN_Address(ExtGN_Address EGNA) return GN_Address {
+  var GN_Address GNA;
+
+  var TypeOfAddress toa;
+  int2enum(bit2int(EGNA.typeOfAddress),toa);
+  GNA.typeOfAddress := toa;
+
+  var LibItsGeoNetworking_TypesAndValues.StationType st;
+  int2enum(bit2int(EGNA.stationType),st);
+  GNA.stationType := st;
+
+  GNA.stationCountryCode := EGNA.stationCountryCode;
+  GNA.mid := EGNA.mid;
+
+  return GNA;
+}
+
+function f_GN_Address2ExtGN_Address(GN_Address GNA) return ExtGN_Address {
+  var ExtGN_Address EGNA;
+
+  EGNA.typeOfAddress := int2bit(enum2int(GNA.typeOfAddress),1);
+  EGNA.stationType := int2bit(enum2int(GNA.stationType),5);
+  EGNA.stationCountryCode := GNA.stationCountryCode;
+  EGNA.mid := GNA.mid;
+
+  return EGNA;
+}
+
+
 type record ExtLongPosVector {
-    //GN_Address  gnAddr,
-    BIT1	   typeOfAddress,
-    BIT5           stationType,
-    UInt10         stationCountryCode,
-    Oct6           mid,
-    //LongPosVect
+    ExtGN_Address  gnAddr,
     UInt32         timestamp,
     Int32          latitude,
     Int32          longitude,
@@ -1132,25 +1206,11 @@ type record ExtLongPosVector {
     UInt16         heading
 } with { variant "FIELDORDER(msb)" };
 
-external function f_decto_ExtLongPosVector(octetstring os) return ExtLongPosVector
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
 
-
-function f_dec_ExtLongPosVector(ExtLongPosVector ELPV) return LongPosVector {
+function f_ExtLongPosVector2LongPosVector(ExtLongPosVector ELPV) return LongPosVector {
     var LongPosVector LPV;
 
-    var TypeOfAddress toa;
-    int2enum(bit2int(ELPV.typeOfAddress),toa);
-    LPV.gnAddr.typeOfAddress := toa;
-
-    var LibItsGeoNetworking_TypesAndValues.StationType st;
-    int2enum(bit2int(ELPV.stationType),st);
-    LPV.gnAddr.stationType := st;
-
-    LPV.gnAddr.stationCountryCode := ELPV.stationCountryCode;
-    LPV.gnAddr.mid := ELPV.mid;
+    LPV.gnAddr := f_ExtGN_Address2GN_Address(ELPV.gnAddr);
 
     LPV.timestamp := ELPV.timestamp;
     LPV.latitude := ELPV.latitude;
@@ -1162,26 +1222,381 @@ function f_dec_ExtLongPosVector(ExtLongPosVector ELPV) return LongPosVector {
     return LPV;
 }
 
+function f_LongPosVector2ExtLongPosVector(LongPosVector LPV) return ExtLongPosVector {
+  var ExtLongPosVector ELPV;
+
+  ELPV.gnAddr := f_GN_Address2ExtGN_Address(LPV.gnAddr);
+
+  ELPV.timestamp := LPV.timestamp;
+  ELPV.latitude := LPV.latitude;
+  ELPV.longitude := LPV.longitude;
+  ELPV.pai := LPV.pai;
+  ELPV.speed := LPV.speed;
+  ELPV.heading := LPV.heading;
+
+  return ELPV;
+}
+
+external function f_dec_ExtLongPosVector(in octetstring os) return ExtLongPosVector
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+external function f_enc_ExtLongPosVector(ExtLongPosVector ELPV) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+function f_dec_LongPosVector(in octetstring stream) return LongPosVector {
+  var LongPosVector LPV;
+  LPV := f_ExtLongPosVector2LongPosVector(f_dec_ExtLongPosVector(stream));
+  return LPV;
+}
+
+function f_enc_LongPosVector(in LongPosVector pdu) return octetstring{
+  
+  return f_enc_ExtLongPosVector(f_LongPosVector2ExtLongPosVector(pdu));
+  
+}
+
+
+type record ExtShortPosVector {
+   ExtGN_Address  gnAddr,
+   UInt32         timestamp,
+   Int32          latitude,
+   Int32          longitude
+} with { variant "FIELDORDER(msb)"};
+
+function f_ExtShortPosVector2ShortPosVector(ExtShortPosVector ESPV)
+ return ShortPosVector {
+  var ShortPosVector SPV;
+
+  SPV.gnAddr    := f_ExtGN_Address2GN_Address(ESPV.gnAddr);
+  SPV.timestamp := ESPV.timestamp;
+  SPV.latitude  := ESPV.latitude;
+  SPV.longitude := ESPV.longitude;
+
+  return SPV;
+}
+
+function f_ShortPosVector2ExtShortPosVector(ShortPosVector SPV)
+ return ExtShortPosVector {
+  var ExtShortPosVector ESPV;
+
+  ESPV.gnAddr    := f_GN_Address2ExtGN_Address(SPV.gnAddr);
+  ESPV.timestamp := SPV.timestamp;
+  ESPV.latitude  := SPV.latitude;
+  ESPV.longitude := SPV.longitude;
+
+  return ESPV;
+}
+
+
 
 type union ExtExtendedHeader {
-    GeoUnicastHeader    geoUnicastHeader,
-    TSBHeader           tsbHeader,
-    ExtSHBHeader        shbHeader,
-    GeoBroadcastHeader  geoBroadcastHeader,
-    GeoAnycastHeader    geoAnycastHeader,
-    BeaconHeader        beaconHeader,
-    LSRequestHeader     lsRequestHeader,
-    LSReplyHeader       lsReplyHeader,
-    AnyHeader           anyHeader
+    ExtGeoUnicastHeader    geoUnicastHeader,
+    ExtTSBHeader           tsbHeader,
+    ExtSHBHeader           shbHeader,
+    ExtGeoBroadcastHeader  geoBroadcastHeader,
+    ExtGeoAnycastHeader    geoAnycastHeader,
+    ExtBeaconHeader        beaconHeader,
+    ExtLSRequestHeader     lsRequestHeader,
+    ExtLSReplyHeader       lsReplyHeader,
+    ExtAnyHeader           anyHeader
 } with { variant "FIELDORDER(msb)" };
 
 
+//GeoUnicastHeader
+type record ExtGeoUnicastHeader {
+    UInt16          seqNumber,
+    UInt16          reserved,
+    ExtLongPosVector   srcPosVector,
+    ExtShortPosVector  dstPosVector
+} with { variant "FIELDORDER(msb)" };
+
+function f_ExtGeoUnicastHeader2GeoUnicastHeader(ExtGeoUnicastHeader EGUH)
+ return GeoUnicastHeader {
+  var GeoUnicastHeader GUH;
+
+  GUH.seqNumber    := EGUH.seqNumber;
+  GUH.reserved     := EGUH.reserved;
+  GUH.srcPosVector := f_ExtLongPosVector2LongPosVector(EGUH.srcPosVector);
+  GUH.dstPosVector := f_ExtShortPosVector2ShortPosVector(EGUH.dstPosVector);
+
+  return GUH;
+}
+
+function f_GeoUnicastHeader2ExtGeoUnicastHeader(GeoUnicastHeader GUH)
+ return ExtGeoUnicastHeader {
+  var ExtGeoUnicastHeader EGUH;
+
+  EGUH.seqNumber    := GUH.seqNumber;
+  EGUH.reserved     := GUH.reserved;
+  EGUH.srcPosVector := f_LongPosVector2ExtLongPosVector(GUH.srcPosVector);
+  EGUH.dstPosVector := f_ShortPosVector2ExtShortPosVector(GUH.dstPosVector);
+
+  return EGUH;
+}
+
+//GeoUnicastHeader End
+
+//TSBHeader
+type record ExtTSBHeader {
+  UInt16           seqNumber,
+  UInt16           reserved,
+  ExtLongPosVector srcPosVector
+} with { variant "FIELDORDER(msb)" };
+
+function f_ExtTSBHeader2TSBHeader(ExtTSBHeader ETH) return TSBHeader {
+  var TSBHeader TH;
+
+  TH.seqNumber    := ETH.seqNumber;
+  TH.reserved     := ETH.reserved;
+  TH.srcPosVector := f_ExtLongPosVector2LongPosVector(ETH.srcPosVector);
+
+  return TH;
+}
+
+function f_TSBHeader2ExtTSBHeader(TSBHeader TH) return ExtTSBHeader {
+  var ExtTSBHeader ETH;
+
+  ETH.seqNumber    := TH.seqNumber;
+  ETH.reserved     := TH.reserved;
+  ETH.srcPosVector := f_LongPosVector2ExtLongPosVector(TH.srcPosVector);
+
+  return ETH;
+}
+//TSBHeader End
+
+//SHBHeader
 type record ExtSHBHeader {
     ExtLongPosVector   srcPosVector,
     UInt32             reserved
 } with { variant "FIELDORDER(msb)" };
 
+function f_ExtSHBHeader2SHBHeader(ExtSHBHeader ESH) return SHBHeader {
+  var SHBHeader SH;
 
+  SH.srcPosVector := f_ExtLongPosVector2LongPosVector(ESH.srcPosVector);
+  SH.reserved     := ESH.reserved;
+
+  return SH;
+}
+
+function f_SHBHeader2ExtSHBHeader(SHBHeader SH) return ExtSHBHeader {
+  var ExtSHBHeader ESH;
+
+  ESH.srcPosVector := f_LongPosVector2ExtLongPosVector(SH.srcPosVector);
+  ESH.reserved     := SH.reserved;
+
+  return ESH;
+}
+//SHBHeader End
+
+//GeoBroadcastHeader
+type ExtGeoAnycastHeader ExtGeoBroadcastHeader with { variant "FIELDORDER(msb)" };
+
+function f_ExtGeoBroadcastHeader2GeoBroadcastHeader(ExtGeoBroadcastHeader EGBH)
+ return GeoBroadcastHeader {
+  var GeoBroadcastHeader GBH;
+
+  GBH.seqNumber := EGBH.seqNumber;
+  GBH.reserved := EGBH.reserved;
+  GBH.srcPosVector := f_ExtLongPosVector2LongPosVector(EGBH.srcPosVector);
+  GBH.geoAreaPosLatitude := EGBH.geoAreaPosLatitude;
+  GBH.geoAreaPosLongitude := EGBH.geoAreaPosLongitude;
+  GBH.distanceA := EGBH.distanceA;
+  GBH.distanceB := EGBH.distanceB;
+  GBH.angle := EGBH.angle;
+  GBH.reserved2 := EGBH.reserved2;
+
+  return GBH;
+}
+
+function f_GeoBroadcastHeader2ExtGeoBroadcastHeader(GeoBroadcastHeader GBH)
+ return ExtGeoBroadcastHeader {
+  var ExtGeoBroadcastHeader EGBH;
+
+  EGBH.seqNumber := GBH.seqNumber;
+  EGBH.reserved := GBH.reserved;
+  EGBH.srcPosVector := f_LongPosVector2ExtLongPosVector(GBH.srcPosVector);
+  EGBH.geoAreaPosLatitude := GBH.geoAreaPosLatitude;
+  EGBH.geoAreaPosLongitude := GBH.geoAreaPosLongitude;
+  EGBH.distanceA := GBH.distanceA;
+  EGBH.distanceB := GBH.distanceB;
+  EGBH.angle := GBH.angle;
+  EGBH.reserved2 := GBH.reserved2;
+
+  return EGBH;
+}
+
+//GeoBroadcastHeader End
+
+//GeoAnycastHeader
+type record ExtGeoAnycastHeader {
+  UInt16           seqNumber,
+  UInt16           reserved,
+  ExtLongPosVector srcPosVector,
+  Int32            geoAreaPosLatitude,
+  Int32            geoAreaPosLongitude,
+  UInt16           distanceA,
+  UInt16           distanceB,
+  UInt16           angle,
+  UInt16           reserved2
+} with { variant "FIELDORDER(msb)"};
+
+function f_ExtGeoAnycastHeader2GeoAnycastHeader(ExtGeoAnycastHeader EGAH)
+ return GeoAnycastHeader {
+  var GeoAnycastHeader GAH;
+
+  GAH.seqNumber := EGAH.seqNumber;
+  GAH.reserved := EGAH.reserved;
+  GAH.srcPosVector := f_ExtLongPosVector2LongPosVector(EGAH.srcPosVector);
+  GAH.geoAreaPosLatitude := EGAH.geoAreaPosLatitude;
+  GAH.geoAreaPosLongitude := EGAH.geoAreaPosLongitude;
+  GAH.distanceA := EGAH.distanceA;
+  GAH.distanceB := EGAH.distanceB;
+  GAH.angle := EGAH.angle;
+  GAH.reserved2 := EGAH.reserved2;
+
+  return GAH;
+}
+
+function f_GeoAnycastHeader2ExtGeoAnycastHeader(GeoAnycastHeader GAH)
+ return ExtGeoAnycastHeader {
+  var ExtGeoAnycastHeader EGAH;
+
+  EGAH.seqNumber := GAH.seqNumber;
+  EGAH.reserved := GAH.reserved;
+  EGAH.srcPosVector := f_LongPosVector2ExtLongPosVector(GAH.srcPosVector);
+  EGAH.geoAreaPosLatitude := GAH.geoAreaPosLatitude;
+  EGAH.geoAreaPosLongitude := GAH.geoAreaPosLongitude;
+  EGAH.distanceA := GAH.distanceA;
+  EGAH.distanceB := GAH.distanceB;
+  EGAH.angle := GAH.angle;
+  EGAH.reserved2 := GAH.reserved2;
+
+  return EGAH;
+}
+//GeoAnycastHeader End
+
+//BeaconHeader
+type record ExtBeaconHeader {
+  ExtLongPosVector   srcPosVector
+} with { variant "FIELDORDER(msb)"};
+
+function f_ExtBeaconHeader2BeaconHeader(ExtBeaconHeader EBH) return BeaconHeader {
+  var BeaconHeader BH;
+
+  BH.srcPosVector := f_ExtLongPosVector2LongPosVector(EBH.srcPosVector);
+
+  return BH;
+}
+
+function f_BeaconHeader2ExtBeaconHeader(BeaconHeader BH) return ExtBeaconHeader {
+  var ExtBeaconHeader EBH;
+
+  EBH.srcPosVector := f_LongPosVector2ExtLongPosVector(BH.srcPosVector);
+
+  return EBH;
+}
+//BeaconHeader End
+
+//LSRequestHeader
+type record ExtLSRequestHeader {
+  UInt16             seqNumber,
+  UInt16             reserved,
+  ExtLongPosVector   srcPosVector,
+  ExtGN_Address      gnAddress
+} with { variant "FIELDORDER(msb)"};
+
+function f_ExtLSRequestHeader2LSRequestHeader(ExtLSRequestHeader ELSRH)
+ return LSRequestHeader {
+  var LSRequestHeader LSRH;
+
+  LSRH.seqNumber    := ELSRH.seqNumber;
+  LSRH.reserved     := ELSRH.reserved;
+  LSRH.srcPosVector := f_ExtLongPosVector2LongPosVector(ELSRH.srcPosVector);
+  LSRH.gnAddress    := f_ExtGN_Address2GN_Address(ELSRH.gnAddress);
+
+  return LSRH;
+}
+
+function f_LSRequestHeader2ExtLSRequestHeader(LSRequestHeader LSRH)
+ return ExtLSRequestHeader {
+  var ExtLSRequestHeader ELSRH;
+
+  ELSRH.seqNumber    := LSRH.seqNumber;
+  ELSRH.reserved     := LSRH.reserved;
+  ELSRH.srcPosVector := f_LongPosVector2ExtLongPosVector(LSRH.srcPosVector);
+  ELSRH.gnAddress    := f_GN_Address2ExtGN_Address(LSRH.gnAddress);
+
+  return ELSRH;
+}
+//LSRequestHeader End
+
+//LSReplyHeader
+type record ExtLSReplyHeader {
+  UInt16          seqNumber,
+  UInt16          reserved,
+  ExtLongPosVector   srcPosVector,
+  ExtShortPosVector  dstPosVector
+} with { variant "FIELDORDER(msb)" };
+
+function f_ExtLSReplyHeader2LSReplyHeader(ExtLSReplyHeader ELSRH)
+ return LSReplyHeader {
+  var LSReplyHeader LSRH;
+
+  LSRH.seqNumber    := ELSRH.seqNumber;
+  LSRH.reserved     := ELSRH.reserved;
+  LSRH.srcPosVector := f_ExtLongPosVector2LongPosVector(ELSRH.srcPosVector);
+  LSRH.dstPosVector := f_ExtShortPosVector2ShortPosVector(ELSRH.dstPosVector);
+
+  return LSRH;
+}
+
+function f_LSReplyHeader2ExtLSReplyHeader(LSReplyHeader LSRH)
+ return ExtLSReplyHeader {
+  var ExtLSReplyHeader ELSRH;
+
+  ELSRH.seqNumber    := LSRH.seqNumber;
+  ELSRH.reserved     := LSRH.reserved;
+  ELSRH.srcPosVector := f_LongPosVector2ExtLongPosVector(LSRH.srcPosVector);
+  ELSRH.dstPosVector := f_ShortPosVector2ExtShortPosVector(LSRH.dstPosVector);
+
+  return ELSRH;
+}
+//LSReplyHeader End
+
+//AnyHeader
+type record ExtAnyHeader {
+  UInt16          seqNumber,
+  UInt16          reserved
+} with { variant "FIELDORDER(msb)" };
+
+function f_ExtAnyHeader2AnyHeader(ExtAnyHeader EAH) return AnyHeader {
+  var AnyHeader AH;
+
+  AH.seqNumber := EAH.seqNumber;
+  AH.reserved  := EAH.reserved;
+  
+  return AH;
+}
+
+function f_AnyHeader2ExtAnyHeader(AnyHeader AH) return ExtAnyHeader {
+  var ExtAnyHeader EAH;
+
+  EAH.seqNumber := AH.seqNumber;
+  EAH.reserved  := AH.reserved;
+  
+  return EAH;
+}
+
+//AnyHeader End
+
+
+//GnNonSecuredPacket
 type record ExtGnNonSecuredPacket {
   //CommonHeader
   NextHeader         nextHeader,
@@ -1219,10 +1634,6 @@ type record ExtGnNonSecuredPacket {
   lsReplyHeader, 	   headerTST = 97)";
 
   variant(ipv6Packet)     "PRESENCE(nextHeader = e_ipv6;)";
-/*
-  variant(btpHeader)      "PRESENCE(nextHeader = e_btpA;)";
-  variant(btpHeader)      "PRESENCE(nextHeader = e_btpB;)";
-*/
   variant(btpHeader)      "CROSSTAG(btpAHeader, nextHeader = e_btpA;
                                     btpBHeader, nextHeader = e_btpB;)";
 
@@ -1231,13 +1642,357 @@ type record ExtGnNonSecuredPacket {
 
 };
 
+function f_ExtGnNonSecuredPacket2GnNonSecuredPacket(ExtGnNonSecuredPacket EGNSP)
+return GnNonSecuredPacket {
+  var GnNonSecuredPacket GNSP;
+  
+  GNSP.commonHeader.nextHeader := EGNSP.nextHeader;
+  GNSP.commonHeader.reserved := EGNSP.reserved;
+
+  select (EGNSP.headerTST) {
+    case (0) {
+      GNSP.commonHeader.headerTST := {anyHdr := {headerType := e_any, 
+                                                 headerSubType := 0}};
+      GNSP.extendedHeader.anyHeader :=
+        f_ExtAnyHeader2AnyHeader(EGNSP.extendedHeader.anyHeader);
+    }
+    case (16) {
+      GNSP.commonHeader.headerTST := {beaconHdr := {headerType := e_beacon, 
+                                                    headerSubType := 0}};
+      GNSP.extendedHeader.beaconHeader :=
+        f_ExtBeaconHeader2BeaconHeader(EGNSP.extendedHeader.beaconHeader);
+    }
+    case (32) {
+      GNSP.commonHeader.headerTST := {geoUnicastHdr := {headerType := e_geoUnicast, 
+                                                        headerSubType := 0}};
+      GNSP.extendedHeader.geoUnicastHeader :=
+        f_ExtGeoUnicastHeader2GeoUnicastHeader(EGNSP.extendedHeader.geoUnicastHeader);
+    }
+    case (48) {
+      GNSP.commonHeader.headerTST := {geoAnycastHdr :=
+                                       {headerType := e_geoAnycast, 
+                                        headerSubType := e_geoAnycastCircle}};
+      GNSP.extendedHeader.geoAnycastHeader :=
+        f_ExtGeoAnycastHeader2GeoAnycastHeader(EGNSP.extendedHeader.geoAnycastHeader);
+    }
+    case (49) {
+      GNSP.commonHeader.headerTST := {geoAnycastHdr :=
+                                       {headerType := e_geoAnycast, 
+                                        headerSubType := e_geoAnycastRect}};
+      GNSP.extendedHeader.geoAnycastHeader :=
+        f_ExtGeoAnycastHeader2GeoAnycastHeader(EGNSP.extendedHeader.geoAnycastHeader);
+    }
+    case (50) {
+      GNSP.commonHeader.headerTST := {geoAnycastHdr :=
+                                       {headerType := e_geoAnycast, 
+                                        headerSubType := e_geoAnycastElip}};
+      GNSP.extendedHeader.geoAnycastHeader :=
+        f_ExtGeoAnycastHeader2GeoAnycastHeader(EGNSP.extendedHeader.geoAnycastHeader);
+    }
+    case (64) {
+      GNSP.commonHeader.headerTST := {geoBroadcastHdr :=
+                                       {headerType := e_geoBroadcast, 
+                                        headerSubType := e_geoBroadcastCircle}};
+      GNSP.extendedHeader.geoBroadcastHeader :=
+        f_ExtGeoBroadcastHeader2GeoBroadcastHeader(EGNSP.extendedHeader.geoBroadcastHeader);
+    }
+    case (65) {
+      GNSP.commonHeader.headerTST := {geoBroadcastHdr :=
+                                       {headerType := e_geoBroadcast, 
+                                        headerSubType := e_geoBroadcastRect}};
+      GNSP.extendedHeader.geoBroadcastHeader :=
+        f_ExtGeoBroadcastHeader2GeoBroadcastHeader(EGNSP.extendedHeader.geoBroadcastHeader);
+    }
+    case (66) {
+      GNSP.commonHeader.headerTST := {geoBroadcastHdr :=
+                                       {headerType := e_geoBroadcast, 
+                                        headerSubType := e_geoBroadcastElip}};
+      GNSP.extendedHeader.geoBroadcastHeader :=
+        f_ExtGeoBroadcastHeader2GeoBroadcastHeader(EGNSP.extendedHeader.geoBroadcastHeader);
+    }
+    case (80) {
+      GNSP.commonHeader.headerTST :=
+        {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
+                    headerSubType := e_singleHop}};
+      GNSP.extendedHeader.shbHeader :=
+        f_ExtSHBHeader2SHBHeader(EGNSP.extendedHeader.shbHeader);
+    }
+    case (81) {
+      GNSP.commonHeader.headerTST := 
+        {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
+                    headerSubType := e_multiHop}};
+      GNSP.extendedHeader.tsbHeader :=
+      f_ExtTSBHeader2TSBHeader(EGNSP.extendedHeader.tsbHeader);
+    }
+    case (96) {
+      GNSP.commonHeader.headerTST := 
+      {lsHdr := {headerType := e_locationService, 
+                 headerSubType := e_lsRequest}};
+      GNSP.extendedHeader.lsRequestHeader :=
+        f_ExtLSRequestHeader2LSRequestHeader(EGNSP.extendedHeader.lsRequestHeader);
+    }
+    case (97) {
+      GNSP.commonHeader.headerTST := 
+      {lsHdr := {headerType := e_locationService, 
+                 headerSubType := e_lsReply}};
+      GNSP.extendedHeader.lsReplyHeader :=
+        f_ExtLSReplyHeader2LSReplyHeader(EGNSP.extendedHeader.lsReplyHeader);
+    }
+  } 
+  //TODO saHdr???
+
+
+  GNSP.commonHeader.trafficClass
+    := f_ExtTrafficClass2TrafficClass(EGNSP.trafficClass);
+  GNSP.commonHeader.flags        := EGNSP.flags;
+  GNSP.commonHeader.plLength     := EGNSP.plLength;
+  GNSP.commonHeader.maxHopLimit  := EGNSP.maxHopLimit;
+  GNSP.commonHeader.reserved2    := EGNSP.reserved2;
+
+  if (EGNSP.nextHeader == e_btpA) {
+  
+    var BtpPacket v_btpPacket;
+    var DecodedBtpPayload v_decodedPayload;
+    if ((EGNSP.plLength > 0) and
+         isWellKnownBTPPort(EGNSP.btpHeader.btpAHeader.destinationPort) ) {
+      v_decodedPayload := 
+        decodeBTPPayload(EGNSP.btpPayload, 
+                         EGNSP.btpHeader.btpAHeader.destinationPort);
+    }
+
+    if (isbound(v_decodedPayload)) {
+        v_btpPacket := {header  := EGNSP.btpHeader,
+                        payload := {decodedPayload := v_decodedPayload,
+                                    rawPayload     := EGNSP.btpPayload}};
+    } else {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := omit};
+    } 
+
+    if (isbound(v_btpPacket)) {
+        GNSP.payload.decodedPayload := 
+            {btpPacket := v_btpPacket};
+    } else {
+        GNSP.payload.decodedPayload := omit;
+    }
+
+    var octetstring btpPayload;
+    if (ispresent(EGNSP.btpPayload)) {
+      btpPayload := EGNSP.btpPayload;
+    } else {
+      btpPayload := ''O;
+    }
+
+    GNSP.payload.rawPayload :=
+      int2oct(EGNSP.btpHeader.btpAHeader.destinationPort,2) &
+      int2oct(EGNSP.btpHeader.btpAHeader.sourcePort,2) &
+      btpPayload;
+
+  }
+  else if (EGNSP.nextHeader == e_btpB)
+  {
+
+    var BtpPacket v_btpPacket;
+    var DecodedBtpPayload v_decodedPayload;
+
+    if ((EGNSP.plLength > 0) and
+         isWellKnownBTPPort(EGNSP.btpHeader.btpBHeader.destinationPort)) {
+      v_decodedPayload := 
+        decodeBTPPayload(EGNSP.btpPayload, 
+                         EGNSP.btpHeader.btpBHeader.destinationPort);
+    }
+
+    if (isbound(v_decodedPayload)) {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := {decodedPayload := v_decodedPayload,
+                                  rawPayload     := EGNSP.btpPayload}};
+    } else {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := omit};
+    }
+
+    if (isbound(v_btpPacket)) {
+        GNSP.payload.decodedPayload := 
+            {btpPacket := v_btpPacket};
+    } else {
+        GNSP.payload.decodedPayload := omit;
+    }
+
+    var octetstring btpPayload;
+    if (ispresent(EGNSP.btpPayload)) {
+      btpPayload := EGNSP.btpPayload;
+    } else {
+      btpPayload := ''O;
+    }
+
+    GNSP.payload.rawPayload :=
+      int2oct(EGNSP.btpHeader.btpBHeader.destinationPort,2) &
+      int2oct(EGNSP.btpHeader.btpBHeader.destinationPortInfo,2) &
+      btpPayload;
+
+  } else if (EGNSP.nextHeader == e_ipv6) {
+
+    //TODO Handle Ipv6
+    GNSP.payload.decodedPayload := omit;
+    GNSP.payload.rawPayload := EGNSP.rawPayload;
+  } else if (EGNSP.nextHeader == e_any) {
+    GNSP.payload.decodedPayload := omit;
+    GNSP.payload.rawPayload := EGNSP.rawPayload;
+  }
+  return GNSP;
+}
+
+function f_GnNonSecuredPacket2ExtGnNonSecuredPacket(GnNonSecuredPacket GNSP)
+return ExtGnNonSecuredPacket {
+  var ExtGnNonSecuredPacket EGNSP;
+  
+  EGNSP.nextHeader := GNSP.commonHeader.nextHeader;
+  EGNSP.reserved := GNSP.commonHeader.reserved;
+  
+  if (ischosen(GNSP.extendedHeader.anyHeader)) {
+    EGNSP.headerTST := 0;
+    EGNSP.extendedHeader.anyHeader :=
+      f_AnyHeader2ExtAnyHeader(GNSP.extendedHeader.anyHeader);   
+  } else if (ischosen(GNSP.extendedHeader.beaconHeader)){
+    EGNSP.headerTST := 16;
+    EGNSP.extendedHeader.beaconHeader :=
+        f_BeaconHeader2ExtBeaconHeader(GNSP.extendedHeader.beaconHeader);
+  } else if (ischosen(GNSP.extendedHeader.geoUnicastHeader)){
+    EGNSP.headerTST := 32;
+    EGNSP.extendedHeader.geoUnicastHeader :=
+        f_GeoUnicastHeader2ExtGeoUnicastHeader(GNSP.extendedHeader.geoUnicastHeader);
+  } else if (ischosen(GNSP.extendedHeader.geoAnycastHeader)){
+    if (GNSP.commonHeader.headerTST.geoAnycastHdr.headerSubType ==
+          e_geoAnycastCircle) {
+      EGNSP.headerTST := 48;
+      EGNSP.extendedHeader.geoAnycastHeader :=
+        f_GeoAnycastHeader2ExtGeoAnycastHeader(GNSP.extendedHeader.geoAnycastHeader);
+    } else if (GNSP.commonHeader.headerTST.geoAnycastHdr.headerSubType ==
+                 e_geoAnycastRect) {
+      EGNSP.headerTST := 49;
+      EGNSP.extendedHeader.geoAnycastHeader :=
+        f_GeoAnycastHeader2ExtGeoAnycastHeader(GNSP.extendedHeader.geoAnycastHeader);
+    } else if (GNSP.commonHeader.headerTST.geoAnycastHdr.headerSubType ==
+                 e_geoAnycastElip) {
+      EGNSP.headerTST := 50;
+      EGNSP.extendedHeader.geoAnycastHeader :=
+        f_GeoAnycastHeader2ExtGeoAnycastHeader(GNSP.extendedHeader.geoAnycastHeader);
+    }
+  } else if (ischosen(GNSP.extendedHeader.geoBroadcastHeader)){
+    if (GNSP.commonHeader.headerTST.geoBroadcastHdr.headerSubType ==
+          e_geoBroadcastCircle) {
+      EGNSP.headerTST := 64;
+      EGNSP.extendedHeader.geoBroadcastHeader :=
+        f_GeoBroadcastHeader2ExtGeoBroadcastHeader(GNSP.extendedHeader.geoBroadcastHeader);
+    } else if (GNSP.commonHeader.headerTST.geoBroadcastHdr.headerSubType ==
+                 e_geoBroadcastRect) {
+      EGNSP.headerTST := 65;
+      EGNSP.extendedHeader.geoBroadcastHeader :=
+        f_GeoBroadcastHeader2ExtGeoBroadcastHeader(GNSP.extendedHeader.geoBroadcastHeader);
+    } else if (GNSP.commonHeader.headerTST.geoBroadcastHdr.headerSubType ==
+                 e_geoBroadcastElip) {
+      EGNSP.headerTST := 66;
+      EGNSP.extendedHeader.geoBroadcastHeader :=
+        f_GeoBroadcastHeader2ExtGeoBroadcastHeader(GNSP.extendedHeader.geoBroadcastHeader);
+    }
+  } else if (ischosen(GNSP.extendedHeader.shbHeader)){
+    EGNSP.headerTST := 80;
+    EGNSP.extendedHeader.shbHeader :=
+      f_SHBHeader2ExtSHBHeader(GNSP.extendedHeader.shbHeader);
+  } else if (ischosen(GNSP.extendedHeader.tsbHeader)){
+    EGNSP.headerTST := 81;
+    EGNSP.extendedHeader.tsbHeader :=
+      f_TSBHeader2ExtTSBHeader(GNSP.extendedHeader.tsbHeader);
+  } else if (ischosen(GNSP.extendedHeader.lsRequestHeader)){
+    EGNSP.headerTST := 96;
+    EGNSP.extendedHeader.lsRequestHeader :=
+      f_LSRequestHeader2ExtLSRequestHeader(GNSP.extendedHeader.lsRequestHeader);
+  } else if (ischosen(GNSP.extendedHeader.lsReplyHeader)){
+    EGNSP.headerTST := 96;
+    EGNSP.extendedHeader.lsReplyHeader :=
+      f_LSReplyHeader2ExtLSReplyHeader(GNSP.extendedHeader.lsReplyHeader);
+  } 
+
+
+  //TODO saHdr???
+
+
+  EGNSP.trafficClass :=
+    f_TrafficClass2ExtTrafficClass(GNSP.commonHeader.trafficClass);
+  EGNSP.flags        := GNSP.commonHeader.flags;
+  EGNSP.plLength     := GNSP.commonHeader.plLength;
+  EGNSP.maxHopLimit  := GNSP.commonHeader.maxHopLimit;
+  EGNSP.reserved2    := GNSP.commonHeader.reserved2;
+ 
+  if (GNSP.commonHeader.nextHeader == e_btpA) {
+    EGNSP.ipv6Packet := omit;
+    EGNSP.btpHeader  := GNSP.payload.decodedPayload.btpPacket.header;
+    if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
+      EGNSP.btpPayload :=
+        encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+    } else {
+      EGNSP.btpPayload := omit;
+    }
+  } else if (GNSP.commonHeader.nextHeader == e_btpB) {
+    EGNSP.ipv6Packet := omit;
+    EGNSP.btpHeader  := GNSP.payload.decodedPayload.btpPacket.header;
+    if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
+      EGNSP.btpPayload :=
+        encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+    } else {
+      EGNSP.btpPayload := omit;
+    }
+  } else { //TODO: Handle e_any, e_reserved, e_ipv6
+    EGNSP.ipv6Packet := omit;
+    EGNSP.btpHeader  := omit;
+    EGNSP.btpPayload := omit;
+  }
+
+  if (ispresent(GNSP.payload)) {
+    EGNSP.rawPayload := GNSP.payload.rawPayload;
+  } else {
+    EGNSP.rawPayload := ''O;
+  }
+
+  return EGNSP;
+}
+//GnNonSecuredPacket End
+
+//Lifetime
+type record ExtLifetime {
+  Bit6  multiplier,
+  Bit2  ltBase
+} with { variant "FIELDORDER(msb)" };
+
+function f_ExtLifetime2Lifetime(ExtLifetime ELT) return Lifetime {
+  var Lifetime LT;
+
+  LT.multiplier := bit2int(ELT.multiplier);
+  int2enum(bit2int(ELT.ltBase),LT.ltBase);
+
+  return LT;
+}
+
+function f_Lifetime2ExtLifetime(Lifetime LT) return ExtLifetime {
+  var ExtLifetime ELT;
+
+  ELT.multiplier := int2bit(LT.multiplier,6);
+  ELT.ltBase     := int2bit(enum2int(LT.ltBase),2);
+
+  return ELT;
+}
+
+
+//Lifetime END
+
+
+
+
 type record ExtGeoNetworkingPdu {
   UInt4                 version,
   BasicNextHeader       nextHeader,
   UInt8                 reserved,
-  //Lifetime              lifeTime,
-  UInt6                 ltMultiplier,
-  LtBase                ltBase,
+  ExtLifetime           lifeTime,
   UInt8                 routerHopLimit,
   ExtGnNonSecuredPacket packet     optional,
   SecuredMessage        securedMsg optional
@@ -1255,229 +2010,15 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
   var ExtGeoNetworkingInd EGNI := f_dec_ExtGeoNetworkingInd(stream);
   var GeoNetworkingInd    GNI;
 
-  GNI.msgIn.basicHeader.version             := EGNI.msgIn.version;
-  GNI.msgIn.basicHeader.nextHeader          := EGNI.msgIn.nextHeader;
-  GNI.msgIn.basicHeader.reserved            := EGNI.msgIn.reserved;
-  GNI.msgIn.basicHeader.lifeTime.multiplier := EGNI.msgIn.ltMultiplier;
-  GNI.msgIn.basicHeader.lifeTime.ltBase     := EGNI.msgIn.ltBase;
-  GNI.msgIn.basicHeader.routerHopLimit      := EGNI.msgIn.routerHopLimit;
+  GNI.msgIn.basicHeader.version        := EGNI.msgIn.version;
+  GNI.msgIn.basicHeader.nextHeader     := EGNI.msgIn.nextHeader;
+  GNI.msgIn.basicHeader.reserved       := EGNI.msgIn.reserved;
+  GNI.msgIn.basicHeader.lifeTime       := f_ExtLifetime2Lifetime(EGNI.msgIn.lifeTime);
+  GNI.msgIn.basicHeader.routerHopLimit := EGNI.msgIn.routerHopLimit;
 
   if (ispresent(EGNI.msgIn.packet)) {
-    GNI.msgIn.gnPacket.packet.commonHeader.nextHeader := 
-    EGNI.msgIn.packet.nextHeader;
-    GNI.msgIn.gnPacket.packet.commonHeader.reserved := 
-    EGNI.msgIn.packet.reserved;
-
-    select (EGNI.msgIn.packet.headerTST) {
-      case (0) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {anyHdr := {headerType := e_any, 
-            headerSubType := 0}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.anyHeader :=
-	  EGNI.msgIn.packet.extendedHeader.anyHeader;
-      }
-      case (16) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {beaconHdr := {headerType := e_beacon, 
-            headerSubType := 0}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.beaconHeader :=
-	  EGNI.msgIn.packet.extendedHeader.beaconHeader;
-	    
-      }
-      case (32) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoUnicastHdr := {headerType := e_geoUnicast, 
-            headerSubType := 0}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.geoUnicastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoUnicastHeader;
-	    
-      }
-      case (48) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoAnycastHdr := {headerType := e_geoAnycast, 
-            headerSubType := e_geoAnycastCircle}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.geoAnycastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoAnycastHeader;
-	    
-      }
-      case (49) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoAnycastHdr := {headerType := e_geoAnycast, 
-            headerSubType := e_geoAnycastRect}};
-    	GNI.msgIn.gnPacket.packet.extendedHeader.geoAnycastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoAnycastHeader;
-
-	    
-      }
-      case (50) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoAnycastHdr := {headerType := e_geoAnycast, 
-            headerSubType := e_geoAnycastElip}};
-    	GNI.msgIn.gnPacket.packet.extendedHeader.geoAnycastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoAnycastHeader;
-
-      }
-      case (64) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoBroadcastHdr := {headerType := e_geoBroadcast, 
-            headerSubType := e_geoBroadcastCircle}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoBroadcastHeader;
-	    
-      }
-      case (65) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoBroadcastHdr := {headerType := e_geoBroadcast, 
-            headerSubType := e_geoBroadcastRect}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoBroadcastHeader;
-	    
-      }
-      case (66) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {geoBroadcastHdr := {headerType := e_geoBroadcast, 
-            headerSubType := e_geoBroadcastElip}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.geoBroadcastHeader :=
-	  EGNI.msgIn.packet.extendedHeader.geoBroadcastHeader;
-	    
-      }
-      case (80) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
-            headerSubType := e_singleHop}};
-
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector :=
-	    f_dec_ExtLongPosVector(EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector);
-/*
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.typeOfAddress :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.typeOfAddress;
-        GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationType :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationType;
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationCountryCode :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.stationCountryCode;
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.mid :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.gnAddr.mid;
-
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.timestamp :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.timestamp;
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.latitude :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.latitude;
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.longitude :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.longitude;
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.pai :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.pai;
-	GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.speed :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.speed;
-        GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.srcPosVector.heading :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.srcPosVector.heading;
-
-*/
-
-        GNI.msgIn.gnPacket.packet.extendedHeader.shbHeader.reserved :=
-	  EGNI.msgIn.packet.extendedHeader.shbHeader.reserved;
-	  
-      }
-      case (81) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {tsbHdr := {headerType := e_topologicallyScopedBroadcast, 
-            headerSubType := e_multiHop}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.tsbHeader :=
-	  EGNI.msgIn.packet.extendedHeader.tsbHeader;
-	    
-      }
-      case (96) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {lsHdr := {headerType := e_locationService, 
-            headerSubType := e_lsRequest}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.lsRequestHeader :=
-	  EGNI.msgIn.packet.extendedHeader.lsRequestHeader;
-	    
-      }
-      case (97) {
-        GNI.msgIn.gnPacket.packet.commonHeader.headerTST := 
-        {lsHdr := {headerType := e_locationService, 
-            headerSubType := e_lsReply}};
-	GNI.msgIn.gnPacket.packet.extendedHeader.lsReplyHeader :=
-	  EGNI.msgIn.packet.extendedHeader.lsReplyHeader;
-	    
-      }
-    } 
-    //TODO saHdr???
-
-
-    GNI.msgIn.gnPacket.packet.commonHeader.trafficClass := f_dec_TrafficClass(EGNI.msgIn.packet.trafficClass);
-    GNI.msgIn.gnPacket.packet.commonHeader.flags := 
-    EGNI.msgIn.packet.flags;
-    GNI.msgIn.gnPacket.packet.commonHeader.plLength := 
-    EGNI.msgIn.packet.plLength;
-    GNI.msgIn.gnPacket.packet.commonHeader.maxHopLimit := 
-    EGNI.msgIn.packet.maxHopLimit;
-    GNI.msgIn.gnPacket.packet.commonHeader.reserved2 := 
-    EGNI.msgIn.packet.reserved2;
-
-    //GNI.msgIn.gnPacket.packet.extendedHeader := EGNI.msgIn.packet.extendedHeader;
-    
-
-
-    if (EGNI.msgIn.packet.nextHeader == e_btpA) {
-    
-      var BtpPacket v_btpPacket;
-      var DecodedBtpPayload v_decodedPayload;
-      if ((EGNI.msgIn.packet.plLength > 0) and
-           isWellKnownBTPPort(EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort) ) {
-        v_decodedPayload := 
-          decodeBTPPayload(EGNI.msgIn.packet.btpPayload, 
-                           EGNI.msgIn.packet.btpHeader.btpAHeader.destinationPort);
-      }
-
-      if (isbound(v_decodedPayload)) {
-          v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-                          payload := {decodedPayload := v_decodedPayload,
-                                      rawPayload     := EGNI.msgIn.packet.btpPayload}};
-      } 
-
-      if (isbound(v_btpPacket)) {
-          GNI.msgIn.gnPacket.packet.payload.decodedPayload := 
-              {btpPacket := v_btpPacket};
-      } else {
-          GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
-      }
+    GNI.msgIn.gnPacket.packet := f_ExtGnNonSecuredPacket2GnNonSecuredPacket(EGNI.msgIn.packet);
     }
-    else if (EGNI.msgIn.packet.nextHeader == e_btpB)
-    {
-
-      var BtpPacket v_btpPacket;
-      var DecodedBtpPayload v_decodedPayload;
-
-      if ((EGNI.msgIn.packet.plLength > 0) and
-           isWellKnownBTPPort(EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort)) {
-        v_decodedPayload := 
-          decodeBTPPayload(EGNI.msgIn.packet.btpPayload, 
-                           EGNI.msgIn.packet.btpHeader.btpBHeader.destinationPort);
-      }
-
-      if (isbound(v_decodedPayload)) {
-          v_btpPacket := {header  := EGNI.msgIn.packet.btpHeader,
-                          payload := {decodedPayload := v_decodedPayload,
-                                      rawPayload     := EGNI.msgIn.packet.btpPayload}};
-      } 
-
-      if (isbound(v_btpPacket)) {
-          GNI.msgIn.gnPacket.packet.payload.decodedPayload := 
-              {btpPacket := v_btpPacket};
-      } else {
-          GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
-      }
-
-    } else if (EGNI.msgIn.packet.nextHeader == e_ipv6) {
-
-      //TODO Handle Ipv6
-      GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
-    } else if (EGNI.msgIn.packet.nextHeader == e_any) {
-      GNI.msgIn.gnPacket.packet.payload.decodedPayload := omit;
-    }
-    GNI.msgIn.gnPacket.packet.payload.rawPayload := EGNI.msgIn.packet.rawPayload;
-  }//End of ExtGnNonSecuredPacket
 
   GNI.msgIn.gnPacket.securedMsg := EGNI.msgIn.securedMsg;
   GNI.macDestinationAddress := EGNI.macDestinationAddress;
@@ -1507,23 +2048,18 @@ with { extension "prototype(convert)"
 
 //AdapterControlPort--------------------------------------------------------
 
+/*
 external function f_enc_LongPosVector(in LongPosVector pdu) return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
-
+*/
 /*
 external function f_dec_LongPosVector(in octetstring stream) return LongPosVector
 with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
 */
-
-function f_dec_LongPosVector(in octetstring stream) return LongPosVector {
-  var LongPosVector LPV;
-  LPV := f_dec_ExtLongPosVector(f_decto_ExtLongPosVector(stream));
-  return LPV;
-}
 
 
 
