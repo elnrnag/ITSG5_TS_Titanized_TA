@@ -31,11 +31,12 @@ CXX = g++
 
 # Flags for the C++ preprocessor (and makedepend as well):
 CPPFLAGS = -D$(PLATFORM) -I$(TTCN3_DIR)/include -I.
+#-DMEMORY_DEBUG 
 
 # Flags for the C++ compiler:
 CXXFLAGS = -Wall  
 CXXFLAGS += -fpermissive
-CXXFLAGS += -g
+#CXXFLAGS += -g
 
 # Flags for the linker:
 LDFLAGS = -lpthread
