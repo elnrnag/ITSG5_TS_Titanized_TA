@@ -2,3 +2,5 @@
 *~
 *.o
 /build/
+./.project
+.TITAN_properties

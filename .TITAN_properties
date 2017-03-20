@@ -3,12 +3,7 @@
   <ActiveConfiguration>Default</ActiveConfiguration>
   <ProjectProperties>
     <MakefileSettings>
-      <symboliclinklessBuild>false</symboliclinklessBuild>
-      <GNUMake>false</GNUMake>
-      <incrementalDependencyRefresh>false</incrementalDependencyRefresh>
       <targetExecutable>bin/ITSG5_TS_Titanized_TA</targetExecutable>
-      <includeSourceInfo>false</includeSourceInfo>
-      <suppressWarnings>true</suppressWarnings>
     </MakefileSettings>
     <LocalBuildSettings>
       <MakefileScript/>
@@ -18,6 +13,13 @@
   <FolderProperties>
     <FolderResource>
       <FolderPath>META-INF</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>TRI</FolderPath>
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
         <ExcludeFromBuild>true</ExcludeFromBuild>
@@ -80,56 +82,7 @@
       </FolderProperties>
     </FolderResource>
     <FolderResource>
-      <FolderPath>src/PER/CAM_CNL_113_xxx_updated</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/CAM_CNL_113_xxx_updated/test</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/DENM_CNL_113_xxx_updated</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/DENM_CNL_113_xxx_updated/test</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/MAP_CNL_113_xxx</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/MAP_CNL_113_xxx/test</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/SPAT_CNL_113_xxx</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>src/PER/SPAT_CNL_113_xxx/test</FolderPath>
+      <FolderPath>src</FolderPath>
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
         <ExcludeFromBuild>true</ExcludeFromBuild>
@@ -149,128 +102,5 @@
         <ExcludeFromBuild>true</ExcludeFromBuild>
       </FolderProperties>
     </FolderResource>
-    <FolderResource>
-      <FolderPath>tt3plugins</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsATSP</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsDCC</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsFNTP</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsFSAP</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsIICP</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsIPv6OverGeoNetworking</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsSecurity</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/AtsV2G</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/LibIts/CALM</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/LibIts/DCC</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>ttcn/LibIts/V2G</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>unittests</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
   </FolderProperties>
-  <FileProperties>
-    <FileResource>
-      <FilePath>src/PER/DSCR2.asn</FilePath>
-      <FileProperties>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FileProperties>
-    </FileResource>
-    <FileResource>
-      <FilePath>src/PER/SPAT_CNL_113_xxx/src/MAP_SPAT_ETSI.asn</FilePath>
-      <FileProperties>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FileProperties>
-    </FileResource>
-    <FileResource>
-      <FilePath>src/PER/SPAT_CNL_113_xxx/src/MAP_SPAT_REG_D.asn</FilePath>
-      <FileProperties>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FileProperties>
-    </FileResource>
-    <FileResource>
-      <FilePath>src/PER/SPAT_CNL_113_xxx/src/REGION.asn</FilePath>
-      <FileProperties>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FileProperties>
-    </FileResource>
-    <FileResource>
-      <FilePath>ttcn/LibIts/Security/LibItsSecurity_Functions.ttcn</FilePath>
-      <FileProperties>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FileProperties>
-    </FileResource>
-  </FileProperties>
 </TITAN_Designer_Properties>

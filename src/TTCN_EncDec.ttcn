@@ -1106,17 +1106,14 @@ with { extension "prototype(convert)"
 };
 
 
-external function f_enc_GN_Address(in GN_Address pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
+function f_enc_GN_Address(in GN_Address pdu) return octetstring {
+  return f_enc_ExtGN_Address(f_GN_Address2ExtGN_Address(pdu));
 };
 
 
-external function f_dec_GN_Address(in octetstring stream) return GN_Address
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
+function f_dec_GN_Address(in octetstring stream) return GN_Address {
+  return f_ExtGN_Address2GN_Address(f_dec_ExtGN_Address(stream));
 };
-
 
 type record ExtGeoNetworkingReq {
                 ExtGeoNetworkingPdu    msgOut,
@@ -1166,6 +1163,16 @@ type record ExtGN_Address {
     UInt10 stationCountryCode,
     Oct6   mid
 } with { variant "FIELDORDER(msb)"};
+
+external function f_enc_ExtGN_Address(in ExtGN_Address egna) return octetstring
+with { extension "prototype(convert)"
+       extension "encode(RAW)"
+     };
+
+external function f_dec_ExtGN_Address(in octetstring os) return ExtGN_Address
+with { extension "prototype(convert)"
+       extension "decode(RAW)"
+     };
 
 function f_ExtGN_Address2GN_Address(ExtGN_Address EGNA) return GN_Address {
   var GN_Address GNA;
@@ -1243,7 +1250,7 @@ with { extension "prototype(convert)"
 };
 
 
-external function f_enc_ExtLongPosVector(ExtLongPosVector ELPV) return octetstring
+external function f_enc_ExtLongPosVector(in ExtLongPosVector ELPV) return octetstring
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };

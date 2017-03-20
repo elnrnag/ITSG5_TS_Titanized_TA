@@ -23,34 +23,34 @@ module ItsGeoNetworking_TestControl {
         /* FDV */
         
         if(PICS_GN_BASIC_HEADER) {
-            execute(TC_GEONW_FDV_BAH_BV_01());
-//            execute(TC_GEONW_FDV_BAH_BI_02());
+            //execute(TC_GEONW_FDV_BAH_BV_01());
+            //execute(TC_GEONW_FDV_BAH_BI_02());
         }
-/*
+
         if(PICS_GN_COMMON_HEADER) {
-            execute(TC_GEONW_FDV_COH_BV_01());
-            execute(TC_GEONW_FDV_COH_BV_02());
-            execute(TC_GEONW_FDV_COH_BV_03());
-            execute(TC_GEONW_FDV_COH_BO_04());
+            //execute(TC_GEONW_FDV_COH_BV_01());
+            //execute(TC_GEONW_FDV_COH_BV_02());
+            //execute(TC_GEONW_FDV_COH_BV_03());
+            //execute(TC_GEONW_FDV_COH_BO_04()); //1 out of 10 times pass, otherwise error!
         }        
         
         if(PICS_GN_BEACON_SRC) {
-            execute(TC_GEONW_FDV_BEA_BV_01());
-            execute(TC_GEONW_FDV_BEA_BV_02());
-            execute(TC_GEONW_FDV_BEA_BV_03());
-            execute(TC_GEONW_FDV_BEA_BV_04());
+            //execute(TC_GEONW_FDV_BEA_BV_01());
+            //execute(TC_GEONW_FDV_BEA_BV_02());
+            //execute(TC_GEONW_FDV_BEA_BV_03());
+            //execute(TC_GEONW_FDV_BEA_BV_04());
         }
         
         if(PICS_GN_GUC_SRC) {
-	        execute(TC_GEONW_FDV_GUC_BV_01());
+	        //execute(TC_GEONW_FDV_GUC_BV_01());
         }
         
         if(PICS_GN_GBC_SRC) {
-    	    execute(TC_GEONW_FDV_GBC_BV_01());
+    	    //execute(TC_GEONW_FDV_GBC_BV_01());
         }
         
         if(PICS_GN_GAC_SRC) {
-        	execute(TC_GEONW_FDV_GAC_BV_01());
+        	//execute(TC_GEONW_FDV_GAC_BV_01());
         }
         
         if(PICS_GN_SHB_SRC) {
@@ -58,388 +58,388 @@ module ItsGeoNetworking_TestControl {
         }
         
         if(PICS_GN_TSB_SRC) {
-        	execute(TC_GEONW_FDV_TSB_BV_01());
+        	//execute(TC_GEONW_FDV_TSB_BV_01());
         }
 
-*/		/* PON/LOT */
-/*
+		/* PON/LOT */
+
         if(PICS_GN_GUC_SRC and PICS_GN_BEACON_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_01());
+        	//execute(TC_GEONW_PON_LOT_BV_01());
         }
         
         if(PICS_GN_LS_REQ_SRC and PICS_GN_LS_REP_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_02());
+        	//execute(TC_GEONW_PON_LOT_BV_02());
         }
         
         if(PICS_GN_BEACON_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_01());
+        	//execute(TC_GEONW_PON_LOT_BV_03_01());
         }
         
         if(PICS_GN_GUC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_02());
+        	//execute(TC_GEONW_PON_LOT_BV_03_02());
         }
         
         if(PICS_GN_GAC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_03());
+        	//execute(TC_GEONW_PON_LOT_BV_03_03());
         }
         
         if(PICS_GN_GBC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_04());
+        	//execute(TC_GEONW_PON_LOT_BV_03_04());
         }
         
         if(PICS_GN_TSB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_05());
+        	//execute(TC_GEONW_PON_LOT_BV_03_05());
         }
         
         if(PICS_GN_SHB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_06());
+        	//execute(TC_GEONW_PON_LOT_BV_03_06());
         }
         
         if(PICS_GN_LS_REQ_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_07());
+        	//execute(TC_GEONW_PON_LOT_BV_03_07());
         }
         
         if(PICS_GN_LS_REP_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_08());
+        	//execute(TC_GEONW_PON_LOT_BV_03_08());
         }
         
         if(PICS_GN_LS_REQ_SRC) {
-        	execute(TC_GEONW_PON_LOT_BV_04());
+        	//execute(TC_GEONW_PON_LOT_BV_04());
         }
         
         if(PICS_GN_GUC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_01());
+        	//execute(TC_GEONW_PON_LOT_BV_05_01());
         }
         
         if(PICS_GN_GAC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_02());
+        	//execute(TC_GEONW_PON_LOT_BV_05_02());
         }
         
         if(PICS_GN_GBC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_03());
+        	//execute(TC_GEONW_PON_LOT_BV_05_03());
         }
         
         if(PICS_GN_TSB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_04());
+        	//execute(TC_GEONW_PON_LOT_BV_05_04());
         }
         
         if(PICS_GN_SHB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_05());
+        	//execute(TC_GEONW_PON_LOT_BV_05_05());
         }
         
         if(PICS_GN_LS_REQ_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_06());
+        	//execute(TC_GEONW_PON_LOT_BV_05_06());
         }
         
         if(PICS_GN_LS_REP_DST) {
-       		execute(TC_GEONW_PON_LOT_BV_05_07());
+       		//execute(TC_GEONW_PON_LOT_BV_05_07());
         }
-*/        
+        
         /* PON/LPV */
-/*        
+        
         if(PICS_GN_BEACON_SRC) {
-        	execute(TC_GEONW_PON_LPV_BV_01());
+        	//execute(TC_GEONW_PON_LPV_BV_01());
         }
-*/        
+        
         /* PON/SQN */
-/*        
+        
         if(PICS_GN_GBC_SRC) {
-            execute(TC_GEONW_PON_SQN_BV_01());
-            execute(TC_GEONW_PON_SQN_BV_02());
+            //execute(TC_GEONW_PON_SQN_BV_01());
+            //execute(TC_GEONW_PON_SQN_BV_02());
         }
-*/        
+        
         /* PON/LOS */
-/*        
+        
         if(PICS_GN_LS_REQ_SRC) {
-            execute(TC_GEONW_PON_LOS_BV_01());
-            execute(TC_GEONW_PON_LOS_BV_02());
+            //execute(TC_GEONW_PON_LOS_BV_01());
+            //execute(TC_GEONW_PON_LOS_BV_02());
 	        if(PICS_GN_LS_REP_DST) {
-                execute(TC_GEONW_PON_LOS_BV_03());
-                execute(TC_GEONW_PON_LOS_BV_04());
+                //execute(TC_GEONW_PON_LOS_BV_03());
+                //execute(TC_GEONW_PON_LOS_BV_04());
 	        }
-            execute(TC_GEONW_PON_LOS_BV_05());
+            //execute(TC_GEONW_PON_LOS_BV_05());
         }
         
         if(PICS_GN_LS_REQ_RETRANSMISSION) {
-            execute(TC_GEONW_PON_LOS_TI_06());
-            execute(TC_GEONW_PON_LOS_BV_07());
+            //execute(TC_GEONW_PON_LOS_TI_06());
+            //execute(TC_GEONW_PON_LOS_BV_07());
         }
         
         if(PICS_GN_LS_REQ_DST) {
-            execute(TC_GEONW_PON_LOS_BV_08());
-            execute(TC_GEONW_PON_LOS_BO_09());
+            //execute(TC_GEONW_PON_LOS_BV_08());
+            //execute(TC_GEONW_PON_LOS_BO_09());
         }
         
         if(PICS_GN_LS_FWD) {
-        execute(TC_GEONW_PON_LOS_BV_10());
-        execute(TC_GEONW_PON_LOS_BV_11());
+        //execute(TC_GEONW_PON_LOS_BV_10());
+        //execute(TC_GEONW_PON_LOS_BV_11());
         }
         
         if(PICS_GN_LS_REQ_SRC) {
-            execute(TC_GEONW_PON_LOS_BV_12());
-            execute(TC_GEONW_PON_LOS_BV_13());
-            execute(TC_GEONW_PON_LOS_BV_14());
-            execute(TC_GEONW_PON_LOS_BV_15());
-            execute(TC_GEONW_PON_LOS_BV_16());
-            execute(TC_GEONW_PON_LOS_BV_17());
+            //execute(TC_GEONW_PON_LOS_BV_12());
+            //execute(TC_GEONW_PON_LOS_BV_13());
+            //execute(TC_GEONW_PON_LOS_BV_14());
+            //execute(TC_GEONW_PON_LOS_BV_15());
+            //execute(TC_GEONW_PON_LOS_BV_16());
+            //execute(TC_GEONW_PON_LOS_BV_17());
         }
-*/        
+        
         /* PON/FPB */
-/*        
+        
         if(PICS_GN_GUC_SRC) {
-            execute(TC_GEONW_PON_FPB_BV_01());
-            execute(TC_GEONW_PON_FPB_BV_02());
-            execute(TC_GEONW_PON_FPB_BV_03());
-            execute(TC_GEONW_PON_FPB_BV_04());
+            //execute(TC_GEONW_PON_FPB_BV_01());
+            //execute(TC_GEONW_PON_FPB_BV_02());
+            //execute(TC_GEONW_PON_FPB_BV_03());
+            //execute(TC_GEONW_PON_FPB_BV_04());
         }
         
         if(PICS_GN_TSB_SRC) {
-            execute(TC_GEONW_PON_FPB_BV_06());
-            execute(TC_GEONW_PON_FPB_BV_07());
-            execute(TC_GEONW_PON_FPB_BV_08());
+            //execute(TC_GEONW_PON_FPB_BV_06());
+            //execute(TC_GEONW_PON_FPB_BV_07());
+            //execute(TC_GEONW_PON_FPB_BV_08());
         }
         
         if(PICS_GN_GUC_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_09());
+        	//execute(TC_GEONW_PON_FPB_BV_09());
         }
         
         if(PICS_GN_TSB_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_10());
+        	//execute(TC_GEONW_PON_FPB_BV_10());
         }
         
         if(PICS_GN_GUC_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_11_01());
+        	//execute(TC_GEONW_PON_FPB_BV_11_01());
         }
         
         if(PICS_GN_GAC_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_11_02());
+        	//execute(TC_GEONW_PON_FPB_BV_11_02());
         }
         
         if(PICS_GN_GBC_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_11_03());
+        	//execute(TC_GEONW_PON_FPB_BV_11_03());
         }
         
         if(PICS_GN_TSB_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_11_04());
+        	//execute(TC_GEONW_PON_FPB_BV_11_04());
         }
         
         if(PICS_GN_SHB_SRC) {
-        	execute(TC_GEONW_PON_FPB_BV_11_05());
+        	//execute(TC_GEONW_PON_FPB_BV_11_05());
         }
         
         if(PICS_GN_GUC_SRC) {
-        execute(TC_GEONW_PON_FPB_BV_12_01());
+        //execute(TC_GEONW_PON_FPB_BV_12_01());
         }
         
         if(PICS_GN_GAC_SRC) {
-        execute(TC_GEONW_PON_FPB_BV_12_02());
+        //execute(TC_GEONW_PON_FPB_BV_12_02());
         }
         
         if(PICS_GN_GBC_SRC) {
-        execute(TC_GEONW_PON_FPB_BV_12_03());
+        //execute(TC_GEONW_PON_FPB_BV_12_03());
         }
         
         if(PICS_GN_TSB_SRC) {
-        execute(TC_GEONW_PON_FPB_BV_12_04());
+        //execute(TC_GEONW_PON_FPB_BV_12_04());
         }
-*/        
+        
         /* PON/GNA */
-/*        
+        
         if(PICS_GN_ADDR_AUTO) {
             if (PICS_GN_LOCAL_ADDR_CONF_METHOD == e_auto) {
-                execute(TC_GEONW_PON_GNA_BV_01());
+                //execute(TC_GEONW_PON_GNA_BV_01());
             }
         }
         
         if(PICS_GN_DAD) {
-	        execute(TC_GEONW_PON_GNA_BV_02());
+	        //execute(TC_GEONW_PON_GNA_BV_02());
         }
-*/        
+        
         /* PON/BEA */
-/*        
+        
         if(PICS_GN_BEACON_SRC) {
-            execute(TC_GEONW_PON_BEA_TI_01());
-            execute(TC_GEONW_PON_BEA_TI_02());
+            //execute(TC_GEONW_PON_BEA_TI_01());
+            //execute(TC_GEONW_PON_BEA_TI_02());
         }
-*/        
+        
         /* PON/GUC */
-/*        
+        
         if(PICS_GN_GUC_SRC) {
             if ((PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_greedy) or (PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_unspecified)) {
-                execute(TC_GEONW_PON_GUC_BV_01());
+                //execute(TC_GEONW_PON_GUC_BV_01());
             }
             
             if (PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_cbf) {
-                execute(TC_GEONW_PON_GUC_BV_11());
+                //execute(TC_GEONW_PON_GUC_BV_11());
             }            
         }
 
         if(PICS_GN_GUC_FWD) {
             if ((PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_greedy) or (PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_unspecified)) {
-	            execute(TC_GEONW_PON_GUC_BV_02());
+	            //execute(TC_GEONW_PON_GUC_BV_02());
             }
             
-            execute(TC_GEONW_PON_GUC_BV_03());
-            execute(TC_GEONW_PON_GUC_BO_04());
+            //execute(TC_GEONW_PON_GUC_BV_03());
+            //execute(TC_GEONW_PON_GUC_BO_04());
 
             if (PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_cbf) {
-                execute(TC_GEONW_PON_GUC_BV_06());
-                execute(TC_GEONW_PON_GUC_BV_07());
-                execute(TC_GEONW_PON_GUC_BV_08());
-                execute(TC_GEONW_PON_GUC_BV_10());
+                //execute(TC_GEONW_PON_GUC_BV_06());
+                //execute(TC_GEONW_PON_GUC_BV_07());
+                //execute(TC_GEONW_PON_GUC_BV_08());
+                //execute(TC_GEONW_PON_GUC_BV_10());
             }
             
             if ((PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_greedy) or (PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_unspecified)) {
-                execute(TC_GEONW_PON_GUC_BO_12());
+                //execute(TC_GEONW_PON_GUC_BO_12());
             }
         }
 
         if(PICS_GN_GUC_DST) {
-	        execute(TC_GEONW_PON_GUC_BV_05());
+	        //execute(TC_GEONW_PON_GUC_BV_05());
        
             if ((PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_greedy) or (PICS_GN_GEOUNICAST_FORWARDING_ALGORITHM == e_unspecified)) {
-	            execute(TC_GEONW_PON_GUC_BO_13());
+	            //execute(TC_GEONW_PON_GUC_BO_13());
             }
         }
-*/        
+        
         /* PON/GBC */        
-/*        
+        
         if(PICS_GN_GBC_SRC) {
-            execute(TC_GEONW_PON_GBC_BV_01());
+            //execute(TC_GEONW_PON_GBC_BV_01());
             if ((PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_simple) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_unspecified) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_advanced)) {
-            	execute(TC_GEONW_PON_GBC_BV_02());
+            	//execute(TC_GEONW_PON_GBC_BV_02());
             }
             if ((PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_simple) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_unspecified)) {
-                execute(TC_GEONW_PON_GBC_BV_03());
+                //execute(TC_GEONW_PON_GBC_BV_03());
             }
             if (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_cbf) {
-                execute(TC_GEONW_PON_GBC_BV_12());
+                //execute(TC_GEONW_PON_GBC_BV_12());
             }
         }
 
         if(PICS_GN_GBC_FWD) {        
             if ((PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_simple) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_unspecified)) {
-            	execute(TC_GEONW_PON_GBC_BO_04());
+            	//execute(TC_GEONW_PON_GBC_BO_04());
             }
-            execute(TC_GEONW_PON_GBC_BV_05());
+            //execute(TC_GEONW_PON_GBC_BV_05());
             if ((PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_simple) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_unspecified)) {
-                execute(TC_GEONW_PON_GBC_BO_06());
+                //execute(TC_GEONW_PON_GBC_BO_06());
             }
-            execute(TC_GEONW_PON_GBC_BV_07());
-            execute(TC_GEONW_PON_GBC_BV_08());
-            execute(TC_GEONW_PON_GBC_BV_11());
-            execute(TC_GEONW_PON_GBC_BO_19());
-            execute(TC_GEONW_PON_GBC_BV_20());
-            execute(TC_GEONW_PON_GBC_BV_21());
+            //execute(TC_GEONW_PON_GBC_BV_07());
+            //execute(TC_GEONW_PON_GBC_BV_08());
+            //execute(TC_GEONW_PON_GBC_BV_11());
+            //execute(TC_GEONW_PON_GBC_BO_19());
+            //execute(TC_GEONW_PON_GBC_BV_20());
+            //execute(TC_GEONW_PON_GBC_BV_21());
         }
 
         if(PICS_GN_GBC_DST) {
-            execute(TC_GEONW_PON_GBC_BV_09());
+            //execute(TC_GEONW_PON_GBC_BV_09());
             if ((PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_simple) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_unspecified)) {
-            	execute(TC_GEONW_PON_GBC_BO_10());
+            	//execute(TC_GEONW_PON_GBC_BO_10());
             }
         }
-*/        
+        
         /* PON/TSB */
-/*
+
         if(PICS_GN_TSB_SRC) {        
-        	execute(TC_GEONW_PON_TSB_BV_01());
+        	//execute(TC_GEONW_PON_TSB_BV_01());
         }
 
         if(PICS_GN_TSB_FWD) {        
-            execute(TC_GEONW_PON_TSB_BV_02());
-            execute(TC_GEONW_PON_TSB_BO_03());
-            execute(TC_GEONW_PON_TSB_BV_04());
-            execute(TC_GEONW_PON_TSB_BO_05());
+            //execute(TC_GEONW_PON_TSB_BV_02());
+            //execute(TC_GEONW_PON_TSB_BO_03());
+            //execute(TC_GEONW_PON_TSB_BV_04());
+            //execute(TC_GEONW_PON_TSB_BO_05());
         }
         if(PICS_GN_TSB_DST) {        
-            execute(TC_GEONW_PON_TSB_BV_06());
-            execute(TC_GEONW_PON_TSB_BO_07());
+            //execute(TC_GEONW_PON_TSB_BV_06());
+            //execute(TC_GEONW_PON_TSB_BO_07());
         }
-*/        
+        
         /* PON/SHB */
-/*        
+        
         if(PICS_GN_SHB_SRC) {
-            execute(TC_GEONW_PON_SHB_BV_01());
+            //execute(TC_GEONW_PON_SHB_BV_01());
         }
         if(PICS_GN_SHB_DST) {        
-            execute(TC_GEONW_PON_SHB_BV_02());
+            //execute(TC_GEONW_PON_SHB_BV_02());
         }
-*/        
+        
         /* PON/GAC */
-/*
+
         if(PICS_GN_GAC_SRC) {        
-            execute(TC_GEONW_PON_GAC_BV_01());
+            //execute(TC_GEONW_PON_GAC_BV_01());
             if ((PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_simple) or (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_unspecified)) {
-            	execute(TC_GEONW_PON_GAC_BV_02());
+            	//execute(TC_GEONW_PON_GAC_BV_02());
             }
             if (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_cbf) {
-                execute(TC_GEONW_PON_GAC_BV_13());
+                //execute(TC_GEONW_PON_GAC_BV_13());
             }            
         }
 
         if(PICS_GN_GAC_FWD) {        
-            execute(TC_GEONW_PON_GAC_BV_03());
-            execute(TC_GEONW_PON_GAC_BV_04());
-            execute(TC_GEONW_PON_GAC_BO_05());
-            execute(TC_GEONW_PON_GAC_BV_06());
-            execute(TC_GEONW_PON_GAC_BO_07());
-            execute(TC_GEONW_PON_GAC_BO_11());
+            //execute(TC_GEONW_PON_GAC_BV_03());
+            //execute(TC_GEONW_PON_GAC_BV_04());
+            //execute(TC_GEONW_PON_GAC_BO_05());
+            //execute(TC_GEONW_PON_GAC_BV_06());
+            //execute(TC_GEONW_PON_GAC_BO_07());
+            //execute(TC_GEONW_PON_GAC_BO_11());
         }
 
         if(PICS_GN_GAC_DST) {        
-            execute(TC_GEONW_PON_GAC_BV_08());
-            execute(TC_GEONW_PON_GAC_BO_09());
-            execute(TC_GEONW_PON_GAC_BV_10());
+            //execute(TC_GEONW_PON_GAC_BV_08());
+            //execute(TC_GEONW_PON_GAC_BO_09());
+            //execute(TC_GEONW_PON_GAC_BV_10());
         }
-*/        
-		/* PON/BCA */
-/*
+        
+	/* PON/BCA */
+
         if(PICS_GN_GBC_FWD) {        
             if (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_cbf) {
-                execute(TC_GEONW_PON_BCA_BV_01());
-                execute(TC_GEONW_PON_BCA_BV_02());
-                execute(TC_GEONW_PON_BCA_BV_03());
-                execute(TC_GEONW_PON_BCA_BO_04());
-                execute(TC_GEONW_PON_BCA_BV_05());
-                execute(TC_GEONW_PON_BCA_BV_06());
-				execute(TC_GEONW_PON_BCA_BV_07());
-                execute(TC_GEONW_PON_BCA_BV_08());
+                //execute(TC_GEONW_PON_BCA_BV_01());
+                //execute(TC_GEONW_PON_BCA_BV_02());
+                //execute(TC_GEONW_PON_BCA_BV_03());
+                //execute(TC_GEONW_PON_BCA_BO_04());
+                //execute(TC_GEONW_PON_BCA_BV_05());
+                //execute(TC_GEONW_PON_BCA_BV_06());
+				//execute(TC_GEONW_PON_BCA_BV_07());
+                //execute(TC_GEONW_PON_BCA_BV_08());
             }
         }
-*/        
+        
         /* PON/BAA */
-/*        
+        
         if(PICS_GN_GBC_FWD) {
             if (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_advanced) {
-                execute(TC_GEONW_PON_BAA_BV_01());
-                execute(TC_GEONW_PON_BAA_BV_02());
-                execute(TC_GEONW_PON_BAA_BV_03());
-                execute(TC_GEONW_PON_BAA_BV_04());
-                execute(TC_GEONW_PON_BAA_BV_05());
-                execute(TC_GEONW_PON_BAA_BV_06());
-                execute(TC_GEONW_PON_BAA_BV_07());
-                execute(TC_GEONW_PON_BAA_BO_08());
-                execute(TC_GEONW_PON_BAA_BV_09());
-                execute(TC_GEONW_PON_BAA_BV_10());
-                execute(TC_GEONW_PON_BAA_BV_11());
+                //execute(TC_GEONW_PON_BAA_BV_01());
+                //execute(TC_GEONW_PON_BAA_BV_02());
+                //execute(TC_GEONW_PON_BAA_BV_03());
+                //execute(TC_GEONW_PON_BAA_BV_04());
+                //execute(TC_GEONW_PON_BAA_BV_05());
+                //execute(TC_GEONW_PON_BAA_BV_06());
+                //execute(TC_GEONW_PON_BAA_BV_07());
+                //execute(TC_GEONW_PON_BAA_BO_08());
+                //execute(TC_GEONW_PON_BAA_BV_09());
+                //execute(TC_GEONW_PON_BAA_BV_10());
+                //execute(TC_GEONW_PON_BAA_BV_11());
             }
         }
-*/                
+                
         /* CAP */       
-/*        
+        
         if(PICS_GN_LS_REQ_SRC) {         
-        	execute(TC_GEONW_CAP_LOS_BV_01());
+        	//execute(TC_GEONW_CAP_LOS_BV_01());
         }
         
         if(PICS_GN_GUC_FWD) {        
-        	execute(TC_GEONW_CAP_FPB_BV_01());
+        	//execute(TC_GEONW_CAP_FPB_BV_01());
         }
       
         if(PICS_GN_GBC_FWD) {
-      	  execute(TC_GEONW_CAP_FPB_BV_02());
+      	  //execute(TC_GEONW_CAP_FPB_BV_02());
         }
-*/        
+        
     }
     
 } // end ItsGeoNetworking_TestControl
