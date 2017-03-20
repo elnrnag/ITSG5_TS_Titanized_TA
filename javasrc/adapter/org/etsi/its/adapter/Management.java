@@ -13,6 +13,7 @@ package org.etsi.its.adapter;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -232,6 +233,16 @@ public class Management implements IManagementTA, IManagementLayers {
      */
     @Override
     public byte[] getLongPositionVector(byte[] targetGnAddress) {
+    	
+    	System.out.println("locTable:");
+		Iterator<Long> it = locTable.keySet().iterator();
+		while (it.hasNext()) {
+			Long l = it.next();
+			ITuple<Long, byte[]> u = locTable.get(l);
+			System.out.println(String.valueOf(l)+"->"+String.valueOf(u.getA())+":"+ByteHelper.byteArrayToString(u.getB()));
+		}
+		System.out.println("End locTable");
+		
         byte[] mid = ByteHelper.extract(targetGnAddress, 2, 6);
         long key = ByteHelper.byteArrayToLong(mid);
         for(int i = 0; i < GET_LPV_TIMEOUT; ++i) {
