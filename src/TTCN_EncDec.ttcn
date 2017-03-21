@@ -136,7 +136,7 @@ type record ExtTrafficClass {
   BIT1   scf,
   BIT1   channelOffload,
   BIT6   tcId
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 
 function f_TrafficClass2ExtTrafficClass(TrafficClass tc) return ExtTrafficClass {
@@ -166,7 +166,7 @@ function f_ExtTrafficClass2TrafficClass(ExtTrafficClass etc) return TrafficClass
 type record ExtGnPayload {
   //DecodedPayload decodedPayload optional, //TODO: Not yet implemented
   octetstring rawPayload
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 
 /*
@@ -226,7 +226,8 @@ type record ExtGenerateGeoBroadcastMessage {
   Area area,
   UInt16 payloadLength,
   ExtGnPayload payload 
-} with { variant(payloadLength) "LENGTHTO(payload)" };
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
 
 
 external function f_enc_Ext_UtGnGenerateGeoBroadcastMessage(in ExtGenerateGeoBroadcastMessage pdu) return octetstring
@@ -299,7 +300,8 @@ type record ExtGenerateSHBMessage {
   ExtTrafficClass trafficClass,
   UInt16 payloadLength,
   ExtGnPayload payload 
-} with { variant(payloadLength) "LENGTHTO(payload)" };
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
 
 external function f_enc_Ext_Ut_Gn_GenerateSHBMessage(in ExtGenerateSHBMessage pdu) 
   return octetstring
@@ -332,7 +334,8 @@ type record ExtGenerateTSBMessage {
   ExtTrafficClass trafficClass,
   UInt16          payloadLength,
   ExtGnPayload    payload 
-} with { variant(payloadLength) "LENGTHTO(payload)" };
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
 
 external function f_enc_Ext_Ut_Gn_GenerateTSBMessage(in ExtGenerateTSBMessage pdu) 
   return octetstring
@@ -395,7 +398,8 @@ type record ExtPtActivation {
   UInt8 		ptActivationDataLength,
   octetstring   	ptActivationData
 
-}with { variant(ptActivationDataLength) "LENGTHTO(ptActivationData)" };
+}with { variant(ptActivationDataLength) "LENGTHTO(ptActivationData)";
+        variant "FIELDORDER(msb)"};
 
 
 type union ExtUtCamTrigger {
@@ -476,7 +480,8 @@ function f_enc_UtCAmTrigger(in UtCamTrigger pdu) return octetstring
 type record ExtUtCamEventInd {
   UInt16      camPduLength,
   octetstring camMsg
-} with { variant(camPduLength) "LENGTHTO(camMsg)" };
+} with { variant(camPduLength) "LENGTHTO(camMsg)";
+         variant "FIELDORDER(msb)"};
 
 
 
@@ -507,11 +512,11 @@ type record ExtSituationContainer {
   UInt8 informationQuality,
   UInt8 causeCode,
   UInt8 subCauseCode
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 type record ExtAlacarteContainer {
   UInt8 TODO
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 
 type record ExtUtDenmTrigger {
@@ -526,15 +531,16 @@ type record ExtUtDenmTrigger {
   UInt16 repetitionInterval optional,
   UInt8 alacarteLength optional,
   ExtAlacarteContainer alacarte optional
-} with { variant (bitmask) "FIELDLENGTH(8)";
-  variant (detectionTime) "FIELDLENGTH(48)";
-  variant (validityDuration) "FIELDLENGTH(24)";
-  variant (repetitionDuration) "FIELDLENGTH(24)";
-  variant (relevanceDistance) "FIELDLENGTH(8)";
-  variant (relevanceTrafficDirection) "FIELDLENGTH(8)";
-  variant (transmissionInterval) "FIELDLENGTH(16)";
-  variant (repetitionInterval) "FIELDLENGTH(16)";
-  variant (alacarteLength) "FIELDLENGTH(8)" };
+} with { variant "FIELDORDER(msb)";
+         variant (bitmask) "FIELDLENGTH(8)";
+         variant (detectionTime) "FIELDLENGTH(48)";
+         variant (validityDuration) "FIELDLENGTH(24)";
+         variant (repetitionDuration) "FIELDLENGTH(24)";
+         variant (relevanceDistance) "FIELDLENGTH(8)";
+         variant (relevanceTrafficDirection) "FIELDLENGTH(8)";
+         variant (transmissionInterval) "FIELDLENGTH(16)";
+         variant (repetitionInterval) "FIELDLENGTH(16)";
+         variant (alacarteLength) "FIELDLENGTH(8)" };
 
 
 
@@ -608,7 +614,7 @@ function f_enc_UtDenmTrigger(in UtDenmTrigger pdu) return octetstring
 type record ExtActionID {
   UInt32 originatingStationID,
   UInt16 sequenceNumber
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 type record ExtUtDenmUpdate {
   UInt8                 bitmask,
@@ -622,7 +628,9 @@ type record ExtUtDenmUpdate {
   UInt16 		 repetitionInterval 	   optional,
   UInt8 		 alacarteLength 	   optional,
   ExtAlacarteContainer  alacarte 		   optional
-} with { variant (bitmask) "FIELDLENGTH(8)";
+} with {
+  variant "FIELDORDER(msb)";
+  variant (bitmask) "FIELDLENGTH(8)";
   variant (detectionTime) "FIELDLENGTH(48)";
   variant (validityDuration) "FIELDLENGTH(24)";
   variant (relevanceDistance) "FIELDLENGTH(8)";
@@ -725,7 +733,7 @@ type record ExtDenmInd {
   UInt8   gnTrafficClass,
   UInt16  btpDestinationPort,
   UInt16  btpInfo
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 
 external function f_enc_ExtDenmInd(in ExtDenmInd pdu) return octetstring
@@ -746,7 +754,8 @@ with { extension "prototype(convert)"
 type record ExtUtDenmEventInd {
   UInt16      denmPduLength,
   octetstring denMsg
-} with { variant(denmPduLength) "LENGTHTO(denMsg)" };
+} with { variant(denmPduLength) "LENGTHTO(denMsg)";
+         variant "FIELDORDER(msb)"};
 
 
 
@@ -812,7 +821,8 @@ extension "decode(RAW)"
 type record ExtUtMapEventInd {
   UInt16      mapPduLength,
   octetstring mapMsg
-} with { variant(mapPduLength) "LENGTHTO(mapMsg)" };
+} with { variant(mapPduLength) "LENGTHTO(mapMsg)";
+         variant "FIELDORDER(msb)"};
 
 external function f_dec_ExtUt_Map_EventInd(in octetstring stream) return ExtUtMapEventInd
 with { extension "prototype(convert)"
@@ -836,7 +846,8 @@ function f_dec_Ut_Map_EventInd(in octetstring stream) return UtMapEventInd
 type record ExtUtSpatEventInd {
   UInt16      spatPduLength,
   octetstring spatMsg
-} with { variant(spatPduLength) "LENGTHTO(spatMsg)" };
+} with { variant(spatPduLength) "LENGTHTO(spatMsg)";
+         variant "FIELDORDER(msb)"};
 
 external function f_dec_ExtUt_Spat_EventInd(in octetstring stream) return ExtUtSpatEventInd
 with { extension "prototype(convert)"
@@ -863,14 +874,15 @@ function f_dec_Ut_Spat_EventInd(in octetstring stream) return UtSpatEventInd
 type record ExtBtpPayload {
   //DecodedBtpPayload decodedPayload optional,
   BtpRawPayload rawPayload
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 type record ExtBtpReq {
   OCT1           nextheader,
   BtpHeader      header,
   ExtBtpPayload  payload optional
 } with { variant (header)  "CROSSTAG( btpAHeader, nextheader = '01'O; 
-  btpBHeader, nextheader = '02'O; )"  };
+                                      btpBHeader, nextheader = '02'O; )";
+         variant "FIELDORDER(msb)"};
 
 external function f_enc_ExtBtpReq(in ExtBtpReq pdu) return octetstring
 
@@ -902,7 +914,8 @@ type record ExtBtpInd {
   BtpHeader      header,
   octetstring    rawPayload optional
 } with { variant (header)  "CROSSTAG( btpAHeader, nextheader = '01'O; 
-  btpBHeader, nextheader = '02'O; )"  };
+                                      btpBHeader, nextheader = '02'O; )";
+         variant "FIELDORDER(msb)"};
 
 external function f_dec_ExtBtpInd(in octetstring stream) return ExtBtpInd
 with { extension "prototype(convert)"
@@ -1000,7 +1013,7 @@ type record ExtCamInd {
   UInt8   gnTrafficClass,
   UInt16  btpDestinationPort,
   UInt16  btpInfo
-} with { variant "" };
+} with { variant "FIELDORDER(msb)" };
 
 
 external function f_enc_ExtCamInd(in ExtCamInd pdu) return octetstring
@@ -1032,7 +1045,7 @@ type record ExtMapSpatInd {
   UInt8   	   gnTrafficClass,
   UInt16  	   btpDestinationPort,
   UInt16  	   btpInfo
-} with {variant "" };
+} with {variant "FIELDORDER(msb)" };
 
 external function f_dec_ExtMapSpatInd(in octetstring stream) return ExtMapSpatInd
 with { extension "prototype(convert)"
@@ -1938,7 +1951,7 @@ return ExtGnNonSecuredPacket {
       EGNSP.btpPayload :=
         encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
     } else {
-      EGNSP.btpPayload := omit;
+      EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
     }
   } else if (GNSP.commonHeader.nextHeader == e_btpB) {
     EGNSP.ipv6Packet := omit;
@@ -1947,7 +1960,7 @@ return ExtGnNonSecuredPacket {
       EGNSP.btpPayload :=
         encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
     } else {
-      EGNSP.btpPayload := omit;
+      EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
     }
   } else { //TODO: Handle e_any, e_reserved, e_ipv6
     EGNSP.ipv6Packet := omit;
