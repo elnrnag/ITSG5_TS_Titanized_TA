@@ -17,21 +17,21 @@ module ItsGeoNetworking_TestControl {
     import from LibItsGeoNetworking_Pics all;
     import from LibItsGeoNetworking_TypesAndValues all;
     
-    // Test Execution
+    // Test execution
     control {
         
         /* FDV */
         
         if(PICS_GN_BASIC_HEADER) {
             //execute(TC_GEONW_FDV_BAH_BV_01());
-            //execute(TC_GEONW_FDV_BAH_BI_02());
+            execute(TC_GEONW_FDV_BAH_BI_02());
         }
 
         if(PICS_GN_COMMON_HEADER) {
             //execute(TC_GEONW_FDV_COH_BV_01());
             //execute(TC_GEONW_FDV_COH_BV_02());
             //execute(TC_GEONW_FDV_COH_BV_03());
-            //execute(TC_GEONW_FDV_COH_BO_04()); //1 out of 10 times pass, otherwise error!
+            //execute(TC_GEONW_FDV_COH_BO_04());
         }        
         
         if(PICS_GN_BEACON_SRC) {
@@ -54,14 +54,14 @@ module ItsGeoNetworking_TestControl {
         }
         
         if(PICS_GN_SHB_SRC) {
-        	execute(TC_GEONW_FDV_SHB_BV_01());
+        	//execute(TC_GEONW_FDV_SHB_BV_01());
         }
         
         if(PICS_GN_TSB_SRC) {
         	//execute(TC_GEONW_FDV_TSB_BV_01());
         }
 
-		/* PON/LOT */
+	/* PON/LOT */
 
         if(PICS_GN_GUC_SRC and PICS_GN_BEACON_DST) {
         	//execute(TC_GEONW_PON_LOT_BV_01());
@@ -259,7 +259,7 @@ module ItsGeoNetworking_TestControl {
         
         if(PICS_GN_BEACON_SRC) {
             //execute(TC_GEONW_PON_BEA_TI_01());
-            //execute(TC_GEONW_PON_BEA_TI_02());
+//            //execute(TC_GEONW_PON_BEA_TI_02());
         }
         
         /* PON/GUC */
@@ -392,10 +392,10 @@ module ItsGeoNetworking_TestControl {
             //execute(TC_GEONW_PON_GAC_BO_09());
             //execute(TC_GEONW_PON_GAC_BV_10());
         }
-        
+
 	/* PON/BCA */
 
-        if(PICS_GN_GBC_FWD) {        
+	if(PICS_GN_GBC_FWD) {        
             if (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_cbf) {
                 //execute(TC_GEONW_PON_BCA_BV_01());
                 //execute(TC_GEONW_PON_BCA_BV_02());

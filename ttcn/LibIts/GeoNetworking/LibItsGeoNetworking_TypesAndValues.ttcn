@@ -729,7 +729,7 @@ module LibItsGeoNetworking_TypesAndValues {
                     Bit1        pai,
                     Int15       speed,
                     UInt16      heading
-                } with { variant "" };
+                } with { variant "FIELDORDER(msb)" };
                 
                 /**
                  * @desc Short Position Vector
@@ -760,7 +760,7 @@ module LibItsGeoNetworking_TypesAndValues {
                     UInt32      timestamp,
                     Int32       latitude,
                     Int32       longitude
-                } with { variant "" };
+                } with { variant "FIELDORDER(msb)" };
                 
                 group geoNetworkingAddress {
                     /**
@@ -787,7 +787,7 @@ module LibItsGeoNetworking_TypesAndValues {
                         StationType     stationType,
                         UInt10          stationCountryCode,
                         Oct6            mid
-                    } with { variant "" };
+                    } with { variant "FIELDORDER(msb)" };
                     
                     group geoNetworkingAddressSubtypes {
                         

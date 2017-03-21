@@ -4,3 +4,5 @@
 /build/
 ./.project
 .TITAN_properties
+/src/cfg.cfg
+/titan_tri_mapper/taproperties.cfg

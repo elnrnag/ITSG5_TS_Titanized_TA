@@ -1126,7 +1126,7 @@ module LibItsGeoNetworking_Templates {
                 in template (present) GN_Address.mid p_mid
             ) := {
                 commonHeader := mw_commonHeader(
-                    e_any,
+                    ?,//e_any,
                     m_lsRequestHeaderType
                 ),
                 extendedHeader := mw_lsRequestHeader(
