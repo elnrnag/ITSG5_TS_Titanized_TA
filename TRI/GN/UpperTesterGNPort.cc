@@ -69,6 +69,16 @@ namespace LibItsGeoNetworking__TestSystem {
 	  } else {
 	    TTCN_error("Invalid message length of UtInitializeResult");
 	  }
+	} else if (tmp1[0] == 0x03) { //utChangePositionResult
+	  if (tmp.lengthof()==2) { //Fixed length 2 octets
+	    //Subtract header
+	    tmp1++;
+	    LibItsCommon__TypesAndValues::UtChangePositionResult ret_val;
+	    ret_val.utChangePositionResult() = *tmp1;
+	    incoming_message(ret_val);
+	  } else {
+	    TTCN_error("Invalid message length of UtChangePositionResult");
+	  }
 	} else if (tmp1[0] == 0x41) { //utGnTriggerResult
 	  if (tmp.lengthof()==2) { //Fixed length 2 octets
 	    //Subtract header
