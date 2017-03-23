@@ -1096,28 +1096,6 @@ function f_dec_MapSpatInd(in octetstring stream) return MapSpatInd {
 
 
 //GeoNetworking--------------------------------------------------------
-external function f_enc_GeoNetworkingPdu(in GeoNetworkingPdu pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-
-external function f_dec_GeoNetworkingPdu(in octetstring stream) return GeoNetworkingPdu
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-external function f_enc_BeaconHeader(in BeaconHeader pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-
-external function f_dec_BeaconHeader(in octetstring stream) return BeaconHeader
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
 
 function f_enc_GN_Address(in GN_Address pdu) return octetstring {
   return f_enc_ExtGN_Address(f_GN_Address2ExtGN_Address(pdu));
@@ -1143,22 +1121,7 @@ with { extension "prototype(convert)"
 function f_enc_GeoNetworkingReq(in GeoNetworkingReq pdu) return octetstring {
   var ExtGeoNetworkingReq EGNR;
 
-  EGNR.msgOut.version := pdu.msgOut.basicHeader.version;
-  EGNR.msgOut.nextHeader :=  pdu.msgOut.basicHeader.nextHeader;
-  EGNR.msgOut.reserved := pdu.msgOut.basicHeader.reserved;
-  EGNR.msgOut.lifeTime := f_Lifetime2ExtLifetime(pdu.msgOut.basicHeader.lifeTime);
-  EGNR.msgOut.routerHopLimit := pdu.msgOut.basicHeader.routerHopLimit
-
-  if (ispresent(pdu.msgOut.gnPacket.packet)) {
-    EGNR.msgOut.packet := f_GnNonSecuredPacket2ExtGnNonSecuredPacket(pdu.msgOut.gnPacket.packet);
-  } else {
-    EGNR.msgOut.packet := omit;
-  }
-
-
-  //TODO: Encode securedMsg when security comes in
-  EGNR.msgOut.securedMsg := pdu.msgOut.gnPacket.securedMsg;
-
+  EGNR.msgOut := f_GeoNetworkingPdu2ExtGeoNetworkingPdu(pdu.msgOut);
 
   EGNR.macDestinationAddress := pdu.macDestinationAddress;
 
@@ -1505,6 +1468,26 @@ function f_GeoAnycastHeader2ExtGeoAnycastHeader(GeoAnycastHeader GAH)
 type record ExtBeaconHeader {
   ExtLongPosVector   srcPosVector
 } with { variant "FIELDORDER(msb)"};
+
+external function f_enc_ExtBeaconHeader(in ExtBeaconHeader pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtBeaconHeader(in octetstring stream) return ExtBeaconHeader
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+function f_enc_BeaconHeader(in BeaconHeader pdu) return octetstring
+{
+  return f_enc_ExtBeaconHeader(f_BeaconHeader2ExtBeaconHeader(pdu));
+}
+
+function f_dec_BeaconHeader(in octetstring stream) return BeaconHeader
+{
+  return f_ExtBeaconHeader2BeaconHeader(f_dec_ExtBeaconHeader(stream));
+}
 
 function f_ExtBeaconHeader2BeaconHeader(ExtBeaconHeader EBH) return BeaconHeader {
   var BeaconHeader BH;
@@ -2021,6 +2004,67 @@ type record ExtGeoNetworkingPdu {
   variant (securedMsg) "PRESENCE(nextHeader = e_securedPacket)";
 };
 
+function f_ExtGeoNetworkingPdu2GeoNetworkingPdu(ExtGeoNetworkingPdu EGNP)
+ return GeoNetworkingPdu {
+  var GeoNetworkingPdu    GNP;
+
+  GNP.basicHeader.version        := EGNP.version;
+  GNP.basicHeader.nextHeader     := EGNP.nextHeader;
+  GNP.basicHeader.reserved       := EGNP.reserved;
+  GNP.basicHeader.lifeTime       := f_ExtLifetime2Lifetime(EGNP.lifeTime);
+  GNP.basicHeader.routerHopLimit := EGNP.routerHopLimit;
+
+  if (ispresent(EGNP.packet)) {
+    GNP.gnPacket.packet := f_ExtGnNonSecuredPacket2GnNonSecuredPacket(EGNP.packet);
+    }
+
+  GNP.gnPacket.securedMsg := EGNP.securedMsg;
+
+  return GNP;
+}
+
+function f_GeoNetworkingPdu2ExtGeoNetworkingPdu(GeoNetworkingPdu GNP)
+ return ExtGeoNetworkingPdu {
+  var ExtGeoNetworkingPdu EGNP;
+  EGNP.version := GNP.basicHeader.version;
+  EGNP.nextHeader :=  GNP.basicHeader.nextHeader;
+  EGNP.reserved := GNP.basicHeader.reserved;
+  EGNP.lifeTime := f_Lifetime2ExtLifetime(GNP.basicHeader.lifeTime);
+  EGNP.routerHopLimit := GNP.basicHeader.routerHopLimit
+
+  if (ispresent(GNP.gnPacket.packet)) {
+    EGNP.packet := f_GnNonSecuredPacket2ExtGnNonSecuredPacket(GNP.gnPacket.packet);
+  } else {
+    EGNP.packet := omit;
+  }
+
+  //TODO: Encode securedMsg when security comes in
+  EGNP.securedMsg := GNP.gnPacket.securedMsg;
+
+  return EGNP;
+}
+
+
+external function f_enc_ExtGeoNetworkingPdu(in ExtGeoNetworkingPdu pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtGeoNetworkingPdu(in octetstring stream) return ExtGeoNetworkingPdu
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+function f_enc_GeoNetworkingPdu(in GeoNetworkingPdu pdu) return octetstring
+{
+  return f_enc_ExtGeoNetworkingPdu(f_GeoNetworkingPdu2ExtGeoNetworkingPdu(pdu));
+};
+
+function f_dec_GeoNetworkingPdu(in octetstring stream) return GeoNetworkingPdu
+{
+  return f_ExtGeoNetworkingPdu2GeoNetworkingPdu(f_dec_ExtGeoNetworkingPdu(stream));
+};
+
 type record ExtGeoNetworkingInd {
   ExtGeoNetworkingPdu msgIn,
   MacAddress          macDestinationAddress
@@ -2028,25 +2072,75 @@ type record ExtGeoNetworkingInd {
 
 function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
   var ExtGeoNetworkingInd EGNI := f_dec_ExtGeoNetworkingInd(stream);
-  var GeoNetworkingInd    GNI;
-
-  GNI.msgIn.basicHeader.version        := EGNI.msgIn.version;
-  GNI.msgIn.basicHeader.nextHeader     := EGNI.msgIn.nextHeader;
-  GNI.msgIn.basicHeader.reserved       := EGNI.msgIn.reserved;
-  GNI.msgIn.basicHeader.lifeTime       := f_ExtLifetime2Lifetime(EGNI.msgIn.lifeTime);
-  GNI.msgIn.basicHeader.routerHopLimit := EGNI.msgIn.routerHopLimit;
-
-  if (ispresent(EGNI.msgIn.packet)) {
-    GNI.msgIn.gnPacket.packet := f_ExtGnNonSecuredPacket2GnNonSecuredPacket(EGNI.msgIn.packet);
-    }
-
-  GNI.msgIn.gnPacket.securedMsg := EGNI.msgIn.securedMsg;
+  var GeoNetworkingInd GNI;
+  
+  GNI.msgIn := f_ExtGeoNetworkingPdu2GeoNetworkingPdu(EGNI.msgIn);
   GNI.macDestinationAddress := EGNI.macDestinationAddress;
 
   log(GNI);
 
   return GNI;	 
 }
+
+//Security
+
+type record ExtSecuredMessage {
+  UInt8           protocol_version,
+  ExtHeaderFields header_fields,
+  SecPayload      payload_field,  // Used by the codec to fill it with the
+                                  // secured packet in case of 'omit' value
+  TrailerFields   trailer_fields
+} with { variant "FIELDORDER(msb)" };
+
+
+type record ExtHeaderFields {
+  UInt8                       h_length,
+  UInt8			      f_signer_info optional,  //SignerInfo is first!!!
+  SignerInfo                  signer optional,
+  UInt8	                      f_generation_time optional,
+  UInt64                      generation_time optional,
+  UInt8	                      f_generation_time_standard_deviation optional,
+  Time64WithStandardDeviation generation_time_standard_deviation optional,
+  UInt8			      f_expiration optional,
+  UInt32		      expiration optional,
+  UInt8			      f_generation_location optional,
+  ThreeDLocation              generation_location optional,
+  UInt8			      f_request_unrecognized_certificate optional,
+  HashedId3s                  digests optional,
+  UInt8			      f_its_aid optional,
+  IntX                        its_aid optional,
+  UInt8			      f_encryption_parameters optional,
+  EncryptionParameters	      enc_params optional,
+  UInt8			      f_recipient_info optional,
+  RecipientInfos              recipients optional,
+  octetstring		      other_header optional 
+} with { variant           "FIELDORDER(msb)";
+         variant(h_length) "LENGTHTO(f_generation_time,
+				     generation_time,
+				     f_generation_time_standard_deviation,
+				     generation_time_standard_deviation,
+				     f_expiration,
+				     expiration,
+				     f_generation_location,
+				     generation_location,
+				     f_request_unrecognized_certificate,
+				     digests,
+				     f_its_aid,
+				     its_aid,
+				     f_signer_info,
+				     signer,
+				     f_encryption_parameters,
+				     enc_params,
+				     f_recipient_info,
+				     other_header)"
+  };
+
+
+
+
+
+
+// End of type SecuredMessage
 
 
 
