@@ -1615,7 +1615,7 @@ type record ExtGnNonSecuredPacket {
   BtpHeader          btpHeader        optional,
   octetstring        btpPayload       optional,
   GnRawPayload       rawPayload//,
-  //UInt16	     CohdaBug
+  //UInt16	     cohdaBug         optional
 } with { variant 	            "FIELDORDER(msb)";
          variant(plLength)     	    "LENGTHTO(ipv6Packet, 
                                               btpHeader, 
@@ -1642,7 +1642,12 @@ type record ExtGnNonSecuredPacket {
 
   variant(btpPayload)     "PRESENCE(nextHeader = e_btpA;)";
   variant(btpPayload)     "PRESENCE(nextHeader = e_btpB;)";
-
+/*
+  variant(cohdaBug)	  "PRESENCE(nextHeader = e_btpA,
+                                    btpHeader.btpAHeader.destinationPort = 0;)";
+  variant(cohdaBug)	  "PRESENCE(nextHeader = e_btpB,
+                                    btpHeader.btpBHeader.destinationPort = 0;)";
+*/
 };
 
 function f_ExtGnNonSecuredPacket2GnNonSecuredPacket(ExtGnNonSecuredPacket EGNSP)
@@ -1930,21 +1935,32 @@ return ExtGnNonSecuredPacket {
   if (GNSP.commonHeader.nextHeader == e_btpA) {
     EGNSP.ipv6Packet := omit;
     EGNSP.btpHeader  := GNSP.payload.decodedPayload.btpPacket.header;
-    if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
-      EGNSP.btpPayload :=
-        encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+
+    if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload)){
+      if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
+        EGNSP.btpPayload :=
+          encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+      } else {
+        EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
+      }
     } else {
-      EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
+      EGNSP.btpPayload := ''O;
     }
-  } else if (GNSP.commonHeader.nextHeader == e_btpB) {
+ } else if (GNSP.commonHeader.nextHeader == e_btpB) {
     EGNSP.ipv6Packet := omit;
     EGNSP.btpHeader  := GNSP.payload.decodedPayload.btpPacket.header;
-    if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
-      EGNSP.btpPayload :=
-        encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+
+    if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload)){
+      if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
+        EGNSP.btpPayload :=
+          encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+      } else {
+        EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
+      }
     } else {
-      EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
+      EGNSP.btpPayload := ''O;
     }
+      
   } else { //TODO: Handle e_any, e_reserved, e_ipv6
     EGNSP.ipv6Packet := omit;
     EGNSP.btpHeader  := omit;
@@ -1956,6 +1972,8 @@ return ExtGnNonSecuredPacket {
   } else {
     EGNSP.rawPayload := ''O;
   }
+
+  //EGNSP.cohdaBug := omit;
 
   return EGNSP;
 }
@@ -2040,7 +2058,7 @@ function f_GeoNetworkingPdu2ExtGeoNetworkingPdu(GeoNetworkingPdu GNP)
 
   //TODO: Encode securedMsg when security comes in
   EGNP.securedMsg := GNP.gnPacket.securedMsg;
-
+  
   return EGNP;
 }
 
@@ -2086,59 +2104,1097 @@ function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
 
 type record ExtSecuredMessage {
   UInt8           protocol_version,
+  UInt8           header_length,
   ExtHeaderFields header_fields,
   SecPayload      payload_field,  // Used by the codec to fill it with the
                                   // secured packet in case of 'omit' value
+  UInt8           trailer_length,
   TrailerFields   trailer_fields
+} with { variant "FIELDORDER(msb)";
+         variant(header_length)  "LENGTHTO(header_fields)";
+	 variant(trailer_length) "LENGTHTO(trailer_fields)";
+};
+
+type enumerated ExtHeaderFieldType {
+  e_generation_time                       (0),
+  e_generation_time_standard_deviation    (1),
+  e_expiration                            (2),
+  e_generation_location                   (3),
+  e_request_unrecognized_certificate      (4),
+  e_its_aid                               (5),
+  //e_other                                 (6..127, 131..255),
+  e_other6                                (6),
+  e_other7                                (7),
+  e_other8                                (8),
+  e_other9                                (9),
+  e_other10                               (10),
+  e_other11                               (11),
+  e_other12                               (12),
+  e_other13                               (13),
+  e_other14                               (14),
+  e_other15                               (15),
+  e_other16                               (16),
+  e_other17                               (17),
+  e_other18                               (18),
+  e_other19                               (19),
+  e_other20                               (20),
+  e_other21                               (21),
+  e_other22                               (22),
+  e_other23                               (23),
+  e_other24                               (24),
+  e_other25                               (25),
+  e_other26                               (26),
+  e_other27                               (27),
+  e_other28                               (28),
+  e_other29                               (29),
+  e_other30                               (30),
+  e_other31                               (31),
+  e_other32                               (32),
+  e_other33                               (33),
+  e_other34                               (34),
+  e_other35                               (35),
+  e_other36                               (36),
+  e_other37                               (37),
+  e_other38                               (38),
+  e_other39                               (39),
+  e_other40                               (40),
+  e_other41                               (41),
+  e_other42                               (42),
+  e_other43                               (43),
+  e_other44                               (44),
+  e_other45                               (45),
+  e_other46                               (46),
+  e_other47                               (47),
+  e_other48                               (48),
+  e_other49                               (49),
+  e_other50                               (50),
+  e_other51                               (51),
+  e_other52                               (52),
+  e_other53                               (53),
+  e_other54                               (54),
+  e_other55                               (55),
+  e_other56                               (56),
+  e_other57                               (57),
+  e_other58                               (58),
+  e_other59                               (59),
+  e_other60                               (60),
+  e_other61                               (61),
+  e_other62                               (62),
+  e_other63                               (63),
+  e_other64                               (64),
+  e_other65                               (65),
+  e_other66                               (66),
+  e_other67                               (67),
+  e_other68                               (68),
+  e_other69                               (69),
+  e_other70                               (70),
+  e_other71                               (71),
+  e_other72                               (72),
+  e_other73                               (73),
+  e_other74                               (74),
+  e_other75                               (75),
+  e_other76                               (76),
+  e_other77                               (77),
+  e_other78                               (78),
+  e_other79                               (79),
+  e_other80                               (80),
+  e_other81                               (81),
+  e_other82                               (82),
+  e_other83                               (83),
+  e_other84                               (84),
+  e_other85                               (85),
+  e_other86                               (86),
+  e_other87                               (87),
+  e_other88                               (88),
+  e_other89                               (89),
+  e_other90                               (90),
+  e_other91                               (91),
+  e_other92                               (92),
+  e_other93                               (93),
+  e_other94                               (94),
+  e_other95                               (95),
+  e_other96                               (96),
+  e_other97                               (97),
+  e_other98                               (98),
+  e_other99                               (99),
+  e_other100                              (100),
+  e_other101                              (101),
+  e_other102                              (102),
+  e_other103                              (103),
+  e_other104                              (104),
+  e_other105                              (105),
+  e_other106                              (106),
+  e_other107                              (107),
+  e_other108                              (108),
+  e_other109                              (109),
+  e_other110                              (110),
+  e_other111                              (111),
+  e_other112                              (112),
+  e_other113                              (113),
+  e_other114                              (114),
+  e_other115                              (115),
+  e_other116                              (116),
+  e_other117                              (117),
+  e_other118                              (118),
+  e_other119                              (119),
+  e_other120                              (120),
+  e_other121                              (121),
+  e_other122                              (122),
+  e_other123                              (123),
+  e_other124                              (124),
+  e_other125                              (125),
+  e_other126                              (126),
+  e_other127                              (127),
+  e_signer_info                           (128),
+  e_encryption_parameters                 (129),
+  e_recipient_info                        (130),
+  e_other131                              (131),
+  e_other132                              (132),
+  e_other133                              (133),
+  e_other134                              (134),
+  e_other135                              (135),
+  e_other136                              (136),
+  e_other137                              (137),
+  e_other138                              (138),
+  e_other139                              (139),
+  e_other140                              (140),
+  e_other141                              (141),
+  e_other142                              (142),
+  e_other143                              (143),
+  e_other144                              (144),
+  e_other145                              (145),
+  e_other146                              (146),
+  e_other147                              (147),
+  e_other148                              (148),
+  e_other149                              (149),
+  e_other150                              (150),
+  e_other151                              (151),
+  e_other152                              (152),
+  e_other153                              (153),
+  e_other154                              (154),
+  e_other155                              (155),
+  e_other156                              (156),
+  e_other157                              (157),
+  e_other158                              (158),
+  e_other159                              (159),
+  e_other160                              (160),
+  e_other161                              (161),
+  e_other162                              (162),
+  e_other163                              (163),
+  e_other164                              (164),
+  e_other165                              (165),
+  e_other166                              (166),
+  e_other167                              (167),
+  e_other168                              (168),
+  e_other169                              (169),
+  e_other170                              (170),
+  e_other171                              (171),
+  e_other172                              (172),
+  e_other173                              (173),
+  e_other174                              (174),
+  e_other175                              (175),
+  e_other176                              (176),
+  e_other177                              (177),
+  e_other178                              (178),
+  e_other179                              (179),
+  e_other180                              (180),
+  e_other181                              (181),
+  e_other182                              (182),
+  e_other183                              (183),
+  e_other184                              (184),
+  e_other185                              (185),
+  e_other186                              (186),
+  e_other187                              (187),
+  e_other188                              (188),
+  e_other189                              (189),
+  e_other190                              (190),
+  e_other191                              (191),
+  e_other192                              (192),
+  e_other193                              (193),
+  e_other194                              (194),
+  e_other195                              (195),
+  e_other196                              (196),
+  e_other197                              (197),
+  e_other198                              (198),
+  e_other199                              (199),
+  e_other200                              (200),
+  e_other201                              (201),
+  e_other202                              (202),
+  e_other203                              (203),
+  e_other204                              (204),
+  e_other205                              (205),
+  e_other206                              (206),
+  e_other207                              (207),
+  e_other208                              (208),
+  e_other209                              (209),
+  e_other210                              (210),
+  e_other211                              (211),
+  e_other212                              (212),
+  e_other213                              (213),
+  e_other214                              (214),
+  e_other215                              (215),
+  e_other216                              (216),
+  e_other217                              (217),
+  e_other218                              (218),
+  e_other219                              (219),
+  e_other220                              (220),
+  e_other221                              (221),
+  e_other222                              (222),
+  e_other223                              (223),
+  e_other224                              (224),
+  e_other225                              (225),
+  e_other226                              (226),
+  e_other227                              (227),
+  e_other228                              (228),
+  e_other229                              (229),
+  e_other230                              (230),
+  e_other231                              (231),
+  e_other232                              (232),
+  e_other233                              (233),
+  e_other234                              (234),
+  e_other235                              (235),
+  e_other236                              (236),
+  e_other237                              (237),
+  e_other238                              (238),
+  e_other239                              (239),
+  e_other240                              (240),
+  e_other241                              (241),
+  e_other242                              (242),
+  e_other243                              (243),
+  e_other244                              (244),
+  e_other245                              (245),
+  e_other246                              (246),
+  e_other247                              (247),
+  e_other248                              (248),
+  e_other249                              (249),
+  e_other250                              (250),
+  e_other251                              (251),
+  e_other252                              (252),
+  e_other253                              (253),
+  e_other254                              (254),
+  e_other255                              (255)
+} with { variant "FIELDLENGTH(8)" };
+
+type record ExtHeaderField {
+  ExtHeaderFieldType  key,
+  ExtHeaderValue header_value
+} with { variant "FIELDORDER(msb)";
+         variant(header_value)
+	  "CROSSTAG(signer,              key = e_signer_info;
+                    generation_time,     key = e_generation_time;
+                    generation_time_standard_deviation, 
+                     key = e_generation_time_standard_deviation;
+                    expiration,          key = e_expiration;
+                    generation_location, key = e_generation_location;
+                    digests,             key = e_request_unrecognized_certificate;
+                    its_aid,             key = e_its_aid;
+                    enc_params,          key = e_signer_info;
+                    recipients,          key = e_encryption_parameters;
+                    other_header,        key = e_other6;
+                    other_header,        key = e_other7;
+                    other_header,        key = e_other8;
+                    other_header,        key = e_other9;
+                    other_header,        key = e_other10;
+                    other_header,        key = e_other11;
+                    other_header,        key = e_other12;
+                    other_header,        key = e_other13;
+                    other_header,        key = e_other14;
+                    other_header,        key = e_other15;
+                    other_header,        key = e_other16;
+                    other_header,        key = e_other17;
+                    other_header,        key = e_other18;
+                    other_header,        key = e_other19;
+                    other_header,        key = e_other20;
+                    other_header,        key = e_other21;
+                    other_header,        key = e_other22;
+                    other_header,        key = e_other23;
+                    other_header,        key = e_other24;
+                    other_header,        key = e_other25;
+                    other_header,        key = e_other26;
+                    other_header,        key = e_other27;
+                    other_header,        key = e_other28;
+                    other_header,        key = e_other29;
+                    other_header,        key = e_other30;
+                    other_header,        key = e_other31;
+                    other_header,        key = e_other32;
+                    other_header,        key = e_other33;
+                    other_header,        key = e_other34;
+                    other_header,        key = e_other35;
+                    other_header,        key = e_other36;
+                    other_header,        key = e_other37;
+                    other_header,        key = e_other38;
+                    other_header,        key = e_other39;
+                    other_header,        key = e_other40;
+                    other_header,        key = e_other41;
+                    other_header,        key = e_other42;
+                    other_header,        key = e_other43;
+                    other_header,        key = e_other44;
+                    other_header,        key = e_other45;
+                    other_header,        key = e_other46;
+                    other_header,        key = e_other47;
+                    other_header,        key = e_other48;
+                    other_header,        key = e_other49;
+                    other_header,        key = e_other50;
+                    other_header,        key = e_other51;
+                    other_header,        key = e_other52;
+                    other_header,        key = e_other53;
+                    other_header,        key = e_other54;
+                    other_header,        key = e_other55;
+                    other_header,        key = e_other56;
+                    other_header,        key = e_other57;
+                    other_header,        key = e_other58;
+                    other_header,        key = e_other59;
+                    other_header,        key = e_other60;
+                    other_header,        key = e_other61;
+                    other_header,        key = e_other62;
+                    other_header,        key = e_other63;
+                    other_header,        key = e_other64;
+                    other_header,        key = e_other65;
+                    other_header,        key = e_other66;
+                    other_header,        key = e_other67;
+                    other_header,        key = e_other68;
+                    other_header,        key = e_other69;
+                    other_header,        key = e_other70;
+                    other_header,        key = e_other71;
+                    other_header,        key = e_other72;
+                    other_header,        key = e_other73;
+                    other_header,        key = e_other74;
+                    other_header,        key = e_other75;
+                    other_header,        key = e_other76;
+                    other_header,        key = e_other77;
+                    other_header,        key = e_other78;
+                    other_header,        key = e_other79;
+                    other_header,        key = e_other80;
+                    other_header,        key = e_other81;
+                    other_header,        key = e_other82;
+                    other_header,        key = e_other83;
+                    other_header,        key = e_other84;
+                    other_header,        key = e_other85;
+                    other_header,        key = e_other86;
+                    other_header,        key = e_other87;
+                    other_header,        key = e_other88;
+                    other_header,        key = e_other89;
+                    other_header,        key = e_other90;
+                    other_header,        key = e_other91;
+                    other_header,        key = e_other92;
+                    other_header,        key = e_other93;
+                    other_header,        key = e_other94;
+                    other_header,        key = e_other95;
+                    other_header,        key = e_other96;
+                    other_header,        key = e_other97;
+                    other_header,        key = e_other98;
+                    other_header,        key = e_other99;
+                    other_header,        key = e_other100;
+                    other_header,        key = e_other101;
+                    other_header,        key = e_other102;
+                    other_header,        key = e_other103;
+                    other_header,        key = e_other104;
+                    other_header,        key = e_other105;
+                    other_header,        key = e_other106;
+                    other_header,        key = e_other107;
+                    other_header,        key = e_other108;
+                    other_header,        key = e_other109;
+                    other_header,        key = e_other110;
+                    other_header,        key = e_other111;
+                    other_header,        key = e_other112;
+                    other_header,        key = e_other113;
+                    other_header,        key = e_other114;
+                    other_header,        key = e_other115;
+                    other_header,        key = e_other116;
+                    other_header,        key = e_other117;
+                    other_header,        key = e_other118;
+                    other_header,        key = e_other119;
+                    other_header,        key = e_other120;
+                    other_header,        key = e_other121;
+                    other_header,        key = e_other122;
+                    other_header,        key = e_other123;
+                    other_header,        key = e_other124;
+                    other_header,        key = e_other125;
+                    other_header,        key = e_other126;
+                    other_header,        key = e_other127;
+                    other_header,        key = e_other131;
+                    other_header,        key = e_other132;
+                    other_header,        key = e_other133;
+                    other_header,        key = e_other134;
+                    other_header,        key = e_other135;
+                    other_header,        key = e_other136;
+                    other_header,        key = e_other137;
+                    other_header,        key = e_other138;
+                    other_header,        key = e_other139;
+                    other_header,        key = e_other140;
+                    other_header,        key = e_other141;
+                    other_header,        key = e_other142;
+                    other_header,        key = e_other143;
+                    other_header,        key = e_other144;
+                    other_header,        key = e_other145;
+                    other_header,        key = e_other146;
+                    other_header,        key = e_other147;
+                    other_header,        key = e_other148;
+                    other_header,        key = e_other149;
+                    other_header,        key = e_other150;
+                    other_header,        key = e_other151;
+                    other_header,        key = e_other152;
+                    other_header,        key = e_other153;
+                    other_header,        key = e_other154;
+                    other_header,        key = e_other155;
+                    other_header,        key = e_other156;
+                    other_header,        key = e_other157;
+                    other_header,        key = e_other158;
+                    other_header,        key = e_other159;
+                    other_header,        key = e_other160;
+                    other_header,        key = e_other161;
+                    other_header,        key = e_other162;
+                    other_header,        key = e_other163;
+                    other_header,        key = e_other164;
+                    other_header,        key = e_other165;
+                    other_header,        key = e_other166;
+                    other_header,        key = e_other167;
+                    other_header,        key = e_other168;
+                    other_header,        key = e_other169;
+                    other_header,        key = e_other170;
+                    other_header,        key = e_other171;
+                    other_header,        key = e_other172;
+                    other_header,        key = e_other173;
+                    other_header,        key = e_other174;
+                    other_header,        key = e_other175;
+                    other_header,        key = e_other176;
+                    other_header,        key = e_other177;
+                    other_header,        key = e_other178;
+                    other_header,        key = e_other179;
+                    other_header,        key = e_other180;
+                    other_header,        key = e_other181;
+                    other_header,        key = e_other182;
+                    other_header,        key = e_other183;
+                    other_header,        key = e_other184;
+                    other_header,        key = e_other185;
+                    other_header,        key = e_other186;
+                    other_header,        key = e_other187;
+                    other_header,        key = e_other188;
+                    other_header,        key = e_other189;
+                    other_header,        key = e_other190;
+                    other_header,        key = e_other191;
+                    other_header,        key = e_other192;
+                    other_header,        key = e_other193;
+                    other_header,        key = e_other194;
+                    other_header,        key = e_other195;
+                    other_header,        key = e_other196;
+                    other_header,        key = e_other197;
+                    other_header,        key = e_other198;
+                    other_header,        key = e_other199;
+                    other_header,        key = e_other200;
+                    other_header,        key = e_other201;
+                    other_header,        key = e_other202;
+                    other_header,        key = e_other203;
+                    other_header,        key = e_other204;
+                    other_header,        key = e_other205;
+                    other_header,        key = e_other206;
+                    other_header,        key = e_other207;
+                    other_header,        key = e_other208;
+                    other_header,        key = e_other209;
+                    other_header,        key = e_other210;
+                    other_header,        key = e_other211;
+                    other_header,        key = e_other212;
+                    other_header,        key = e_other213;
+                    other_header,        key = e_other214;
+                    other_header,        key = e_other215;
+                    other_header,        key = e_other216;
+                    other_header,        key = e_other217;
+                    other_header,        key = e_other218;
+                    other_header,        key = e_other219;
+                    other_header,        key = e_other220;
+                    other_header,        key = e_other221;
+                    other_header,        key = e_other222;
+                    other_header,        key = e_other223;
+                    other_header,        key = e_other224;
+                    other_header,        key = e_other225;
+                    other_header,        key = e_other226;
+                    other_header,        key = e_other227;
+                    other_header,        key = e_other228;
+                    other_header,        key = e_other229;
+                    other_header,        key = e_other230;
+                    other_header,        key = e_other231;
+                    other_header,        key = e_other232;
+                    other_header,        key = e_other233;
+                    other_header,        key = e_other234;
+                    other_header,        key = e_other235;
+                    other_header,        key = e_other236;
+                    other_header,        key = e_other237;
+                    other_header,        key = e_other238;
+                    other_header,        key = e_other239;
+                    other_header,        key = e_other240;
+                    other_header,        key = e_other241;
+                    other_header,        key = e_other242;
+                    other_header,        key = e_other243;
+                    other_header,        key = e_other244;
+                    other_header,        key = e_other245;
+                    other_header,        key = e_other246;
+                    other_header,        key = e_other247;
+                    other_header,        key = e_other248;
+                    other_header,        key = e_other249;
+                    other_header,        key = e_other250;
+                    other_header,        key = e_other251;
+                    other_header,        key = e_other252;
+                    other_header,        key = e_other253;
+                    other_header,        key = e_other254;
+                    other_header,        key = e_other255;     
+                                         )";
+};
+
+type record of ExtHeaderField ExtHeaderFields 
+  with { variant "FIELDORDER(msb)" };
+
+type union ExtHeaderValue {
+  SignerInfo                  signer,
+  UInt64                      generation_time,
+  Time64WithStandardDeviation generation_time_standard_deviation,
+  UInt32		      expiration,
+  ThreeDLocation              generation_location,
+  HashedId3s                  digests,
+  IntX                        its_aid,
+  EncryptionParameters	      enc_params,
+  RecipientInfos              recipients,
+  octetstring		      other_header
 } with { variant "FIELDORDER(msb)" };
 
 
-type record ExtHeaderFields {
-  UInt8                       h_length,
-  UInt8			      f_signer_info optional,  //SignerInfo is first!!!
-  SignerInfo                  signer optional,
-  UInt8	                      f_generation_time optional,
-  UInt64                      generation_time optional,
-  UInt8	                      f_generation_time_standard_deviation optional,
-  Time64WithStandardDeviation generation_time_standard_deviation optional,
-  UInt8			      f_expiration optional,
-  UInt32		      expiration optional,
-  UInt8			      f_generation_location optional,
-  ThreeDLocation              generation_location optional,
-  UInt8			      f_request_unrecognized_certificate optional,
-  HashedId3s                  digests optional,
-  UInt8			      f_its_aid optional,
-  IntX                        its_aid optional,
-  UInt8			      f_encryption_parameters optional,
-  EncryptionParameters	      enc_params optional,
-  UInt8			      f_recipient_info optional,
-  RecipientInfos              recipients optional,
-  octetstring		      other_header optional 
-} with { variant           "FIELDORDER(msb)";
-         variant(h_length) "LENGTHTO(f_generation_time,
-				     generation_time,
-				     f_generation_time_standard_deviation,
-				     generation_time_standard_deviation,
-				     f_expiration,
-				     expiration,
-				     f_generation_location,
-				     generation_location,
-				     f_request_unrecognized_certificate,
-				     digests,
-				     f_its_aid,
-				     its_aid,
-				     f_signer_info,
-				     signer,
-				     f_encryption_parameters,
-				     enc_params,
-				     f_recipient_info,
-				     other_header)"
+
+type record of ExtTrailerField ExtTrailerFields 
+  with { variant "FIELDORDER(msb)" };
+
+type enumerated ExtTrailerFieldType {
+  //e_other         (0, 2..255),
+  e_other0        (0),
+  e_signature     (1),
+  e_other2        (2),
+  e_other3        (3),
+  e_other4        (4),
+  e_other5        (5),
+  e_other6        (6),
+  e_other7        (7),
+  e_other8        (8),
+  e_other9        (9),
+  e_other10       (10),
+  e_other11       (11),
+  e_other12       (12),
+  e_other13       (13),
+  e_other14       (14),
+  e_other15       (15),
+  e_other16       (16),
+  e_other17       (17),
+  e_other18       (18),
+  e_other19       (19),
+  e_other20       (20),
+  e_other21       (21),
+  e_other22       (22),
+  e_other23       (23),
+  e_other24       (24),
+  e_other25       (25),
+  e_other26       (26),
+  e_other27       (27),
+  e_other28       (28),
+  e_other29       (29),
+  e_other30       (30),
+  e_other31       (31),
+  e_other32       (32),
+  e_other33       (33),
+  e_other34       (34),
+  e_other35       (35),
+  e_other36       (36),
+  e_other37       (37),
+  e_other38       (38),
+  e_other39       (39),
+  e_other40       (40),
+  e_other41       (41),
+  e_other42       (42),
+  e_other43       (43),
+  e_other44       (44),
+  e_other45       (45),
+  e_other46       (46),
+  e_other47       (47),
+  e_other48       (48),
+  e_other49       (49),
+  e_other50       (50),
+  e_other51       (51),
+  e_other52       (52),
+  e_other53       (53),
+  e_other54       (54),
+  e_other55       (55),
+  e_other56       (56),
+  e_other57       (57),
+  e_other58       (58),
+  e_other59       (59),
+  e_other60       (60),
+  e_other61       (61),
+  e_other62       (62),
+  e_other63       (63),
+  e_other64       (64),
+  e_other65       (65),
+  e_other66       (66),
+  e_other67       (67),
+  e_other68       (68),
+  e_other69       (69),
+  e_other70       (70),
+  e_other71       (71),
+  e_other72       (72),
+  e_other73       (73),
+  e_other74       (74),
+  e_other75       (75),
+  e_other76       (76),
+  e_other77       (77),
+  e_other78       (78),
+  e_other79       (79),
+  e_other80       (80),
+  e_other81       (81),
+  e_other82       (82),
+  e_other83       (83),
+  e_other84       (84),
+  e_other85       (85),
+  e_other86       (86),
+  e_other87       (87),
+  e_other88       (88),
+  e_other89       (89),
+  e_other90       (90),
+  e_other91       (91),
+  e_other92       (92),
+  e_other93       (93),
+  e_other94       (94),
+  e_other95       (95),
+  e_other96       (96),
+  e_other97       (97),
+  e_other98       (98),
+  e_other99       (99),
+  e_other100      (100),
+  e_other101      (101),
+  e_other102      (102),
+  e_other103      (103),
+  e_other104      (104),
+  e_other105      (105),
+  e_other106      (106),
+  e_other107      (107),
+  e_other108      (108),
+  e_other109      (109),
+  e_other110      (110),
+  e_other111      (111),
+  e_other112      (112),
+  e_other113      (113),
+  e_other114      (114),
+  e_other115      (115),
+  e_other116      (116),
+  e_other117      (117),
+  e_other118      (118),
+  e_other119      (119),
+  e_other120      (120),
+  e_other121      (121),
+  e_other122      (122),
+  e_other123      (123),
+  e_other124      (124),
+  e_other125      (125),
+  e_other126      (126),
+  e_other127      (127),
+  e_other128      (128),
+  e_other129      (129),
+  e_other130      (130),
+  e_other131      (131),
+  e_other132      (132),
+  e_other133      (133),
+  e_other134      (134),
+  e_other135      (135),
+  e_other136      (136),
+  e_other137      (137),
+  e_other138      (138),
+  e_other139      (139),
+  e_other140      (140),
+  e_other141      (141),
+  e_other142      (142),
+  e_other143      (143),
+  e_other144      (144),
+  e_other145      (145),
+  e_other146      (146),
+  e_other147      (147),
+  e_other148      (148),
+  e_other149      (149),
+  e_other150      (150),
+  e_other151      (151),
+  e_other152      (152),
+  e_other153      (153),
+  e_other154      (154),
+  e_other155      (155),
+  e_other156      (156),
+  e_other157      (157),
+  e_other158      (158),
+  e_other159      (159),
+  e_other160      (160),
+  e_other161      (161),
+  e_other162      (162),
+  e_other163      (163),
+  e_other164      (164),
+  e_other165      (165),
+  e_other166      (166),
+  e_other167      (167),
+  e_other168      (168),
+  e_other169      (169),
+  e_other170      (170),
+  e_other171      (171),
+  e_other172      (172),
+  e_other173      (173),
+  e_other174      (174),
+  e_other175      (175),
+  e_other176      (176),
+  e_other177      (177),
+  e_other178      (178),
+  e_other179      (179),
+  e_other180      (180),
+  e_other181      (181),
+  e_other182      (182),
+  e_other183      (183),
+  e_other184      (184),
+  e_other185      (185),
+  e_other186      (186),
+  e_other187      (187),
+  e_other188      (188),
+  e_other189      (189),
+  e_other190      (190),
+  e_other191      (191),
+  e_other192      (192),
+  e_other193      (193),
+  e_other194      (194),
+  e_other195      (195),
+  e_other196      (196),
+  e_other197      (197),
+  e_other198      (198),
+  e_other199      (199),
+  e_other200      (200),
+  e_other201      (201),
+  e_other202      (202),
+  e_other203      (203),
+  e_other204      (204),
+  e_other205      (205),
+  e_other206      (206),
+  e_other207      (207),
+  e_other208      (208),
+  e_other209      (209),
+  e_other210      (210),
+  e_other211      (211),
+  e_other212      (212),
+  e_other213      (213),
+  e_other214      (214),
+  e_other215      (215),
+  e_other216      (216),
+  e_other217      (217),
+  e_other218      (218),
+  e_other219      (219),
+  e_other220      (220),
+  e_other221      (221),
+  e_other222      (222),
+  e_other223      (223),
+  e_other224      (224),
+  e_other225      (225),
+  e_other226      (226),
+  e_other227      (227),
+  e_other228      (228),
+  e_other229      (229),
+  e_other230      (230),
+  e_other231      (231),
+  e_other232      (232),
+  e_other233      (233),
+  e_other234      (234),
+  e_other235      (235),
+  e_other236      (236),
+  e_other237      (237),
+  e_other238      (238),
+  e_other239      (239),
+  e_other240      (240),
+  e_other241      (241),
+  e_other242      (242),
+  e_other243      (243),
+  e_other244      (244),
+  e_other245      (245),
+  e_other246      (246),
+  e_other247      (247),
+  e_other248      (248),
+  e_other249      (249),
+  e_other250      (250),
+  e_other251      (251),
+  e_other252      (252),
+  e_other253      (253),
+  e_other254      (254),
+  e_other255      (255)
+} with { variant "FIELDORDER(msb)";
+         variant "FIELDLENGTH(8)" };
+
+type union TrailerFieldContainer {
+  Signature   signature_,
+  octetstring security_field
+} with { variant "FIELDORDER(msb)" };
+
+
+type record ExtTrailerField {
+  ExtTrailerFieldType      key,
+  ExtTrailerFieldContainer trailer_value
+} with { variant "FIELDORDER(msb)";
+         variant(trailer_value)
+	  "CROSSTAG(security_field, key = e_other0;
+                    signature_,     key = e_signature;
+                    security_field, key = e_other2;
+                    security_field, key = e_other3;
+                    security_field, key = e_other4;
+                    security_field, key = e_other5;
+                    security_field, key = e_other6;
+                    security_field, key = e_other7;
+                    security_field, key = e_other8;
+                    security_field, key = e_other9;
+                    security_field, key = e_other10;
+                    security_field, key = e_other11;
+                    security_field, key = e_other12;
+                    security_field, key = e_other13;
+                    security_field, key = e_other14;
+                    security_field, key = e_other15;
+                    security_field, key = e_other16;
+                    security_field, key = e_other17;
+                    security_field, key = e_other18;
+                    security_field, key = e_other19;
+                    security_field, key = e_other20;
+                    security_field, key = e_other21;
+                    security_field, key = e_other22;
+                    security_field, key = e_other23;
+                    security_field, key = e_other24;
+                    security_field, key = e_other25;
+                    security_field, key = e_other26;
+                    security_field, key = e_other27;
+                    security_field, key = e_other28;
+                    security_field, key = e_other29;
+                    security_field, key = e_other30;
+                    security_field, key = e_other31;
+                    security_field, key = e_other32;
+                    security_field, key = e_other33;
+                    security_field, key = e_other34;
+                    security_field, key = e_other35;
+                    security_field, key = e_other36;
+                    security_field, key = e_other37;
+                    security_field, key = e_other38;
+                    security_field, key = e_other39;
+                    security_field, key = e_other40;
+                    security_field, key = e_other41;
+                    security_field, key = e_other42;
+                    security_field, key = e_other43;
+                    security_field, key = e_other44;
+                    security_field, key = e_other45;
+                    security_field, key = e_other46;
+                    security_field, key = e_other47;
+                    security_field, key = e_other48;
+                    security_field, key = e_other49;
+                    security_field, key = e_other50;
+                    security_field, key = e_other51;
+                    security_field, key = e_other52;
+                    security_field, key = e_other53;
+                    security_field, key = e_other54;
+                    security_field, key = e_other55;
+                    security_field, key = e_other56;
+                    security_field, key = e_other57;
+                    security_field, key = e_other58;
+                    security_field, key = e_other59;
+                    security_field, key = e_other60;
+                    security_field, key = e_other61;
+                    security_field, key = e_other62;
+                    security_field, key = e_other63;
+                    security_field, key = e_other64;
+                    security_field, key = e_other65;
+                    security_field, key = e_other66;
+                    security_field, key = e_other67;
+                    security_field, key = e_other68;
+                    security_field, key = e_other69;
+                    security_field, key = e_other70;
+                    security_field, key = e_other71;
+                    security_field, key = e_other72;
+                    security_field, key = e_other73;
+                    security_field, key = e_other74;
+                    security_field, key = e_other75;
+                    security_field, key = e_other76;
+                    security_field, key = e_other77;
+                    security_field, key = e_other78;
+                    security_field, key = e_other79;
+                    security_field, key = e_other80;
+                    security_field, key = e_other81;
+                    security_field, key = e_other82;
+                    security_field, key = e_other83;
+                    security_field, key = e_other84;
+                    security_field, key = e_other85;
+                    security_field, key = e_other86;
+                    security_field, key = e_other87;
+                    security_field, key = e_other88;
+                    security_field, key = e_other89;
+                    security_field, key = e_other90;
+                    security_field, key = e_other91;
+                    security_field, key = e_other92;
+                    security_field, key = e_other93;
+                    security_field, key = e_other94;
+                    security_field, key = e_other95;
+                    security_field, key = e_other96;
+                    security_field, key = e_other97;
+                    security_field, key = e_other98;
+                    security_field, key = e_other99;
+                    security_field, key = e_other100;
+                    security_field, key = e_other101;
+                    security_field, key = e_other102;
+                    security_field, key = e_other103;
+                    security_field, key = e_other104;
+                    security_field, key = e_other105;
+                    security_field, key = e_other106;
+                    security_field, key = e_other107;
+                    security_field, key = e_other108;
+                    security_field, key = e_other109;
+                    security_field, key = e_other110;
+                    security_field, key = e_other111;
+                    security_field, key = e_other112;
+                    security_field, key = e_other113;
+                    security_field, key = e_other114;
+                    security_field, key = e_other115;
+                    security_field, key = e_other116;
+                    security_field, key = e_other117;
+                    security_field, key = e_other118;
+                    security_field, key = e_other119;
+                    security_field, key = e_other120;
+                    security_field, key = e_other121;
+                    security_field, key = e_other122;
+                    security_field, key = e_other123;
+                    security_field, key = e_other124;
+                    security_field, key = e_other125;
+                    security_field, key = e_other126;
+                    security_field, key = e_other127;
+                    security_field, key = e_other128;
+                    security_field, key = e_other129;
+                    security_field, key = e_other130;
+                    security_field, key = e_other131;
+                    security_field, key = e_other132;
+                    security_field, key = e_other133;
+                    security_field, key = e_other134;
+                    security_field, key = e_other135;
+                    security_field, key = e_other136;
+                    security_field, key = e_other137;
+                    security_field, key = e_other138;
+                    security_field, key = e_other139;
+                    security_field, key = e_other140;
+                    security_field, key = e_other141;
+                    security_field, key = e_other142;
+                    security_field, key = e_other143;
+                    security_field, key = e_other144;
+                    security_field, key = e_other145;
+                    security_field, key = e_other146;
+                    security_field, key = e_other147;
+                    security_field, key = e_other148;
+                    security_field, key = e_other149;
+                    security_field, key = e_other150;
+                    security_field, key = e_other151;
+                    security_field, key = e_other152;
+                    security_field, key = e_other153;
+                    security_field, key = e_other154;
+                    security_field, key = e_other155;
+                    security_field, key = e_other156;
+                    security_field, key = e_other157;
+                    security_field, key = e_other158;
+                    security_field, key = e_other159;
+                    security_field, key = e_other160;
+                    security_field, key = e_other161;
+                    security_field, key = e_other162;
+                    security_field, key = e_other163;
+                    security_field, key = e_other164;
+                    security_field, key = e_other165;
+                    security_field, key = e_other166;
+                    security_field, key = e_other167;
+                    security_field, key = e_other168;
+                    security_field, key = e_other169;
+                    security_field, key = e_other170;
+                    security_field, key = e_other171;
+                    security_field, key = e_other172;
+                    security_field, key = e_other173;
+                    security_field, key = e_other174;
+                    security_field, key = e_other175;
+                    security_field, key = e_other176;
+                    security_field, key = e_other177;
+                    security_field, key = e_other178;
+                    security_field, key = e_other179;
+                    security_field, key = e_other180;
+                    security_field, key = e_other181;
+                    security_field, key = e_other182;
+                    security_field, key = e_other183;
+                    security_field, key = e_other184;
+                    security_field, key = e_other185;
+                    security_field, key = e_other186;
+                    security_field, key = e_other187;
+                    security_field, key = e_other188;
+                    security_field, key = e_other189;
+                    security_field, key = e_other190;
+                    security_field, key = e_other191;
+                    security_field, key = e_other192;
+                    security_field, key = e_other193;
+                    security_field, key = e_other194;
+                    security_field, key = e_other195;
+                    security_field, key = e_other196;
+                    security_field, key = e_other197;
+                    security_field, key = e_other198;
+                    security_field, key = e_other199;
+                    security_field, key = e_other200;
+                    security_field, key = e_other201;
+                    security_field, key = e_other202;
+                    security_field, key = e_other203;
+                    security_field, key = e_other204;
+                    security_field, key = e_other205;
+                    security_field, key = e_other206;
+                    security_field, key = e_other207;
+                    security_field, key = e_other208;
+                    security_field, key = e_other209;
+                    security_field, key = e_other210;
+                    security_field, key = e_other211;
+                    security_field, key = e_other212;
+                    security_field, key = e_other213;
+                    security_field, key = e_other214;
+                    security_field, key = e_other215;
+                    security_field, key = e_other216;
+                    security_field, key = e_other217;
+                    security_field, key = e_other218;
+                    security_field, key = e_other219;
+                    security_field, key = e_other220;
+                    security_field, key = e_other221;
+                    security_field, key = e_other222;
+                    security_field, key = e_other223;
+                    security_field, key = e_other224;
+                    security_field, key = e_other225;
+                    security_field, key = e_other226;
+                    security_field, key = e_other227;
+                    security_field, key = e_other228;
+                    security_field, key = e_other229;
+                    security_field, key = e_other230;
+                    security_field, key = e_other231;
+                    security_field, key = e_other232;
+                    security_field, key = e_other233;
+                    security_field, key = e_other234;
+                    security_field, key = e_other235;
+                    security_field, key = e_other236;
+                    security_field, key = e_other237;
+                    security_field, key = e_other238;
+                    security_field, key = e_other239;
+                    security_field, key = e_other240;
+                    security_field, key = e_other241;
+                    security_field, key = e_other242;
+                    security_field, key = e_other243;
+                    security_field, key = e_other244;
+                    security_field, key = e_other245;
+                    security_field, key = e_other246;
+                    security_field, key = e_other247;
+                    security_field, key = e_other248;
+                    security_field, key = e_other249;
+                    security_field, key = e_other250;
+                    security_field, key = e_other251;
+                    security_field, key = e_other252;
+                    security_field, key = e_other253;
+                    security_field, key = e_other254;
+                    security_field, key = e_other255)";
   };
 
-
-
-
-
+type union ExtTrailerFieldContainer {
+  Signature   signature_,
+  octetstring security_field
+} with { variant "FIELDORDER(msb)" };
 
 // End of type SecuredMessage
 
@@ -2161,22 +3217,4 @@ with { extension "prototype(convert)"
 
 
 //AdapterControlPort--------------------------------------------------------
-
-/*
-external function f_enc_LongPosVector(in LongPosVector pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-*/
-/*
-external function f_dec_LongPosVector(in octetstring stream) return LongPosVector
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-*/
-
-
-
-
-
 } //endmodule
