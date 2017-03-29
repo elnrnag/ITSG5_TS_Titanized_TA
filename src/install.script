@@ -90,6 +90,11 @@ ln -sf $protocolmodulepath/LibItsGeoNetworking_Pics.ttcn .
 ln -sf $protocolmodulepath/LibItsGeoNetworking_Pixits.ttcn .
 ln -sf $protocolmodulepath/LibItsGeoNetworking_TypesAndValues.ttcn .
 
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsGeoNetworking'}
+ln -sf $protocolmodulepath/ItsGeoNetworking_TestControl.ttcn .
+ln -sf $protocolmodulepath/ItsGeoNetworking_TestCases.ttcn .
+ln -sf $protocolmodulepath/ItsGeoNetworking_TpFunctions.ttcn .
+
 protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/Ipv6OverGeoNetworking'}
 
 ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Functions.ttcn .
@@ -99,6 +104,10 @@ ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Pics.ttcn .
 ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_Pixits.ttcn .
 ln -sf $protocolmodulepath/LibItsIpv6OverGeoNetworking_TypesAndValues.ttcn .
 
+protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsIPv6OverGeoNetworking'}
+ln -sf $protocolmodulepath/ItsIpv6OverGeoNetworking_TestControl.ttcn .
+ln -sf $protocolmodulepath/ItsIpv6OverGeoNetworking_TestCases.ttcn .
+
 protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/LibIts/Security'}
 
 #ln -sf $protocolmodulepath/LibItsSecurity_Functions.ttcn .
@@ -107,12 +116,6 @@ ln -sf $protocolmodulepath/LibItsSecurity_Templates.ttcn .
 ln -sf $protocolmodulepath/LibItsSecurity_Pics.ttcn .
 ln -sf $protocolmodulepath/LibItsSecurity_Pixits.ttcn .
 ln -sf $protocolmodulepath/LibItsSecurity_TypesAndValues.ttcn .
-
-protocolmodulepath=${PROTOCOLMODULE_PATH:-'../ttcn/AtsGeoNetworking'}
-ln -sf $protocolmodulepath/ItsGeoNetworking_TestControl.ttcn .
-ln -sf $protocolmodulepath/ItsGeoNetworking_TestCases.ttcn .
-ln -sf $protocolmodulepath/ItsGeoNetworking_TpFunctions.ttcn .
-
 
 protocolmodulepath=${PROTOCOLMODULE_PATH:-'../TRI/BTP'}
 

@@ -390,7 +390,7 @@ module ItsIpv6OverGeoNetworking_TestCases {
                 // Local variables
                 var template (present) LongPosVector v_longPosVectorIut;
                 var LongPosVector v_longPosVectorNodeA;
-				var LongposVector v_longPosVectorNodeB;
+				var LongPosVector v_longPosVectorNodeB; // ELNRNAG LongposVector -> LongPosVector
                 var AddressTableEntry v_addressesIut, v_addressesNodeA;
                 var template (value) Ipv6Packet v_ipv6Packet;
                 
@@ -792,7 +792,7 @@ module ItsIpv6OverGeoNetworking_TestCases {
                 var template (present) LongPosVector v_longPosVectorIut;
                 var LongPosVector v_longPosVectorNodeA;
                 var LongPosVector v_longPosVectorNodeB;
-                var AddressTableEntry v_addressesIut, v_addressesNodeA;
+                var AddressTableEntry v_addressesIut, v_addressesNodeA, v_addressesNodeB; //ELNRNAG Added v_addressesNodeB to list
                 var template (value) Ipv6Packet v_ipv6Packet;
                 
                 // Test control
@@ -1210,7 +1210,7 @@ module ItsIpv6OverGeoNetworking_TestCases {
                 alt {
                   [] ipv6OverGeoNetworkingPort.receive(
                         mw_ipv6OverGeoNwInd(
-                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2)),
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2), omit), //ELNRNAG: Added omit to list
                             v_addressesNodeA.macAddress,
                             c_llBroadcast,
                             v_ipv6Packet
@@ -1414,7 +1414,7 @@ module ItsIpv6OverGeoNetworking_TestCases {
                 alt {
                   [] ipv6OverGeoNetworkingPort.receive(
                         mw_ipv6OverGeoNwInd(
-                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2)),
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2), omit), //ELNRNAG: Added omit to list
                             v_addressesNodeA.macAddress,
                             c_llBroadcast, 
                             v_ipv6Packet
@@ -1850,7 +1850,7 @@ module ItsIpv6OverGeoNetworking_TestCases {
                 alt {
                   [] ipv6OverGeoNetworkingPort.receive(
                         mw_ipv6OverGeoNwInd(
-                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2)),
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2), omit), //ELNRNAG: Added omit to list
                             v_addressesNodeA.macAddress,
                             v_addressesIut.macAddress,
                             v_ipv6Packet
@@ -2069,7 +2069,7 @@ module ItsIpv6OverGeoNetworking_TestCases {
                 alt {
                   [] ipv6OverGeoNetworkingPort.receive(
                         mw_ipv6OverGeoNwInd(
-                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2), f_getGvlInterface(c_gvl3)),
+                            complement (f_getGvlInterface(c_gvl1), f_getGvlInterface(c_gvl2), f_getGvlInterface(c_gvl3), omit), //ELNRNAG: Added omit to list
                             v_addressesNodeA.macAddress,
                             v_addressesIut.macAddress,
                             v_ipv6Packet
