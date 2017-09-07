@@ -9,7 +9,7 @@ ETSI TR103099 Test Suite (revision 2240 of ETSI SVN) ported to be able to be com
 
 Install Titan, set env variables.
 
-Clone this repo to your computer to any folder (this will be referred from now on as "installation_dir". Create the build directory and run the installer script. Then compile the project:
+Clone this repo to your computer to any folder (this will be referred from now on as "installation_dir"). Create the build directory and run the installer script. Then compile the project:
 ```
 $ cd <installation_dir>
 $ mkdir build
