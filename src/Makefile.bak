@@ -30,7 +30,7 @@ PLATFORM = LINUX
 CXX = g++ 
 
 # Flags for the C++ preprocessor (and makedepend as well):
-CPPFLAGS = -D$(PLATFORM) -I$(TTCN3_DIR)/include -I.
+CPPFLAGS = -D$(PLATFORM) -I$(TTCN3_DIR)/include -I. 
 
 # Flags for the C++ compiler:
 CXXFLAGS = -Wall  

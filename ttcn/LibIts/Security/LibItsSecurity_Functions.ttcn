@@ -1297,7 +1297,7 @@ module LibItsSecurity_Functions {
             * @desc    Unload from memory cache the certificates
             * @return  true on success, false otherwise
             */
-            //external function fx_unloadCertificates() return boolean;
+            external function fx_unloadCertificates() return boolean;
             
             /**
             * @desc    Read the specified certificate

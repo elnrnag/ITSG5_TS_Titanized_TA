@@ -28,7 +28,7 @@ module LibItsGeoNetworking_Pics {
             typeOfAddress := e_manual,
             stationType := e_passengerCar,
             stationCountryCode := c_uInt10Zero,
-            mid := '04e548019da0'O //c_6ZeroBytes
+            mid := c_6ZeroBytes
         };
         
         /**

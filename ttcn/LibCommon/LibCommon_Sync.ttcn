@@ -809,7 +809,7 @@ module LibCommon_Sync {
        */
       function f_serverWaitForAllClientsToStop()
       runs on ServerSyncComp {
-        tc_sync.start;
+        tc_sync.start(PX_TSYNC_TIME_LIMIT+1.0);
         alt {
           [] all component.done {
               tc_sync.stop;

@@ -1548,3 +1548,4 @@ ln -sf $protocolmodulepath/YawRateValue.c .
 ln -sf $protocolmodulepath/YawRateValue.h .
 ln -sf $protocolmodulepath/ZoneLength.c .
 ln -sf $protocolmodulepath/ZoneLength.h .
+
