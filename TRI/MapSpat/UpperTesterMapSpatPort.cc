@@ -145,7 +145,7 @@ void UpperTesterMapSpatPort::Handle_Fd_Event_Readable(int fd)
 
 void UpperTesterMapSpatPort::user_map(const char * system_port)
 {
-TRI_map("UtMapSpatPort",system_port,mp_data);
+TRI_map("UpperTesterMapSpatPort",system_port,mp_data);
     Handler_Add_Fd_Read(mp_data.tri_socket);
 }
 
@@ -157,7 +157,7 @@ void UpperTesterMapSpatPort::user_unmap(const char * system_port)
 
 void UpperTesterMapSpatPort::user_start()
 {
-  TRI_start("UtMapSpatPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
+  TRI_start("UpperTesterMapSpatPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
 }
 
 void UpperTesterMapSpatPort::user_stop()

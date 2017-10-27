@@ -4,6 +4,13 @@
   <ProjectProperties>
     <MakefileSettings>
       <targetExecutable>bin/ITSG5_TS_Titanized_TA</targetExecutable>
+<<<<<<< HEAD
+=======
+      <defaultasOmit>true</defaultasOmit>
+      <omitInValueList>true</omitInValueList>
+      <warningsForBadVariants>true</warningsForBadVariants>
+      <ignoreUntaggedOnTopLevelUnion>true</ignoreUntaggedOnTopLevelUnion>
+>>>>>>> Geonetworking related fixes
     </MakefileSettings>
     <LocalBuildSettings>
       <MakefileScript/>
@@ -54,13 +61,6 @@
       </FolderProperties>
     </FolderResource>
     <FolderResource>
-      <FolderPath>logs</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
       <FolderPath>reference_logs</FolderPath>
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
@@ -82,7 +82,25 @@
       </FolderProperties>
     </FolderResource>
     <FolderResource>
+<<<<<<< HEAD
       <FolderPath>src</FolderPath>
+=======
+      <FolderPath>src/PER/MAP_CNL_113_xxx/src/bin</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>src/PER/MAP_CNL_113_xxx/test</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>src/PER/SPAT_CNL_113_xxx/test</FolderPath>
+>>>>>>> Geonetworking related fixes
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
         <ExcludeFromBuild>true</ExcludeFromBuild>
@@ -103,4 +121,69 @@
       </FolderProperties>
     </FolderResource>
   </FolderProperties>
+<<<<<<< HEAD
+=======
+  <FileProperties>
+    <FileResource>
+      <FilePath>ne-countries-50m.json</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/DENM_CNL_113_xxx_updated/src/ITS_Container.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/MAP_CNL_113_xxx/src/DSRC2.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/MAP_CNL_113_xxx/src/DSRC_REG_D.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/MAP_CNL_113_xxx/src/ITS_Container.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/MAP_CNL_113_xxx/src/MAP_SPAT_ETSI.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/MAP_CNL_113_xxx/src/MAP_SPAT_REG_D.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/MAP_CNL_113_xxx/src/REGION.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>src/PER/SPAT_CNL_113_xxx/src/ITS_Container.asn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+    <FileResource>
+      <FilePath>ttcn/LibIts/Security/LibItsSecurity_Functions.ttcn</FilePath>
+      <FileProperties>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FileProperties>
+    </FileResource>
+  </FileProperties>
+>>>>>>> Geonetworking related fixes
 </TITAN_Designer_Properties>

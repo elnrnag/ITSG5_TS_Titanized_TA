@@ -107,288 +107,6 @@ with { extension "prototype(convert)"
 
 encoding-decoding is done in the test port
 */
-//UT-GN------------------------------------------------------------------------
-
-/*MTC@elx1pjld12-hz: 
-f_enc_Ut_Gn_GenerateGeoBroadcastMessage(): 
-Encoding @LibItsGeoNetworking_TypesAndValues.GenerateGeoBroadcastMessage: 
-
-{ shape := e_geoCircle (0), 
-lifetime := 10000, 
-trafficClass := { scf := e_scfEnable (1), 
-channelOffload := e_choffDisabled (0), 
-tcId := 0 },
-reserved := 0, 
-area := { geoAreaPosLatitude := 10256, 
-geoAreaPosLongitude := 0, 
-distanceA := 0, 
-distanceB := 0, 
-angle := 0 }, 
-payload := { decodedPayload := omit, 
-rawPayload := ''O } }
-*/
-
-
-type bitstring BIT1 length(1) with { variant "FIELDLENGTH(1)" };
-type bitstring BIT6 length(6) with { variant "FIELDLENGTH(6)" };
-
-type record ExtTrafficClass {
-  BIT1   scf,
-  BIT1   channelOffload,
-  BIT6   tcId
-} with { variant "FIELDORDER(msb)" };
-
-
-function f_TrafficClass2ExtTrafficClass(TrafficClass tc) return ExtTrafficClass {
-  var ExtTrafficClass etc;
-  etc.scf := int2bit(enum2int(tc.scf),1);
-  etc.channelOffload := int2bit(enum2int(tc.channelOffload),1);
-  etc.tcId := int2bit(tc.tcId,6);
-  return etc;
-}
-
-function f_ExtTrafficClass2TrafficClass(ExtTrafficClass etc) return TrafficClass {
-  var TrafficClass tc;
-
-  var SCF v_SCF;
-  int2enum(bit2int(etc.scf),v_SCF);
-  tc.scf := v_SCF;
-
-  var ChannelOffload v_CO;
-  int2enum(bit2int(etc.channelOffload),v_CO);
-  tc.channelOffload := v_CO;
-  
-  tc.tcId := bit2int(etc.tcId);
-
-  return tc;
-}
-
-type record ExtGnPayload {
-  //DecodedPayload decodedPayload optional, //TODO: Not yet implemented
-  octetstring rawPayload
-} with { variant "FIELDORDER(msb)" };
-
-
-/*
- * GeoUnicast
-*/
-
-type record ExtGenerateGeoUnicastMessage {
-  ExtGN_Address gnAddress,
-  UInt16 lifetime,
-  ExtTrafficClass trafficClass,
-  UInt16 payloadLength,
-  ExtGnPayload payload 
-} with { variant(payloadLength) "LENGTHTO(payload)";
-         variant "FIELDORDER(msb)"};
-
-external function f_enc_Ext_UtGnGenerateGeoUnicastMessage(in ExtGenerateGeoUnicastMessage pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-function f_enc_Ut_Gn_GenerateGeoUnicastMessage(in GenerateGeoUnicastMessage pdu) return octetstring {
-  var ExtGenerateGeoUnicastMessage ext;
-
-  ext.gnAddress := f_GN_Address2ExtGN_Address(pdu.gnAddress);
-  ext.lifetime := pdu.lifetime;
-
-  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
-
-  ext.payloadLength := lengthof(pdu.payload.rawPayload);
-  ext.payload.rawPayload := pdu.payload.rawPayload;
-
-  //TODO: decodedPayload 
-  /*if (ispresent(pdu.payload.decodedPayload)) {
-  ext.payloadLength := ext.payloadLength + lengthof(pdu.payload.DecodedPayload);
-  ext.payload.DecodedPayload := pdu.payload.DecodedPayload
-  }
-  */
-
-  return f_enc_Ext_UtGnGenerateGeoUnicastMessage(ext);
-}
-
-external function f_dec_Ut_Gn_GenerateGeoUnicastMessage(in octetstring stream) return GenerateGeoUnicastMessage
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-
-/*
- * GeoBroadcast
-*/
-
-type record ExtGenerateGeoBroadcastMessage {
-  UInt8  shape,
-  UInt16 lifetime,
-  ExtTrafficClass trafficClass,
-  UInt24 reserved,
-  Area area,
-  UInt16 payloadLength,
-  ExtGnPayload payload 
-} with { variant(payloadLength) "LENGTHTO(payload)";
-         variant "FIELDORDER(msb)"};
-
-
-external function f_enc_Ext_UtGnGenerateGeoBroadcastMessage(in ExtGenerateGeoBroadcastMessage pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-
-function f_enc_Ut_Gn_GenerateGeoBroadcastMessage(in GenerateGeoBroadcastMessage pdu) return octetstring {
-  var ExtGenerateGeoBroadcastMessage ext;
-
-  ext.shape := enum2int(pdu.shape);
-  ext.lifetime := pdu.lifetime;
-
-  ext.trafficClass.scf := int2bit(enum2int(pdu.trafficClass.scf),1);
-  ext.trafficClass.channelOffload := int2bit(enum2int(pdu.trafficClass.channelOffload),1);
-  ext.trafficClass.tcId := int2bit(pdu.trafficClass.tcId,6);
-
-  ext.reserved := 0;
-
-  ext.area := pdu.area;
-
-  ext.payloadLength := lengthof(pdu.payload.rawPayload);
-  ext.payload.rawPayload := pdu.payload.rawPayload;
-
-  //TODO: decodedPayload 
-  /*if (ispresent(pdu.payload.decodedPayload)) {
-  ext.payloadLength := ext.payloadLength + lengthof(pdu.payload.DecodedPayload);
-  ext.payload.DecodedPayload := pdu.payload.DecodedPayload
-  }
-  */
-
-  return f_enc_Ext_UtGnGenerateGeoBroadcastMessage(ext);
-}
-
-
-external function f_dec_Ut_Gn_GenerateGeoBroadcastMessage(in octetstring stream) return GenerateGeoBroadcastMessage
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-
-
-/*
- * GeoAnycast
-*/
-
-function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring {
-  return f_enc_Ut_Gn_GenerateGeoBroadcastMessage(pdu);
-}
-
-/*
-external function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-*/
-
-external function f_dec_Ut_Gn_GenerateGeoAnycastMessage(in octetstring stream) return GenerateGeoAnycastMessage
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-/*
- * SHBMessage
-*/
-
-
-type record ExtGenerateSHBMessage {
-  ExtTrafficClass trafficClass,
-  UInt16 payloadLength,
-  ExtGnPayload payload 
-} with { variant(payloadLength) "LENGTHTO(payload)";
-         variant "FIELDORDER(msb)"};
-
-external function f_enc_Ext_Ut_Gn_GenerateSHBMessage(in ExtGenerateSHBMessage pdu) 
-  return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-function f_enc_Ut_Gn_GenerateSHBMessage(in GenerateSHBMessage pdu) return octetstring
-{
-  var ExtGenerateSHBMessage ext;
-  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
-  ext.payloadLength := lengthof(pdu.payload.rawPayload);
-  ext.payload.rawPayload := pdu.payload.rawPayload;
-  return f_enc_Ext_Ut_Gn_GenerateSHBMessage(ext);
-}
-
-
-external function f_dec_Ut_Gn_GenerateSHBMessage(in octetstring stream) return GenerateSHBMessage
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-/*
- * TSBMessage
-*/
-
-type record ExtGenerateTSBMessage {
-  UInt8           nbHops,
-  UInt16          lifetime,
-  ExtTrafficClass trafficClass,
-  UInt16          payloadLength,
-  ExtGnPayload    payload 
-} with { variant(payloadLength) "LENGTHTO(payload)";
-         variant "FIELDORDER(msb)"};
-
-external function f_enc_Ext_Ut_Gn_GenerateTSBMessage(in ExtGenerateTSBMessage pdu) 
-  return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
-{
-  var ExtGenerateTSBMessage ext;
-  ext.nbHops := pdu.nbHops;
-  ext.lifetime := pdu.lifetime;
-  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
-  ext.payloadLength := lengthof(pdu.payload.rawPayload);
-  ext.payload.rawPayload := pdu.payload.rawPayload;
-  return f_enc_Ext_Ut_Gn_GenerateTSBMessage(ext);
-}
-
-/*
-external function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-*/
-
-external function f_dec_Ut_Gn_GenerateTSBMessage(in octetstring stream) return GenerateTSBMessage
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-
-/*
- * UtGnTrigger
-*/
-
-
-function f_enc_UtGnTrigger(in UtGnTrigger pdu) return octetstring
-{
-
-  var octetstring ret_os;
-  if (ischosen(pdu.geoUnicast)) { ret_os:='50'O&f_enc_Ut_Gn_GenerateGeoUnicastMessage(pdu.geoUnicast); }
-  else if (ischosen(pdu.geoBroadcast))  { ret_os:='51'O&f_enc_Ut_Gn_GenerateGeoBroadcastMessage(pdu.geoBroadcast); }
-  else if (ischosen(pdu.geoAnycast))  { ret_os:='52'O&f_enc_Ut_Gn_GenerateGeoAnycastMessage(pdu.geoAnycast); }
-  else if (ischosen(pdu.shb))  { ret_os:='53'O&f_enc_Ut_Gn_GenerateSHBMessage(pdu.shb); }
-  else if (ischosen(pdu.tsb))  { ret_os:='54'O&f_enc_Ut_Gn_GenerateTSBMessage(pdu.tsb); }
-
-  return ret_os;
-}
-
-
-
-
-
 //UT-CAM------------------------------------------------------------------------
 
 type bitstring BIT8 length(8) with { variant "FIELDLENGTH(8)" };
@@ -531,17 +249,15 @@ type record ExtUtDenmTrigger {
   UInt16 repetitionInterval optional,
   UInt8 alacarteLength optional,
   ExtAlacarteContainer alacarte optional
-} with { variant "FIELDORDER(msb)";
-         variant (bitmask) "FIELDLENGTH(8)";
-         variant (detectionTime) "FIELDLENGTH(48)";
-         variant (validityDuration) "FIELDLENGTH(24)";
-         variant (repetitionDuration) "FIELDLENGTH(24)";
-         variant (relevanceDistance) "FIELDLENGTH(8)";
-         variant (relevanceTrafficDirection) "FIELDLENGTH(8)";
-         variant (transmissionInterval) "FIELDLENGTH(16)";
-         variant (repetitionInterval) "FIELDLENGTH(16)";
-         variant (alacarteLength) "FIELDLENGTH(8)" };
-
+} with { variant (bitmask) "FIELDLENGTH(8)";
+  variant (detectionTime) "FIELDLENGTH(48)"; //ELNRNAG
+  variant (validityDuration) "FIELDLENGTH(24)";
+  variant (repetitionDuration) "FIELDLENGTH(24)";
+  variant (relevanceDistance) "FIELDLENGTH(8)";
+  variant (relevanceTrafficDirection) "FIELDLENGTH(8)";
+  variant (transmissionInterval) "FIELDLENGTH(16)";
+  variant (repetitionInterval) "FIELDLENGTH(16)";
+  variant (alacarteLength) "FIELDLENGTH(8)" };
 
 
 external function f_enc_ExtUt_Denm_Trigger(in ExtUtDenmTrigger pdu) return octetstring
@@ -958,7 +674,7 @@ function f_dec_BtpInd(in octetstring stream) return BtpInd {
 
 }
 
-function encodeBTPPayload(DecodedBtpPayload payload) 
+function f_encodeBTPPayload(DecodedBtpPayload payload) 
   return octetstring {
     var octetstring result;
     if (ischosen(payload.camPacket)) {
@@ -974,7 +690,6 @@ function encodeBTPPayload(DecodedBtpPayload payload)
     
     return result;
 }
-
 
 
 function decodeBTPPayload(octetstring rawPayload, integer destinationPort) 
@@ -1090,12 +805,276 @@ function f_dec_MapSpatInd(in octetstring stream) return MapSpatInd {
 
 }
 
-
-
-
-
-
 //GeoNetworking--------------------------------------------------------
+//UT-GN------------------------------------------------------------------------
+
+type bitstring BIT1 length(1) with {variant "FIELDLENGTH(1)"};
+
+type bitstring BIT6 length(6) with { variant "FIELDLENGTH(6)" };
+
+type record ExtTrafficClass {
+  BIT1   scf,
+  BIT1   channelOffload,
+  BIT6   tcId
+} with { variant "FIELDORDER(msb)" };
+
+external function f_enc_ExtTrafficClass(in ExtTrafficClass pdu) return octetstring
+with { extension "prototype(convert)"
+       extension "encode(RAW)"
+};
+
+external function f_dec_ExtTrafficClass(in octetstring stream) return ExtTrafficClass
+with { extension "prototype(convert)"
+       extension "decode(RAW)"
+};
+
+function f_TrafficClass2ExtTrafficClass(TrafficClass tc) return ExtTrafficClass {
+  var ExtTrafficClass etc;
+  etc.scf := int2bit(enum2int(tc.scf),1);
+  etc.channelOffload := int2bit(enum2int(tc.channelOffload),1);
+  etc.tcId := int2bit(tc.tcId,6);
+  return etc;
+}
+
+function f_ExtTrafficClass2TrafficClass(ExtTrafficClass etc) return TrafficClass {
+  var TrafficClass tc;
+
+  var SCF v_SCF;
+  int2enum(bit2int(etc.scf),v_SCF);
+  tc.scf := v_SCF;
+
+  var ChannelOffload v_CO;
+  int2enum(bit2int(etc.channelOffload),v_CO);
+  tc.channelOffload := v_CO;
+  
+  tc.tcId := bit2int(etc.tcId);
+
+  return tc;
+}
+
+type record ExtGnPayload {
+  //DecodedPayload decodedPayload optional, //TODO: Not yet implemented
+  octetstring rawPayload
+} with { variant "FIELDORDER(msb)" };
+
+
+/*
+ * GeoUnicast
+*/
+
+type record ExtGenerateGeoUnicastMessage {
+  ExtGN_Address gnAddress,
+  UInt16 lifetime,
+  ExtTrafficClass trafficClass,
+  UInt16 payloadLength,
+  ExtGnPayload payload 
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
+
+external function f_enc_Ext_UtGnGenerateGeoUnicastMessage(in ExtGenerateGeoUnicastMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+function f_enc_Ut_Gn_GenerateGeoUnicastMessage(in GenerateGeoUnicastMessage pdu) return octetstring {
+  var ExtGenerateGeoUnicastMessage ext;
+
+  ext.gnAddress := f_GN_Address2ExtGN_Address(pdu.gnAddress);
+  ext.lifetime := pdu.lifetime;
+
+  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
+
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+
+  //TODO: decodedPayload 
+  /*if (ispresent(pdu.payload.decodedPayload)) {
+  ext.payloadLength := ext.payloadLength + lengthof(pdu.payload.DecodedPayload);
+  ext.payload.DecodedPayload := pdu.payload.DecodedPayload
+  }
+  */
+
+  return f_enc_Ext_UtGnGenerateGeoUnicastMessage(ext);
+}
+
+external function f_dec_Ut_Gn_GenerateGeoUnicastMessage(in octetstring stream) return GenerateGeoUnicastMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+/*
+ * GeoBroadcast
+*/
+
+type record ExtGenerateGeoBroadcastMessage {
+  UInt8  shape,
+  UInt16 lifetime,
+  ExtTrafficClass trafficClass,
+  UInt24 reserved,
+  Area area,
+  UInt16 payloadLength,
+  ExtGnPayload payload 
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
+
+
+external function f_enc_Ext_UtGnGenerateGeoBroadcastMessage(in ExtGenerateGeoBroadcastMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+
+function f_enc_Ut_Gn_GenerateGeoBroadcastMessage(in GenerateGeoBroadcastMessage pdu) return octetstring {
+  var ExtGenerateGeoBroadcastMessage ext;
+
+  ext.shape := enum2int(pdu.shape);
+  ext.lifetime := pdu.lifetime;
+
+  ext.trafficClass.scf := int2bit(enum2int(pdu.trafficClass.scf),1);
+  ext.trafficClass.channelOffload := int2bit(enum2int(pdu.trafficClass.channelOffload),1);
+  ext.trafficClass.tcId := int2bit(pdu.trafficClass.tcId,6);
+
+  ext.reserved := 0;
+
+  ext.area := pdu.area;
+
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+
+  //TODO: decodedPayload 
+  /*if (ispresent(pdu.payload.decodedPayload)) {
+  ext.payloadLength := ext.payloadLength + lengthof(pdu.payload.DecodedPayload);
+  ext.payload.DecodedPayload := pdu.payload.DecodedPayload
+  }
+  */
+
+  return f_enc_Ext_UtGnGenerateGeoBroadcastMessage(ext);
+}
+
+
+external function f_dec_Ut_Gn_GenerateGeoBroadcastMessage(in octetstring stream) return GenerateGeoBroadcastMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+
+/*
+ * GeoAnycast
+*/
+
+function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring {
+  return f_enc_Ut_Gn_GenerateGeoBroadcastMessage(pdu);
+}
+
+/*
+external function f_enc_Ut_Gn_GenerateGeoAnycastMessage(in GenerateGeoAnycastMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+*/
+
+external function f_dec_Ut_Gn_GenerateGeoAnycastMessage(in octetstring stream) return GenerateGeoAnycastMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+/*
+ * SHBMessage
+*/
+
+
+type record ExtGenerateSHBMessage {
+  ExtTrafficClass trafficClass,
+  UInt16 payloadLength,
+  ExtGnPayload payload 
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
+
+external function f_enc_Ext_Ut_Gn_GenerateSHBMessage(in ExtGenerateSHBMessage pdu) 
+  return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+function f_enc_Ut_Gn_GenerateSHBMessage(in GenerateSHBMessage pdu) return octetstring
+{
+  var ExtGenerateSHBMessage ext;
+  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+  return f_enc_Ext_Ut_Gn_GenerateSHBMessage(ext);
+}
+
+
+external function f_dec_Ut_Gn_GenerateSHBMessage(in octetstring stream) return GenerateSHBMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+/*
+ * TSBMessage
+*/
+
+type record ExtGenerateTSBMessage {
+  UInt8           nbHops,
+  UInt16          lifetime,
+  ExtTrafficClass trafficClass,
+  UInt16          payloadLength,
+  ExtGnPayload    payload 
+} with { variant(payloadLength) "LENGTHTO(payload)";
+         variant "FIELDORDER(msb)"};
+
+external function f_enc_Ext_Ut_Gn_GenerateTSBMessage(in ExtGenerateTSBMessage pdu) 
+  return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
+{
+  var ExtGenerateTSBMessage ext;
+  ext.nbHops := pdu.nbHops;
+  ext.lifetime := pdu.lifetime;
+  ext.trafficClass := f_TrafficClass2ExtTrafficClass(pdu.trafficClass);
+  ext.payloadLength := lengthof(pdu.payload.rawPayload);
+  ext.payload.rawPayload := pdu.payload.rawPayload;
+  return f_enc_Ext_Ut_Gn_GenerateTSBMessage(ext);
+}
+
+/*
+external function f_enc_Ut_Gn_GenerateTSBMessage(in GenerateTSBMessage pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+*/
+
+external function f_dec_Ut_Gn_GenerateTSBMessage(in octetstring stream) return GenerateTSBMessage
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+
+/*
+ * UtGnTrigger
+*/
+
+
+function f_enc_UtGnTrigger(in UtGnTrigger pdu) return octetstring
+{
+
+  var octetstring ret_os;
+  if (ischosen(pdu.geoUnicast)) { ret_os:='50'O&f_enc_Ut_Gn_GenerateGeoUnicastMessage(pdu.geoUnicast); }
+  else if (ischosen(pdu.geoBroadcast))  { ret_os:='51'O&f_enc_Ut_Gn_GenerateGeoBroadcastMessage(pdu.geoBroadcast); }
+  else if (ischosen(pdu.geoAnycast))  { ret_os:='52'O&f_enc_Ut_Gn_GenerateGeoAnycastMessage(pdu.geoAnycast); }
+  else if (ischosen(pdu.shb))  { ret_os:='53'O&f_enc_Ut_Gn_GenerateSHBMessage(pdu.shb); }
+  else if (ischosen(pdu.tsb))  { ret_os:='54'O&f_enc_Ut_Gn_GenerateTSBMessage(pdu.tsb); }
+
+  return ret_os;
+}
+
+// GN
 
 function f_enc_GN_Address(in GN_Address pdu) return octetstring {
   return f_enc_ExtGN_Address(f_GN_Address2ExtGN_Address(pdu));
@@ -1115,8 +1094,6 @@ external function f_enc_ExtGeoNetworkingReq(in ExtGeoNetworkingReq pdu) return o
 with { extension "prototype(convert)"
   extension "encode(RAW)"
 };
-
-
 
 function f_enc_GeoNetworkingReq(in GeoNetworkingReq pdu) return octetstring {
   var ExtGeoNetworkingReq EGNR;
@@ -1611,13 +1588,13 @@ type record ExtGnNonSecuredPacket {
   UInt8              maxHopLimit,
   UInt8              reserved2,
   ExtExtendedHeader  extendedHeader,//  optional,
-  Ipv6Packet         ipv6Packet       optional,
+  //ELNRNAGIpv6Packet         ipv6Packet       optional,
   BtpHeader          btpHeader        optional,
   octetstring        btpPayload       optional,
   GnRawPayload       rawPayload//,
   //UInt16	     cohdaBug         optional
 } with { variant 	            "FIELDORDER(msb)";
-         variant(plLength)     	    "LENGTHTO(ipv6Packet, 
+         variant(plLength)     	    "LENGTHTO(//ELNRNAGipv6Packet, 
                                               btpHeader, 
                                               btpPayload, 
                                               rawPayload)";
@@ -1636,7 +1613,7 @@ type record ExtGnNonSecuredPacket {
   lsRequestHeader, 	   headerTST = 96;
   lsReplyHeader, 	   headerTST = 97)";
 
-  variant(ipv6Packet)     "PRESENCE(nextHeader = e_ipv6;)";
+  //variant(ipv6Packet)     "PRESENCE(nextHeader = e_ipv6;)";
   variant(btpHeader)      "CROSSTAG(btpAHeader, nextHeader = e_btpA;
                                     btpBHeader, nextHeader = e_btpB;)";
 
@@ -1652,6 +1629,7 @@ type record ExtGnNonSecuredPacket {
 
 function f_ExtGnNonSecuredPacket2GnNonSecuredPacket(ExtGnNonSecuredPacket EGNSP)
 return GnNonSecuredPacket {
+  log(EGNSP);
   var GnNonSecuredPacket GNSP;
   
   GNSP.commonHeader.nextHeader := EGNSP.nextHeader;
@@ -1762,28 +1740,12 @@ return GnNonSecuredPacket {
     var BtpPacket v_btpPacket;
     var DecodedBtpPayload v_decodedPayload;
     if ((EGNSP.plLength > 0) and
-         isWellKnownBTPPort(EGNSP.btpHeader.btpAHeader.destinationPort) ) {
+         isWellKnownBTPPort(EGNSP.btpHeader.btpAHeader.destinationPort)) {
       v_decodedPayload := 
         decodeBTPPayload(EGNSP.btpPayload, 
-                         EGNSP.btpHeader.btpAHeader.destinationPort);
+                           EGNSP.btpHeader.btpAHeader.destinationPort);
     }
-
-    if (isbound(v_decodedPayload)) {
-        v_btpPacket := {header  := EGNSP.btpHeader,
-                        payload := {decodedPayload := v_decodedPayload,
-                                    rawPayload     := EGNSP.btpPayload}};
-    } else {
-      v_btpPacket := {header  := EGNSP.btpHeader,
-                      payload := omit};
-    } 
-
-    if (isbound(v_btpPacket)) {
-        GNSP.payload.decodedPayload := 
-            {btpPacket := v_btpPacket};
-    } else {
-        GNSP.payload.decodedPayload := omit;
-    }
-
+    
     var octetstring btpPayload;
     if (ispresent(EGNSP.btpPayload)) {
       btpPayload := EGNSP.btpPayload;
@@ -1791,6 +1753,23 @@ return GnNonSecuredPacket {
       btpPayload := ''O;
     }
 
+    if (isbound(v_decodedPayload)) {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := {decodedPayload := v_decodedPayload,
+                                  rawPayload     := btpPayload}};
+    } else {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := {decodedPayload := omit,
+                                  rawPayload     := btpPayload}};
+    }
+
+    if (isbound(v_btpPacket)) {
+        GNSP.payload.decodedPayload := 
+            {btpPacket := v_btpPacket};
+    } else {
+        GNSP.payload.decodedPayload := omit;
+    }
+    
     GNSP.payload.rawPayload :=
       int2oct(EGNSP.btpHeader.btpAHeader.destinationPort,2) &
       int2oct(EGNSP.btpHeader.btpAHeader.sourcePort,2) &
@@ -1807,23 +1786,7 @@ return GnNonSecuredPacket {
          isWellKnownBTPPort(EGNSP.btpHeader.btpBHeader.destinationPort)) {
       v_decodedPayload := 
         decodeBTPPayload(EGNSP.btpPayload, 
-                         EGNSP.btpHeader.btpBHeader.destinationPort);
-    }
-
-    if (isbound(v_decodedPayload)) {
-      v_btpPacket := {header  := EGNSP.btpHeader,
-                      payload := {decodedPayload := v_decodedPayload,
-                                  rawPayload     := EGNSP.btpPayload}};
-    } else {
-      v_btpPacket := {header  := EGNSP.btpHeader,
-                      payload := omit};
-    }
-
-    if (isbound(v_btpPacket)) {
-        GNSP.payload.decodedPayload := 
-            {btpPacket := v_btpPacket};
-    } else {
-        GNSP.payload.decodedPayload := omit;
+                           EGNSP.btpHeader.btpBHeader.destinationPort);
     }
 
     var octetstring btpPayload;
@@ -1833,16 +1796,34 @@ return GnNonSecuredPacket {
       btpPayload := ''O;
     }
 
+    if (isbound(v_decodedPayload)) {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := {decodedPayload := v_decodedPayload,
+                                  rawPayload     := btpPayload}};
+    } else {
+      v_btpPacket := {header  := EGNSP.btpHeader,
+                      payload := {decodedPayload := omit,
+                                  rawPayload     := btpPayload}};
+    }
+
+    if (isbound(v_btpPacket)) {
+        GNSP.payload.decodedPayload := 
+            {btpPacket := v_btpPacket};
+    } else {
+        GNSP.payload.decodedPayload := omit;
+    }
+
+
     GNSP.payload.rawPayload :=
       int2oct(EGNSP.btpHeader.btpBHeader.destinationPort,2) &
       int2oct(EGNSP.btpHeader.btpBHeader.destinationPortInfo,2) &
       btpPayload;
 
-  } else if (EGNSP.nextHeader == e_ipv6) {
+/*ELNRNAG  } else if (EGNSP.nextHeader == e_ipv6) {
 
     //TODO Handle Ipv6
     GNSP.payload.decodedPayload := omit;
-    GNSP.payload.rawPayload := EGNSP.rawPayload;
+    GNSP.payload.rawPayload := EGNSP.rawPayload; */
   } else if (EGNSP.nextHeader == e_any) {
     GNSP.payload.decodedPayload := omit;
     GNSP.payload.rawPayload := EGNSP.rawPayload;
@@ -1933,13 +1914,13 @@ return ExtGnNonSecuredPacket {
   EGNSP.reserved2    := GNSP.commonHeader.reserved2;
  
   if (GNSP.commonHeader.nextHeader == e_btpA) {
-    EGNSP.ipv6Packet := omit;
+   // EGNSP.ipv6Packet := omit;
     EGNSP.btpHeader  := GNSP.payload.decodedPayload.btpPacket.header;
 
     if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload)){
       if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
         EGNSP.btpPayload :=
-          encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+          f_encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
       } else {
         EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
       }
@@ -1947,13 +1928,13 @@ return ExtGnNonSecuredPacket {
       EGNSP.btpPayload := ''O;
     }
  } else if (GNSP.commonHeader.nextHeader == e_btpB) {
-    EGNSP.ipv6Packet := omit;
+    //EGNSP.ipv6Packet := omit;
     EGNSP.btpHeader  := GNSP.payload.decodedPayload.btpPacket.header;
 
     if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload)){
       if (ispresent(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload)) {
         EGNSP.btpPayload :=
-          encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
+          f_encodeBTPPayload(GNSP.payload.decodedPayload.btpPacket.payload.decodedPayload);
       } else {
         EGNSP.btpPayload := GNSP.payload.decodedPayload.btpPacket.payload.rawPayload;
       }
@@ -1962,7 +1943,7 @@ return ExtGnNonSecuredPacket {
     }
       
   } else { //TODO: Handle e_any, e_reserved, e_ipv6
-    EGNSP.ipv6Packet := omit;
+//    EGNSP.ipv6Packet := omit;
     EGNSP.btpHeader  := omit;
     EGNSP.btpPayload := omit;
   }
@@ -1994,111 +1975,6 @@ function f_ExtLifetime2Lifetime(ExtLifetime ELT) return Lifetime {
   return LT;
 }
 
-function f_Lifetime2ExtLifetime(Lifetime LT) return ExtLifetime {
-  var ExtLifetime ELT;
-
-  ELT.multiplier := int2bit(LT.multiplier,6);
-  ELT.ltBase     := int2bit(enum2int(LT.ltBase),2);
-
-  return ELT;
-}
-
-
-//Lifetime END
-
-
-
-
-type record ExtGeoNetworkingPdu {
-  UInt4                 version,
-  BasicNextHeader       nextHeader,
-  UInt8                 reserved,
-  ExtLifetime           lifeTime,
-  UInt8                 routerHopLimit,
-  ExtGnNonSecuredPacket packet     optional,
-  SecuredMessage        securedMsg optional
-} with { variant 	      "FIELDORDER(msb)";
-  variant (packet)     "PRESENCE(nextHeader = e_commonHeader)";
-  variant (securedMsg) "PRESENCE(nextHeader = e_securedPacket)";
-};
-
-function f_ExtGeoNetworkingPdu2GeoNetworkingPdu(ExtGeoNetworkingPdu EGNP)
- return GeoNetworkingPdu {
-  var GeoNetworkingPdu    GNP;
-
-  GNP.basicHeader.version        := EGNP.version;
-  GNP.basicHeader.nextHeader     := EGNP.nextHeader;
-  GNP.basicHeader.reserved       := EGNP.reserved;
-  GNP.basicHeader.lifeTime       := f_ExtLifetime2Lifetime(EGNP.lifeTime);
-  GNP.basicHeader.routerHopLimit := EGNP.routerHopLimit;
-
-  if (ispresent(EGNP.packet)) {
-    GNP.gnPacket.packet := f_ExtGnNonSecuredPacket2GnNonSecuredPacket(EGNP.packet);
-    }
-
-  GNP.gnPacket.securedMsg := EGNP.securedMsg;
-
-  return GNP;
-}
-
-function f_GeoNetworkingPdu2ExtGeoNetworkingPdu(GeoNetworkingPdu GNP)
- return ExtGeoNetworkingPdu {
-  var ExtGeoNetworkingPdu EGNP;
-  EGNP.version := GNP.basicHeader.version;
-  EGNP.nextHeader :=  GNP.basicHeader.nextHeader;
-  EGNP.reserved := GNP.basicHeader.reserved;
-  EGNP.lifeTime := f_Lifetime2ExtLifetime(GNP.basicHeader.lifeTime);
-  EGNP.routerHopLimit := GNP.basicHeader.routerHopLimit
-
-  if (ispresent(GNP.gnPacket.packet)) {
-    EGNP.packet := f_GnNonSecuredPacket2ExtGnNonSecuredPacket(GNP.gnPacket.packet);
-  } else {
-    EGNP.packet := omit;
-  }
-
-  //TODO: Encode securedMsg when security comes in
-  EGNP.securedMsg := GNP.gnPacket.securedMsg;
-  
-  return EGNP;
-}
-
-
-external function f_enc_ExtGeoNetworkingPdu(in ExtGeoNetworkingPdu pdu) return octetstring
-with { extension "prototype(convert)"
-  extension "encode(RAW)"
-};
-
-external function f_dec_ExtGeoNetworkingPdu(in octetstring stream) return ExtGeoNetworkingPdu
-with { extension "prototype(convert)"
-  extension "decode(RAW)"
-};
-
-function f_enc_GeoNetworkingPdu(in GeoNetworkingPdu pdu) return octetstring
-{
-  return f_enc_ExtGeoNetworkingPdu(f_GeoNetworkingPdu2ExtGeoNetworkingPdu(pdu));
-};
-
-function f_dec_GeoNetworkingPdu(in octetstring stream) return GeoNetworkingPdu
-{
-  return f_ExtGeoNetworkingPdu2GeoNetworkingPdu(f_dec_ExtGeoNetworkingPdu(stream));
-};
-
-type record ExtGeoNetworkingInd {
-  ExtGeoNetworkingPdu msgIn,
-  MacAddress          macDestinationAddress
-} with { variant (msgIn) "FIELDORDER(msb)" };
-
-function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
-  var ExtGeoNetworkingInd EGNI := f_dec_ExtGeoNetworkingInd(stream);
-  var GeoNetworkingInd GNI;
-  
-  GNI.msgIn := f_ExtGeoNetworkingPdu2GeoNetworkingPdu(EGNI.msgIn);
-  GNI.macDestinationAddress := EGNI.macDestinationAddress;
-
-  log(GNI);
-
-  return GNI;	 
-}
 
 //Security
 
@@ -3198,7 +3074,110 @@ type union ExtTrailerFieldContainer {
 
 // End of type SecuredMessage
 
+function f_Lifetime2ExtLifetime(Lifetime LT) return ExtLifetime {
+  var ExtLifetime ELT;
+  ELT.multiplier := int2bit(LT.multiplier,6);
+  ELT.ltBase     := int2bit(enum2int(LT.ltBase),2);
 
+  return ELT;
+}
+
+
+//Lifetime END
+
+
+
+
+type record ExtGeoNetworkingPdu {
+  UInt4                 version,
+  BasicNextHeader       nextHeader,
+  UInt8                 reserved,
+  ExtLifetime           lifeTime,
+  UInt8                 routerHopLimit,
+  ExtGnNonSecuredPacket packet     optional,
+  SecuredMessage        securedMsg optional
+} with { variant 	      "FIELDORDER(msb)";
+  variant (packet)     "PRESENCE(nextHeader = e_commonHeader)";
+  variant (securedMsg) "PRESENCE(nextHeader = e_securedPacket)";
+};
+
+function f_ExtGeoNetworkingPdu2GeoNetworkingPdu(ExtGeoNetworkingPdu EGNP)
+ return GeoNetworkingPdu {
+  var GeoNetworkingPdu    GNP;
+
+  GNP.basicHeader.version        := EGNP.version;
+  GNP.basicHeader.nextHeader     := EGNP.nextHeader;
+  GNP.basicHeader.reserved       := EGNP.reserved;
+  GNP.basicHeader.lifeTime       := f_ExtLifetime2Lifetime(EGNP.lifeTime);
+  GNP.basicHeader.routerHopLimit := EGNP.routerHopLimit;
+
+  if (ispresent(EGNP.packet)) {
+    GNP.gnPacket.packet := f_ExtGnNonSecuredPacket2GnNonSecuredPacket(EGNP.packet);
+    }
+
+  GNP.gnPacket.securedMsg := EGNP.securedMsg;
+
+  return GNP;
+}
+
+function f_GeoNetworkingPdu2ExtGeoNetworkingPdu(GeoNetworkingPdu GNP)
+ return ExtGeoNetworkingPdu {
+  var ExtGeoNetworkingPdu EGNP;
+  EGNP.version := GNP.basicHeader.version;
+  EGNP.nextHeader :=  GNP.basicHeader.nextHeader;
+  EGNP.reserved := GNP.basicHeader.reserved;
+  EGNP.lifeTime := f_Lifetime2ExtLifetime(GNP.basicHeader.lifeTime);
+  EGNP.routerHopLimit := GNP.basicHeader.routerHopLimit
+
+  if (ispresent(GNP.gnPacket.packet)) {
+    EGNP.packet := f_GnNonSecuredPacket2ExtGnNonSecuredPacket(GNP.gnPacket.packet);
+  } else {
+    EGNP.packet := omit;
+  }
+
+  //TODO: Encode securedMsg when security comes in
+  EGNP.securedMsg := GNP.gnPacket.securedMsg;
+  
+  return EGNP;
+}
+
+
+external function f_enc_ExtGeoNetworkingPdu(in ExtGeoNetworkingPdu pdu) return octetstring
+with { extension "prototype(convert)"
+  extension "encode(RAW)"
+};
+
+external function f_dec_ExtGeoNetworkingPdu(in octetstring stream) return ExtGeoNetworkingPdu
+with { extension "prototype(convert)"
+  extension "decode(RAW)"
+};
+
+function f_enc_GeoNetworkingPdu(in GeoNetworkingPdu pdu) return octetstring
+{
+  return f_enc_ExtGeoNetworkingPdu(f_GeoNetworkingPdu2ExtGeoNetworkingPdu(pdu));
+};
+
+function f_dec_GeoNetworkingPdu(in octetstring stream) return GeoNetworkingPdu
+{
+  return f_ExtGeoNetworkingPdu2GeoNetworkingPdu(f_dec_ExtGeoNetworkingPdu(stream));
+};
+
+type record ExtGeoNetworkingInd {
+  ExtGeoNetworkingPdu msgIn,
+  MacAddress          macDestinationAddress
+} with { variant (msgIn) "FIELDORDER(msb)" };
+
+function f_dec_GeoNetworkingInd(in octetstring stream) return GeoNetworkingInd {
+  var ExtGeoNetworkingInd EGNI := f_dec_ExtGeoNetworkingInd(stream);
+  var GeoNetworkingInd GNI;
+  
+  GNI.msgIn := f_ExtGeoNetworkingPdu2GeoNetworkingPdu(EGNI.msgIn);
+  GNI.macDestinationAddress := EGNI.macDestinationAddress;
+
+  log(GNI);
+
+  return GNI;	 
+}
 
 
 //IPv6OverGeoNetworking--------------------------------------------------------
@@ -3214,7 +3193,4 @@ with { extension "prototype(convert)"
   extension "decode(RAW)"
 };
 
-
-
-//AdapterControlPort--------------------------------------------------------
 } //endmodule

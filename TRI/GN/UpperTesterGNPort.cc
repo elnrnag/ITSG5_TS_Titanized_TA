@@ -149,7 +149,7 @@ namespace LibItsGeoNetworking__TestSystem {
 
   void UpperTesterGNPort::user_map(const char * system_port)
   {
-    TRI_map("GeoNetworkingPort",system_port,mp_data);
+    TRI_map("UpperTesterGNPort",system_port,mp_data);
     Handler_Add_Fd_Read(mp_data.tri_socket);
   }
 
@@ -161,7 +161,7 @@ namespace LibItsGeoNetworking__TestSystem {
 
   void UpperTesterGNPort::user_start()
   {
-    TRI_start("GeoNetworkingPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
+    TRI_start("UpperTesterGNPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
   }
 
   void UpperTesterGNPort::user_stop()

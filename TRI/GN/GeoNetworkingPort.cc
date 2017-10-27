@@ -64,7 +64,7 @@ void GeoNetworkingPort::Handle_Fd_Event_Readable(int fd)
       break;
     case TRI__interface__Types::Msg__union::ALT_result:
       if(pdu.msg().result().result()==TRI__interface__Types::Result__value::TRI__error){
-	TTCN_error("Unsucessfull send");
+	TTCN_error("Unsucessful send");
       }
       break;
     default:

@@ -212,7 +212,7 @@ namespace LibItsDenm__TestSystem {
 
   void UpperTesterDENMPort::user_map(const char * system_port)
   {
-    TRI_map("UtDenmPort",system_port,mp_data);
+    TRI_map("UpperTesterDENMPort",system_port,mp_data);
     Handler_Add_Fd_Read(mp_data.tri_socket);
   }
 
@@ -224,7 +224,7 @@ namespace LibItsDenm__TestSystem {
 
   void UpperTesterDENMPort::user_start()
   {
-    TRI_start("UtDenmPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
+    TRI_start("UpperTesterDENMPort",get_name(),(component)self,COMPONENT::get_component_name(self),mp_data);
   }
 
   void UpperTesterDENMPort::user_stop()

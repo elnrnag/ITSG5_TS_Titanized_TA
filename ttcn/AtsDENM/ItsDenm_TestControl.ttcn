@@ -21,84 +21,84 @@ module ItsDenm_TestControl {
         
         if(PICS_DENM_GENERATION) {
             execute(TC_DEN_MSGF_BV_01());
-            execute(TC_DEN_MSGF_BV_02());
+            //execute(TC_DEN_MSGF_BV_02());
             
-            execute(TC_DEN_EVGN_BV_01());
-            execute(TC_DEN_EVGN_BV_02());
-            execute(TC_DEN_EVGN_BV_03());
-            execute(TC_DEN_EVGN_BV_04());
-            execute(TC_DEN_EVGN_BV_05());
-            execute(TC_DEN_EVGN_BV_07());
-            execute(TC_DEN_EVGN_BV_10()); 
+            //execute(TC_DEN_EVGN_BV_01());
+            //execute(TC_DEN_EVGN_BV_02());
+            //execute(TC_DEN_EVGN_BV_03());
+            //execute(TC_DEN_EVGN_BV_04());
+            //execute(TC_DEN_EVGN_BV_05());
+            //execute(TC_DEN_EVGN_BV_07());
+            //execute(TC_DEN_EVGN_BV_10()); 
         }
         
         if(PICS_DENM_UPDATE) {
-            execute(TC_DEN_EVUP_BV_01());
-            execute(TC_DEN_EVUP_BV_02());
-            execute(TC_DEN_EVUP_BV_03());
-            execute(TC_DEN_EVUP_BO_04());
+            //execute(TC_DEN_EVUP_BV_01());
+            //execute(TC_DEN_EVUP_BV_02());
+            //execute(TC_DEN_EVUP_BV_03());
+            //execute(TC_DEN_EVUP_BO_04());
         }
         
         if(PICS_DENM_CANCELLATION) {
-            execute(TC_DEN_EVTR_BV_01());
-            execute(TC_DEN_EVTR_BV_04());
-            execute(TC_DEN_EVTR_BV_08());
+            //execute(TC_DEN_EVTR_BV_01());
+            //execute(TC_DEN_EVTR_BV_04());
+            //execute(TC_DEN_EVTR_BV_08());
         }
         
         if(PICS_DENM_NEGATION) {
-            execute(TC_DEN_EVTR_BV_02());
-            execute(TC_DEN_EVTR_BV_03());
-            execute(TC_DEN_EVTR_BV_05());
+            //execute(TC_DEN_EVTR_BV_02());
+            //execute(TC_DEN_EVTR_BV_03());
+            //execute(TC_DEN_EVTR_BV_05());
         }
         
         if(PICS_DENM_NEGATION or PICS_DENM_CANCELLATION) {
-            execute(TC_DEN_EVTR_BO_06());
-            execute(TC_DEN_EVTR_BO_07());
+            //execute(TC_DEN_EVTR_BO_06());
+            //execute(TC_DEN_EVTR_BO_07());
         }
         
         if(PICS_DENM_REPETITION) {
-            execute(TC_DEN_EVRP_TI_01());
-            execute(TC_DEN_EVRP_BV_02());
-            execute(TC_DEN_EVRP_BV_03());
-            execute(TC_DEN_EVRP_BV_04());
-            execute(TC_DEN_EVRP_BV_05());
-            execute(TC_DEN_EVRP_BV_06());
-            execute(TC_DEN_EVRP_BV_08());
-            execute(TC_DEN_EVRP_BV_09());
-            execute(TC_DEN_EVRP_BV_10());
-            execute(TC_DEN_EVRP_BV_11());
+            //execute(TC_DEN_EVRP_TI_01());
+            //execute(TC_DEN_EVRP_BV_02());
+            //execute(TC_DEN_EVRP_BV_03());
+            //execute(TC_DEN_EVRP_BV_04());
+            //execute(TC_DEN_EVRP_BV_05());
+            //execute(TC_DEN_EVRP_BV_06());
+            //execute(TC_DEN_EVRP_BV_08());
+            //execute(TC_DEN_EVRP_BV_09());
+            //execute(TC_DEN_EVRP_BV_10());
+            //execute(TC_DEN_EVRP_BV_11());
         }
 
         if(PICS_DENM_GENERATION) {
-            execute(TC_DEN_PAR_BV_01());
-            execute(TC_DEN_PAR_BV_02());
+            //execute(TC_DEN_PAR_BV_01());
+            //execute(TC_DEN_PAR_BV_02());
         }
         
         if(PICS_DENM_RECEPTION) {
-            execute(TC_DEN_MSRV_BV_01());
-            execute(TC_DEN_MSRV_BV_02());
-            execute(TC_DEN_MSRV_BO_03());
-            execute(TC_DEN_MSRV_BO_04());
-            execute(TC_DEN_MSRV_BO_05());
-            execute(TC_DEN_MSRV_BO_06());
-            execute(TC_DEN_MSRV_BV_07());
+            //execute(TC_DEN_MSRV_BV_01());
+            //execute(TC_DEN_MSRV_BV_02());
+            //execute(TC_DEN_MSRV_BO_03());
+            //execute(TC_DEN_MSRV_BO_04());
+            //execute(TC_DEN_MSRV_BO_05());
+            //execute(TC_DEN_MSRV_BO_06());
+            //execute(TC_DEN_MSRV_BV_07());
             
             if(PICS_IMPACT_REDUCTION) {
-                execute(TC_DEN_MSRV_BV_10());
+                //execute(TC_DEN_MSRV_BV_10());
             }
         }        
         
         if(PICS_DENM_KAF) {
-            execute(TC_DEN_KAFW_BV_01());
-            execute(TC_DEN_KAFW_BV_02());
-            execute(TC_DEN_KAFW_TI_03());
-            execute(TC_DEN_KAFW_BV_04());
-            execute(TC_DEN_KAFW_BV_05());
-            execute(TC_DEN_KAFW_BV_06());
-            execute(TC_DEN_KAFW_BV_07());
-            execute(TC_DEN_KAFW_BV_08());
-            execute(TC_DEN_KAFW_BV_09());
-            execute(TC_DEN_KAFW_BV_10());
+            //execute(TC_DEN_KAFW_BV_01());
+            //execute(TC_DEN_KAFW_BV_02());
+            //execute(TC_DEN_KAFW_TI_03());
+            //execute(TC_DEN_KAFW_BV_04());
+            //execute(TC_DEN_KAFW_BV_05());
+            //execute(TC_DEN_KAFW_BV_06());
+            //execute(TC_DEN_KAFW_BV_07());
+            //execute(TC_DEN_KAFW_BV_08());
+            //execute(TC_DEN_KAFW_BV_09());
+            //execute(TC_DEN_KAFW_BV_10());
         }
 	
     }

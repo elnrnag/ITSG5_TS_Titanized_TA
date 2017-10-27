@@ -350,7 +350,8 @@ public class GnPort extends ProtocolPort implements Runnable, IEthernetSpecific 
                 byte[] filterMid = new byte[6];
                 System.arraycopy(beaconFilter, 2, filterMid, 0, 6);
                 if(java.util.Arrays.equals(mid, filterMid) == false) {
-                    // Received beacon does not match filter
+                	System.out.println("Received beacon does not match filterMid: " +  
+                			ByteHelper.byteArrayToString(filterMid) + " (incoming mid: "+ ByteHelper.byteArrayToString(mid)+")");
                     return;
                 }
             }    

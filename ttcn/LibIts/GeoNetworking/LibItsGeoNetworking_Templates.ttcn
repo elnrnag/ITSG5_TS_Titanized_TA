@@ -1126,7 +1126,7 @@ module LibItsGeoNetworking_Templates {
                 in template (present) GN_Address.mid p_mid
             ) := {
                 commonHeader := mw_commonHeader(
-                    ?,//e_any,
+                    ?, //ELNRNAGe_any,
                     m_lsRequestHeaderType
                 ),
                 extendedHeader := mw_lsRequestHeader(
@@ -1215,7 +1215,7 @@ module LibItsGeoNetworking_Templates {
              */
             template (present) GnNonSecuredPacket mw_geoNwBeaconPacket(
                 in template (present) LongPosVector p_sourceLongPosVec := ?,
-                in template (present) NextHeader p_nextHeader := e_any
+                in template (present) NextHeader p_nextHeader := ?//ELNRNAGe_any
             ) := {
                 commonHeader := mw_commonHeader_noPayload(
                     p_nextHeader,
@@ -1229,7 +1229,7 @@ module LibItsGeoNetworking_Templates {
                     },
                     { // Ethernet testing requires minimum packet size of 60 bytes
                         decodedPayload := *,
-                        rawPayload := '00000000000000000000'O
+                        rawPayload := ?                       //ELNRNAG '00000000000000000000'O
                     }
                 )
             }

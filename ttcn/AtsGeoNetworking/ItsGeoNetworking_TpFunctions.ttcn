@@ -178,6 +178,9 @@ module ItsGeoNetworking_TpFunctions {
                 f_selfOrClientSyncAndVerdict(c_prDone, e_success);
                 
                 // Test Body
+
+		log("==== ELNRNAG waiting for:  ====");
+		log(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBeaconPacket(?))));
                 tc_ac.start;
                 alt {
                     [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBeaconPacket(?))))  {
@@ -692,14 +695,18 @@ module ItsGeoNetworking_TpFunctions {
                     log("*** " & testcasename() & ": INCONC: Trigger failed ***");
                     f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
                 }
-                log("ELNRNAG");
+                
+		log("ELNRNAG");
 		log(mw_geoNwInd(
-                      mw_geoNwPdu(
-                        mw_geoNwUnicastPacketWithSourcePv(
-                          mw_shortPosVectorPosition_withDelta(f_longPosVector2ShortPosVector(v_longPosVectorNodeB)), // DEPV
-                          ?, // sequence number
-                          mw_longPosVectorPosition_withDelta(v_longPosVectorIut) //SOPV
-                    ))));
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacketWithSourcePv(
+                                        mw_shortPosVectorPosition_withDelta(f_longPosVector2ShortPosVector(v_longPosVectorNodeB)), // DEPV
+                                        ?, // sequence number
+                                        mw_longPosVectorPosition_withDelta(v_longPosVectorIut) //SOPV
+                                    )
+                                )
+                            )
+);
                 tc_ac.start;
                 alt {
                     [] geoNetworkingPort.receive(
@@ -3191,6 +3198,21 @@ module ItsGeoNetworking_TpFunctions {
                     )
                 );
                 
+		
+		log("======= ELNRNAG Waiting for: ======");
+		log(f_receiveGeoNetMessageWithPayload(
+                            mw_geoNwInd(
+                                mw_geoNwPdu(
+                                    mw_geoNwUnicastPacket(
+                                        mw_shortPosVectorPosition(f_longPosVector2ShortPosVector(v_longPosVectorNodeA)),
+                                        ?
+                                    )
+                                )
+                            ),
+                            f_adaptPayload_mw(v_payload1)
+                        )
+                    );
+		
                 tc_ac.start;
                 alt {
                     [] a_receiveLsRequest(?, v_longPosVectorNodeA.gnAddr.mid, v_longPosVectorIut) {
@@ -6133,6 +6155,9 @@ module ItsGeoNetworking_TpFunctions {
                     log("*** " & testcasename() & ": INCONC: Trigger failed ***");
                     f_selfOrClientSyncAndVerdict(c_tbDone, e_timeout);
                 }
+		log("========== ELNRNAG");
+		log(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBeaconPacket)));
+
                 tc_ac.start;
                 alt {
                     [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwShbPacket))) {
@@ -8370,6 +8395,12 @@ module ItsGeoNetworking_TpFunctions {
                     f_selfOrClientSyncAndVerdict(c_prDone, e_success);
                     
                     // Test Body
+
+		    //ELNRNAG DEBUG
+		    
+		    log("====== ELNRNAG Waiting for:");
+		    log (mw_longPosVectorPosition(v_longPosVectorNodeC));
+
                     tc_ac.start;
                     alt {
                         [] a_receiveGeoBroadcastWithArea(
@@ -9081,8 +9112,12 @@ module ItsGeoNetworking_TpFunctions {
                     
                     // Local variables
                     var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB);
-                    var template (value) GeoNetworkingInd p_msgInd;
-					var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+
+		    //ELNRNAG variable shall not be of template type, because a message is stored into it
+                    //var template (value) GeoNetworkingInd p_msgInd;
+    		    //var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+		    var GeoNetworkingInd v_msgInd;
+
                     var integer i;
                     
                     // Preamble
@@ -10199,8 +10234,11 @@ function f_GEONW_PON_TSB_BO_03_nodeD() runs on ItsGeoNetworking {
                     
                     // Local variables
                     var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB);
-                    var template (value) GeoNetworkingInd p_msgInd;
-					var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+
+		    //ELNRNAG variable shall not be of template type, because a message is stored into it
+                    //var template (value) GeoNetworkingInd p_msgInd;
+                    //var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+		    var GeoNetworkingInd v_msgInd;
                     
                     // Preamble
                     f_prNeighbour();
@@ -10775,8 +10813,12 @@ function f_GEONW_PON_TSB_BO_07_nodeD() runs on ItsGeoNetworking {
                     
                     // Local variables
                     var LongPosVector v_longPosVectorNodeB := f_getPosition(c_compNodeB);
-                    var template (value) GeoNetworkingInd p_msgInd;
-					var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+
+		    //ELNRNAG variable shall not be of template type, because a message is stored into it
+                    //var template (value) GeoNetworkingInd p_msgInd;
+		    //var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+		    var GeoNetworkingInd v_msgInd;
+
                     var integer i;
                     var template (value) GeoNetworkingPdu v_gnPacket;
                     
@@ -11599,8 +11641,11 @@ function f_GEONW_PON_GAC_BO_05_nodeB() runs on ItsGeoNetworking {
                     
                     // Local variables
                     var LongPosVector v_longPosVectorNodeC := f_getPosition(c_compNodeC);
-                    var template (present) GeoNetworkingInd p_msgInd;
-					var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+		    
+		    //ELNRNAG variable shall not be of template type, because a message is stored into it
+                    //var template (present) GeoNetworkingInd p_msgInd;
+                    //var GeoNetworkingInd v_msgInd := valueof(p_msgInd);
+		    var GeoNetworkingInd v_msgInd;
                     
                     // Preamble
                     f_prNeighbour();
@@ -11628,8 +11673,9 @@ function f_GEONW_PON_GAC_BO_05_nodeB() runs on ItsGeoNetworking {
                     }
                     
                     // Test Body
-                    p_msgInd.msgIn.basicHeader.routerHopLimit := ?;
-					v_msgInd := valueof(p_msgInd);
+		    //ELNRNAG Performing valueof on a not fully specified template
+                    //p_msgInd.msgIn.basicHeader.routerHopLimit := ?;
+		    //v_msgInd := valueof(p_msgInd);
                     tc_noac.start;
                     alt {
                         [] geoNetworkingPort.receive(v_msgInd) {

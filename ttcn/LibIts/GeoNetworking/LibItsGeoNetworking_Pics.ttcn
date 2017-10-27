@@ -28,7 +28,7 @@ module LibItsGeoNetworking_Pics {
             typeOfAddress := e_manual,
             stationType := e_passengerCar,
             stationCountryCode := c_uInt10Zero,
-            mid := c_6ZeroBytes
+            mid := '04E548019DA0'O//c_6ZeroBytes
         };
         
         /**
@@ -352,7 +352,7 @@ module LibItsGeoNetworking_Pics {
         /**
          * @desc IUT's Mac address
          */
-        modulepar MacAddress PICS_IUT_MAC_ADDRESS := 'FFFFFFFFFFFF'O;
+        modulepar MacAddress PICS_IUT_MAC_ADDRESS := '04E548019DA0'O;
 
     } // end geoNwPics
     

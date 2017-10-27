@@ -20,87 +20,87 @@ module ItsCam_TestControl {
     control {
         
         if(PICS_CAM_GENERATION) {
-            execute(TC_CAM_MSD_FMT_BV_01());
+            //execute(TC_CAM_MSD_FMT_BV_01());
             if (not PICS_RSU) {
-                execute(TC_CAM_MSD_FMT_BV_02());
-                execute(TC_CAM_MSD_FMT_BV_03());
-                execute(TC_CAM_MSD_FMT_BV_04());
-                execute(TC_CAM_MSD_FMT_BV_05());
-		execute(TC_CAM_MSD_INA_BV_01_01());
-                execute(TC_CAM_MSD_INA_BV_01_02());
-                execute(TC_CAM_MSD_INA_BV_01_03());
-                execute(TC_CAM_MSD_INA_BV_01_04());
-                execute(TC_CAM_MSD_INA_BV_01_05());
-                execute(TC_CAM_MSD_INA_BV_01_06());
-                execute(TC_CAM_MSD_INA_BV_01_07());
-                execute(TC_CAM_MSD_INA_BV_01_08());
-                execute(TC_CAM_MSD_INA_BV_01_09());
-                execute(TC_CAM_MSD_INA_BV_01_10());
-                execute(TC_CAM_MSD_INA_BV_01_11());
-                execute(TC_CAM_MSD_INA_BV_01_12());
-                execute(TC_CAM_MSD_INA_BV_01_13());
-                execute(TC_CAM_MSD_INA_BV_01_14());
-                execute(TC_CAM_MSD_INA_BV_01_15());
-                execute(TC_CAM_MSD_INA_BV_01_16());
-                execute(TC_CAM_MSD_INA_BV_01_17());
-                execute(TC_CAM_MSD_INA_BV_01_18());
-                execute(TC_CAM_MSD_INA_BV_01_19());
-                execute(TC_CAM_MSD_INA_BV_01_20());
-                execute(TC_CAM_MSD_INA_BV_01_21());
-                execute(TC_CAM_MSD_INA_BV_01_22());
-                execute(TC_CAM_MSD_INA_BV_01_23());
-                execute(TC_CAM_MSD_INA_BV_01_24());
-                execute(TC_CAM_MSD_INA_BV_01_25());
-                execute(TC_CAM_MSD_INA_BV_01_26());
-                execute(TC_CAM_MSD_INA_BV_01_27());
-                execute(TC_CAM_MSD_INA_BV_01_28());
-                execute(TC_CAM_MSD_INA_BV_01_29());
-                execute(TC_CAM_MSD_INA_BV_01_30());
-                execute(TC_CAM_MSD_INA_BV_01_31());
-                execute(TC_CAM_MSD_INA_BV_01_32());
-                execute(TC_CAM_MSD_INA_BV_01_33());
-                execute(TC_CAM_MSD_INA_BV_01_34());
-                execute(TC_CAM_MSD_INA_BV_01_35());
+                //execute(TC_CAM_MSD_FMT_BV_02());
+                //execute(TC_CAM_MSD_FMT_BV_03());
+                //execute(TC_CAM_MSD_FMT_BV_04());
+                //execute(TC_CAM_MSD_FMT_BV_05());
+		//execute(TC_CAM_MSD_INA_BV_01_01());
+                //execute(TC_CAM_MSD_INA_BV_01_02());
+                //execute(TC_CAM_MSD_INA_BV_01_03());
+                //execute(TC_CAM_MSD_INA_BV_01_04());
+                //execute(TC_CAM_MSD_INA_BV_01_05());
+                //execute(TC_CAM_MSD_INA_BV_01_06());
+                //execute(TC_CAM_MSD_INA_BV_01_07());
+                //execute(TC_CAM_MSD_INA_BV_01_08());
+                //execute(TC_CAM_MSD_INA_BV_01_09());
+                //execute(TC_CAM_MSD_INA_BV_01_10());
+                //execute(TC_CAM_MSD_INA_BV_01_11());
+                //execute(TC_CAM_MSD_INA_BV_01_12());
+                //execute(TC_CAM_MSD_INA_BV_01_13());
+                //execute(TC_CAM_MSD_INA_BV_01_14());
+                //execute(TC_CAM_MSD_INA_BV_01_15());
+                //execute(TC_CAM_MSD_INA_BV_01_16());
+                //execute(TC_CAM_MSD_INA_BV_01_17());
+                //execute(TC_CAM_MSD_INA_BV_01_18());
+                //execute(TC_CAM_MSD_INA_BV_01_19());
+                //execute(TC_CAM_MSD_INA_BV_01_20());
+                //execute(TC_CAM_MSD_INA_BV_01_21());
+                //execute(TC_CAM_MSD_INA_BV_01_22());
+                //execute(TC_CAM_MSD_INA_BV_01_23());
+                //execute(TC_CAM_MSD_INA_BV_01_24());
+                //execute(TC_CAM_MSD_INA_BV_01_25());
+                //execute(TC_CAM_MSD_INA_BV_01_26());
+                //execute(TC_CAM_MSD_INA_BV_01_27());
+                //execute(TC_CAM_MSD_INA_BV_01_28());
+                //execute(TC_CAM_MSD_INA_BV_01_29());
+                //execute(TC_CAM_MSD_INA_BV_01_30());
+                //execute(TC_CAM_MSD_INA_BV_01_31());
+                //execute(TC_CAM_MSD_INA_BV_01_32());
+                //execute(TC_CAM_MSD_INA_BV_01_33());
+                //execute(TC_CAM_MSD_INA_BV_01_34());
+                //execute(TC_CAM_MSD_INA_BV_01_35());
             }
             if (PICS_PUBLICTRANS) {
-                execute(TC_CAM_MSD_INA_BV_02());
+                //execute(TC_CAM_MSD_INA_BV_02());
             }
             if (PICS_SPECIALTRANS) {
-                execute(TC_CAM_MSD_INA_BV_03());
+                //execute(TC_CAM_MSD_INA_BV_03());
             }
             if (PICS_DANGEROUSGOODS) {
-                execute(TC_CAM_MSD_INA_BV_04());
+                //execute(TC_CAM_MSD_INA_BV_04());
             }
             if (PICS_ROADWORKS) {
-                execute(TC_CAM_MSD_INA_BV_05());
+                //execute(TC_CAM_MSD_INA_BV_05());
             }
             if (PICS_RESCUE) {
-                execute(TC_CAM_MSD_INA_BV_06());
+                //execute(TC_CAM_MSD_INA_BV_06());
             }
             if (PICS_EMERGENCY) {
-                execute(TC_CAM_MSD_INA_BV_07());
+                //execute(TC_CAM_MSD_INA_BV_07());
             }
             if (PICS_SAFETY_CAR) {
-                execute(TC_CAM_MSD_INA_BV_08());
+                //execute(TC_CAM_MSD_INA_BV_08());
             }
             
-            execute(TC_CAM_MSD_GFQ_TI_01());
-            execute(TC_CAM_MSD_GFQ_TI_02());
-            execute(TC_CAM_MSD_GFQ_TI_03());
-            execute(TC_CAM_MSD_GFQ_BV_04());
-            execute(TC_CAM_MSD_GFQ_BV_05());
+            //execute(TC_CAM_MSD_GFQ_TI_01());
+            //execute(TC_CAM_MSD_GFQ_TI_02());
+            //execute(TC_CAM_MSD_GFQ_TI_03());
+            //execute(TC_CAM_MSD_GFQ_BV_04());
+            //execute(TC_CAM_MSD_GFQ_BV_05());
             execute(TC_CAM_MSD_GFQ_BV_06());
-            execute(TC_CAM_MSD_GFQ_TI_07());
-            execute(TC_CAM_MSD_GFQ_TI_08());
+            //execute(TC_CAM_MSD_GFQ_TI_07());
+            //execute(TC_CAM_MSD_GFQ_TI_08());
             
-            execute(TC_CAM_MSD_PAR_BV_01());
-            execute(TC_CAM_MSD_PAR_BV_02());
-            execute(TC_CAM_MSD_PAR_BV_03());
+            //execute(TC_CAM_MSD_PAR_BV_01());
+            //execute(TC_CAM_MSD_PAR_BV_02());
+            //execute(TC_CAM_MSD_PAR_BV_03());
             
    		}
         
         if(PICS_CAM_RECEPTION) {
-        	execute(TC_CAM_MSP_BV_01());
+        	//execute(TC_CAM_MSP_BV_01());
         }
         
     }

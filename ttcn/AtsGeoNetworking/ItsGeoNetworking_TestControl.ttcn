@@ -23,171 +23,171 @@ module ItsGeoNetworking_TestControl {
         /* FDV */
         
         if(PICS_GN_BASIC_HEADER) {
-            execute(TC_GEONW_FDV_BAH_BV_01());
-            execute(TC_GEONW_FDV_BAH_BI_02());
+            execute(TC_GEONW_FDV_BAH_BV_01()); //PASS
+            execute(TC_GEONW_FDV_BAH_BI_02()); //PASS
         }
 
         if(PICS_GN_COMMON_HEADER) {
-            execute(TC_GEONW_FDV_COH_BV_01());
-            execute(TC_GEONW_FDV_COH_BV_02());
-            execute(TC_GEONW_FDV_COH_BV_03());
-            execute(TC_GEONW_FDV_COH_BO_04());
+            execute(TC_GEONW_FDV_COH_BV_01()); //PASS
+            execute(TC_GEONW_FDV_COH_BV_02()); //PASS
+            execute(TC_GEONW_FDV_COH_BV_03()); //PASS
+            execute(TC_GEONW_FDV_COH_BO_04()); //INCONC, sync
         }        
         
         if(PICS_GN_BEACON_SRC) {
-            execute(TC_GEONW_FDV_BEA_BV_01());
-            execute(TC_GEONW_FDV_BEA_BV_02());
-            execute(TC_GEONW_FDV_BEA_BV_03());
-            execute(TC_GEONW_FDV_BEA_BV_04());
+            execute(TC_GEONW_FDV_BEA_BV_01()); //PASS
+            execute(TC_GEONW_FDV_BEA_BV_02()); //PASS
+            execute(TC_GEONW_FDV_BEA_BV_03()); //PASS
+            execute(TC_GEONW_FDV_BEA_BV_04()); //PASS
         }
         
         if(PICS_GN_GUC_SRC) {
-	        execute(TC_GEONW_FDV_GUC_BV_01());
+	        execute(TC_GEONW_FDV_GUC_BV_01()); //PASS
         }
         
         if(PICS_GN_GBC_SRC) {
-    	    execute(TC_GEONW_FDV_GBC_BV_01());
+    	    execute(TC_GEONW_FDV_GBC_BV_01()); //PASS
         }
         
         if(PICS_GN_GAC_SRC) {
-        	execute(TC_GEONW_FDV_GAC_BV_01());
+        	execute(TC_GEONW_FDV_GAC_BV_01()); //PASS
         }
         
         if(PICS_GN_SHB_SRC) {
-        	execute(TC_GEONW_FDV_SHB_BV_01());
+        	execute(TC_GEONW_FDV_SHB_BV_01()); //PASS
         }
         
         if(PICS_GN_TSB_SRC) {
-        	execute(TC_GEONW_FDV_TSB_BV_01());
+        	execute(TC_GEONW_FDV_TSB_BV_01()); //PASS
         }
 
-	/* PON/LOT */
+		/* PON/LOT */
 
         if(PICS_GN_GUC_SRC and PICS_GN_BEACON_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_01());
+        	execute(TC_GEONW_PON_LOT_BV_01()); //PASS
         }
         
         if(PICS_GN_LS_REQ_SRC and PICS_GN_LS_REP_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_02());
+        	execute(TC_GEONW_PON_LOT_BV_02()); //PASS
         }
         
         if(PICS_GN_BEACON_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_01());
+        	execute(TC_GEONW_PON_LOT_BV_03_01()); //PASS
         }
         
         if(PICS_GN_GUC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_02());
+        	execute(TC_GEONW_PON_LOT_BV_03_02()); //PASS
         }
         
         if(PICS_GN_GAC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_03());
+        	execute(TC_GEONW_PON_LOT_BV_03_03()); //PASS
         }
         
         if(PICS_GN_GBC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_04());
+        	execute(TC_GEONW_PON_LOT_BV_03_04()); //PASS
         }
         
         if(PICS_GN_TSB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_05());
+        	execute(TC_GEONW_PON_LOT_BV_03_05()); //PASS
         }
         
         if(PICS_GN_SHB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_06());
+        	execute(TC_GEONW_PON_LOT_BV_03_06()); //PASS
         }
         
         if(PICS_GN_LS_REQ_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_07());
+        	execute(TC_GEONW_PON_LOT_BV_03_07()); //PASS
         }
         
         if(PICS_GN_LS_REP_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_03_08());
+        	execute(TC_GEONW_PON_LOT_BV_03_08()); //PASS
         }
         
         if(PICS_GN_LS_REQ_SRC) {
-        	execute(TC_GEONW_PON_LOT_BV_04());
+        	execute(TC_GEONW_PON_LOT_BV_04()); //INCONC
         }
         
         if(PICS_GN_GUC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_01());
+        	execute(TC_GEONW_PON_LOT_BV_05_01()); //PASS
         }
         
         if(PICS_GN_GAC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_02());
+        	execute(TC_GEONW_PON_LOT_BV_05_02()); //PASS
         }
         
         if(PICS_GN_GBC_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_03());
+        	execute(TC_GEONW_PON_LOT_BV_05_03()); //PASS
         }
         
         if(PICS_GN_TSB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_04());
+        	execute(TC_GEONW_PON_LOT_BV_05_04()); //PASS
         }
         
         if(PICS_GN_SHB_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_05());
+        	execute(TC_GEONW_PON_LOT_BV_05_05()); //PASS
         }
         
         if(PICS_GN_LS_REQ_DST) {
-        	execute(TC_GEONW_PON_LOT_BV_05_06());
+        	execute(TC_GEONW_PON_LOT_BV_05_06()); //PASS
         }
         
         if(PICS_GN_LS_REP_DST) {
-       		execute(TC_GEONW_PON_LOT_BV_05_07());
+       		execute(TC_GEONW_PON_LOT_BV_05_07()); //PASS
         }
         
         /* PON/LPV */
         
         if(PICS_GN_BEACON_SRC) {
-        	execute(TC_GEONW_PON_LPV_BV_01());
+        	execute(TC_GEONW_PON_LPV_BV_01()); //PASS
         }
         
         /* PON/SQN */
         
         if(PICS_GN_GBC_SRC) {
-            execute(TC_GEONW_PON_SQN_BV_01());
-            execute(TC_GEONW_PON_SQN_BV_02());
+            execute(TC_GEONW_PON_SQN_BV_01()); //PASS
+            execute(TC_GEONW_PON_SQN_BV_02()); //PASS
         }
         
         /* PON/LOS */
         
         if(PICS_GN_LS_REQ_SRC) {
-            execute(TC_GEONW_PON_LOS_BV_01());
-            execute(TC_GEONW_PON_LOS_BV_02());
+            execute(TC_GEONW_PON_LOS_BV_01()); //PASS
+            execute(TC_GEONW_PON_LOS_BV_02()); //PASS
 	        if(PICS_GN_LS_REP_DST) {
-                execute(TC_GEONW_PON_LOS_BV_03());
-                execute(TC_GEONW_PON_LOS_BV_04());
+                execute(TC_GEONW_PON_LOS_BV_03()); //PASS
+                execute(TC_GEONW_PON_LOS_BV_04()); //PASS
 	        }
-            execute(TC_GEONW_PON_LOS_BV_05());
+            execute(TC_GEONW_PON_LOS_BV_05()); //PASS
         }
         
         if(PICS_GN_LS_REQ_RETRANSMISSION) {
-            execute(TC_GEONW_PON_LOS_TI_06());
-            execute(TC_GEONW_PON_LOS_BV_07());
+            execute(TC_GEONW_PON_LOS_TI_06()); //PASS
+            execute(TC_GEONW_PON_LOS_BV_07()); //PASS
         }
         
         if(PICS_GN_LS_REQ_DST) {
-            execute(TC_GEONW_PON_LOS_BV_08());
-            execute(TC_GEONW_PON_LOS_BO_09());
+            execute(TC_GEONW_PON_LOS_BV_08()); //PASS
+            execute(TC_GEONW_PON_LOS_BO_09()); //ERROR, SYNC
         }
         
         if(PICS_GN_LS_FWD) {
-        execute(TC_GEONW_PON_LOS_BV_10());
-        execute(TC_GEONW_PON_LOS_BV_11());
+        execute(TC_GEONW_PON_LOS_BV_10()); //PASS
+        execute(TC_GEONW_PON_LOS_BV_11()); //PASS
         }
         
         if(PICS_GN_LS_REQ_SRC) {
-            execute(TC_GEONW_PON_LOS_BV_12());
-            execute(TC_GEONW_PON_LOS_BV_13());
-            execute(TC_GEONW_PON_LOS_BV_14());
-            execute(TC_GEONW_PON_LOS_BV_15());
-            execute(TC_GEONW_PON_LOS_BV_16());
-            execute(TC_GEONW_PON_LOS_BV_17());
+            execute(TC_GEONW_PON_LOS_BV_12()); //PASS
+            execute(TC_GEONW_PON_LOS_BV_13()); //PASS
+            execute(TC_GEONW_PON_LOS_BV_14()); //PASS
+            execute(TC_GEONW_PON_LOS_BV_15());   //PASS
+            execute(TC_GEONW_PON_LOS_BV_16());   //PASS
+            execute(TC_GEONW_PON_LOS_BV_17());   //PASS
         }
         
         /* PON/FPB */
         
         if(PICS_GN_GUC_SRC) {
-            execute(TC_GEONW_PON_FPB_BV_01());
+            execute(TC_GEONW_PON_FPB_BV_01()); //INCONC, Sync
             execute(TC_GEONW_PON_FPB_BV_02());
             execute(TC_GEONW_PON_FPB_BV_03());
             execute(TC_GEONW_PON_FPB_BV_04());
@@ -259,7 +259,7 @@ module ItsGeoNetworking_TestControl {
         
         if(PICS_GN_BEACON_SRC) {
             execute(TC_GEONW_PON_BEA_TI_01());
-//            execute(TC_GEONW_PON_BEA_TI_02());
+            //execute(TC_GEONW_PON_BEA_TI_02());
         }
         
         /* PON/GUC */
@@ -392,10 +392,10 @@ module ItsGeoNetworking_TestControl {
             execute(TC_GEONW_PON_GAC_BO_09());
             execute(TC_GEONW_PON_GAC_BV_10());
         }
+        
+		/* PON/BCA */
 
-	/* PON/BCA */
-
-	if(PICS_GN_GBC_FWD) {        
+        if(PICS_GN_GBC_FWD) {        
             if (PICS_GN_GEOBROADCAST_FORWARDING_ALGORITHM == e_cbf) {
                 execute(TC_GEONW_PON_BCA_BV_01());
                 execute(TC_GEONW_PON_BCA_BV_02());

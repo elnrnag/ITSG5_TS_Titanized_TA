@@ -136,7 +136,8 @@ module LibItsDenm_Templates {
              */
             template (value) UtDenmTrigger m_utTriggerEvent(
                 template (value) SituationContainer p_situation,
-                template (omit) ValidityDuration p_validityDuration := c_duration_2sec,
+                template (omit) ValidityDuration p_validityDuration := c_duration_10sec,
+		//ELNRNAG template (omit) ValidityDuration p_validityDuration := c_duration_2sec,
                 template (omit) ValidityDuration p_repetitionDuration := omit,
                 template (omit) TransmissionInterval p_repetitionInterval := omit,
                 template (omit) TransmissionInterval p_transmissionInterval := omit,

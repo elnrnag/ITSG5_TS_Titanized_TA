@@ -103,11 +103,6 @@ module LibItsDenm_Functions {
         function f_utTriggerEvent(template (value) UtDenmTrigger p_event) runs on ItsDenm return ActionID {
             var ActionID v_actionId;
             var UtDenmTriggerResult v_result;
-
-	      //ELNRNAG
-              p_event.detectionTime := 1000;
-	      //ELNRNAG
-
             utPort.send(p_event);
 	    
             tc_wait.start;

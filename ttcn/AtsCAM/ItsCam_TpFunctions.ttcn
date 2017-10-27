@@ -2611,7 +2611,7 @@ module ItsCam_TpFunctions {
                 
                 // Local variables
                 timer t_genCam_dcc := PICS_T_GENCAMDCC * 0.90;
-                timer t_genCam_min := PICS_T_GENCAMMIN * 1.10;
+                timer t_genCam_min := PICS_T_GENCAMMIN * 11.10; //ELNRNAG
                 var CamInd v_camPdu;
                 var SpeedValue v_speedValue;
                 var SpeedValue v_changeSpeedValue := 60; // 0,5 m/s << 0,6 m/s == 60 cm/s
@@ -2651,7 +2651,9 @@ module ItsCam_TpFunctions {
                 t_genCam_dcc.timeout;
                 t_genCam_min.start;
                 alt {
-                    [] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_speed( (v_speedValue + v_changeSpeedValue) mod 16384 ) ) )){ 
+                    //ELNRNAG: According to TP there is no speed value check
+		    //[] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_speed( (v_speedValue + v_changeSpeedValue) mod 16384 ) ) )){ 
+		    [] camPort.receive(mw_camInd ( mw_camMsg_HF_BV ( mw_HF_BV_speed( ? ) ) )){
                         tc_ac.stop;
                         log("*** " & testcasename() & ": PASS: CAM message received ***");
                         f_selfOrClientSyncAndVerdict(c_tbDone, e_success);

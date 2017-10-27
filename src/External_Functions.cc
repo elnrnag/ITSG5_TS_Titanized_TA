@@ -36,6 +36,9 @@ namespace LibItsCommon__Functions {
     unsigned long long timestampNow = tv.tv_sec*1000 + tv.tv_usec/1000;
     INTEGER i = INTEGER();
     i.set_long_long_val(timestampNow - timestamp2004);
+    TTCN_Logger::begin_event(TTCN_DEBUG);
+    i.log();
+    TTCN_Logger::end_event();
     return i;
   }
 

@@ -149,15 +149,21 @@ public class Management implements IManagementTA, IManagementLayers {
         }
         
         // For debug only:
-        byte[] mid = new byte[] {(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
-                                 (byte)0x00, (byte)0x00};
-        byte[] lpv = new byte[] {(byte)0x0B, (byte)0x00, (byte)0x00, (byte)0x00, 
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+        //byte[] mid = new byte[] {(byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
+        //                         (byte)0x00, (byte)0x00};
+        /*
+        byte[] mid = new byte[] {(byte)0x04, (byte)0xE5, (byte)0x48, (byte)0x01, 
+        		                 (byte)0x9D, (byte)0xA0};
+        
+        //byte[] lpv = new byte[] {(byte)0x0B, (byte)0x00, (byte)0x00, (byte)0x00,
+        byte[] lpv = new byte[] {(byte)0x94, (byte)0x00, (byte)0x04, (byte)0xE5, 
+                                 (byte)0x48, (byte)0x01, (byte)0x9D, (byte)0xA0,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00};
         gnUpdateLocTable(mid, 0, lpv);
+        */
     }
 
     /**
