@@ -3673,7 +3673,7 @@ module ItsGeoNetworking_TpFunctions {
                     f_selfOrClientSyncAndVerdict(c_prDone, e_success);
                     
                     // Test Body
-                    f_sleepIgnoreDef(1.0);
+                    //ELNRNAG f_sleepIgnoreDef(1.0);
                     f_startBeingNeighbour();
                     
                     tc_ac.start;
@@ -3803,7 +3803,7 @@ module ItsGeoNetworking_TpFunctions {
                     f_selfOrClientSyncAndVerdict(c_prDone, e_success);
                     
                     // Test Body
-                    f_sleep(1.0);
+                    //ELNRNAG f_sleep(1.0);
                     f_startBeingNeighbour();
                     
                     tc_ac.start;
@@ -3931,9 +3931,13 @@ module ItsGeoNetworking_TpFunctions {
                     f_selfOrClientSyncAndVerdict(c_prDone, e_success);
                     
                     // Test Body
-                    f_sleep(1.0);
+                    //ELNRNAGf_sleep(1.0);
                     f_startBeingNeighbour();
                     
+
+		    log("========= ELNRNAG ========== Waiting for");
+		    log(mw_shortPosVectorPosition(f_longPosVector2ShortPosVector(v_longPosVectorNodeA)));
+
                     tc_ac.start;
                     alt {
                         [] a_receiveGeoUnicast(
@@ -3948,6 +3952,8 @@ module ItsGeoNetworking_TpFunctions {
                             else {
                                 v_expectedSequenceNumber := v_expectedSequenceNumber + 1;
                                 tc_ac.start;
+				log("==== ELNRNAG SeqNum");
+				log(v_expectedSequenceNumber);
                                 repeat;
                             }
                         }
@@ -4168,6 +4174,10 @@ module ItsGeoNetworking_TpFunctions {
                     
                     // Preamble
                     f_prDefault();
+		    log("===== ELNRNAG");
+		    log(f_getArea(c_area1));
+		    log(m_generateGeoBroadcastMessage(f_getArea(c_area1)));
+
                     if (not f_utTriggerEvent(m_generateGeoBroadcastMessage(f_getArea(c_area1))) ) {
                         log("*** " & testcasename() & ": INCONC: Trigger failed ***");
                         f_selfOrClientSyncAndVerdict(c_prDone, e_timeout);
@@ -4175,8 +4185,12 @@ module ItsGeoNetworking_TpFunctions {
                     f_selfOrClientSyncAndVerdict(c_prDone, e_success);
                     
                     // Test Body
-                    f_sleep(1.0);
+                    //ELNRNAG f_sleep(1.0);
                     f_startBeingNeighbour();
+
+		    log("==== ELNRNAG WaitingFor:");
+		    log(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBroadcastPacket(mw_longPosVectorPosition_withDelta(v_longPosVectorIut),?))));
+		    
                     tc_ac.start;
                     alt {
                         [] geoNetworkingPort.receive(mw_geoNwInd(mw_geoNwPdu(mw_geoNwBroadcastPacket(

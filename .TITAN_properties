@@ -4,13 +4,10 @@
   <ProjectProperties>
     <MakefileSettings>
       <targetExecutable>bin/ITSG5_TS_Titanized_TA</targetExecutable>
-<<<<<<< HEAD
-=======
       <defaultasOmit>true</defaultasOmit>
       <omitInValueList>true</omitInValueList>
       <warningsForBadVariants>true</warningsForBadVariants>
       <ignoreUntaggedOnTopLevelUnion>true</ignoreUntaggedOnTopLevelUnion>
->>>>>>> Geonetworking related fixes
     </MakefileSettings>
     <LocalBuildSettings>
       <MakefileScript/>
@@ -20,13 +17,6 @@
   <FolderProperties>
     <FolderResource>
       <FolderPath>META-INF</FolderPath>
-      <FolderProperties>
-        <CentralStorage>false</CentralStorage>
-        <ExcludeFromBuild>true</ExcludeFromBuild>
-      </FolderProperties>
-    </FolderResource>
-    <FolderResource>
-      <FolderPath>TRI</FolderPath>
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
         <ExcludeFromBuild>true</ExcludeFromBuild>
@@ -82,9 +72,6 @@
       </FolderProperties>
     </FolderResource>
     <FolderResource>
-<<<<<<< HEAD
-      <FolderPath>src</FolderPath>
-=======
       <FolderPath>src/PER/MAP_CNL_113_xxx/src/bin</FolderPath>
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
@@ -100,7 +87,6 @@
     </FolderResource>
     <FolderResource>
       <FolderPath>src/PER/SPAT_CNL_113_xxx/test</FolderPath>
->>>>>>> Geonetworking related fixes
       <FolderProperties>
         <CentralStorage>false</CentralStorage>
         <ExcludeFromBuild>true</ExcludeFromBuild>
@@ -120,9 +106,98 @@
         <ExcludeFromBuild>true</ExcludeFromBuild>
       </FolderProperties>
     </FolderResource>
+    <FolderResource>
+      <FolderPath>tt3plugins</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsATSP</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsDCC</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsFNTP</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsFSAP</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsIICP</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsIPv6OverGeoNetworking</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsSecurity</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/AtsV2G</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/LibIts/CALM</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/LibIts/DCC</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>ttcn/LibIts/V2G</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
+    <FolderResource>
+      <FolderPath>unittests</FolderPath>
+      <FolderProperties>
+        <CentralStorage>false</CentralStorage>
+        <ExcludeFromBuild>true</ExcludeFromBuild>
+      </FolderProperties>
+    </FolderResource>
   </FolderProperties>
-<<<<<<< HEAD
-=======
   <FileProperties>
     <FileResource>
       <FilePath>ne-countries-50m.json</FilePath>
@@ -185,5 +260,4 @@
       </FileProperties>
     </FileResource>
   </FileProperties>
->>>>>>> Geonetworking related fixes
 </TITAN_Designer_Properties>

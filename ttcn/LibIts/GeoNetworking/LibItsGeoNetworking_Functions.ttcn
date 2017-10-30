@@ -835,6 +835,8 @@ module LibItsGeoNetworking_Functions {
             
             // Get positions
             v_longPosVectorIut := f_getIutLongPosVector();
+	    log("=== ELNRNAG v_longPosVectorIut:");
+	    log(v_longPosVectorIut);
             v_longPosVectorNodeA := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeA, c_latitudeFactorNodeA);
             v_longPosVectorNodeB := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeB, c_latitudeFactorNodeB);
             v_longPosVectorNodeC := f_computePosition(v_longPosVectorIut, c_longitudeFactorNodeC, c_latitudeFactorNodeC);

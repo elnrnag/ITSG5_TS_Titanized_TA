@@ -40,7 +40,7 @@ module LibItsGeoNetworking_Pixits {
                 typeOfAddress := e_manual,
                 stationType := e_passengerCar,
                 stationCountryCode := c_uInt10Zero,
-                mid := int2oct(11,6)//'001D096BD3C8'O//int2oct(11,6)
+                mid := int2oct(11,6)
             };
             
             /**
