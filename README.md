@@ -13,8 +13,8 @@ Clone this repo to your computer to any folder (this will be referred from now o
 ```
 $ cd <installation_dir>
 $ mkdir build
+$ cd build
 $ ../src/install.script
-$ cd <installation_dir>/build
 $ make
 ```
 
