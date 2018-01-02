@@ -86,7 +86,7 @@ namespace LibItsCommon__Functions {
     double ref_lon = p__refLongitude*M_PI/180.0;
 
     p__latitude = asin(sin(ref_lat)*cos(distance) + cos(ref_lat)*sin(distance)*cos(angle))*180/M_PI;
-    p__longitude = p__refLongitude + atan2(sin(angle)*sin(distance)*cos(ref_lat), cos(distance) - sin(ref_lat)*sin(p__latitude))*180/M_PI;
+    p__longitude = p__refLongitude + atan2(sin(angle)*sin(distance)*cos(ref_lat), cos(distance) - sin(ref_lat)*sin((double)p__latitude))*180/M_PI;
   }
         
   /**
