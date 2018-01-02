@@ -50,7 +50,7 @@ AR = ar
 ARFLAGS = 
 
 # Flags for the TTCN-3 and ASN.1 compiler:
-COMPILER_FLAGS = -L -w -M
+COMPILER_FLAGS = -L -w -M -e
 
 # Execution mode: (either ttcn3 or ttcn3-parallel)
 TTCN3_LIB = ttcn3-parallel
